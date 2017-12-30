@@ -130,13 +130,13 @@ bool AddrSpace::setProperty(const string& propertyName, const EmuValuesList& val
         return true;
 
     if (propertyName == "range" && values[1].isInt() && values[2].isInt()) {
-        addRange(values[1].asInt(), values[2].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())));
+        addRange(values[1].asInt(), values[2].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())), values[3].asInt());
         return true;
     } else if (propertyName == "readRange" && values[1].isInt() && values[2].isInt()) {
-        addReadRange(values[1].asInt(), values[2].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())));
+        addReadRange(values[1].asInt(), values[2].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())), values[3].asInt());
         return true;
     } else if (propertyName == "writeRange" && values[1].isInt() && values[2].isInt()) {
-        addWriteRange(values[1].asInt(), values[2].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())));
+        addWriteRange(values[1].asInt(), values[2].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())), values[3].asInt());
         return true;
     } else if (propertyName == "poke" && values[0].isInt() && values[1].isInt()) {
         writeByte(values[0].asInt(), values[1].asInt());

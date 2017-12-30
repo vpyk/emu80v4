@@ -57,7 +57,7 @@ void RkRomDisk::setPortC(uint8_t value)
 }
 
 
-bool RkRomDisk::setProperty(const string& propertyName, const EmuValuesList& values)
+/*bool RkRomDisk::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
@@ -67,4 +67,4 @@ bool RkRomDisk::setProperty(const string& propertyName, const EmuValuesList& val
         return true;
     }
     return false;
-}
+}*/

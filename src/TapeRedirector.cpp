@@ -17,15 +17,18 @@
  */
 
 #include "Pal.h"
-#include "TapeRedirector.h"
 
 #include "Emulation.h"
+#include "PlatformCore.h"
+#include "WavReader.h"
+
+#include "TapeRedirector.h"
 
 using namespace std;
 
 TapeRedirector::TapeRedirector()
 {
-    m_filter = "Все файлы (*.*)|*";
+    m_filter = "All Files (*.*)|*";
 }
 
 
@@ -55,21 +58,35 @@ void TapeRedirector::openFile()
         closeFile();
 
     if (m_permanentFileName == "") {
-        m_fileName = palOpenFileDialog("Open rk file", m_filter, m_rwMode == "w");
+        m_fileName = palOpenFileDialog("Open rk file", m_filter + "|Wav Files (*.wav)|*.wav;*.WAV", m_rwMode == "w");
         g_emulation->restoreFocus();
     }
     else
         m_fileName = m_permanentFileName;
+
+    string ext;
+    if (m_fileName.size() >= 4)
+        ext = m_fileName.substr(m_fileName.size() - 4, 4);
+    if (ext == ".wav" || ext == ".WAV") {
+        m_cancelled = true;
+        if (m_rwMode == "r")
+            g_emulation->getWavReader()->loadFile(m_fileName);
+        else if (m_rwMode == "w") {
+            m_wavWriter = new WavWriter(m_platform, m_fileName);
+        }
+        return;
+    }
 
     if (m_fileName == "") {
         m_cancelled = true;
         return;
     }
 
-    m_file.open(m_fileName.c_str(), m_rwMode);
+    m_file.open(m_fileName, m_rwMode);
     m_isOpen = m_file.isOpen();
 
     m_cancelled = !m_isOpen;
+    m_read = false;
 }
 
 
@@ -80,6 +97,12 @@ void TapeRedirector::closeFile()
         m_isOpen = false;
     }
     m_cancelled = false;
+    m_read = false;
+
+    if (m_wavWriter) {
+        delete m_wavWriter;
+        m_wavWriter = nullptr;
+    }
 }
 
 
@@ -95,6 +118,7 @@ uint8_t TapeRedirector::readByte()
     if (isEof()) {
         closeFile();
         m_cancelled = true;
+        m_read = true;
     }
 
     return buf;
@@ -215,4 +239,10 @@ bool TapeRedirector::setProperty(const string& propertyName, const EmuValuesList
         }
 
     return false;
+}
+
+
+bool TapeRedirector::isCancelled()
+{
+    return m_cancelled && !m_read;
 }

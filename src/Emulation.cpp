@@ -342,12 +342,10 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
             m_isPaused = !m_isPaused;
             break;
         case SR_SPEEDUP:
-            m_speedUpFactor = 4;
-            m_mixer->setFrequency(m_frequency * m_speedUpFactor);
+            setSpeedUpFactor(4);
             break;
         case SR_SPEEDNORMAL:
-            m_speedUpFactor = 1;
-            m_mixer->setFrequency(m_frequency);
+            setSpeedUpFactor(1);
             break;
         case SR_LOADWAV:
             if (m_wavReader) {
@@ -429,6 +427,13 @@ void Emulation::dropFile(EmuWindow* wnd, const string& fileName)
     Platform* platform = platformByWindow(wnd);
     if (platform)
         platform->loadFile(fileName);
+}
+
+
+void Emulation::setSpeedUpFactor(unsigned speed)
+{
+    m_speedUpFactor = speed;
+    m_mixer->setFrequency(m_frequency * m_speedUpFactor);
 }
 
 

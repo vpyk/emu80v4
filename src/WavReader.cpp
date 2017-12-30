@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include "Pal.h"
 #include "WavReader.h"
 #include "Emulation.h"
@@ -38,6 +40,7 @@ bool WavReader::chooseAndLoadFile()
 {
     if (m_isOpen) {
         m_file.close();
+        g_emulation->setSpeedUpFactor(1);
         m_isOpen = false;
         return false;
     }
@@ -133,7 +136,7 @@ bool WavReader::loadFile(const std::string& fileName)
         signature = m_file.read32();
         dataSize = m_file.read32();
         len -= 8;
-            if (len < dataSize || dataSize < 8) {
+            if (len < dataSize) {
                 emuLog << "Invalid WAV file format: " << fileName << "\n";
                 m_file.close();
                 return false;
@@ -152,8 +155,9 @@ bool WavReader::loadFile(const std::string& fileName)
     m_curSample = 0;
     m_isOpen = true;
 
-    return true;
+    g_emulation->setSpeedUpFactor(m_speedUpFactor);
 
+    return true;
 }
 
 
@@ -220,6 +224,7 @@ bool WavReader::getCurValue()
     else {
         m_isOpen = false;
         m_file.close();
+        g_emulation->setSpeedUpFactor(1);
         return false;
     }
 }
@@ -242,6 +247,13 @@ bool WavReader::setProperty(const std::string& propertyName, const EmuValuesList
             return true;
         } else
             return false;
+    } else if (propertyName == "speedUpFactor") {
+        m_speedUpFactor = values[0].asInt();
+        if (m_speedUpFactor == 0)
+            m_speedUpFactor = 1;
+        if (m_isOpen)
+            g_emulation->setSpeedUpFactor(m_speedUpFactor);
+        return true;
     }
     return false;
 }
@@ -269,6 +281,11 @@ string WavReader::getPropertyStringValue(const string& propertyName)
             default:
                 break;
         }
+    else if (propertyName == "speedUpFactor") {
+        stringstream stringStream;
+        stringStream << m_speedUpFactor;
+        stringStream >> res;
+    }
     return res;
 }
 

@@ -62,6 +62,7 @@ class WavReader : public EmuObject
         bool m_curValue;
 
         WavChannel m_channel = WC_LEFT;
+        unsigned m_speedUpFactor = 1;
 
         WavSoundSource* m_wavSource;
 

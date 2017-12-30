@@ -322,7 +322,7 @@ uint8_t SpecPpi8255Circuit::getPortA()
 
 uint8_t SpecPpi8255Circuit::getPortB()
 {
-    return (m_kbd->getVMatrixData() << 2) | (m_kbd->getShift() ? 0 : 2) | (g_emulation->getWavReader()->getCurValue() ? 0x01 : 0x00);
+    return (m_kbd->getVMatrixData() << 2) | (m_kbd->getShift() ? 0 : 2) | (g_emulation->getWavReader()->getCurValue() ? 0x00 : 0x01);
 }
 
 
@@ -363,6 +363,7 @@ void SpecPpi8255Circuit::setPortC(uint8_t value)
     m_kbdMask |= (value & 0xf) << 8;;
     m_kbd->setVMatrixMask(m_kbdMask);
     m_tapeSoundSource->setValue(((value & 0x20) >> 5) + ((value & 0x80) >> 7));
+    m_platform->getCore()->tapeOut(value & 0x80);
     if (m_videoRam)
         m_videoRam->setCurColor(value & 0xD0);
 }
@@ -561,7 +562,7 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
     if (!buf)
         return false;
 
-    if (fileSize < 8) {
+    if (fileSize < 7) {
         delete[] buf;
         return false;
     }
@@ -573,6 +574,22 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
         fileSize--;
     }
 
+    if (ptr[0] == 0xD9 && ptr[1] == 0xD9 && ptr[2] == 0xD9) {
+        // Named file
+        ptr += 3;
+        fileSize -= 3;
+        while ((*ptr) != 0xE6 && fileSize > 0) {
+            ++ptr;
+            --fileSize;
+        }
+        ++ptr;
+        --fileSize;
+        if (fileSize < 7) {
+            delete[] buf;
+            return false;
+        }
+    }
+
     uint16_t begAddr = (ptr[1] << 8) | ptr[0];
     uint16_t endAddr = (ptr[3] << 8) | ptr[2];
     ptr += 4;
@@ -580,7 +597,7 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
 
     uint16_t progLen = endAddr - begAddr + 1;
 
-    if (begAddr == 0xE6E6 || begAddr == 0xD3D3 || fileSize < progLen + 2) {
+    if (begAddr == 0xE6E6 || begAddr == 0xD3D3 || fileSize < progLen/* + 2*/) {
         // Basic or EDM File
         delete[] buf;
         return false;
@@ -588,6 +605,9 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
 
     for (uint16_t addr = begAddr; addr <= endAddr; addr++)
         m_as->writeByte(addr, *ptr++);
+
+    if (fileSize < progLen + 2)
+        emuLog << "Warning: no checksum in file " << fileName << "\n";
 
     if (run) {
         m_platform->reset();

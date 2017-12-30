@@ -62,6 +62,9 @@
 #include "FdImage.h"
 #include "Fdc1793.h"
 #include "EmuConfig.h"
+#include "GenericModules.h"
+//#include "RkSdController.h"
+
 
 using namespace std;
 
@@ -168,7 +171,7 @@ void ConfigReader::fillValuesList(string s, EmuValuesList* values)
             string var = token.substr(1);
             auto it = m_varMap.find(var);
             if (it != m_varMap.end())
-                s = it->second + " " + s;
+                s = it->second + s;
             else {
                 s = "";
                 logPrefix();
@@ -556,6 +559,8 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new CloseFileHook(parameters[0].asInt());
     else if (typeName == "RkRomDisk")
         obj = new RkRomDisk(parameters[0].asString());
+    //else if (typeName == "RkSdController")
+    //    obj = new RkSdController(parameters[0].asString());
     else if (typeName == "ApogeyRomDisk")
         obj = new ApogeyRomDisk(parameters[0].asString());
     else if (typeName == "Ut88MemPageSelector")
@@ -564,6 +569,14 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new Ut88AddrSpaceMapper();
     else if (typeName == "Ut88MemPageSelector")
         obj = new Ut88MemPageSelector();
+    else if (typeName == "PeriodicInt8080")
+        obj = new PeriodicInt8080(static_cast<Cpu8080Compatible*>(g_emulation->findObject(parameters[0].asString())), parameters[1].asInt(), parameters[2].asInt());
+    else if (typeName == "PageSelector")
+        obj = new PageSelector();
+    else if (typeName == "Splitter")
+        obj = new Splitter();
+    else if (typeName == "Translator")
+        obj = new Translator(static_cast<AddressableDevice*>(g_emulation->findObject(parameters[0].asString())));
     else if (typeName == "ConfigTab")
         obj = new EmuConfigTab(parameters[0].asString());
     else if (typeName == "ConfigRadioSelector")

@@ -18,6 +18,7 @@
 
 #include "Mikrosha.h"
 #include "Emulation.h"
+#include "Platform.h"
 #include "EmuWindow.h"
 #include "Crt8275Renderer.h"
 #include "Ppi8255Circuit.h"
@@ -116,6 +117,7 @@ void MikroshaPpi8255Circuit::attachPit(Pit8253* pit)
 void MikroshaPpi8255Circuit::setPortC(uint8_t value)
 {
     m_tapeSoundSource->setValue(value & 1);
+    m_platform->getCore()->tapeOut(value & 1);
     m_pit->getCounter(2)->setGate(value & 4);
     m_pitSoundSource->setGate(value & 2);
 }

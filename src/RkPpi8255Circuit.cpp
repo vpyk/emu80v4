@@ -20,6 +20,8 @@
 // Реализация класса обвязки основного КР580ВВ55 на РК86 и Апогее
 
 #include "Emulation.h"
+#include "Platform.h"
+#include "PlatformCore.h"
 #include "SoundMixer.h"
 #include "RkKeyboard.h"
 #include "Ppi8255Circuit.h"
@@ -60,7 +62,7 @@ uint8_t RkPpi8255Circuit::getPortB()
 
 uint8_t RkPpi8255Circuit::getPortC()
 {
-    return (m_kbd->getCtrlKeys() & 0xE0) | (g_emulation->getWavReader()->getCurValue() ? 0x10 : 0x00) | 0x0F;
+    return (m_kbd->getCtrlKeys() & 0xEF) | (g_emulation->getWavReader()->getCurValue() ? 0x10 : 0x00);
 }
 
 
@@ -82,6 +84,7 @@ void RkPpi8255Circuit::setPortB(uint8_t value)
 void RkPpi8255Circuit::setPortC(uint8_t value)
 {
     m_tapeSoundSource->setValue(value & 1);
+    m_platform->getCore()->tapeOut(value & 1);
 }
 
 

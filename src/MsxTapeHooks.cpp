@@ -31,6 +31,15 @@ bool MsxTapeOutHook::hookProc()
     if (!m_isEnabled)
         return false;
 
+    if (m_file->isCancelled())
+        return false;
+
+    if (!m_file->isOpen())
+        m_file->openFile();
+
+    if (m_file->isCancelled())
+        return false;
+
     Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_cpu);
     uint8_t outByte;
     if (m_regC)
@@ -67,6 +76,15 @@ bool MsxTapeOutHeaderHook::hookProc()
     if (!m_isEnabled)
         return false;
 
+    if (m_file->isCancelled())
+        return false;
+
+    if (!m_file->isOpen())
+        m_file->openFile();
+
+    if (m_file->isCancelled())
+        return false;
+
     unsigned padding = 8 - m_file->getPos() % 8;
     padding %= 8;
 
@@ -93,6 +111,9 @@ bool MsxTapeInHook::hookProc()
     if (!m_isEnabled)
         return false;
 
+    if (m_file->isCancelled())
+        return false;
+
     uint8_t inByte = 0;
 
     Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_cpu);
@@ -107,6 +128,9 @@ bool MsxTapeInHook::hookProc()
 
     if (m_file)
         inByte = m_ignoreHeaders ? m_file->readByteSkipSeq(headerSeq, 8) : m_file->readByte();
+
+    if (m_file->isCancelled())
+        return false;
 
     cpu->setAF((af & 0xFF) | (inByte << 8));
 

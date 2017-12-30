@@ -21,6 +21,8 @@
 
 #include "Mikro80.h"
 #include "Emulation.h"
+#include "Platform.h"
+#include "PlatformCore.h"
 #include "EmuWindow.h"
 #include "Memory.h"
 #include "SoundMixer.h"
@@ -156,6 +158,7 @@ Mikro80TapeRegister::~Mikro80TapeRegister()
 void Mikro80TapeRegister::writeByte(int nAddr, uint8_t value)
 {
     m_tapeSoundSource->setValue(value & 1);
+    m_platform->getCore()->tapeOut(value & 1);
 }
 
 

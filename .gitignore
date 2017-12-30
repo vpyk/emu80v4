@@ -1,0 +1,7 @@
+/obj
+/bin
+/src/*.layout
+/src/*.depend
+*.o
+/Emu80
+/Emu80lite

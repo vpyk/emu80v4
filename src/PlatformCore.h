@@ -44,13 +44,17 @@ class PlatformCore : public EmuObject
         virtual void hrtc(bool isActive, int lc) {};
         virtual void vrtc(bool isActive) {};
         virtual void inte(bool isActive) {};
-        virtual void tapeOut(bool isActive) {};
-        virtual void pitOut(int value) {};
+        virtual void tapeOut(bool isActive) {m_tapeOut = isActive;};
+
+        virtual bool getTapeOut() {return m_tapeOut;};
 
         virtual void draw() {};
 
     protected:
         EmuWindow* m_window = nullptr;
+
+    private:
+        bool m_tapeOut;
 };
 
 

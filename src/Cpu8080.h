@@ -77,7 +77,6 @@ class Cpu8080 : public Cpu8080Compatible
 {
     public:
         Cpu8080();
-        virtual ~Cpu8080() {};
 
         virtual CpuType getType()  override {return Cpu::CPU_8080;};
 

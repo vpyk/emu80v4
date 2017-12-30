@@ -37,7 +37,7 @@ class Cpu : public ActiveDevice
         };
 
         Cpu();
-        virtual ~Cpu() {};
+        virtual ~Cpu();
 
         virtual CpuType getType() = 0;
 
@@ -69,6 +69,9 @@ class Cpu : public ActiveDevice
         int m_nHooks = 0;
 
         bool m_stepReq = false;
+
+        bool m_debugOnHalt = false;
+        bool m_debugOnIllegalCmd = false;
 };
 
 

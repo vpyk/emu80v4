@@ -333,6 +333,7 @@ uint8_t PartnerPpi8255Circuit::getPortC()
 void PartnerPpi8255Circuit::setPortC(uint8_t value)
 {
     m_tapeSoundSource->setValue(value & 1);
+    m_core->tapeOut(value & 1);
 
     m_core->setBeepGate(value & 2);
     return;

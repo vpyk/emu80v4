@@ -29,7 +29,7 @@ class RkRomDisk : public Ppi8255Circuit
         RkRomDisk(std::string romDiskName);
         virtual ~RkRomDisk();
 
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         uint8_t getPortA() override;
         uint8_t getPortB() override {return 0xff;};

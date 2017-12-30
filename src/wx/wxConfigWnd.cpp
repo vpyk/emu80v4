@@ -111,7 +111,8 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-Enter\t– полноэкранный режим\n"
         "End\t– ускоренная работа при нажатой клавише (4x)\n"
         "Pause, Alt-P\t– пауза/возобновление\n"
-        "Alt-F1\t– эта подсказка\n"
+        "Alt-F1\t– эта подсказка\n\n"
+        "Вместо клавиши Alt может быть использована Meta (Win)"
         ;
 	wxStaticText* helpText = new wxStaticText(m_helpPanel, wxID_ANY, helpString);
     //wxFont font = helpText->GetFont();

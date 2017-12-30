@@ -32,6 +32,12 @@ Cpu::Cpu()
 }
 
 
+Cpu::~Cpu()
+{
+    for (auto it = m_hookVector.begin(); it != m_hookVector.end(); it++)
+        (*it)->setCpu(nullptr);
+}
+
 
 void Cpu::attachAddrSpace(AddressableDevice* as)
 {
@@ -88,6 +94,16 @@ bool Cpu::setProperty(const string& propertyName, const EmuValuesList& values)
     } else if (propertyName == "startAddr" && values[0].isInt()) {
         setStartAddr(values[0].asInt());
         return true;
+    } else if (propertyName == "debugOnHalt") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_debugOnHalt = values[0].asString() == "yes";
+            return true;
+        }
+    } else if (propertyName == "debugOnIllegalCmd") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_debugOnIllegalCmd = values[0].asString() == "yes";
+            return true;
+        }
     }
 
     return false;

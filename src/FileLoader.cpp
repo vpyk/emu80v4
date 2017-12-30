@@ -43,7 +43,7 @@ bool FileLoader::chooseAndLoadFile(bool run)
     if (fileName == "")
         return true;
     if (!loadFile(fileName, run)) {
-        emuLog << "Error loading file: " << fileName;
+        emuLog << "Error loading file: " << fileName << "\n";
         return false;
     }
     return true;
@@ -76,7 +76,7 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
     if (!buf)
         return false;
 
-    if (fileSize < 8) {
+    if (fileSize < 9) {
         delete[] buf;
         return false;
     }

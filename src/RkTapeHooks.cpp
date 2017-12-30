@@ -28,6 +28,17 @@ bool RkTapeOutHook::hookProc()
     if (!m_isEnabled)
         return false;
 
+    if (m_file->isCancelled())
+        return false;
+
+    if (!m_file->isOpen()) {
+        m_file->openFile();
+        m_isSbFound = false;
+    }
+
+    if (m_file->isCancelled())
+        return false;
+
     Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_cpu);
 
     uint8_t outByte;
@@ -36,16 +47,11 @@ bool RkTapeOutHook::hookProc()
     else
         outByte = cpu->getBC() & 0xFF;
 
-    if (m_isSbFound && !m_file->isOpen())
-        m_isSbFound = false;
-
     if (m_isSbFound)
         m_file->writeByte(outByte);
 
-    if (outByte == 0xE6 && !m_file->isOpen()) {
-        m_file->openFile();
+    if (outByte == 0xE6)
         m_isSbFound = true;
-    }
 
     static_cast<Cpu8080Compatible*>(m_cpu)->ret();
 
@@ -56,6 +62,9 @@ bool RkTapeOutHook::hookProc()
 bool RkTapeInHook::hookProc()
 {
     if (!m_isEnabled)
+        return false;
+
+    if (m_file->isCancelled())
         return false;
 
     uint8_t inByte = 0;
@@ -74,6 +83,9 @@ bool RkTapeInHook::hookProc()
 
         inByte = m_file->readByte();
     }
+
+    if (m_file->isCancelled())
+        return false;
 
     cpu->setAF((af & 0xFF) | (inByte << 8));
 

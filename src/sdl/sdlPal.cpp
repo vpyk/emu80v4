@@ -453,7 +453,7 @@ static bool palProcessEvents()
                             (*pfnSysReqCallBackFunc)(event.key.windowID, sr);
                     } else
                         (*pfnKbdCallBackFunc)(event.key.windowID, key, event.type == SDL_KEYDOWN);*/
-                    SysReq sr = TranslateKeyToSysReq(key, event.type == SDL_KEYDOWN, SDL_GetModState() &  KMOD_ALT);
+                    SysReq sr = TranslateKeyToSysReq(key, event.type == SDL_KEYDOWN, SDL_GetModState() & (KMOD_ALT | KMOD_GUI));
                     if (sr)
                         (*pfnSysReqCallBackFunc)(PalWindow::windowById(event.key.windowID), sr);
                     else

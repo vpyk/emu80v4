@@ -121,6 +121,8 @@
 		<Unit filename="Fdc1793.h" />
 		<Unit filename="FileLoader.cpp" />
 		<Unit filename="FileLoader.h" />
+		<Unit filename="GenericModules.cpp" />
+		<Unit filename="GenericModules.h" />
 		<Unit filename="Globals.h" />
 		<Unit filename="KbdLayout.cpp" />
 		<Unit filename="KbdLayout.h" />
@@ -138,6 +140,7 @@
 		<Unit filename="Orion.h" />
 		<Unit filename="Pal.cpp" />
 		<Unit filename="Pal.h" />
+		<Unit filename="PalFile.h" />
 		<Unit filename="PalKeys.h" />
 		<Unit filename="PalWindow.h" />
 		<Unit filename="Parameters.cpp" />
@@ -179,6 +182,8 @@
 		<Unit filename="Ut88.h" />
 		<Unit filename="WavReader.cpp" />
 		<Unit filename="WavReader.h" />
+		<Unit filename="WavWriter.cpp" />
+		<Unit filename="WavWriter.h" />
 		<Unit filename="lite/litePal.cpp">
 			<Option target="Lite-Debug" />
 			<Option target="Lite-Release" />

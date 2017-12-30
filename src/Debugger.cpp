@@ -795,6 +795,8 @@ void DebugWindow::drawHintBar()
     switch (m_mode) {
         case AM_CODE:
             s = "C/D/R/B,Tab,Esc-Section A-Addr F4-Here F5-B/p F7-Step F8-Over F9-Run";
+            if (!m_compactMode)
+                s += " U-Skip";
             if (!m_z80Mode) {
                 s += " Z-Mnemo";
                 if (!m_compactMode)
@@ -863,7 +865,8 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                         m_mode = AM_CODE;
                     break;
                 case PK_M:
-                    setLayout(!m_compactMode);
+                    if (!m_z80Mode)
+                        setLayout(!m_compactMode);
                     break;
                 default:
                     switch (m_mode) {
@@ -952,6 +955,16 @@ void DebugWindow::over()
         hide();
     } else
         step();
+}
+
+
+void DebugWindow::skip()
+{
+    unsigned pc = m_states[m_stateNum].pc;
+    unsigned len = getInstructionLength(pc);
+    m_cpu->setPC(pc + len);
+    m_isRunning = true;
+    startDebug();
 }
 
 
@@ -1330,6 +1343,9 @@ void DebugWindow::codeKbdProc(PalKeyCode keyCode)
             break;
         case PK_F9:
             run();
+            break;
+        case PK_U:
+            skip();
             break;
         case PK_A:
             inputStart(m_mode, m_curLayout->code.left + 3, 1 + m_codeHighlightedLine, 4, true, m_codeLayout[m_codeHighlightedLine]);

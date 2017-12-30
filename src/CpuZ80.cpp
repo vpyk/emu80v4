@@ -1304,8 +1304,10 @@ unsigned CpuZ80::simz80()
         PutBYTE(HL, lreg(HL));
         break;
     case 0x76:          /* HALT */
-        //return PC&0xffff;
         PC--;
+        if (m_debugOnHalt)
+            g_emulation->debugRequest(this);
+        //return PC&0xffff;
         break; //!!!
     case 0x77:          /* LD (HL),A */
         PutBYTE(HL, hreg(AF));

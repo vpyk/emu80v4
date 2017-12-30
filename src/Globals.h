@@ -27,7 +27,7 @@
     #define TARGET " lite"
 #endif
 
-#define VERSION "4.0.271" TARGET
+#define VERSION "4.0.277" TARGET
 
 class Emulation;
 extern Emulation* g_emulation;

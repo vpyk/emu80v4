@@ -285,7 +285,6 @@ int Cpu8080::i8080_execute(int opcode) {
     m_statusWord = 0x82;
 
     switch (opcode) {
-        case 0x00:            /* nop */
         // Undocumented NOP.
         case 0x08:            /* nop */
         case 0x10:            /* nop */
@@ -294,6 +293,12 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0x28:            /* nop */
         case 0x30:            /* nop */
         case 0x38:            /* nop */
+            if (m_debugOnIllegalCmd) {
+                PC--;
+                g_emulation->debugRequest(this);
+                break;
+            }
+        case 0x00:            /* nop */
             cpu_cycles = 4;
             break;
 
@@ -873,6 +878,8 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0x76:            /* hlt */
             cpu_cycles = 4;
             PC--;
+            if (m_debugOnHalt)
+                g_emulation->debugRequest(this);
             break;
 
         case 0x77:            /* mov m, a */
@@ -1270,8 +1277,13 @@ int Cpu8080::i8080_execute(int opcode) {
             }
             break;
 
-        case 0xC3:            /* jmp addr */
         case 0xCB:            /* jmp addr, undocumented */
+            if (m_debugOnIllegalCmd) {
+                PC--;
+                g_emulation->debugRequest(this);
+                break;
+            }
+        case 0xC3:            /* jmp addr */
             cpu_cycles = 10;
             PC = RD_WORD(PC);
             break;
@@ -1310,8 +1322,13 @@ int Cpu8080::i8080_execute(int opcode) {
             }
             break;
 
-        case 0xC9:            /* ret */
         case 0xD9:            /* ret, undocumented */
+            if (m_debugOnIllegalCmd) {
+                PC--;
+                g_emulation->debugRequest(this);
+                break;
+            }
+        case 0xC9:            /* ret */
             cpu_cycles = 10;
             POP(PC);
             break;
@@ -1335,10 +1352,15 @@ int Cpu8080::i8080_execute(int opcode) {
             }
             break;
 
-        case 0xCD:            /* call addr */
         case 0xDD:            /* call, undocumented */
         case 0xED:
         case 0xFD:
+            if (m_debugOnIllegalCmd) {
+                PC--;
+                g_emulation->debugRequest(this);
+                break;
+            }
+        case 0xCD:            /* call addr */
             cpu_cycles = 17;
             CALL;
             break;
@@ -1685,12 +1707,12 @@ Cpu8080::Cpu8080() {
 
 void Cpu8080::operate() {
     bool retFlag = false;
-    // ìîæíî ñäåëàòü óïîðÿäî÷åííûé ñïèñîê, ÷òîáû íå ïåðåáèðàòü âñå
+    // можно сделать упорядоченный список, чтобы не перебирать все
     for (int i = 0; i < m_nHooks; i++) {
         if (PC == m_hookAddresses[i]) {
             if (m_hookVector[i]->hookProc())
                 retFlag = true;
-                //return; // ïîìåíÿòü, åñëè íåîáõîäèìî íåñêîëüêî ëîâóøåê íà îäèí àäðåñ
+                //return; // поменять, если необходимо несколько ловушек на один адрес
         }
     }
 
@@ -1719,7 +1741,7 @@ void Cpu8080::intRst(int vect) {
         if (RD_BYTE(PC) == 0x76)
             PC++;
         RST(vect * 8);
-        m_curClock += m_kDiv * 11; // óòî÷íèòü!
+        m_curClock += m_kDiv * 11; // уточнить!
     }
 }
 

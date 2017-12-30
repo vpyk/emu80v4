@@ -22,6 +22,7 @@
 #include "PalFile.h"
 
 #include "EmuObjects.h"
+#include "WavWriter.h"
 
 
 // Файловый редиректор. Обеспечивает перенаправление ф файл или из файла различных обращений эмулируемой платформы
@@ -46,6 +47,7 @@ class TapeRedirector : public EmuObject
         int getPos();
         bool isEof();
         bool isOpen();
+        bool isCancelled();
 
     private:
         std::string m_fileName;
@@ -56,6 +58,9 @@ class TapeRedirector : public EmuObject
         PalFile m_file;
         bool m_isOpen = false;
         bool m_cancelled = false;
+        bool m_read = false;
+
+        WavWriter* m_wavWriter = nullptr;
 };
 
 

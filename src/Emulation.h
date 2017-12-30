@@ -84,6 +84,7 @@ class Emulation : public ParentObject
         int getSampleRate() {return m_sampleRate;};
         void setFrameRate(int frameRate);               // установка частоты кадров, 0 - vsync
         bool getVsync() {return m_frameRate == 0;};
+        void setSpeedUpFactor(unsigned speed);
 
         void processCmdLine();
 

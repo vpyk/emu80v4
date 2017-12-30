@@ -259,6 +259,7 @@ class DebugWindow : private EmuWindow
         // debugger operations
         void step();
         void over();
+        void skip();
         void here();
         void run();
         void breakpoint();
