@@ -45,6 +45,7 @@ class WavReader : public EmuObject
 
         bool loadFile(const std::string& fileName);
         bool chooseAndLoadFile();
+        bool isPlaying() {return m_isOpen;};
 
         bool getCurValue();
 

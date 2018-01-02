@@ -120,6 +120,8 @@ class Emulation : public ParentObject
 
         Platform* platformByWindow(EmuWindow* window);
 
+        void checkPlatforms();
+
         // параметры командной строки
         int m_argc;
         char** m_argv;

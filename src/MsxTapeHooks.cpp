@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Emulation.h"
+#include "WavReader.h"
 #include "MsxTapeHooks.h"
 #include "Cpu8080.h"
 #include "TapeRedirector.h"
@@ -29,6 +31,9 @@ static const uint8_t headerSeq[8] = {0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0
 bool MsxTapeOutHook::hookProc()
 {
     if (!m_isEnabled)
+        return false;
+
+    if (g_emulation->getWavReader()->isPlaying())
         return false;
 
     if (m_file->isCancelled())

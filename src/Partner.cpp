@@ -294,7 +294,7 @@ void PartnerModuleSelector::writeByte(int addr, uint8_t value)
     else if (~value & 8)
         moduleNum = 3;
     else
-        moduleNum = 5;  // non-existent mudule number
+        moduleNum = 5;  // non-existent module number
     m_romWinAddrSpaceMapper->setCurPage(moduleNum);
     m_ramWinAddrSpaceMapper->setCurPage(moduleNum);
     m_devWinAddrSpaceMapper->setCurPage(moduleNum);

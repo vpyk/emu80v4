@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Emulation.h"
+#include "WavReader.h"
 #include "RkTapeHooks.h"
 #include "Cpu8080.h"
 #include "TapeRedirector.h"
@@ -26,6 +28,9 @@ using namespace std;
 bool RkTapeOutHook::hookProc()
 {
     if (!m_isEnabled)
+        return false;
+
+    if (g_emulation->getWavReader()->isPlaying())
         return false;
 
     if (m_file->isCancelled())

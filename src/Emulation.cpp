@@ -70,7 +70,8 @@ Emulation::Emulation(int argc, char** argv)
         } else
             palRequestForQuit();
     }
-    //m_prevSysClock = palGetCounter() - palGetCounterFreq() / 60; // перенесено в mainLoop
+
+    checkPlatforms();
 }
 
 #include <typeinfo>
@@ -90,6 +91,21 @@ Emulation::~Emulation()
     for (auto it = tempList.begin(); it != tempList.end(); it++)
         if ((*it) != this)
             delete (*it);
+}
+
+
+void Emulation::checkPlatforms()
+{
+    // Delete platforms without windows (missing conf files)
+    // and request for quit if no platform left
+    for (auto it = m_platformList.begin(); it != m_platformList.end();)
+        if (!(*it)->getWindow())
+            m_platformList.erase(it++);
+        else
+            it++;
+
+    if (m_platformList.empty())
+        palRequestForQuit();
 }
 
 
@@ -335,6 +351,7 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
                     Platform* newPlatform = new Platform(pi.configFileName, pi.objName);
                     m_platformList.push_back(newPlatform);
                     //m_activePlatform = platform;
+                    checkPlatforms();
                 }
             }
             break;
