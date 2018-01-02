@@ -30,9 +30,6 @@ bool RkTapeOutHook::hookProc()
     if (!m_isEnabled)
         return false;
 
-    if (g_emulation->getWavReader()->isPlaying())
-        return false;
-
     if (m_file->isCancelled())
         return false;
 
@@ -67,6 +64,9 @@ bool RkTapeOutHook::hookProc()
 bool RkTapeInHook::hookProc()
 {
     if (!m_isEnabled)
+        return false;
+
+    if (g_emulation->getWavReader()->isPlaying())
         return false;
 
     if (m_file->isCancelled())
