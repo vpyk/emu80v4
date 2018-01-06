@@ -48,18 +48,9 @@ std::string palMakeFullFileName(std::string fileName);
 int palReadFromFile(const std::string& fileName, int first, int size, uint8_t* buffer, bool useBasePath = true);
 uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePath = true);
 
-//bool palProcessEvents(); //!!!
-
 void palRequestForQuit();
 
 void palPlaySample(int16_t sample);
 
-//void palUpdateScreen();
-
-void palRegisterEmulationCycleCallbackFunc(void (*func)());
-void palRegisterKbdCallbackFunc(void (*func)(PalWindow*, PalKeyCode, bool));
-void palRegisterSysReqCallbackFunc(void (*func)(PalWindow*, SysReq));
-void palRegisterFocusWndCallbackFunc(void (*func)(PalWindow*));
-void palRegisterDropFileCallbackFunc(void (*func)(PalWindow*, char*));
 
 #endif // SDLPAL_H

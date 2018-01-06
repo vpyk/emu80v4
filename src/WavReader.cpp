@@ -45,7 +45,7 @@ bool WavReader::chooseAndLoadFile()
         return false;
     }
 
-    string fileName = palOpenFileDialog("Open WAV file", "*.wav", false);
+    string fileName = palOpenFileDialog("Open WAV file", "Wav files|*.wav", false);
     g_emulation->restoreFocus();
     if (fileName == "")
         return true;

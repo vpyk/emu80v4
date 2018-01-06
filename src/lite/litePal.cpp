@@ -107,12 +107,6 @@ void palAddRadioSelectorToTab(int tabId, int column, std::string caption, std::s
 void palSetTabOptFileName(int tabId, string optFileName) {
 }
 
-void palRegisterSetPropValueCallbackFunc(bool (*func)(const std::string&, const std::string&, const std::string&)) {
-}
-
-void palRegisterGetPropertyStringValueFunc(std::string (*func)(const std::string&, const std::string&)) {
-}
-
 void palWxProcessMessages() {
 }
 

@@ -25,28 +25,6 @@
 
 using namespace std;
 
-static bool setSinglePropertyValue(const string& objName, const string& propName, const string& value)
-{
-    EmuObject* obj = g_emulation->findObject(objName);
-    if (!obj)
-        return false;
-    return obj->setProperty(propName, value);
-}
-
-
-static string getPropertyStringValue(const string& objName, const string& propName)
-{
-    EmuObject* obj = g_emulation->findObject(objName);
-    return obj->getPropertyStringValue(propName);
-}
-
-
-EmuConfig::EmuConfig()
-{
-    palRegisterSetPropValueCallbackFunc(::setSinglePropertyValue);
-    palRegisterGetPropertyStringValueFunc(::getPropertyStringValue);
-}
-
 
 void EmuConfig::addPlatform(string platformName, string configFileName, string objName, string cmdLineOption)
 {

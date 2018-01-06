@@ -50,9 +50,6 @@ class ConfigWnd: public wxDialog
         void updateConfig();
         void setOptFileName(int tabId, wxString optFileName);
 
-        void registerSetPropValueCallbackFunc(bool (*func)(const std::string&, const std::string&, const std::string&));
-        void registerGetPropertyStringValueFunc(std::string (*func)(const std::string&, const std::string&));
-
 	protected:
 
 		static const long ID_RADIOBOX1;

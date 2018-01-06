@@ -25,6 +25,7 @@
 
 #include "../Pal.h"
 #include "../PalKeys.h"
+#include "../EmuCalls.h"
 #include "../EmuTypes.h"
 #include "../Shortcuts.h"
 
@@ -33,12 +34,6 @@ using namespace std;
 #define BUF_NUM 3
 
 static string basePath;
-
-static void (*pfnEmulationCycleCallBackFunc)();
-static void (*pfnKbdCallBackFunc)(PalWindow*, PalKeyCode, bool);
-static void (*pfnSysReqCallBackFunc)(PalWindow*, SysReq);
-static void (*pfnFocusWndCallBackFunc)(PalWindow*);
-static void (*pfnDropFileCallBackFunc)(PalWindow*, char*);
 
 static SDL_AudioDeviceID audioDevId;
 
@@ -111,7 +106,7 @@ static bool palProcessEvents();
 void palExecute()
 {
     while (!palProcessEvents())
-        (*pfnEmulationCycleCallBackFunc)();
+        emuEmulationCycle();
 }
 
 
@@ -447,28 +442,22 @@ static bool palProcessEvents()
                     if (!SDL_GetWindowFromID(event.key.windowID))
                         break; // могут остаться события, относящиеся к уже уделенному окну
                     PalKeyCode key = TranslateScanCode(event.key.keysym.scancode);
-                    /*if (event.type == SDL_KEYDOWN && SDL_GetModState() &  KMOD_ALT) {
-                        SysReq sr = TranslateKeyToSysReq(key, true, true);
-                        if (sr)
-                            (*pfnSysReqCallBackFunc)(event.key.windowID, sr);
-                    } else
-                        (*pfnKbdCallBackFunc)(event.key.windowID, key, event.type == SDL_KEYDOWN);*/
                     SysReq sr = TranslateKeyToSysReq(key, event.type == SDL_KEYDOWN, SDL_GetModState() & (KMOD_ALT | KMOD_GUI));
                     if (sr)
-                        (*pfnSysReqCallBackFunc)(PalWindow::windowById(event.key.windowID), sr);
+                        emuSysReq(PalWindow::windowById(event.key.windowID), sr);
                     else
-                        (*pfnKbdCallBackFunc)(PalWindow::windowById(event.key.windowID), key, event.type == SDL_KEYDOWN);
+                        emuKeyboard(PalWindow::windowById(event.key.windowID), key, event.type == SDL_KEYDOWN);
                     break;
                 }
             case SDL_WINDOWEVENT:
                 if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && SDL_GetWindowFromID(event.window.windowID))
-                    (*pfnFocusWndCallBackFunc)(PalWindow::windowById(event.window.windowID));
+                    emuFocusWnd(PalWindow::windowById(event.window.windowID));
                 else if (event.window.event == SDL_WINDOWEVENT_CLOSE  && SDL_GetWindowFromID(event.window.windowID))
-                    (*pfnSysReqCallBackFunc)(PalWindow::windowById(event.window.windowID), SR_CLOSE);
+                    emuSysReq(PalWindow::windowById(event.window.windowID), SR_CLOSE);
                 break;
             case SDL_DROPFILE:
                 if (SDL_GetWindowFromID(event.drop.windowID))
-                    (*pfnDropFileCallBackFunc)(PalWindow::windowById(event.drop.windowID), event.drop.file);
+                    emuDropFile(PalWindow::windowById(event.drop.windowID), event.drop.file);
                 break;
         }
     }
@@ -482,38 +471,6 @@ void palRequestForQuit()
     SDL_Event ev;
     ev.type = SDL_QUIT;
     SDL_PushEvent(&ev);
-}
-
-
-void palRegisterEmulationCycleCallbackFunc(void (*func)())
-{
-    pfnEmulationCycleCallBackFunc = func;
-}
-
-
-void palRegisterKbdCallbackFunc(void (*func)(PalWindow*, PalKeyCode, bool))
-{
-    pfnKbdCallBackFunc = func;
-}
-
-
-
-void palRegisterSysReqCallbackFunc(void (*func)(PalWindow*, SysReq))
-{
-    pfnSysReqCallBackFunc = func;
-}
-
-
-
-void palRegisterFocusWndCallbackFunc(void (*func)(PalWindow*))
-{
-    pfnFocusWndCallBackFunc = func;
-}
-
-
-void palRegisterDropFileCallbackFunc(void (*func)(PalWindow*, char*))
-{
-    pfnDropFileCallBackFunc = func;
 }
 
 

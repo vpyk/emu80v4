@@ -1,6 +1,6 @@
 /*
  *  Emu80 v. 4.x
- *  Â© Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,20 +16,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+// Emulation core rouninues to be called from platform abstraction layer (PAL) header file
 
-#ifdef PAL_QT
-    #define TARGET " qt"
-#elif defined PAL_WX
-    #define TARGET ""
-#else
-    #define TARGET " lite"
-#endif
 
-#define VERSION "4.0.279" TARGET
+#ifndef EMUCALLS_H
+#define EMUCALLS_H
 
-class Emulation;
-extern Emulation* g_emulation;
+void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed);
+void emuSysReq(PalWindow* wnd, SysReq sr);
+void emuFocusWnd(PalWindow* wnd);
+void emuDropFile(PalWindow* wnd, char* fileName);
+void emuEmulationCycle();
+bool emuSetPropertyValue(const std::string& objName, const std::string& propName, const std::string& value);
+std::string emuGetPropertyValue(const std::string& objName, const std::string& propName);
 
-#endif // GLOBALS_H
+#endif // EMUCALLS_H

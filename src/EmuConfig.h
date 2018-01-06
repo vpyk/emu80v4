@@ -29,8 +29,6 @@
 class EmuConfig : public EmuObject
 {
     public:
-        EmuConfig();
-
         void addPlatform(std::string platformName, std::string configFileName, std::string objName, std::string cmdLineOption);
         void addExtention(std::string extention, std::string objName);
 

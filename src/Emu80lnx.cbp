@@ -106,6 +106,8 @@
 		<Unit filename="Debugger.h" />
 		<Unit filename="Dma8257.cpp" />
 		<Unit filename="Dma8257.h" />
+		<Unit filename="EmuCalls.cpp" />
+		<Unit filename="EmuCalls.h" />
 		<Unit filename="EmuConfig.cpp" />
 		<Unit filename="EmuConfig.h" />
 		<Unit filename="EmuObjects.cpp" />

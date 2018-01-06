@@ -53,18 +53,6 @@ void palWxQuit()
 }
 
 
-void palRegisterSetPropValueCallbackFunc(bool (*func)(const string& objName, const string& propName, const string& value))
-{
-    configWnd->registerSetPropValueCallbackFunc(func);
-}
-
-
-void palRegisterGetPropertyStringValueFunc(string (*func)(const string&, const string&))
-{
-    configWnd->registerGetPropertyStringValueFunc(func);
-}
-
-
 string palOpenFileDialog(string title, string filter, bool write)
 {
     //palPause();

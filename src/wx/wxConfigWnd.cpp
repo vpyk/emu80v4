@@ -17,7 +17,9 @@
  */
 
 #include "wxConfigWnd.h"
+#include "../Pal.h"
 #include "../EmuTypes.h"
+#include "../EmuCalls.h"
 
 #include <wx/intl.h>
 #include <wx/string.h>
@@ -265,17 +267,6 @@ void ConfigWnd::addRadioSelector(int tabId, int column, wxString caption, wxStri
 }
 
 
-void ConfigWnd::registerSetPropValueCallbackFunc(bool (*func)(const string&, const string&, const string&))
-{
-    m_pfnSetPropValueCallBackFunc = func;
-}
-
-
-void ConfigWnd::registerGetPropertyStringValueFunc(string (*func)(const string&, const string&))
-{
-    m_pfnGetPropValueCallBackFunc = func;
-}
-
 void ConfigWnd::updateConfig()
 {
     for (auto it = m_selectorList.begin(); it != m_selectorList.end(); it++)
@@ -361,8 +352,7 @@ void ConfigWndRadioSelector::applyChoice()
         object = m_object.utf8_str();
         property = m_property.utf8_str();
         value = m_values[m_selectedItem].utf8_str();
-        if (m_configWnd->m_pfnSetPropValueCallBackFunc)
-            (*(m_configWnd->m_pfnSetPropValueCallBackFunc))(object, property, value);
+        emuSetPropertyValue(object, property, value);
     }
 }
 
@@ -378,7 +368,7 @@ void ConfigWndRadioSelector::rereadChoice()
     string object, property, value;
     object = m_object.utf8_str();
     property = m_property.utf8_str();
-    string curValue = (*(m_configWnd->m_pfnGetPropValueCallBackFunc))(object, property);
+    string curValue = emuGetPropertyValue(object, property);
     value = wxString::FromUTF8(curValue.c_str());
 
     for (int i=0; i<m_nItems; i++) {

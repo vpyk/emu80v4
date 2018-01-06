@@ -40,9 +40,6 @@ void palRemoveTabFromConfigWindow(int tabId);
 void palAddRadioSelectorToTab(int tabId, int column, std::string caption, std::string object, std::string property, SelectItem* items, int nItems);
 void palSetTabOptFileName(int tabId, std::string optFileName);
 
-void palRegisterSetPropValueCallbackFunc(bool (*func)(const std::string&, const std::string&, const std::string&));
-void palRegisterGetPropertyStringValueFunc(std::string (*func)(const std::string&, const std::string&));
-
 void palWxProcessMessages();
 
 void palLog(std::string s);
