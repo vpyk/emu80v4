@@ -21,6 +21,7 @@
 #include "EmuWindow.h"
 #include "Emulation.h"
 #include "EmuConfig.h"
+#include "Platform.h"
 
 using namespace std;
 
@@ -45,6 +46,15 @@ EmuWindow::~EmuWindow()
 {
     if (m_interlacedImage)
         delete m_interlacedImage;
+}
+
+
+string EmuWindow::getPlatformObjectName()
+{
+    if (m_platform)
+        return m_platform->getName();
+    else
+        return "";
 }
 
 

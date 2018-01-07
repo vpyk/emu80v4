@@ -59,6 +59,7 @@ Emulation::Emulation(int argc, char** argv)
 
     ConfigReader cr("emu80.conf");
     cr.processConfigFile(this);
+    getConfig()->updateConfig();
 
     if (m_platformList.empty()) {
         PlatformInfo pi;
@@ -66,6 +67,7 @@ Emulation::Emulation(int argc, char** argv)
         if (m_config->choosePlatform(pi, "", newWnd, true)) {
             Platform* platform = new Platform(pi.configFileName, pi.objName);
             m_platformList.push_back(platform);
+            getConfig()->updateConfig();
             //m_activePlatform = platform;
         } else
             palRequestForQuit();

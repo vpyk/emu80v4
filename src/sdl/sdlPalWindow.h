@@ -52,6 +52,8 @@ class PalWindow
         void maximize();
         void focusChanged(bool isFocused);
 
+        virtual std::string getPlatformObjectName() = 0;
+
     protected:
         SDL_Window* m_window = nullptr;
         SDL_Renderer* m_renderer = nullptr;

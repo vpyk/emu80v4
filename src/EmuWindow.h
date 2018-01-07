@@ -87,6 +87,9 @@ class EmuWindow : public EmuObject, public PalWindow
 
         std::string getCaption();
 
+    protected:
+         std::string getPlatformObjectName() override;
+
     private:
         int m_defWindowWidth = 800;
         int m_defWindowHeight = 600;
