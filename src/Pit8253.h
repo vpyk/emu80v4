@@ -74,6 +74,8 @@ class Pit8253Counter : public EmuObject //PassiveDevice
         int m_tempSumOut = 0;
         int m_tempAddOutClocks = 0;
 
+        uint32_t m_prevFastClock = 0;
+
         int m_mode;
         bool m_gate;
         bool m_out;

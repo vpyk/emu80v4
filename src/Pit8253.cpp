@@ -124,25 +124,35 @@ void Pit8253Counter::operateForTicks(int ticks)
     }
 }
 
+
 void Pit8253Counter::updateState()
 {
+    int dt = g_emulation->getCurClock() - m_prevClock;
+
+    if (m_prevFastClock >= m_kDiv * 1024) {
+        m_prevFastClock -= m_kDiv * 1024;
+    } 
+
+    const uint32_t curFastClock = m_prevFastClock + dt;
+    int ticks = curFastClock / m_kDiv - m_prevFastClock / m_kDiv;
+
     uint64_t curClock = g_emulation->getCurClock();
-    int ticks = curClock / m_kDiv - m_prevClock / m_kDiv;
 
     if (m_out || !m_isCounting)
-        m_tempAddOutClocks -= (m_prevClock % m_kDiv);
+        m_tempAddOutClocks -= (m_prevFastClock % m_kDiv);
         //m_tempAddOutClocks += (m_kDiv - m_prevClock % m_kDiv) % m_kDiv;
 
     operateForTicks(ticks);
 
     if (m_out || !m_isCounting)
-        m_tempAddOutClocks += (curClock % m_kDiv);
+        m_tempAddOutClocks += curFastClock % m_kDiv;
 
 //    m_avgOut = 0;
 //    if (curClock != m_prevClock)
 //        m_avgOut = m_tempSumOut * 9 * 4096 / (curClock - m_prevClock + addClock);
 
     m_prevClock = curClock;
+    m_prevFastClock = curFastClock;
 }
 
 
@@ -150,9 +160,11 @@ int Pit8253Counter::getAvgOut()
 {
     uint64_t curClock = g_emulation->getCurClock();
     m_avgOut = 0;
-    if (curClock != m_sampleClock)
-        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * 4096 / (curClock - m_sampleClock);
+    if (curClock != m_sampleClock) {
+        uint32_t dt = curClock - m_sampleClock;
+        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * 4096 / dt;
         //m_avgOut = m_tempSumOut * 4096 / (curClock / 9 - m_sampleClock / 9);
+    }
     return m_avgOut;
 }
 
@@ -163,6 +175,7 @@ void Pit8253Counter::resetStats()
     m_tempSumOut = 0;
     m_tempAddOutClocks = 0;
     m_prevClock = g_emulation->getCurClock();
+    m_prevFastClock = 0;
     m_sampleClock = m_prevClock;
 }
 
