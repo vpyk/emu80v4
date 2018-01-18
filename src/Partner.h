@@ -60,7 +60,6 @@ class PartnerAddrSpace : public AddressableDevice
         uint8_t* m_buf = nullptr;
         AddressableDevice* m_memBlocks[9];
         int m_mapNum = 0;
-        PartnerAddrSpaceSelector* m_partnerAddrSpaceSelector;
 };
 
 
@@ -73,8 +72,8 @@ class PartnerAddrSpaceSelector : public AddressableDevice
 
         void attachPartnerAddrSpace(PartnerAddrSpace* partnerAddrSpace) {m_partnerAddrSpace = partnerAddrSpace;}
 
-        void writeByte(int addr, uint8_t value) override {m_partnerAddrSpace->m_mapNum = (value & 0xf0) >> 4;};
-        uint8_t readByte(int addr)  override {return 0xff;};
+        void writeByte(int, uint8_t value) override {m_partnerAddrSpace->m_mapNum = (value & 0xf0) >> 4;};
+        uint8_t readByte(int)  override {return 0xff;};
 
     private:
         PartnerAddrSpace* m_partnerAddrSpace = nullptr;
@@ -90,7 +89,7 @@ class PartnerModuleSelector : public AddressableDevice
         void attachAddrSpaceMappers(AddrSpaceMapper* romWinAddrSpaceMapper, AddrSpaceMapper* ramWinAddrSpaceMapper, AddrSpaceMapper* devWinAddrSpaceMapper);
 
         virtual void writeByte(int addr, uint8_t value);
-        virtual uint8_t readByte(int addr) {return 0xff;};
+        virtual uint8_t readByte(int) {return 0xff;};
 
     private:
         AddrSpaceMapper* m_romWinAddrSpaceMapper = nullptr;
@@ -104,7 +103,7 @@ class PartnerMcpgSelector : public AddressableDevice
     public:
         virtual void reset() {m_isMcpgEnabled = false;};
         virtual void writeByte(int addr, uint8_t value);
-        virtual uint8_t readByte(int addr) {return 0xff;};
+        virtual uint8_t readByte(int) {return 0xff;};
 
         bool getMcpgEnabled() {return m_isMcpgEnabled;};
 
@@ -229,7 +228,7 @@ class PartnerFddControlRegister : public AddressableDevice
         inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
 
         virtual void writeByte(int addr, uint8_t value);
-        virtual uint8_t readByte(int addr) {return 0xff;};
+        virtual uint8_t readByte(int) {return 0xff;};
 
     private:
         Fdc1793* m_fdc = nullptr;

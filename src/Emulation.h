@@ -117,8 +117,6 @@ class Emulation : public ParentObject
 
         Platform* m_lastActivePlatform = nullptr;
 
-        bool m_quitReq = false;
-
         Platform* platformByWindow(EmuWindow* window);
 
         void checkPlatforms();

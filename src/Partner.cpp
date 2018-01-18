@@ -282,7 +282,7 @@ void PartnerModuleSelector::attachAddrSpaceMappers(AddrSpaceMapper* romWinAddrSp
 }
 
 
-void PartnerModuleSelector::writeByte(int addr, uint8_t value)
+void PartnerModuleSelector::writeByte(int, uint8_t value)
 {
     int moduleNum;
     if (~value & 1)
@@ -318,7 +318,7 @@ bool PartnerModuleSelector::setProperty(const string& propertyName, const EmuVal
 }
 
 
-void PartnerMcpgSelector::writeByte(int addr, uint8_t value)
+void PartnerMcpgSelector::writeByte(int, uint8_t value)
 {
     m_isMcpgEnabled = !(value & 1);
 }
@@ -377,13 +377,13 @@ PartnerRenderer::PartnerRenderer()
 }
 
 
-uint32_t PartnerRenderer::getCurFgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t PartnerRenderer::getCurFgColor(bool, bool, bool)
 {
     return 0xC0C0C0;
 }
 
 
-uint32_t PartnerRenderer::getCurBgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t PartnerRenderer::getCurBgColor(bool, bool, bool)
 {
     return 0x000000;
 }
@@ -433,13 +433,13 @@ void PartnerMcpgRenderer::attachMcpgRam(Ram* mcpgRam)
 }
 
 
-uint32_t PartnerMcpgRenderer::getCurFgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t PartnerMcpgRenderer::getCurFgColor(bool, bool, bool)
 {
     return 0xFFFFFF;
 }
 
 
-uint32_t PartnerMcpgRenderer::getCurBgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t PartnerMcpgRenderer::getCurBgColor(bool, bool, bool)
 {
     return 0x000000;
 }
@@ -484,7 +484,7 @@ bool PartnerMcpgRenderer::setProperty(const string& propertyName, const EmuValue
 }
 
 
-void PartnerFddControlRegister::writeByte(int addr, uint8_t value)
+void PartnerFddControlRegister::writeByte(int, uint8_t value)
 {
     m_fdc->setDrive(value & 8 ? 1 : 0);
     m_fdc->setHead((value & 0x80) >> 7);

@@ -67,7 +67,7 @@ class AddressableDevice : public EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         virtual void writeByte(int addr, uint8_t value) = 0;
-        virtual uint8_t readByte(int addr) {return 0xFF;};
+        virtual uint8_t readByte(int) {return 0xFF;};
 
         void setAddrMask(int mask) {m_addrMask = mask;};
 

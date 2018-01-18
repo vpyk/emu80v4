@@ -41,7 +41,7 @@ class RkPpi8255Circuit : public Ppi8255Circuit
         uint8_t getPortB() override;
         uint8_t getPortC() override;
         void setPortA(uint8_t value) override;
-        void setPortB(uint8_t value) override;
+        void setPortB(uint8_t) override {};
         void setPortC(uint8_t value) override;
 
         // Подключение объекта - клавиатуры типа РК86

@@ -170,7 +170,7 @@ bool Ut88AddrSpaceMapper::setProperty(const string& propertyName, const EmuValue
 }
 
 
-void Ut88MemPageSelector::writeByte(int addr, uint8_t value)
+void Ut88MemPageSelector::writeByte(int, uint8_t value)
 {
     if ((value & 0x0f) == 0x0f)
         m_addrSpaceMapper->setCurPage(0);

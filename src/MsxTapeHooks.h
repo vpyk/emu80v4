@@ -68,9 +68,6 @@ class MsxTapeInHeaderHook : public CpuHook
         virtual ~MsxTapeInHeaderHook() {};
 
         bool hookProc() override;
-
-    private:
-        int m_headerPos = 0;
 };
 
 

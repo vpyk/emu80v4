@@ -140,7 +140,7 @@ void ConfigWnd::OnOk(wxCommandEvent& event)
 }
 
 
-void ConfigWnd::OnCancel(wxCommandEvent& event)
+void ConfigWnd::OnCancel(wxCommandEvent&)
 {
     for (auto it = m_selectorList.begin(); it != m_selectorList.end(); it++)
         (*it)->revertChoice();
@@ -148,7 +148,7 @@ void ConfigWnd::OnCancel(wxCommandEvent& event)
 }
 
 
-void ConfigWnd::OnChangePage(wxBookCtrlEvent& event)
+void ConfigWnd::OnChangePage(wxBookCtrlEvent&)
 {
     // Notebook page changed
     int pageNo = m_notebook->GetSelection();
@@ -202,7 +202,7 @@ void ConfigWnd::Save()
 }
 
 
-void ConfigWnd::OnApply(wxCommandEvent& event)
+void ConfigWnd::OnApply(wxCommandEvent&)
 {
     for (auto it = m_selectorList.begin(); it != m_selectorList.end(); it++)
         (*it)->applyChoice();
@@ -308,7 +308,7 @@ ConfigWndTab::~ConfigWndTab()
 }
 
 
-wxRadioBox* ConfigWndTab::addRadioSelector(int column, wxString caption, wxString property, wxString* items, int nItems, int selectedItem)
+wxRadioBox* ConfigWndTab::addRadioSelector(int column, wxString caption, wxString /*property*/, wxString* items, int nItems, int selectedItem)
 {
 	wxRadioBox* radioBox = new wxRadioBox(m_tabPanel, wxID_ANY, caption, wxDefaultPosition, wxDefaultSize, nItems, items, 1, wxRA_SPECIFY_COLS, wxDefaultValidator, _T("ID_RADIOBOX2"));
 	radioBox->SetSelection(selectedItem);

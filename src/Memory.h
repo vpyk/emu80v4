@@ -53,7 +53,7 @@ class Rom : public AddressableDevice
         Rom();
         Rom(unsigned memSize, std::string fileName);
         virtual ~Rom();
-        void writeByte(int addr, uint8_t value)  override {};
+        void writeByte(int, uint8_t)  override {};
         uint8_t readByte(int addr) override;
         const uint8_t* getDataPtr() {return m_buf;};
         const uint8_t& operator[](int nAddr) {return m_buf[nAddr];}; // no check for borders, use with caution
@@ -71,8 +71,8 @@ class NullSpace : public AddressableDevice
 {
     public:
         NullSpace(uint8_t nullByte = 0xFF) {m_nullByte = nullByte;};
-        void writeByte(int addr, uint8_t value)  override {};
-        uint8_t readByte(int addr)  override {return m_nullByte;};
+        void writeByte(int, uint8_t)  override {};
+        uint8_t readByte(int)  override {return m_nullByte;};
 
     protected:
 

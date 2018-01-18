@@ -49,8 +49,8 @@ class Cpu : public ActiveDevice
         void setStartAddr(unsigned addr) {m_startAddr = addr;};
 
         //virtual int doInstruction() = 0;
-        virtual void interrupt(int vector) {};
-        virtual void hrq(int ticks) {};
+        virtual void interrupt(int) {};
+        virtual void hrq(int) {};
 
         virtual void addHook(CpuHook* hook);
         virtual void removeHook(CpuHook* hook);

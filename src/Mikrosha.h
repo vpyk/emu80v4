@@ -68,7 +68,7 @@ class MikroshaPpi8255Circuit : public RkPpi8255Circuit
         uint8_t getPortA() override;
         uint8_t getPortB() override;
         //uint8_t getPortC() override;
-        void setPortA(uint8_t value) override;
+        void setPortA(uint8_t) override {};
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
 

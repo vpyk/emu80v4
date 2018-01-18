@@ -474,7 +474,7 @@ void palRequestForQuit()
 }
 
 
-void audioCallback(void* userdata, Uint8* stream, int len)
+void audioCallback(void*, Uint8* stream, int len)
 {
     //cout << audioBufferNumIn << ":" << audioBufferNumOut << " ";
     //cout << (audioBufferNumIn + BUF_NUM - audioBufferNumOut) % BUF_NUM << ":" << audioBufferPos << " ";

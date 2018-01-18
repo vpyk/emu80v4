@@ -82,7 +82,7 @@ class Ut88MemPageSelector : public AddressableDevice
         void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;};
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;};
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;

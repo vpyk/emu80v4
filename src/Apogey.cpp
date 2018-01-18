@@ -105,19 +105,19 @@ uint32_t ApogeyRenderer::getCurFgColor(bool gpa0, bool gpa1, bool hglt)
 }
 
 
-uint32_t ApogeyRenderer::getCurBgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t ApogeyRenderer::getCurBgColor(bool, bool, bool)
 {
     return 0x000000;
 }
 
 
-const uint8_t* ApogeyRenderer::getCurFontPtr(bool gpa0, bool gpa1, bool hglt)
+const uint8_t* ApogeyRenderer::getCurFontPtr(bool, bool, bool)
 {
     return m_font + (m_fontNumber ? 1024 : 0);
 }
 
 
-const uint8_t* ApogeyRenderer::getAltFontPtr(bool gpa0, bool gpa1, bool hglt)
+const uint8_t* ApogeyRenderer::getAltFontPtr(bool, bool, bool)
 {
     return m_altFont + (m_fontNumber ? (8+12+16)*128 : 0);
 }

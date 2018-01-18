@@ -169,7 +169,7 @@ void PalWindow::recreateRenderer()
 }
 
 
-void PalWindow::focusChanged(bool isFocused)
+void PalWindow::focusChanged(bool /*isFocused*/)
 {
     /*
     if (m_isFocused != isFocused) {

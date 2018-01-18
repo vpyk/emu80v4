@@ -42,7 +42,7 @@ class SpecMxMemPageSelector : public AddressableDevice
         void reset() override;
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;};
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
@@ -78,7 +78,7 @@ class SpecMxColorRegister : public AddressableDevice
         void attachVideoRam(SpecVideoRam* videoRam) {m_videoRam = videoRam;};
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;};
 
     private:
         SpecVideoRam* m_videoRam = nullptr;
@@ -154,7 +154,7 @@ class SpecMxFddControlRegisters : public AddressableDevice
         inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;};
 
     private:
         Fdc1793* m_fdc = nullptr;

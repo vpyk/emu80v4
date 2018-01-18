@@ -155,14 +155,14 @@ Mikro80TapeRegister::~Mikro80TapeRegister()
 }
 
 
-void Mikro80TapeRegister::writeByte(int nAddr, uint8_t value)
+void Mikro80TapeRegister::writeByte(int, uint8_t value)
 {
     m_tapeSoundSource->setValue(value & 1);
     m_platform->getCore()->tapeOut(value & 1);
 }
 
 
-uint8_t Mikro80TapeRegister::readByte(int addr)
+uint8_t Mikro80TapeRegister::readByte(int)
 {
     return g_emulation->getWavReader()->getCurValue() ? 0x01 : 0x00;
 }

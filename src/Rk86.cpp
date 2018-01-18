@@ -115,19 +115,19 @@ uint32_t Rk86Renderer::getCurFgColor(bool gpa0, bool gpa1, bool hglt)
 }
 
 
-uint32_t Rk86Renderer::getCurBgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t Rk86Renderer::getCurBgColor(bool, bool, bool)
 {
     return 0x000000;
 }
 
 
-const uint8_t* Rk86Renderer::getCurFontPtr(bool gpa0, bool gpa1, bool hglt)
+const uint8_t* Rk86Renderer::getCurFontPtr(bool, bool, bool)
 {
     return m_font;
 }
 
 
-const uint8_t* Rk86Renderer::getAltFontPtr(bool gpa0, bool gpa1, bool hglt)
+const uint8_t* Rk86Renderer::getAltFontPtr(bool, bool, bool)
 {
     return m_altFont;
 }

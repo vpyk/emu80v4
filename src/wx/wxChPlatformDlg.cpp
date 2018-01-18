@@ -74,7 +74,7 @@ ChPlatformDlg::~ChPlatformDlg()
 {
 }
 
-void ChPlatformDlg::OnClose(wxCloseEvent &event)
+void ChPlatformDlg::OnClose(wxCloseEvent&)
 {
     EndModal(wxID_CANCEL);
 }
@@ -91,7 +91,7 @@ void ChPlatformDlg::OnOk(wxCommandEvent &event)
 }
 */
 
-void ChPlatformDlg::OnListDblClk(wxCommandEvent &event)
+void ChPlatformDlg::OnListDblClk(wxCommandEvent&)
 {
     EndModal(wxID_OK);
 }

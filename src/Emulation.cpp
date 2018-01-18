@@ -145,7 +145,7 @@ void Emulation::processCmdLine()
     // Extention based platform
     string cmdLineFileExt = "";
     if (platformName == "") {
-        unsigned dotPos = cmdLineFileName.find_last_of(".");
+        string::size_type dotPos = cmdLineFileName.find_last_of(".");
         if (dotPos != string::npos) {
             cmdLineFileExt = cmdLineFileName.substr(dotPos + 1);
             for (unsigned i = 0; i < cmdLineFileExt.size(); i++)

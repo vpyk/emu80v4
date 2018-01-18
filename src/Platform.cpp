@@ -37,7 +37,7 @@ using namespace std;
 
 Platform::Platform(string configFileName, string name)
 {
-    unsigned slashPos = configFileName.find_last_of("\\/");
+    string::size_type slashPos = configFileName.find_last_of("\\/");
     if (slashPos != string::npos)
         m_baseDir = configFileName.substr(0, slashPos) + "/";
 

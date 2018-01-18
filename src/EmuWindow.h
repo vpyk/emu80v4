@@ -64,7 +64,7 @@ class EmuWindow : public EmuObject, public PalWindow
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
-        virtual void processKey(PalKeyCode keyCode, bool isPressed) {};
+        virtual void processKey(PalKeyCode, bool) {};
         virtual void closeRequest() {};
 
         void sysReq(SysReq sr);

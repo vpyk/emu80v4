@@ -244,7 +244,7 @@ bool SpecMxMemPageSelector::setProperty(const string& propertyName, const EmuVal
 }
 
 
-void SpecMxColorRegister::writeByte(int addr, uint8_t value)
+void SpecMxColorRegister::writeByte(int, uint8_t value)
 {
     if (m_videoRam)
         m_videoRam->setCurColor(value);
@@ -644,7 +644,7 @@ bool SpecMxFileLoader::loadFile(const std::string& fileName, bool run)
 
     delete inputStream;
 
-    unsigned dotPos = fileName.find_last_of(".");
+    string::size_type dotPos = fileName.find_last_of(".");
     if (dotPos == string::npos)
         return false;
 
@@ -723,7 +723,7 @@ bool SpecMxFileLoader::loadFile(const std::string& fileName, bool run)
         }
 
         // выделяем имя файла без пути
-        unsigned slashPos = monFileName.find_last_of("\\/");
+        string::size_type slashPos = monFileName.find_last_of("\\/");
         if (slashPos != string::npos)
             monFileName = monFileName.substr(slashPos + 1);
         if (monFileName.size() < 7) {

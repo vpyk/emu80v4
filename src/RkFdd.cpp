@@ -25,7 +25,7 @@
 using namespace std;
 
 
-uint8_t RkFddRegister::readByte(int addr)
+uint8_t RkFddRegister::readByte(int)
 {
     m_fdd->updateState();
     return m_fdd->readCurByte();

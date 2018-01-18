@@ -34,7 +34,7 @@ PeriodicInt8080::PeriodicInt8080(Cpu8080Compatible* cpu, unsigned rst, unsigned 
 }
 
 
-void PeriodicInt8080::writeByte(int addr, uint8_t value)
+void PeriodicInt8080::writeByte(int, uint8_t value)
 {
     m_active = value & 1;
 }
@@ -70,14 +70,14 @@ PageSelector::PageSelector()
 }
 
 
-void PageSelector::writeByte(int addr, uint8_t value)
+void PageSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
     m_addrSpaceMapper->setCurPage(value);
 }
 
 
-uint8_t PageSelector::readByte(int addr)
+uint8_t PageSelector::readByte(int)
 {
     return m_value;
 }
@@ -113,7 +113,7 @@ void Splitter::writeByte(int addr, uint8_t value)
 }
 
 
-uint8_t Splitter::readByte(int addr)
+uint8_t Splitter::readByte(int)
 {
     if (m_readLastWritten)
         return m_value;

@@ -176,7 +176,7 @@ class Crt8275 : public AddressableDevice, public IActive
 
         bool m_isDisplayStarted;     // display started Flag
 
-        bool m_isDmaStarted;         // true if DMA not stopped due special code for the rest of the frame
+        //bool m_isDmaStarted;         // true if DMA not stopped due special code for the rest of the frame
         bool m_isRasterStarted;
         int m_curRow;                // current row
         int m_curBufPos;                // current position in buffer
@@ -184,17 +184,17 @@ class Crt8275 : public AddressableDevice, public IActive
         int m_curFifoPos;            // current FIFO position
         int m_curBurstPos;
 
-        bool m_needDmaData;
+        //bool m_needDmaData;
         bool m_isBurstSpace;
         bool m_isBurst;
         bool m_isDmaStoppedForRow;
         bool m_isDmaStoppedForFrame;
-        bool m_isDmaUnderrun;
+        //bool m_isDmaUnderrun;
         bool m_needExtraByte = false;
         bool m_wasVsync;
 
         bool m_wasDmaUnderrun;
-        int m_dmaUnderrunAtRow;
+        //int m_dmaUnderrunAtRow;
 
 
         void putCharToBuffer(uint8_t byte);

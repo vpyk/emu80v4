@@ -40,7 +40,7 @@ class OrionMemPageSelector : public AddressableDevice
         void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;};
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;};
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
@@ -101,7 +101,7 @@ class OrionScreenSelector : public AddressableDevice
         inline void attachCrtRenderer(OrionRenderer* renderer) {m_renderer = renderer;};
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;};
 
     private:
         OrionRenderer* m_renderer = nullptr;
@@ -116,7 +116,7 @@ class OrionColorModeSelector : public AddressableDevice
         inline void attachCrtRenderer(OrionRenderer* renderer) {m_renderer = renderer;};
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;};
 
     private:
         OrionRenderer* m_renderer = nullptr;
@@ -136,7 +136,7 @@ class OrionFddControlRegister : public AddressableDevice
         inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;};
 
     private:
         Fdc1793* m_fdc = nullptr;
@@ -151,7 +151,7 @@ class OrionFddQueryRegister : public AddressableDevice
 
         inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
 
-        void writeByte(int addr, uint8_t value)  override {};
+        void writeByte(int, uint8_t)  override {};
         uint8_t readByte(int addr) override;
 
     private:

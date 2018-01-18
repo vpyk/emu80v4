@@ -1124,7 +1124,7 @@ void DebugWindow::inputKbdProc(PalKeyCode keyCode)
                 ++m_inputCurPos;
             break;
         case PK_DEL:
-            if (m_inputCurValue.size() > 0 && m_inputCurPos != m_inputCurValue.size());
+            if (m_inputCurValue.size() > 0 && m_inputCurPos != m_inputCurValue.size())
                 m_inputCurValue.erase(m_inputCurPos, 1);
             break;
         case PK_BSP:

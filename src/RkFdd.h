@@ -31,7 +31,7 @@ class RkFddRegister : public AddressableDevice
 {
     public:
         uint8_t readByte(int addr) override;
-        void writeByte(int addr, uint8_t value) override {};
+        void writeByte(int, uint8_t) override {};
 
         friend RkFddController;
 
@@ -54,7 +54,7 @@ class RkFddController : public Ppi8255Circuit
         uint8_t getPortC()  override {return 0xff;};
         uint8_t getPortB() override;
         void setPortA(uint8_t value) override;
-        void setPortB(uint8_t value) override {};
+        void setPortB(uint8_t) override {};
         void setPortC(uint8_t value) override;
 
         void attachRkFddRegister(RkFddRegister* reg) {m_fddReg = reg; reg->m_fdd = this;};

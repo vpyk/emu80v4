@@ -129,8 +129,8 @@ class Cpu8080StatusWordSpace : public AddressableDevice
 {
     public:
         Cpu8080StatusWordSpace(Cpu8080* cpu) {m_cpu = cpu;};
-        void writeByte(int addr, uint8_t value)  override {};
-        virtual uint8_t readByte(int addr)  override {return m_cpu->getStatusWord();};
+        void writeByte(int, uint8_t)  override {};
+        virtual uint8_t readByte(int)  override {return m_cpu->getStatusWord();};
 
     protected:
 

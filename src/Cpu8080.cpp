@@ -295,6 +295,7 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0x38:            /* nop */
             if (m_debugOnIllegalCmd) {
                 PC--;
+                cpu_cycles = 0;
                 g_emulation->debugRequest(this);
                 break;
             }
@@ -1280,6 +1281,7 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0xCB:            /* jmp addr, undocumented */
             if (m_debugOnIllegalCmd) {
                 PC--;
+                cpu_cycles = 0;
                 g_emulation->debugRequest(this);
                 break;
             }
@@ -1325,6 +1327,7 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0xD9:            /* ret, undocumented */
             if (m_debugOnIllegalCmd) {
                 PC--;
+                cpu_cycles = 0;
                 g_emulation->debugRequest(this);
                 break;
             }
@@ -1357,6 +1360,7 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0xFD:
             if (m_debugOnIllegalCmd) {
                 PC--;
+                cpu_cycles = 0;
                 g_emulation->debugRequest(this);
                 break;
             }

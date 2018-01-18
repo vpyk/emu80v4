@@ -34,9 +34,9 @@ class RkRomDisk : public Ppi8255Circuit
         uint8_t getPortA() override;
         uint8_t getPortB() override {return 0xff;};
         uint8_t getPortC() override {return 0xff;};
-        void setPortA(uint8_t value) override {};
-        void setPortB(uint8_t value) override;
-        void setPortC(uint8_t value) override;
+        void setPortA(uint8_t) override {};
+        void setPortB(uint8_t) override;
+        void setPortC(uint8_t) override;
 
     protected:
         uint8_t* m_romDisk;

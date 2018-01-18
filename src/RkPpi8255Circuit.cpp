@@ -74,13 +74,6 @@ void RkPpi8255Circuit::setPortA(uint8_t value)
 
 
 
-void RkPpi8255Circuit::setPortB(uint8_t value)
-{
-    return;
-}
-
-
-
 void RkPpi8255Circuit::setPortC(uint8_t value)
 {
     m_tapeSoundSource->setValue(value & 1);

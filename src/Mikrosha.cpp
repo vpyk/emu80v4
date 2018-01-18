@@ -86,17 +86,10 @@ uint8_t MikroshaPpi8255Circuit::getPortC()
 
 
 
-void MikroshaPpi8255Circuit::setPortA(uint8_t value)
-{
-    return;
-}
-
-
 void MikroshaPpi8255Circuit::setPortB(uint8_t value)
 {
     m_kbd->setMatrixMask(value);
 }
-
 
 
 MikroshaPpi8255Circuit::~MikroshaPpi8255Circuit()
@@ -180,25 +173,25 @@ MikroshaRenderer::MikroshaRenderer()
 }
 
 
-uint32_t MikroshaRenderer::getCurFgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t MikroshaRenderer::getCurFgColor(bool, bool, bool)
 {
     return 0xC0C0C0;
 }
 
 
-uint32_t MikroshaRenderer::getCurBgColor(bool gpa0, bool gpa1, bool hglt)
+uint32_t MikroshaRenderer::getCurBgColor(bool, bool, bool)
 {
     return 0x000000;
 }
 
 
-const uint8_t* MikroshaRenderer::getCurFontPtr(bool gpa0, bool gpa1, bool hglt)
+const uint8_t* MikroshaRenderer::getCurFontPtr(bool, bool, bool)
 {
     return m_font + (m_fontNumber ? 1024 : 0);
 }
 
 
-const uint8_t* MikroshaRenderer::getAltFontPtr(bool gpa0, bool gpa1, bool hglt)
+const uint8_t* MikroshaRenderer::getAltFontPtr(bool, bool, bool)
 {
     return m_altFont + (m_fontNumber ? (8+12+16)*128 : 0);
 }

@@ -199,7 +199,7 @@ string OrionRenderer::getPropertyStringValue(const string& propertyName)
 }
 
 
-void OrionMemPageSelector::writeByte(int addr, uint8_t value)
+void OrionMemPageSelector::writeByte(int, uint8_t value)
 {
     m_addrSpaceMapper->setCurPage(value & 0x3);
 };
@@ -219,7 +219,7 @@ bool OrionMemPageSelector::setProperty(const string& propertyName, const EmuValu
 }
 
 
-void OrionScreenSelector::writeByte(int addr, uint8_t value)
+void OrionScreenSelector::writeByte(int, uint8_t value)
 {
     if (m_renderer)
         m_renderer->setScreenBase((~value & 0x3) << 14);
@@ -240,7 +240,7 @@ bool OrionScreenSelector::setProperty(const string& propertyName, const EmuValue
 }
 
 
-void OrionColorModeSelector::writeByte(int addr, uint8_t value)
+void OrionColorModeSelector::writeByte(int, uint8_t value)
 {
     if (m_renderer)
         m_renderer->setColorModeByte(value & 0x7);
@@ -261,7 +261,7 @@ bool OrionColorModeSelector::setProperty(const string& propertyName, const EmuVa
 }
 
 
-void OrionFddControlRegister::writeByte(int addr, uint8_t value)
+void OrionFddControlRegister::writeByte(int, uint8_t value)
 {
     m_fdc->setDrive(value & 1);
     if (m_type == OFT_STANDARD)
@@ -294,7 +294,7 @@ bool OrionFddControlRegister::setProperty(const string& propertyName, const EmuV
 }
 
 
-uint8_t OrionFddQueryRegister::readByte(int addr)
+uint8_t OrionFddQueryRegister::readByte(int)
 {
     return (m_fdc->getDrq() ? 0 : 1) | (m_fdc->getIrq() ? 0 : 0x80);
 }

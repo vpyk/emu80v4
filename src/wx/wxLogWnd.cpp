@@ -38,7 +38,7 @@ BEGIN_EVENT_TABLE(LogWnd, wxFrame)
     EVT_BUTTON(ID_QUITBUTTON, LogWnd::OnQuitButtonClick)
 END_EVENT_TABLE()
 
-LogWnd::LogWnd(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
+LogWnd::LogWnd(wxWindow* parent,wxWindowID id,const wxPoint& /*pos*/,const wxSize& /*size*/)
 {
 	Create(parent, id, _("Emu80 error log"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
 	SetClientSize(wxSize(500, 300));
@@ -75,19 +75,19 @@ LogWnd::~LogWnd()
 }
 
 
-void LogWnd::OnClose(wxCloseEvent &event)
+void LogWnd::OnClose(wxCloseEvent&)
 {
     Hide();
 }
 
 
-void LogWnd::OnHideButtonClick(wxCommandEvent& event)
+void LogWnd::OnHideButtonClick(wxCommandEvent&)
 {
     Hide();
 }
 
 
-void LogWnd::OnQuitButtonClick(wxCommandEvent& event)
+void LogWnd::OnQuitButtonClick(wxCommandEvent&)
 {
     palRequestForQuit();
 }

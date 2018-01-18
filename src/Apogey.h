@@ -43,8 +43,6 @@ class ApogeyCore : public PlatformCore
         void attachCrtRenderer(Crt8275Renderer* crtRenderer);
 
     private:
-        bool m_colorMode = true;
-
         Crt8275Renderer* m_crtRenderer = nullptr;
         SoundSource* m_beepSoundSource;
         //Pit8253SoundSource* m_pitSoundSource;
@@ -80,7 +78,6 @@ class ApogeyRomDisk : public RkRomDisk
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
     private:
-        int page = 0;
         bool m_oldA15 = false;
 };
 
