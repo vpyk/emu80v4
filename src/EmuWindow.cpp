@@ -84,7 +84,7 @@ void EmuWindow::setCaption(string caption)
 {
     m_caption = caption;
     string ver = VERSION;
-    m_params.title = "Emu80 " + ver + ": " + caption + " (Alt-F12 for menu)";
+    m_params.title = "Emu80 " + ver + ": " + caption;
     applyParams();
 }
 

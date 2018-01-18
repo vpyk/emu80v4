@@ -20,14 +20,14 @@
 #define GLOBALS_H
 
 #ifdef PAL_QT
-    #define TARGET " qt"
+    #define TARGET "/qt"
 #elif defined PAL_WX
     #define TARGET ""
 #else
-    #define TARGET " lite"
+    #define TARGET "/lite"
 #endif
 
-#define VERSION "4.0.279" TARGET
+#define VERSION "4.0.283" TARGET
 
 class Emulation;
 extern Emulation* g_emulation;

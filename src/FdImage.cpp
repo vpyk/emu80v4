@@ -184,3 +184,20 @@ bool FdImage::setProperty(const string& propertyName, const EmuValuesList& value
     }
     return false;
 }
+
+
+string FdImage::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "label")
+        return m_label;
+    else if (propertyName == "fileName" && m_file.isOpen())
+        return m_fileName;
+
+    return "";
+}

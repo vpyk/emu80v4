@@ -38,7 +38,7 @@ class EmuConfig : public EmuObject
         void showConfigWindow(int configTabId = 0);
         void updateConfig();
 
-        std::vector<PlatformInfo>* getPlatformInfos() {return &m_platformVector;};
+        const std::vector<PlatformInfo>* getPlatformInfos() {return &m_platformVector;};
         std::map<std::string, std::string>* getExtentionMap() {return &m_extentionMap;};
 
     private:

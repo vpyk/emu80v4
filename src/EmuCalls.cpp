@@ -21,6 +21,7 @@
 
 #include "Emulation.h"
 #include "EmuWindow.h"
+#include "EmuConfig.h"
 
 using namespace std;
 
@@ -47,7 +48,7 @@ void emuFocusWnd(PalWindow* wnd)
 
 
 // Drop files event
-void emuDropFile(PalWindow* wnd, char* fileName)
+void emuDropFile(PalWindow* wnd, const char* fileName)
 {
     g_emulation->dropFile(static_cast<EmuWindow*>(wnd), std::string(fileName));
 }
@@ -74,5 +75,23 @@ bool emuSetPropertyValue(const string& objName, const string& propName, const st
 string emuGetPropertyValue(const string& objName, const string& propName)
 {
     EmuObject* obj = g_emulation->findObject(objName);
-    return obj->getPropertyStringValue(propName);
+    if (obj)
+        return obj->getPropertyStringValue(propName);
+    else
+        return "";
+}
+
+
+// Get platform list
+const std::vector<PlatformInfo>* emuGetPlatforms()
+{
+    EmuConfig* config = g_emulation->getConfig();
+    return config->getPlatformInfos();
+}
+
+
+// Run specified platform
+void emuSelectPlatform(const std::string& platform)
+{
+    g_emulation->newPlatform(platform);
 }

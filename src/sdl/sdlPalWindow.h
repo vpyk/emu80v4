@@ -24,6 +24,8 @@
 
 #include <SDL2/SDL.h>
 
+#include "../EmuTypes.h"
+
 class PalWindow
 {
     public:
@@ -53,6 +55,7 @@ class PalWindow
         void focusChanged(bool isFocused);
 
         virtual std::string getPlatformObjectName() = 0;
+        virtual EmuWindowType getWindowType() = 0;//{return EWT_UNDEFINED;};
 
     protected:
         SDL_Window* m_window = nullptr;

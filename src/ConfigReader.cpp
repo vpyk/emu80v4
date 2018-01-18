@@ -20,6 +20,10 @@
 #include <fstream>
 #include <sstream>
 
+/*#include <algorithm>
+#include <cctype>
+#include <locale>*/
+
 #include <string.h>
 
 #include "Pal.h"
@@ -107,11 +111,38 @@ ConfigReader::~ConfigReader()
 }
 
 
+/*
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}*/
+
+
+static inline bool isspc(char c)
+{
+    return c == ' ' || c == '\t' || c == '\r';
+}
+
 static void trim(string& s)
 {
-    while (s != "" && isspace(s[0]))
+    while (s != "" && isspc(s[0]))
         s.erase(0, 1);
-    while (s != "" && isspace(s[s.size() - 1]))
+    while (s != "" && isspc(s[s.size() - 1]))
         s.erase(s.size() - 1, 1);
 }
 
@@ -135,7 +166,7 @@ static string getToken(string &s, string delimeters)
 
     string res;
 
-    unsigned pos = s.find_first_of(delimeters);
+    string::size_type pos = s.find_first_of(delimeters);
 
     if (pos == string::npos) {
         // остаток строки

@@ -32,6 +32,7 @@ class FdImage : public EmuObject
 
         void reset() override;
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
 
         bool assignFileName(std::string fileName);
         void chooseFile();

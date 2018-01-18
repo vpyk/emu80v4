@@ -75,6 +75,12 @@ enum SysReq
 };
 
 
+enum EmuWindowType {
+    EWT_UNDEFINED,
+    EWT_EMULATION,
+    EWT_DEBUG
+};
+
 struct PlatformInfo
 {
     std::string platformName;

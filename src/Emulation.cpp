@@ -130,7 +130,7 @@ void Emulation::processCmdLine()
 
     // Command line platform options
     string platformName = "";
-    std::vector<PlatformInfo>* platforms = m_config->getPlatformInfos();
+    const std::vector<PlatformInfo>* platforms = m_config->getPlatformInfos();
     for (auto it = platforms->begin(); it != platforms->end(); it++) {
         for (int i = 1; i < m_argc; i++) {
             if (m_argv[i] == '-' + it->cmdLineOption) {
@@ -175,11 +175,7 @@ void Emulation::processCmdLine()
 
 void Emulation::runPlatform(const string& platformName)
 {
-    // если уже было создано окно из командной строки, больше не создаем
-    if (m_platformCreatedFromCmdLine)
-        return;
-
-    std::vector<PlatformInfo>* platformVector = m_config->getPlatformInfos();
+    const std::vector<PlatformInfo>* platformVector = m_config->getPlatformInfos();
     for (unsigned i = 0; i < platformVector->size(); i++)
         if ((*platformVector)[i].objName == platformName) {
             Platform* newPlatform = new Platform((*platformVector)[i].configFileName, platformName);
@@ -341,7 +337,7 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
                 if (platform)
                     curPlatformName = platform->getName();
                 bool newWnd;
-                    if (m_config->choosePlatform(pi, curPlatformName, newWnd)) { // если имя платформы было изменено (2 экземпляра), найдено не будет
+                if (m_config->choosePlatform(pi, curPlatformName, newWnd)) { // если имя платформы было изменено (2 экземпляра), найдено не будет
                     // Удяляем активную платформу (как опция можно все - закомментировано)
                     if (!newWnd) {
                         m_platformList.remove(platform);
@@ -491,7 +487,8 @@ bool Emulation::setProperty(const string& propertyName, const EmuValuesList& val
         m_mixer->setVolume(values[0].asInt());
         return true;
     } else if (propertyName == "runPlatform") {
-        runPlatform(values[0].asString());
+        if (!m_platformCreatedFromCmdLine) // если уже было создано окно из командной строки, больше не создаем
+            runPlatform(values[0].asString());
         return true;
     } else if (propertyName == "processCmdLine") {
         processCmdLine();

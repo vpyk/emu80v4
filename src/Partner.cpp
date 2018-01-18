@@ -463,7 +463,7 @@ void PartnerMcpgRenderer::customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol
             color = bgColor;
         else
             color = (col[pt] & 1 ? 0 : 0xFF0000) + (col[pt] & 2 ? 0 : 0x00FF00) + (col[pt] & 4 ? 0 : 0x0000FF) + 0xFF000000;
-        if (gpa0 && gpa1 && !hglt && ((symbol && 0xC0) != 0xC0) /*&& ((symbol && 0xC0) != 0x80)*/)
+        if (gpa0 && gpa1 && !hglt && ((symbol & 0xC0) != 0xC0) /*&& ((symbol & 0xC0) != 0x80)*/)
             color = 0x00000000; //transparent
         linePtr[pt] = color;
     }

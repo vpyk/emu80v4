@@ -101,6 +101,8 @@ class DebugWindow : private EmuWindow
         void startDebug();
         void draw();
 
+        EmuWindowType getWindowType() override {return EWT_DEBUG;};
+
     private:
         struct Cpu8080State {
             uint8_t a;
