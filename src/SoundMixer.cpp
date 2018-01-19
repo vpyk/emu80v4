@@ -1,6 +1,6 @@
 /*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ void SoundMixer::removeSoundSource(SoundSource* snd)
 }
 
 
-void SoundMixer::setFrequency(uint64_t freq)
+void SoundMixer::setFrequency(int64_t freq)
 {
     m_ticksPerSample = freq / g_emulation->getSampleRate();
 }

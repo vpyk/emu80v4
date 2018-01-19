@@ -1,6 +1,6 @@
 /*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class SoundMixer : public ActiveDevice
         void operate() override;
 
         // устанавливет количество тактов на сэмпл (1/SAMPLE_RATE с) на основании тактовой частоты
-        void setFrequency(uint64_t freq)/* override*/;
+        void setFrequency(int64_t freq) override;
 
         // переключает беззвучный режим
         void toggleMute();
