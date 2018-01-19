@@ -1,6 +1,6 @@
 /*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
  *
  *  Based on original code by:
  *  Frank D. Cringle (YAZE project, GPL v.2 licence)
