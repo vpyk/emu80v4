@@ -96,7 +96,13 @@ void ConfigReader::openFile()
         m_inputStream = new istringstream("");
         return;
     }
-    string s((const char*)buf, fileSize);
+    uint8_t* dataPtr = buf;
+    if (fileSize >= 3 && buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF) {
+        // UTF-8 BOF
+        dataPtr +=3;
+        fileSize -= 3;
+    }
+    string s((const char*)dataPtr, fileSize);
     if(buf)
         delete[] buf;
     m_curLine = 0;
