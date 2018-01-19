@@ -75,9 +75,6 @@ class ConfigWnd: public wxDialog
 
         void Save();
 
-        bool (*m_pfnSetPropValueCallBackFunc)(const std::string&, const std::string&, const std::string&);
-        std::string (*m_pfnGetPropValueCallBackFunc)(const std::string&, const std::string&);
-
 		DECLARE_EVENT_TABLE()
 };
 
