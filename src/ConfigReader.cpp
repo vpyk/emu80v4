@@ -98,7 +98,7 @@ void ConfigReader::openFile()
     }
     uint8_t* dataPtr = buf;
     if (fileSize >= 3 && buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF) {
-        // UTF-8 BOF
+        // UTF-8 BOM
         dataPtr +=3;
         fileSize -= 3;
     }
