@@ -492,10 +492,11 @@ void Crt8275::operate()
 
     if (m_dma->dmaRequest(m_dmaChannel, byte, m_isBurst ? m_curClock : 0)) {
         putCharToBuffer(byte);
-        if (!m_isPaused) //!!!
+        if (!m_isPaused) { // !!!
             m_curClock += (m_isBurst ? 8 : 4) * m_cpuKDiv;
             if ((m_curBurstPos == m_burstCount - 1) && (m_curClock % m_kDiv != 0))
                 m_curClock = m_curClock + m_kDiv - m_curClock % m_kDiv;
+        }
         m_curBurstPos = (m_curBurstPos + 1) % m_burstCount;
         if (m_curBurstPos == 0 && m_burstSpaceCount != 0)
             m_isBurstSpace = true;

@@ -259,11 +259,11 @@ void ConfigWnd::addRadioSelector(int tabId, int column, wxString caption, wxStri
 
     wxRadioBox* radioBox = nullptr;
 
-    if (tab)
+    if (tab) {
         radioBox = tab->addRadioSelector(column, caption, property, items, nItems, selectedItem);
-
-	ConfigWndRadioSelector* rs = new ConfigWndRadioSelector(this, tabId, radioBox, object, property, nItems, values, selectedItem);
-	m_selectorList.push_back(rs);
+        ConfigWndRadioSelector* rs = new ConfigWndRadioSelector(this, tabId, radioBox, object, property, nItems, values, selectedItem);
+        m_selectorList.push_back(rs);
+    }
 }
 
 
