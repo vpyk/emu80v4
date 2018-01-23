@@ -44,6 +44,8 @@ void palDelay(uint64_t time);
 bool palSetSampleRate(int sampleRate);
 int palGetSampleRate();
 
+bool palSetFrameRate(int frameRate);
+
 std::string palMakeFullFileName(std::string fileName);
 int palReadFromFile(const std::string& fileName, int first, int size, uint8_t* buffer, bool useBasePath = true);
 uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePath = true);

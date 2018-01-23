@@ -412,6 +412,7 @@ void Emulation::setFrameRate(int frameRate)
 {
     m_frameRate = frameRate;
     // для изменения "на лету" уьдобавить перебор всех окон и пересоздание рендерера при необходимости
+    palSetFrameRate(frameRate);
 }
 
 

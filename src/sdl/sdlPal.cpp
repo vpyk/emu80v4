@@ -133,6 +133,13 @@ int palGetSampleRate()
 }
 
 
+bool palSetFrameRate(int)
+{
+    // nothing to do in SDL version
+    return true;
+}
+
+
 string palMakeFullFileName(string fileName)
 {
     if (fileName[0] == '/' || fileName[0] == '\\' || (fileName.size() > 1 && fileName[1] == ':'))
