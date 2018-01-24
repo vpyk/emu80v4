@@ -385,18 +385,19 @@ void Emulation::mainLoopCycle()
         m_prevSysClock = palGetCounter() - palGetCounterFreq() / 60;
 
     draw();
-    m_sysClock = palGetCounter();
-    uint64_t ticks = m_frequency * m_speedUpFactor * (m_sysClock - m_prevSysClock) / palGetCounterFreq();
-    m_prevSysClock = m_sysClock;
-    if (ticks > m_frequency / 5) // 0.2 s
-        ticks = m_frequency / 5;
-    exec(ticks);
-
     if (m_frameRate > 0) {
-        int64_t delay = palGetCounterFreq() / m_frameRate - (palGetCounter() - m_sysClock);
+        int64_t delay = palGetCounterFreq() / m_frameRate - (palGetCounter() - m_prevSysClock);
         if (delay > 0)
             palDelay(delay);
     }
+
+    m_sysClock = palGetCounter();
+    unsigned dt = m_sysClock - m_prevSysClock;
+    if (dt > palGetCounterFreq() / 10) // 0.1 s
+        dt = palGetCounterFreq() / 10;
+    uint64_t ticks = m_frequency * m_speedUpFactor * dt / palGetCounterFreq();
+    m_prevSysClock = m_sysClock;
+    exec(ticks);
 }
 
 
