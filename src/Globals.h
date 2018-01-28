@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  Emu80 v. 4.x
  *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
@@ -27,7 +27,7 @@
     #define TARGET "/lite"
 #endif
 
-#define VERSION "4.0.287" TARGET
+#define VERSION "4.0.288" TARGET
 
 class Emulation;
 extern Emulation* g_emulation;
