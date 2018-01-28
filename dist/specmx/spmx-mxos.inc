@@ -230,4 +230,5 @@ configTab.addControl = 2, &kbdSelector
 ConfigRadioSelector laSelector = &kbdLayout, layout, "Раскладка клавиатуры"
 laSelector.addItem = qwerty, "Qwerty"
 laSelector.addItem = jcuken, "Йцукен"
+laSelector.addItem = smart, "«Умная» раскладка"
 configTab.addControl = 2, &laSelector
