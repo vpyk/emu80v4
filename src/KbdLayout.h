@@ -127,7 +127,7 @@ class KbdLayout : public EmuObject
             KLM_SMART
         };
 
-        KbdLayoutMode m_mode = KLM_QWERTY;
+        KbdLayoutMode m_mode = KLM_SMART;
         virtual EmuKey translateKeyQwerty(PalKeyCode keyCode) = 0;
         virtual EmuKey translateKeyJcuken(PalKeyCode keyCode) = 0;
         virtual EmuKey translateKeySmart(unsigned unicodeKey, bool& shift) = 0;
