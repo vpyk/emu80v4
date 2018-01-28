@@ -168,6 +168,12 @@ void Platform::sysReq(SysReq sr)
                 g_emulation->getConfig()->updateConfig();
             }
             break;
+        case SR_SMART:
+            if (m_kbdLayout) {
+                m_kbdLayout->setSmartMode();
+                g_emulation->getConfig()->updateConfig();
+            }
+            break;
         case SR_FONT:
             if (m_renderer) {
                 m_renderer->toggleRenderingMethod();
@@ -211,9 +217,9 @@ void Platform::sysReq(SysReq sr)
 }
 
 
-void Platform::processKey(PalKeyCode keyCode, bool isPressed)
+void Platform::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey)
 {
-    m_keyboard->processKey(m_kbdLayout->translateKey(keyCode), isPressed);
+    m_kbdLayout->processKey(keyCode, isPressed, unicodeKey);
 }
 
 

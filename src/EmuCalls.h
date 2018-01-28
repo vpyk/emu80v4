@@ -22,7 +22,7 @@
 #ifndef EMUCALLS_H
 #define EMUCALLS_H
 
-void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed);
+void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed, unsigned unicodeKey = 0);
 void emuSysReq(PalWindow* wnd, SysReq sr);
 void emuFocusWnd(PalWindow* wnd);
 void emuDropFile(PalWindow* wnd, const char* fileName);

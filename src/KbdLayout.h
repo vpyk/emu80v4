@@ -115,14 +115,26 @@ class KbdLayout : public EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
-        void setQwertyMode() {m_isJcuken = false;};
-        void setJcukenMode() {m_isJcuken = true;};
-        EmuKey translateKey(PalKeyCode keyCode);
+        void setQwertyMode() {m_mode = KLM_QWERTY;};
+        void setJcukenMode() {m_mode = KLM_JCUKEN;};
+        void setSmartMode()  {m_mode = KLM_SMART;};
+        void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
 
     protected:
-        bool m_isJcuken = false;
+        enum KbdLayoutMode {
+            KLM_QWERTY,
+            KLM_JCUKEN,
+            KLM_SMART
+        };
+
+        KbdLayoutMode m_mode = KLM_QWERTY;
         virtual EmuKey translateKeyQwerty(PalKeyCode keyCode) = 0;
         virtual EmuKey translateKeyJcuken(PalKeyCode keyCode) = 0;
+        virtual EmuKey translateKeySmart(unsigned unicodeKey, bool& shift) = 0;
+
+    private:
+        bool m_shiftPressed = false;
+        EmuKey m_lastNonUnicodeKey = EK_NONE;
 };
 
 
@@ -132,6 +144,7 @@ class RkKbdLayout : public KbdLayout
     public:
         EmuKey translateKeyQwerty(PalKeyCode keyCode) override;
         EmuKey translateKeyJcuken(PalKeyCode keyCode) override;
+        EmuKey translateKeySmart(unsigned unicodeKey, bool& shift) override;
 };
 
 #endif  // KBDLAYOUT_H

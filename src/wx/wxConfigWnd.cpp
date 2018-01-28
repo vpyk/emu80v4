@@ -98,6 +98,7 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-X\t– выход\n"
         "Alt-Q\t– раскладка Querty\n"
         "Alt-J\t– раскладка Йцукен\n"
+        "Alt-K\t– «Умная» раскладка\n"
         "Alt-A\t– выбор диска A\n"
         "Alt-B\t– выбор диска B\n"
         "Alt-1\t– пресет: 1x, автоподстройка размера окна, без сглаживания\n"

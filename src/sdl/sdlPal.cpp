@@ -86,6 +86,8 @@ void palStart()
     audioDevId = SDL_OpenAudioDevice(NULL, false, &spec, &spec, 0);
     SDL_PauseAudioDevice(audioDevId, false);
 
+    SDL_StartTextInput();
+
     isRunning = true;
 }
 
@@ -428,6 +430,23 @@ static PalKeyCode TranslateScanCode(SDL_Scancode scanCode)
 }
 
 
+static unsigned simpleUtfDecode(const char* text)
+{
+    uint8_t byte1 = text[0];
+    if (byte1 == 0)
+        return 0;
+    if (!(byte1 & 0x80))
+        return byte1;
+    else {
+        uint8_t byte2 = text[1];
+        return ((byte1 & 0x1f) << 6) | (byte2 & 0x3f);
+    }
+    return 0;
+}
+
+
+static unsigned unicodeKey = 0;
+
 static bool palProcessEvents()
 {
     palIdle();
@@ -452,9 +471,23 @@ static bool palProcessEvents()
                     SysReq sr = TranslateKeyToSysReq(key, event.type == SDL_KEYDOWN, SDL_GetModState() & (KMOD_ALT | KMOD_GUI));
                     if (sr)
                         emuSysReq(PalWindow::windowById(event.key.windowID), sr);
-                    else
+                    else {
+                        if (unicodeKey && event.type == SDL_KEYUP) {
+                            emuKeyboard(PalWindow::windowById(event.text.windowID), PK_NONE, false, unicodeKey);
+                            unicodeKey = 0;
+                        }
                         emuKeyboard(PalWindow::windowById(event.key.windowID), key, event.type == SDL_KEYDOWN);
+                    }
                     break;
+                }
+            case SDL_TEXTINPUT:
+                {
+                    if (unicodeKey)
+                        break;
+                    unicodeKey = simpleUtfDecode(event.text.text);
+                    emuKeyboard(PalWindow::windowById(event.text.windowID), PK_NONE, true, unicodeKey);
+                    break;
+
                 }
             case SDL_WINDOWEVENT:
                 if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && SDL_GetWindowFromID(event.window.windowID))

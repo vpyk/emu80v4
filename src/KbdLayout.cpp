@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  Emu80 v. 4.x
  *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
  *
@@ -17,12 +17,54 @@
  */
 
 #include "KbdLayout.h"
+#include "Keyboard.h"
+#include "Platform.h"
+
 
 using namespace std;
 
-EmuKey KbdLayout::translateKey(PalKeyCode keyCode)
+
+void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey)
 {
-    return m_isJcuken ? translateKeyJcuken(keyCode) : translateKeyQwerty(keyCode);
+    Keyboard* kbd = m_platform->getKeyboard();
+
+    EmuKey emuKey;
+
+    switch (m_mode) {
+        case KLM_QWERTY:
+            emuKey = translateKeyQwerty(keyCode);
+            kbd->processKey(emuKey, isPressed);
+            break;
+        case KLM_JCUKEN:
+            emuKey = translateKeyJcuken(keyCode);
+            kbd->processKey(emuKey, isPressed);
+            break;
+        case KLM_SMART:
+            bool shift;
+            emuKey = translateKeySmart(unicodeKey, shift);
+            if (emuKey == EK_NONE) {
+                emuKey = translateKeyQwerty(keyCode);
+                if (emuKey == EK_SHIFT)
+                    m_shiftPressed = isPressed;
+                kbd->processKey(emuKey, isPressed);
+                if (emuKey != EK_SHIFT) // SDL issue, see below
+                    m_lastNonUnicodeKey = emuKey;
+            } else {
+                // Workaround for SDL: unocode and ordinary codes go separately
+                if (keyCode == PK_NONE && m_lastNonUnicodeKey != EK_NONE)
+                    kbd->processKey(m_lastNonUnicodeKey, false);
+                m_lastNonUnicodeKey = EK_NONE;
+
+                if (shift != m_shiftPressed)
+                    kbd->processKey(EK_SHIFT, shift == isPressed);
+                kbd->processKey(emuKey, isPressed);
+            }
+
+            break;
+        default:
+            emuKey = EK_NONE; // normally this never occurs
+    }
+
 }
 
 
@@ -31,12 +73,17 @@ bool KbdLayout::setProperty(const string& propertyName, const EmuValuesList& val
     if (EmuObject::setProperty(propertyName, values))
         return true;
 
+    string s = values[0].asString();
+
     if (propertyName == "layout") {
         if (values[0].asString() == "qwerty") {
             setQwertyMode();
             return true;
         } else if (values[0].asString() == "jcuken") {
             setJcukenMode();
+            return true;
+        } else if (values[0].asString() == "smart") {
+            setSmartMode();
             return true;
         } else
             return false;
@@ -54,10 +101,12 @@ string KbdLayout::getPropertyStringValue(const string& propertyName)
         return res;
 
     if (propertyName == "layout") {
-        if (m_isJcuken)
-            return "jcuken";
-        else
+        if (m_mode == KLM_QWERTY)
             return "qwerty";
+        else if (m_mode == KLM_JCUKEN)
+            return "jcuken";
+        else // if (m_mode == KLM_SMART)
+            return "smart";
     }
 
     return "";
@@ -173,6 +222,7 @@ EmuKey RkKbdLayout::translateKeyQwerty(PalKeyCode keyCode)
             return EK_TAB;
 
         case PK_ENTER:
+        case PK_KP_ENTER:
             return EK_CR;
         case PK_UP:
         case PK_KP_8:
@@ -352,6 +402,7 @@ EmuKey RkKbdLayout::translateKeyJcuken(PalKeyCode keyCode)
             return EK_TAB;
 
         case PK_ENTER:
+        case PK_KP_ENTER:
             return EK_CR;
         case PK_UP:
             return EK_UP;
@@ -400,4 +451,418 @@ EmuKey RkKbdLayout::translateKeyJcuken(PalKeyCode keyCode)
         default:
             return EK_NONE;
     }
+}
+
+
+EmuKey RkKbdLayout::translateKeySmart(unsigned unicodeKey, bool& shift)
+{
+    EmuKey key;
+    shift = false;
+
+    switch (unicodeKey) {
+        // Latin letters (lower case)
+        case L'A':
+        case L'a':
+            key = EK_A;
+            break;
+        case L'B':
+        case L'b':
+            key = EK_B;
+            break;
+        case L'C':
+        case L'c':
+            key = EK_C;
+            break;
+        case L'D':
+        case L'd':
+            key = EK_D;
+            break;
+        case L'E':
+        case L'e':
+            key = EK_E;
+            break;
+        case L'F':
+        case L'f':
+            key = EK_F;
+            break;
+        case L'G':
+        case L'g':
+            key = EK_G;
+            break;
+        case L'H':
+        case L'h':
+            key = EK_H;
+            break;
+        case L'I':
+        case L'i':
+            key = EK_I;
+            break;
+        case L'J':
+        case L'j':
+            key = EK_J;
+            break;
+        case L'K':
+        case L'k':
+            key = EK_K;
+            break;
+        case L'L':
+        case L'l':
+            key = EK_L;
+            break;
+        case L'M':
+        case L'm':
+            key = EK_M;
+            break;
+        case L'N':
+        case L'n':
+            key = EK_N;
+            break;
+        case L'O':
+        case L'o':
+            key = EK_O;
+            break;
+        case L'P':
+        case L'p':
+            key = EK_P;
+            break;
+        case L'Q':
+        case L'q':
+            key = EK_Q;
+            break;
+        case L'R':
+        case L'r':
+            key = EK_R;
+            break;
+        case L'S':
+        case L's':
+            key = EK_S;
+            break;
+        case L'T':
+        case L't':
+            key = EK_T;
+            break;
+        case L'U':
+        case L'u':
+            key = EK_U;
+            break;
+        case L'V':
+        case L'v':
+            key = EK_V;
+            break;
+        case L'W':
+        case L'w':
+            key = EK_W;
+            break;
+        case L'X':
+        case L'x':
+            key = EK_X;
+            break;
+        case L'Y':
+        case L'y':
+            key = EK_Y;
+            break;
+        case L'Z':
+        case L'z':
+            key = EK_Z;
+            break;
+
+        // Lower case symbols
+        case L';':
+            key = EK_SEMICOLON;
+            break;
+        case L'-':
+            key = EK_MINUS;
+            break;
+        case L':':
+            key = EK_COLON;
+            break;
+        case L'[':
+            key = EK_LBRACKET;
+            break;
+        case L']':
+            key = EK_RBRACKET;
+            break;
+        case L'\\':
+            key = EK_BKSLASH;
+            break;
+        case L'.':
+            key = EK_PERIOD;
+            break;
+        case L'^':
+            key = EK_CARET;
+            break;
+        case L'@':
+            key = EK_AT;
+            break;
+        case L',':
+            key = EK_COMMA;
+            break;
+        case L'/':
+            key = EK_SLASH;
+            break;
+        case L'_':
+            key = EK_BSP;
+            break;
+
+
+        // Cyrillic letters (upper case)
+        case L'А':
+        case L'а':
+            key = EK_A;
+            shift = true;
+            break;
+        case L'Б':
+        case L'б':
+            key = EK_B;
+            shift = true;
+            break;
+        case L'В':
+        case L'в':
+            key = EK_W;
+            shift = true;
+            break;
+        case L'Г':
+        case L'г':
+            key = EK_G;
+            shift = true;
+            break;
+        case L'Д':
+        case L'д':
+            key = EK_D;
+            shift = true;
+            break;
+        case L'Е':
+        case L'е':
+            key = EK_E;
+            shift = true;
+            break;
+        case L'Ж':
+        case L'ж':
+            key = EK_V;
+            shift = true;
+            break;
+        case L'З':
+        case L'з':
+            key = EK_Z;
+            shift = true;
+            break;
+        case L'И':
+        case L'и':
+            key = EK_I;
+            shift = true;
+            break;
+        case L'Й':
+        case L'й':
+            key = EK_J;
+            shift = true;
+            break;
+        case L'К':
+        case L'к':
+            key = EK_K;
+            shift = true;
+            break;
+        case L'Л':
+        case L'л':
+            key = EK_L;
+            shift = true;
+            break;
+        case L'М':
+        case L'м':
+            key = EK_M;
+            shift = true;
+            break;
+        case L'Н':
+        case L'н':
+            key = EK_N;
+            shift = true;
+            break;
+        case L'О':
+        case L'о':
+            key = EK_O;
+            shift = true;
+            break;
+        case L'П':
+        case L'п':
+            key = EK_P;
+            shift = true;
+            break;
+        case L'Р':
+        case L'р':
+            key = EK_R;
+            shift = true;
+            break;
+        case L'С':
+        case L'с':
+            key = EK_S;
+            shift = true;
+            break;
+        case L'Т':
+        case L'т':
+            key = EK_T;
+            shift = true;
+            break;
+        case L'У':
+        case L'у':
+            key = EK_U;
+            shift = true;
+            break;
+        case L'Ф':
+        case L'ф':
+            key = EK_F;
+            shift = true;
+            break;
+        case L'Х':
+        case L'х':
+            key = EK_H;
+            shift = true;
+            break;
+        case L'Ц':
+        case L'ц':
+            key = EK_C;
+            shift = true;
+            break;
+        case L'Ч':
+        case L'ч':
+            key = EK_CARET;
+            shift = true;
+            break;
+        case L'Ш':
+        case L'ш':
+            key = EK_LBRACKET;
+            shift = true;
+            break;
+        case L'Щ':
+        case L'щ':
+            key = EK_RBRACKET;
+            shift = true;
+            break;
+        // Ъъ For Mikrosha only
+        case L'Ъ':
+        case L'ъ':
+            key = EK_BSP;
+            shift = true;
+            break;
+        case L'Ы':
+        case L'ы':
+            key = EK_Y;
+            shift = true;
+            break;
+        case L'Ь':
+        case L'ь':
+            key = EK_X;
+            shift = true;
+            break;
+        case L'Э':
+        case L'э':
+            key = EK_BKSLASH;
+            shift = true;
+            break;
+        case L'Ю':
+        case L'ю':
+            key = EK_AT;
+            shift = true;
+            break;
+        case L'Я':
+        case L'я':
+            key = EK_Q;
+            shift = true;
+            break;
+
+        // Digits (lower case)
+        case L'0':
+            key = EK_0;
+            break;
+        case L'1':
+            key = EK_1;
+            break;
+        case L'2':
+            key = EK_2;
+            break;
+        case L'3':
+            key = EK_3;
+            break;
+        case L'4':
+            key = EK_4;
+            break;
+        case L'5':
+            key = EK_5;
+            break;
+        case L'6':
+            key = EK_6;
+            break;
+        case L'7':
+            key = EK_7;
+            break;
+        case L'8':
+            key = EK_8;
+            break;
+        case L'9':
+            key = EK_9;
+            break;
+
+        //Upper-case symbols
+        case L'+':
+            key = EK_SEMICOLON;
+            shift = true;
+            break;
+        case L'!':
+            key = EK_1;
+            shift = true;
+            break;
+        case L'\"':
+            key = EK_2;
+            shift = true;
+            break;
+        case L'#':
+            key = EK_3;
+            shift = true;
+            break;
+        case L'$':
+            key = EK_4;
+            shift = true;
+            break;
+        case L'%':
+            key = EK_5;
+            shift = true;
+            break;
+        case L'&':
+            key = EK_6;
+            shift = true;
+            break;
+        case L'\'':
+            key = EK_7;
+            shift = true;
+            break;
+        case L'(':
+            key = EK_8;
+            shift = true;
+            break;
+        case L')':
+            key = EK_9;
+            shift = true;
+            break;
+        case L'=':
+            key = EK_MINUS;
+            shift = true;
+            break;
+        case L'*':
+            key = EK_COLON;
+            shift = true;
+            break;
+        case L'>':
+            key = EK_PERIOD;
+            shift = true;
+            break;
+        case L'<':
+            key = EK_COMMA;
+            shift = true;
+            break;
+        case L'?':
+            key = EK_SLASH;
+            shift = true;
+            break;
+        default:
+            key = EK_NONE;
+    }
+    return key;
 }

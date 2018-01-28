@@ -27,9 +27,9 @@ using namespace std;
 
 
 // Keyboard event
-void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed)
+void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed, unsigned unicodeKey)
 {
-    g_emulation->processKey(static_cast<EmuWindow*>(wnd), key, isPressed);
+    g_emulation->processKey(static_cast<EmuWindow*>(wnd), key, isPressed, unicodeKey);
 }
 
 

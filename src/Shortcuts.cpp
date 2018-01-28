@@ -50,6 +50,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_QUERTY;
             case PK_J:
                 return SR_JCUKEN;
+            case PK_K:
+                return SR_SMART;
             case PK_F:
                 return SR_FONT;
             case PK_C:

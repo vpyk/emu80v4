@@ -55,6 +55,7 @@ enum SysReq
     SR_DEBUG,
     SR_QUERTY,
     SR_JCUKEN,
+    SR_SMART,
     SR_DISKA,
     SR_DISKB,
     SR_FONT,

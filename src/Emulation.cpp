@@ -282,13 +282,13 @@ void Emulation::draw()
 }
 
 
-void Emulation::processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed)
+void Emulation::processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed, unsigned unicodeKey)
 {
     // нужно отправлять клавишу только активной платформе
     Platform* platform = platformByWindow(wnd);
     if (platform)
-        platform->processKey(keyCode, isPressed);
-    else
+        platform->processKey(keyCode, isPressed, unicodeKey);
+    else if (keyCode != PK_NONE)
         wnd->processKey(keyCode, isPressed);
 }
 
