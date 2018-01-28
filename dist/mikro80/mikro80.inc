@@ -1,4 +1,4 @@
-######## Window ########
+﻿######## Window ########
 
 EmuWindow window
 window.caption = @NAME
