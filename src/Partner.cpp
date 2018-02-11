@@ -97,7 +97,8 @@ void PartnerCore::vrtc(bool isActive)
         }
 
         m_crtRenderer->renderFrame();
-        m_crtMcpgRenderer->renderFrame();
+        if (m_mcpgSelector->getMcpgEnabled())
+            m_crtMcpgRenderer->renderFrame();
     }
 }
 

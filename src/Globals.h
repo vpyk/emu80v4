@@ -29,6 +29,8 @@
 
 #define VERSION "4.0.288" TARGET
 
+#define SND_AMP 4096
+
 class Emulation;
 extern Emulation* g_emulation;
 
