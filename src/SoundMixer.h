@@ -87,8 +87,17 @@ class SoundMixer : public ActiveDevice
         // Список источников звука
         std::list<SoundSource*> m_soundSources;
 
+        // частота дисктеризации
+        int m_sampleRate = 48000; // some initial value
+
         // тактов на сэмпл
         int m_ticksPerSample = 300; // some initial value
+
+        // остаток тактов на сэмпл
+        int m_ticksPerSampleRemainder = 0;
+
+        // ошибка накопления
+        int m_error = 0;
 
         // признак беззвучного режима
         bool m_muted = false;

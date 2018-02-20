@@ -44,6 +44,11 @@ void SoundMixer::operate()
        sample += (*it)->calcValue();
 
     m_curClock += m_ticksPerSample;
+
+    m_error += m_ticksPerSampleRemainder;
+    int delta = m_error / m_sampleRate;
+    m_error -= delta * m_sampleRate;
+    m_curClock += delta;
 }
 
 
@@ -61,7 +66,9 @@ void SoundMixer::removeSoundSource(SoundSource* snd)
 
 void SoundMixer::setFrequency(int64_t freq)
 {
-    m_ticksPerSample = freq / g_emulation->getSampleRate();
+    m_sampleRate = g_emulation->getSampleRate();
+    m_ticksPerSample = freq / m_sampleRate;
+    m_ticksPerSampleRemainder = freq % m_sampleRate;
 }
 
 
