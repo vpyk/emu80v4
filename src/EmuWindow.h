@@ -88,7 +88,6 @@ class EmuWindow : public EmuObject, public PalWindow
         std::string getCaption();
 
         std::string getPlatformObjectName() override;
-        EmuWindowType getWindowType() override {return EWT_EMULATION;};
 
     private:
         int m_defWindowWidth = 800;

@@ -33,6 +33,8 @@ using namespace std;
 
 DebugWindow::DebugWindow(Cpu* cpu)
 {
+    m_windowType = EWT_DEBUG;
+
     m_compactLayout.cols = 80;
     m_compactLayout.rows = 40;
     m_compactLayout.code.left = 1;
@@ -211,8 +213,8 @@ void DebugWindow::startDebug()
     m_stateNum = 1 - m_stateNum;
     fillCpuStatus();
     codeGotoPc();
-    draw();
     show();
+    draw();
 }
 
 

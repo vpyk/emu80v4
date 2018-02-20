@@ -185,6 +185,15 @@ void Emulation::runPlatform(const string& platformName)
 }
 
 
+void Emulation::newPlatform(const string& platformName)
+{
+    // Удаляем все платформы
+    for (auto it = m_platformList.begin(); it != m_platformList.end(); it++)
+        delete (*it);
+    m_platformList.clear();
+    runPlatform(platformName);
+}
+
 void Emulation::registerActiveDevice(IActive* device)
 {
     m_activeDevVector.push_back(device);

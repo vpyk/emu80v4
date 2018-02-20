@@ -55,7 +55,7 @@ class PalWindow
         void focusChanged(bool isFocused);
 
         virtual std::string getPlatformObjectName() = 0;
-        virtual EmuWindowType getWindowType() = 0;//{return EWT_UNDEFINED;};
+        EmuWindowType getWindowType() {return m_windowType;};
 
     protected:
         SDL_Window* m_window = nullptr;
@@ -72,6 +72,8 @@ class PalWindow
                        bool blend = false, bool useAlpha = false);
         void drawEnd();
         void screenshotRequest(const std::string& ssFileName);
+
+        EmuWindowType m_windowType = EWT_UNDEFINED;
 
     private:
         void recreateWindow();

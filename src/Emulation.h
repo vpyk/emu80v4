@@ -68,7 +68,7 @@ class Emulation : public ParentObject
         void setWndFocus(EmuWindow* wnd);
         void dropFile(EmuWindow* wnd, const std::string& fileName);
         void restoreFocus();
-        void newPlatform(const std::string& platformName) {runPlatform(platformName);}; // !!
+        void newPlatform(const std::string& platformName);
 
         void mainLoopCycle();
         void exec(uint64_t ticks);

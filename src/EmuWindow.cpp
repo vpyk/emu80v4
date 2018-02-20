@@ -28,6 +28,8 @@ using namespace std;
 
 EmuWindow::EmuWindow()
 {
+    m_windowType = EWT_EMULATION;
+
     m_curWindowWidth = m_defWindowWidth;
     m_curWindowHeight = m_defWindowHeight;
 
