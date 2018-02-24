@@ -797,3 +797,35 @@ bool SpecMxFileLoader::setProperty(const std::string& propertyName, const EmuVal
 
     return false;
 }
+
+
+SpecRomDisk::SpecRomDisk(string romDiskName)
+{
+    m_romDisk = new uint8_t[65536];
+    memset(m_romDisk, 0xFF, 65536);
+    palReadFromFile(romDiskName, 0, 65536, m_romDisk);
+}
+
+
+SpecRomDisk::~SpecRomDisk()
+{
+    delete[] m_romDisk;
+}
+
+
+uint8_t SpecRomDisk::getPortB()
+{
+    return m_romDisk[m_curAddr];
+}
+
+
+void SpecRomDisk::setPortA(uint8_t value)
+{
+    m_curAddr = (m_curAddr & ~0xff) | value;
+}
+
+
+void SpecRomDisk::setPortC(uint8_t value)
+{
+    m_curAddr = (m_curAddr & ~0xff00) | (value << 8);
+}

@@ -596,6 +596,8 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new CloseFileHook(parameters[0].asInt());
     else if (typeName == "RkRomDisk")
         obj = new RkRomDisk(parameters[0].asString());
+    else if (typeName == "SpecRomDisk")
+        obj = new SpecRomDisk(parameters[0].asString());
     //else if (typeName == "RkSdController")
     //    obj = new RkSdController(parameters[0].asString());
     else if (typeName == "ApogeyRomDisk")

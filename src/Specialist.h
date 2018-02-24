@@ -265,6 +265,26 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
 };
 
 
+class SpecRomDisk : public Ppi8255Circuit
+{
+    public:
+        SpecRomDisk() {}; // явно не использовать, для производных классов
+        SpecRomDisk(std::string romDiskName);
+        virtual ~SpecRomDisk();
+
+        uint8_t getPortA() override {return 0xff;};
+        uint8_t getPortB() override;
+        uint8_t getPortC() override {return 0xff;};
+        void setPortA(uint8_t) override;
+        void setPortB(uint8_t) override {};
+        void setPortC(uint8_t) override;
+
+    protected:
+        uint8_t* m_romDisk;
+        unsigned m_curAddr = 0;
+};
+
+
 class SpecFileLoader : public FileLoader
 {
     public:
