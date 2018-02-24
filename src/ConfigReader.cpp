@@ -53,6 +53,7 @@
 #include "Specialist.h"
 #include "Mikro80.h"
 #include "Ut88.h"
+#include "Eureka.h"
 #include "Globals.h"
 #include "SoundMixer.h"
 #include "RkFdd.h"
@@ -608,6 +609,8 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new Ut88AddrSpaceMapper();
     else if (typeName == "Ut88MemPageSelector")
         obj = new Ut88MemPageSelector();
+    else if (typeName == "EurekaPpi8255Circuit")
+        obj = new EurekaPpi8255Circuit(parameters[0].asString());
     else if (typeName == "PeriodicInt8080")
         obj = new PeriodicInt8080(static_cast<Cpu8080Compatible*>(g_emulation->findObject(parameters[0].asString())), parameters[1].asInt(), parameters[2].asInt());
     else if (typeName == "PageSelector")

@@ -133,6 +133,8 @@
 		<Unit filename="EmuWindow.h" />
 		<Unit filename="Emulation.cpp" />
 		<Unit filename="Emulation.h" />
+		<Unit filename="Eureka.cpp" />
+		<Unit filename="Eureka.h" />
 		<Unit filename="FdImage.cpp" />
 		<Unit filename="FdImage.h" />
 		<Unit filename="Fdc1793.cpp" />
