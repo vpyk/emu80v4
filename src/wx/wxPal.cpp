@@ -58,11 +58,17 @@ string palOpenFileDialog(string title, string filter, bool write)
     //palPause();
     wxString wxFilter = wxString::FromUTF8(filter.c_str());
     wxString wxTitle = wxString::FromUTF8(title.c_str());
-    wxFileDialog openFileDialog(NULL, wxTitle, "", "", wxFilter, wxFD_OPEN | (write ? 0 : wxFD_FILE_MUST_EXIST));
-    string res = "";
-    if (openFileDialog.ShowModal() != wxID_CANCEL) {
-        res = openFileDialog.GetPath().utf8_str();
+    wxFileDialog* openFileDialog = NULL;
+    if (write) {
+        openFileDialog = new wxFileDialog(NULL, wxTitle, "", "", wxFilter, wxFD_SAVE | wxFD_CHANGE_DIR | wxFD_OVERWRITE_PROMPT);
+    } else {
+        openFileDialog = new wxFileDialog(NULL, wxTitle, "", "", wxFilter, wxFD_OPEN | wxFD_CHANGE_DIR | wxFD_FILE_MUST_EXIST);
     }
+    string res = "";
+    if (openFileDialog->ShowModal() != wxID_CANCEL) {
+        res = openFileDialog->GetPath().utf8_str();
+    }
+    openFileDialog->Destroy();
     //palResume();
     return res;
 }
