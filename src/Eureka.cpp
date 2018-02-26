@@ -16,8 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Eureka.h"
+#include <string.h>
 
+#include "Eureka.h"
+#include "Emulation.h"
+
+using namespace std;
 
 EurekaPpi8255Circuit::EurekaPpi8255Circuit(std::string romDiskName)
 {
@@ -41,11 +45,87 @@ void EurekaPpi8255Circuit::setPortA(uint8_t value)
 void EurekaPpi8255Circuit::setPortC(uint8_t value)
 {
     SpecPpi8255Circuit::setPortC(value);
-    m_romDisk->setPortC(value);
+    m_romDisk->setPortC(value & 0x7f);
+    m_useRomDisk = value && 0x80;
+    m_renderer->setColorMode(value & 0x40);
 }
 
 
 uint8_t EurekaPpi8255Circuit::getPortB()
 {
-    return SpecPpi8255Circuit::getPortC() && m_romDisk->getPortC();
+    uint8_t res = SpecPpi8255Circuit::getPortB();
+    if (m_useRomDisk)
+        res &= m_romDisk->getPortB();
+    return res;
+}
+
+
+bool EurekaPpi8255Circuit::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (propertyName == "videoRam")
+        return false;
+    if (SpecPpi8255Circuit::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "crtRenderer") {
+        attachEurekaRenderer(static_cast<EurekaRenderer*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
+}
+
+
+EurekaRenderer::EurekaRenderer()
+{
+    m_sizeX = m_prevSizeX = 384;
+    m_sizeY = m_prevSizeY = 256;
+    m_aspectRatio = m_prevAspectRatio = 12. / 13.;
+    m_bufSize = m_prevBufSize = m_sizeX * m_sizeY;
+    m_pixelData = new uint32_t[m_bufSize];
+    m_prevPixelData = new uint32_t[m_prevBufSize];
+    memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
+    memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
+}
+
+
+void EurekaRenderer::renderFrame()
+{
+    swapBuffers();
+
+    if (m_colorMode) {
+        // color mode
+        for (int row = 0; row < 256; row++)
+            for (int col = 0; col < 48; col++) {
+                int addr = col * 256 + row;
+                uint8_t bt = m_videoRam[addr];
+                for (int pt = 0; pt < 4; pt++, bt <<= 2) {
+                    uint32_t color = eurekaPalette[(bt & 0xC0) >> 6];
+                    m_pixelData[row * 384 + col * 8 + pt * 2] = color;
+                    m_pixelData[row * 384 + col * 8 + pt * 2 + 1] = color;
+                }
+            }
+    } else {
+        // b&w mode
+        for (int row = 0; row < 256; row++)
+            for (int col = 0; col < 48; col++) {
+                int addr = col * 256 + row;
+                uint8_t bt = m_videoRam[addr];
+                for (int pt = 0; pt < 8; pt++, bt <<= 1)
+                    m_pixelData[row * 384 + col * 8 + pt] = (bt & 0x80) ? 0xC0C0C0 : 0x000000;
+            }
+    }
+}
+
+
+bool EurekaRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "videoRam") {
+        attachVideoRam(static_cast<Ram*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+    return false;
 }

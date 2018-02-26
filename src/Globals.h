@@ -27,7 +27,7 @@
     #define TARGET "/lite"
 #endif
 
-#define VERSION "4.0.289" TARGET
+#define VERSION "4.0.290" TARGET
 
 #define SND_AMP 4096
 

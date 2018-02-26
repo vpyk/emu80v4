@@ -23,17 +23,47 @@
 #include "Specialist.h"
 
 
+class EurekaRenderer : public CrtRenderer
+{
+    const uint32_t eurekaPalette[4] = {
+        0x000000, 0x0000FF, 0xFF0000, 0x00FF00,
+    };
+
+    public:
+        EurekaRenderer();
+        void renderFrame() override;
+
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        inline void attachVideoRam(Ram* videoRam) {m_videoRam = videoRam->getDataPtr();};
+        inline void setColorMode(bool colorMode) {m_colorMode = colorMode;};
+
+    private:
+        const uint8_t* m_videoRam = nullptr;
+        bool m_colorMode = false;
+};
+
+
 class EurekaPpi8255Circuit : public SpecPpi8255Circuit
 {
     public:
         EurekaPpi8255Circuit(std::string romDiskName);
         ~EurekaPpi8255Circuit();
+
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
         void setPortA(uint8_t value) override;
         void setPortC(uint8_t value) override;
         uint8_t getPortB() override;
+
+        // Подключение объекта - рендерера
+        inline void attachEurekaRenderer(EurekaRenderer* renderer) {m_renderer = renderer;};
+
     private:
-        SpecRomDisk* m_diskCircuit;
+        SpecRomDisk* m_romDisk;
+        bool m_useRomDisk = true;
+        EurekaRenderer* m_renderer = nullptr;
 };
 
 
-#endif // APOGEY_H
+#endif // EUREKA_H

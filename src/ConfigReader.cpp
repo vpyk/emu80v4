@@ -487,6 +487,8 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new OrionRenderer();
     else if (typeName == "SpecRenderer")
         obj = new SpecRenderer();
+    else if (typeName == "EurekaRenderer")
+        obj = new EurekaRenderer();
     else if (typeName == "Mikro80Renderer")
         obj = new Mikro80Renderer();
     else if (typeName == "Ut88Renderer")

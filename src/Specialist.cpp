@@ -44,7 +44,7 @@ void SpecCore::draw()
 }
 
 
-void SpecCore::attachCrtRenderer(SpecRenderer* crtRenderer)
+void SpecCore::attachCrtRenderer(CrtRenderer* crtRenderer)
 {
     m_crtRenderer = crtRenderer;
 }
@@ -56,7 +56,7 @@ bool SpecCore::setProperty(const string& propertyName, const EmuValuesList& valu
         return true;
 
     if (propertyName == "crtRenderer") {
-        attachCrtRenderer(static_cast<SpecRenderer*>(g_emulation->findObject(values[0].asString())));
+        attachCrtRenderer(static_cast<CrtRenderer*>(g_emulation->findObject(values[0].asString())));
         return true;
     }
     return false;

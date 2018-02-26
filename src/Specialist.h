@@ -139,10 +139,10 @@ class SpecCore : public PlatformCore
 
         void draw() override;
 
-        void attachCrtRenderer(SpecRenderer* crtRenderer);
+        void attachCrtRenderer(CrtRenderer* crtRenderer);
 
     private:
-        SpecRenderer* m_crtRenderer = nullptr;
+        CrtRenderer* m_crtRenderer = nullptr;
 };
 
 
