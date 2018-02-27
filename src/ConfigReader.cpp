@@ -531,6 +531,8 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new OrionCore();
     else if (typeName == "SpecCore")
         obj = new SpecCore();
+    else if (typeName == "EurekaCore")
+        obj = new EurekaCore();
     else if (typeName == "Mikro80Core")
         obj = new Mikro80Core();
     else if (typeName == "Ut88Core")

@@ -20,8 +20,29 @@
 
 #include "Eureka.h"
 #include "Emulation.h"
+#include "SoundMixer.h"
 
 using namespace std;
+
+
+EurekaCore::EurekaCore()
+{
+    m_inteSoundSource = new GeneralSoundSource;
+}
+
+
+
+EurekaCore::~EurekaCore()
+{
+    delete m_inteSoundSource;
+}
+
+
+void EurekaCore::inte(bool isActive)
+{
+    m_inteSoundSource->setValue(isActive ? 1 : 0);
+}
+
 
 EurekaPpi8255Circuit::EurekaPpi8255Circuit(std::string romDiskName)
 {

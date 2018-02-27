@@ -23,6 +23,21 @@
 #include "Specialist.h"
 
 
+class GeneralSoundSource;
+
+class EurekaCore : public SpecCore
+{
+    public:
+        EurekaCore();
+        virtual ~EurekaCore();
+
+        void inte(bool isActive) override;
+
+    private:
+        GeneralSoundSource* m_inteSoundSource;
+};
+
+
 class EurekaRenderer : public CrtRenderer
 {
     const uint32_t eurekaPalette[4] = {
