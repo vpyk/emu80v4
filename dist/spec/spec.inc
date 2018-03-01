@@ -92,6 +92,7 @@ cpu.addHook = &tapeOutHook
 RkTapeInHook tapeInHook = @C806_ADDR
 tapeInHook.tapeRedirector = &tapeInFile
 #tapeInHook.enabled = no
+tapeInHook.suspendAfterResetForMs = 200
 cpu.addHook = &tapeInHook
 
 CloseFileHook closeFileHook = @C803_ADDR
@@ -171,3 +172,8 @@ ConfigRadioSelector tapeSelector = &tapeGrp, enabled, "Перехват магн
 tapeSelector.addItem = yes, "Вкл."
 tapeSelector.addItem = no, "Выкл."
 configTab.addControl = 3, &tapeSelector
+
+ConfigRadioSelector tapeSuspendSelector = &tapeInHook, suspendAfterResetForMs, "Подавлять открытие файла после сброса"
+tapeSuspendSelector.addItem = 200, "Вкл."
+tapeSuspendSelector.addItem = 0, "Выкл."
+configTab.addControl = 3, &tapeSuspendSelector

@@ -42,11 +42,15 @@ class RkTapeInHook : public CpuHook
         RkTapeInHook(uint16_t addr) : CpuHook(addr) {};
         virtual ~RkTapeInHook() {};
 
-        //bool setProperty(const string& propertyName, const EmuValuesList& values) override;
-
+        void reset() override;
         bool hookProc() override;
 
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
     private:
+        unsigned m_suspendPeriod = 0;
+        uint64_t m_suspendEndTime = 0;
 };
 
 

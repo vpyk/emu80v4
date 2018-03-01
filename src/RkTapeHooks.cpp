@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include "Emulation.h"
 #include "WavReader.h"
 #include "RkTapeHooks.h"
@@ -61,12 +63,23 @@ bool RkTapeOutHook::hookProc()
 }
 
 
+void RkTapeInHook::reset()
+{
+    if (m_suspendPeriod)
+        m_suspendEndTime = g_emulation->getCurClock() + g_emulation->getFrequency() * m_suspendPeriod / 1000;
+    else
+        m_suspendEndTime = 0;
+}
+
 bool RkTapeInHook::hookProc()
 {
     if (!m_isEnabled)
         return false;
 
     if (g_emulation->getWavReader()->isPlaying())
+        return false;
+
+    if (g_emulation->getCurClock() < m_suspendEndTime)
         return false;
 
     if (m_file->isCancelled())
@@ -115,3 +128,33 @@ bool RkTapeOutHook::setProperty(const string& propertyName, const EmuValuesList&
     return false;
 }
 
+
+bool RkTapeInHook::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (CpuHook::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "suspendAfterResetForMs" && values[0].isInt()) {
+        m_suspendPeriod = values[0].asInt();
+        return true;
+    }
+
+    return false;
+}
+
+
+string RkTapeInHook::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = CpuHook::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "suspendAfterResetForMs") {
+        stringstream stringStream;
+        stringStream << m_suspendPeriod;
+        stringStream >> res;
+    }
+    return res;
+}
