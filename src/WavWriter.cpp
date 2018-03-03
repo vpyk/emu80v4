@@ -25,26 +25,58 @@
 using namespace std;
 
 
-WavWriter::WavWriter(Platform* platform, const string& fileName)
+WavWriter::WavWriter(Platform* platform, const string& fileName, bool cswFormat)
 {
     m_core = platform->getCore();
     m_ticksPerSample = g_emulation->getFrequency() / 44100;
     m_open = m_file.open(fileName, "w");
+    m_cswFormat = cswFormat;
+    m_initialValue = m_core->getTapeOut();
 
-    if (m_open)
+    if (!m_open)
+        return;
+
+    if (m_cswFormat) {
+        m_cswCurValue = m_initialValue;
+        m_cswRleCounter = 1;
+        for (unsigned i = 0; i < 32; i++)
+            m_file.write8(c_cswHeader[i]);
+    } else
         for (unsigned i = 0; i < 44; i++)
             m_file.write8(c_wavHeader[i]);
+
+    //m_file.write8(1); // 1 sample of initial value
 }
 
 
 WavWriter::~WavWriter()
 {
-    if (m_open) {
+    if (!m_open)
+        return;
+
+    if (!m_cswFormat)
+    {
+        // WAV
         m_file.seek(4);
         m_file.write32(m_size + 36); // litte endian only!
         m_file.seek(40);
         m_file.write32(m_size);      // litte endian only!
-        m_file.close();
+    } else {
+        writeCswSequence();
+        m_file.seek(0x1C);
+        m_file.write8(m_initialValue ? 0 : 1);
+    }
+    m_file.close();
+}
+
+
+void WavWriter::writeCswSequence()
+{
+    if (m_cswRleCounter <= 255)
+        m_file.write8(m_cswRleCounter);
+    else {
+        m_file.write8(0);
+        m_file.write32(m_cswRleCounter);
     }
 }
 
@@ -52,8 +84,25 @@ WavWriter::~WavWriter()
 void WavWriter::operate()
 {
     m_curClock += m_ticksPerSample;
-    if (m_open) {
-        m_file.write8(m_core->getTapeOut() ? 0xE0 : 0x20);
-        ++m_size;
-    }
+    if (!m_open)
+        return;
+
+    bool value = m_core->getTapeOut();
+
+    if (m_size == 0 && value == m_initialValue) // skip silence at the beginning
+        return;
+
+    ++m_size;
+
+    if (m_cswFormat) {
+        if (value == m_cswCurValue)
+            ++m_cswRleCounter;
+        else {
+            m_cswCurValue = value;
+            writeCswSequence();
+            m_cswRleCounter = 1;
+        }
+
+    } else
+        m_file.write8(value ? 0xE0 : 0x20);
 }

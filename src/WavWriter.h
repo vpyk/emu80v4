@@ -27,7 +27,7 @@
 class WavWriter : public ActiveDevice
 {
     public:
-        WavWriter(Platform* platform, const std::string& fileName);
+        WavWriter(Platform* platform, const std::string& fileName, bool cswFormat = false);
         ~WavWriter();
 
         // derived from ActiveDevice
@@ -52,11 +52,29 @@ class WavWriter : public ActiveDevice
             0x00, 0x00, 0x00, 0x00  // data size
             };
 
+        const uint8_t c_cswHeader[32] = {
+            0x43, 0x6F, 0x6D, 0x70, 0x72, 0x65, 0x73, 0x73, 0x65, 0x64, 0x20, // Compressed
+            0x53, 0x71, 0x75, 0x61, 0x72, 0x65, 0x20,                         // Square
+            0x57, 0x61, 0x76, 0x65, 0x1A,                                     // Wave
+            0x01, 0x01,      // version
+            0x44, 0xAC,      // sample rate
+            0x01,            // RLE compression
+            0x00,            // initial value
+            0x00, 0x00, 0x00 // reserved
+        };
+
         unsigned m_ticksPerSample;  // тактов на сэмпл
         PalFile m_file;
         bool m_open = false;
         PlatformCore* m_core;
         unsigned m_size = 0;
+        bool m_initialValue;
+        bool m_cswFormat;
+
+        unsigned m_cswRleCounter = 0;
+        bool m_cswCurValue = false;
+
+        void writeCswSequence();
 };
 
 

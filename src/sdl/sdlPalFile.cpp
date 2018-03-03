@@ -99,3 +99,9 @@ int64_t PalFile::getPos()
 {
     return SDL_RWtell(m_file);
 }
+
+
+bool PalFile::eof()
+{
+    return SDL_RWsize(m_file) == SDL_RWtell(m_file);
+}

@@ -29,6 +29,7 @@ class PalFile
         bool open(std::string fileName, std::string mode = "r");
         void close();
         bool isOpen();
+        bool eof();
         uint8_t read8();
         uint16_t read16();
         uint32_t read32();

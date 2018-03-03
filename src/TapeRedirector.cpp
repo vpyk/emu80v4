@@ -58,7 +58,7 @@ void TapeRedirector::openFile()
         closeFile();
 
     if (m_permanentFileName == "") {
-        m_fileName = palOpenFileDialog("Open rk file", m_filter + "|Wav Files (*.wav)|*.wav;*.WAV", m_rwMode == "w");
+        m_fileName = palOpenFileDialog("Open rk file", m_filter + "|Wav Files (*.wav)|*.wav;*.WAV|CSW Files (*.csw)|*.csw;*.CSW", m_rwMode == "w");
         g_emulation->restoreFocus();
     }
     else
@@ -67,12 +67,12 @@ void TapeRedirector::openFile()
     string ext;
     if (m_fileName.size() >= 4)
         ext = m_fileName.substr(m_fileName.size() - 4, 4);
-    if (ext == ".wav" || ext == ".WAV") {
+    if (ext == ".wav" || ext == ".WAV" || ext == ".csw" || ext == ".CSW") {
         m_cancelled = true;
         if (m_rwMode == "r")
             g_emulation->getWavReader()->loadFile(m_fileName);
         else if (m_rwMode == "w") {
-            m_wavWriter = new WavWriter(m_platform, m_fileName);
+            m_wavWriter = new WavWriter(m_platform, m_fileName, ext == ".csw" || ext == ".CSW");
         }
         return;
     }

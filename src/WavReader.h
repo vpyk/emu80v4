@@ -52,6 +52,10 @@ class WavReader : public EmuObject
     private:
         PalFile m_file;
 
+        std::string m_fileName;
+
+        bool m_cswFormat = false;
+
         int m_channels;
         int m_sampleRate;
         int m_bytesPerSample;
@@ -61,13 +65,20 @@ class WavReader : public EmuObject
         uint64_t m_startClock;
         int m_curSample;
         bool m_curValue;
+        int m_rleCounter = 0;
+        bool m_hasMoreSamples;
 
         WavChannel m_channel = WC_LEFT;
         unsigned m_speedUpFactor = 1;
 
         WavSoundSource* m_wavSource;
 
+        void reportError(const std::string& errorStr);
+        bool tryWavFormat();
+        bool tryCswFormat();
         void readNextSample();
+        void readNextWavSample();
+        void readNextCswSample();
 };
 
 

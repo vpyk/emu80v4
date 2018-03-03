@@ -45,44 +45,68 @@ bool WavReader::chooseAndLoadFile()
         return false;
     }
 
-    string fileName = palOpenFileDialog("Open WAV file", "Wav files|*.wav", false);
+    string fileName = palOpenFileDialog("Open wave file", "Wav and csw files|*.wav;*.WAV;*.csw;*.CSW", false);
     g_emulation->restoreFocus();
     if (fileName == "")
         return true;
-    if (!loadFile(fileName)) {
-        //emuLog << "Error loading file: " << fileName << "\n";
-        return false;
-    }
-    return true;
+
+    return loadFile(fileName);
 }
+
+void WavReader::reportError(const std::string& errorStr)
+{
+    emuLog << errorStr << " " << m_fileName << "\n";
+}
+
+
 
 bool WavReader::loadFile(const std::string& fileName)
 {
+    m_fileName = fileName;
+
     if (!m_file.open(fileName)) {
-        emuLog << "Can't open file " << fileName << "\n";
+        reportError("Can't open file");
         return false;
     }
 
+    bool res = tryWavFormat();
+    if (!res)
+        res = tryCswFormat();
+
+    if (res) {
+        m_startClock = g_emulation->getCurClock();
+        m_curSample = 0;
+        m_isOpen = true;
+        m_hasMoreSamples = true;
+
+        g_emulation->setSpeedUpFactor(m_speedUpFactor);
+    }
+
+    return res;
+}
+
+
+bool WavReader::tryWavFormat()
+{
     unsigned len = m_file.getSize();
 
     if (len < 8) {
-        emuLog << "Invalid WAV file size" << fileName << "\n";
+        reportError("Invalid file size:");
         m_file.close();
         return false;
     }
 
     uint32_t signature = m_file.read32();
     if (signature != 0x46464952) { // "RIFF"
-        emuLog << "Not RIFF file: " << fileName << "\n";
-        m_file.close();
-        return false;
+        m_file.seek(0);
+        return tryCswFormat();
     }
     len -= 4;
 
     uint32_t dataSize = m_file.read32();
     len -=4;
     if (len < dataSize) {
-        emuLog << "Invalid WAV file format: " << fileName << "\n";
+        reportError("Invalid WAV file format:");
         m_file.close();
         return false;
     }
@@ -90,7 +114,7 @@ bool WavReader::loadFile(const std::string& fileName)
 
     signature = m_file.read32();
     if (signature != 0x45564157) { // "WAVE"
-        emuLog << "Not WAVE file: " << fileName << "\n";
+        reportError("Not WAVE file:");
         m_file.close();
         return false;
     }
@@ -101,7 +125,7 @@ bool WavReader::loadFile(const std::string& fileName)
         dataSize = m_file.read32();
         len -= 8;
             if (len < dataSize || dataSize < 16) {
-                emuLog << "Invalid WAV file format: " << fileName << "\n";
+                reportError("Invalid WAV file format:");
                 m_file.close();
                 return false;
             }
@@ -116,12 +140,12 @@ bool WavReader::loadFile(const std::string& fileName)
             len -= (dataSize - 16);
 
             if (compression != 1) {
-                emuLog << "Not PCM WAV file: " << fileName << "\n";
+                reportError("Not PCM WAV file:");
                 m_file.close();
                 return false;
             }
             if (m_channels > 2 || m_bytesPerSample > 2) {
-                emuLog << "Invalid WAV file format, should be mono or stereo and 8 or 16 bit: " << fileName << "\n";
+                reportError("Invalid WAV file format, should be mono or stereo and 8 or 16 bit:");
                 m_file.close();
                 return false;
             }
@@ -137,7 +161,7 @@ bool WavReader::loadFile(const std::string& fileName)
         dataSize = m_file.read32();
         len -= 8;
             if (len < dataSize) {
-                emuLog << "Invalid WAV file format: " << fileName << "\n";
+                reportError("Invalid WAV file format:");
                 m_file.close();
                 return false;
             }
@@ -151,17 +175,75 @@ bool WavReader::loadFile(const std::string& fileName)
 
     m_samples = dataSize / (m_bytesPerSample * m_channels);
 
-    m_startClock = g_emulation->getCurClock();
-    m_curSample = 0;
-    m_isOpen = true;
+    m_cswFormat = false;
 
-    g_emulation->setSpeedUpFactor(m_speedUpFactor);
+    return true;
+}
+
+bool WavReader::tryCswFormat()
+{
+    unsigned len = m_file.getSize();
+
+    if (len < 32) {
+        reportError("Invalid file size:");
+        m_file.close();
+        return false;
+    }
+
+    const char* cswSignature = "Compressed Square Wave\x1a";
+
+    for (int i = 0; i < 23; i++) {
+        char c = m_file.read8();
+        if (c != cswSignature[i]) {
+            reportError("Invalid file format:");
+            m_file.close();
+            return false;
+        }
+    }
+
+    uint8_t majorVersion = m_file.read8();
+    uint8_t minorVersion = m_file.read8();
+
+    if (majorVersion != 1) {
+        reportError("Only CSW-1 supported for now:");
+        m_file.close();
+        return false;
+    }
+
+    m_sampleRate = m_file.read16();
+
+    uint8_t compression = m_file.read8();
+
+    if (compression != 1) {
+        reportError("Only RLE CSW compression supported for now:");
+        m_file.close();
+        return false;
+    }
+
+    m_curValue = ! (minorVersion > 0 ? m_file.read8() & 1 : false); // inverted bit 0 - will be inverted at first reading
+
+    m_file.read16(); //reserved
+    m_file.read8();  //reserved
+
+    len -= 32;
+
+    m_rleCounter = 0;
+    m_cswFormat = true;
 
     return true;
 }
 
 
 void WavReader::readNextSample()
+{
+    if (m_cswFormat)
+        readNextCswSample();
+    else
+        readNextWavSample();
+}
+
+
+void WavReader::readNextWavSample()
 {
     int val;
     if (m_bytesPerSample == 1) {
@@ -203,6 +285,24 @@ void WavReader::readNextSample()
         val /=2;
     m_curValue = val > (m_curValue ? -2 : 2);
     //m_curValue = val > 0;
+
+    if (m_curSample >= m_samples)
+        m_hasMoreSamples = false;
+}
+
+
+void WavReader::readNextCswSample()
+{
+    if (m_rleCounter == 0) {
+        m_rleCounter = m_file.read8();
+        if (m_rleCounter == 0)
+            m_rleCounter = m_file.read32();
+        m_curValue = !m_curValue;
+    }
+    --m_rleCounter;
+
+    if (m_file.eof() && m_rleCounter == 0)
+        m_hasMoreSamples = false;
 }
 
 
@@ -213,13 +313,15 @@ bool WavReader::getCurValue()
 
     uint64_t curClock = g_emulation->getCurClock();
     int sampleNo = (curClock - m_startClock) * m_sampleRate / g_emulation->getFrequency();
+
     if (sampleNo == m_curSample)
         return m_curValue;
-    while (m_curSample < sampleNo && sampleNo < m_samples) {
+
+    while (m_hasMoreSamples && m_curSample < sampleNo) {
         readNextSample();
         ++m_curSample;
     }
-    if (sampleNo < m_samples)
+    if (m_hasMoreSamples)
         return m_curValue;
     else {
         m_isOpen = false;
