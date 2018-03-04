@@ -108,7 +108,9 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu) {
+            cpu->disableHooks();
             g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+            cpu->enableHooks();
             cpu->setPC(begAddr);
         }
     }

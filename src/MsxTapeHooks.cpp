@@ -173,6 +173,9 @@ bool MsxTapeInHeaderHook::hookProc()
     if (!m_isEnabled)
         return false;
 
+    if (g_emulation->getWavReader()->isPlaying())
+        return false;
+
     //int pos = m_file->getPos();
 
     if (m_file)

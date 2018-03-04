@@ -1712,16 +1712,18 @@ Cpu8080::Cpu8080() {
 void Cpu8080::operate() {
     bool retFlag = false;
     // можно сделать упорядоченный список, чтобы не перебирать все
-    for (int i = 0; i < m_nHooks; i++) {
-        if (PC == m_hookAddresses[i]) {
-            if (m_hookVector[i]->hookProc())
-                retFlag = true;
-                //return; // поменять, если необходимо несколько ловушек на один адрес
+    if (!m_hooksDisabled) {
+        for (int i = 0; i < m_nHooks; i++) {
+            if (PC == m_hookAddresses[i]) {
+                if (m_hookVector[i]->hookProc())
+                    retFlag = true;
+                    //return; // поменять, если необходимо несколько ловушек на один адрес
+            }
         }
-    }
 
-    if (retFlag)
-        return;
+        if (retFlag)
+            return;
+    }
 
     m_statusWord = 0xA2;
     m_curClock += m_kDiv * i8080_execute(RD_BYTE(PC++));

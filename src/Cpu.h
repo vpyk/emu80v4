@@ -54,6 +54,8 @@ class Cpu : public ActiveDevice
 
         virtual void addHook(CpuHook* hook);
         virtual void removeHook(CpuHook* hook);
+        void disableHooks() {m_hooksDisabled = true;};
+        void enableHooks() {m_hooksDisabled = false;};
 
         void debugStepRequest() {m_stepReq = true;};
 
@@ -67,6 +69,7 @@ class Cpu : public ActiveDevice
 
         std::vector<CpuHook*> m_hookVector;
         int m_nHooks = 0;
+        bool m_hooksDisabled = false;
 
         bool m_stepReq = false;
 

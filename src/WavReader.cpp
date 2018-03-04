@@ -78,6 +78,7 @@ bool WavReader::loadFile(const std::string& fileName)
         m_curSample = 0;
         m_isOpen = true;
         m_hasMoreSamples = true;
+        readNextSample();
 
         g_emulation->setSpeedUpFactor(m_speedUpFactor);
     }
@@ -400,5 +401,5 @@ WavSoundSource::WavSoundSource(WavReader* wavReader) : SoundSource()
 
 int WavSoundSource::calcValue()
 {
-    return m_wavReader->getCurValue() ? 2048 : 0;
+    return m_wavReader->getCurValue() ? SND_AMP / 2 : 0;
 }

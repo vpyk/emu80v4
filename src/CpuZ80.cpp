@@ -2529,17 +2529,19 @@ CpuZ80::CpuZ80()
 void CpuZ80::operate()
 {
     bool retFlag = false;
-    // ìîæíî ñäåëàòü óïîðÿäî÷åííûé ñïèñîê, ÷òîáû íå ïåðåáèðàòü âñå
-    for (int i = 0; i < m_nHooks; i++) {
-        if (PC == m_hookAddresses[i]) {
-            if (m_hookVector[i]->hookProc())
-                retFlag = true;
-                //return; // ïîìåíÿòü, åñëè íåîáõîäèìî íåñêîëüêî ëîâóøåê íà îäèí àäðåñ
+    // можно сделать упорядоченный список, чтобы не перебирать все
+    if (!m_hooksDisabled) {
+        for (int i = 0; i < m_nHooks; i++) {
+            if (PC == m_hookAddresses[i]) {
+                if (m_hookVector[i]->hookProc())
+                    retFlag = true;
+                    //return; // поменять, если необходимо несколько ловушек на один адрес
+            }
         }
-    }
 
-    if (retFlag)
-        return;
+        if (retFlag)
+            return;
+    }
 
     m_curClock += m_kDiv * simz80();
 
