@@ -173,6 +173,7 @@ class DebugWindow : private EmuWindow
             AM_CODE,    // секция кода
             AM_DUMP,    // секция дампа
             AM_REGS,    // секция регистров
+            AM_FLAGS,   // секция флагов
             AM_BPOINTS, // секция точек останова
             AM_INPUT    // режим ввода числа
         };
@@ -316,7 +317,14 @@ class DebugWindow : private EmuWindow
         void regsKbdProc(PalKeyCode keyCode);   // клавиатурный обработчик секции регистров
         void regsProcessInput();                // обработка завершения ввода
 
-        // vreakpoints section fields and methods
+        // flags section fields and methods
+        const int m_flagsBits[6] = {0, 6, 2, 7, 4, 1}; // позиции битов в регистре флагов
+        int m_flagsCurFlag;                      // номер текущего флага
+        void flagsInit();                        // инициализация секции флагов
+        void flagsDraw();                        // отрисовка секции флагов
+        void flagsKbdProc(PalKeyCode keyCode);   // клавиатурный обработчик секции флагов
+
+        // breakpoints section fields and methods
         unsigned m_curBpoint = 0;                    // номер текущей точки останова
         void bpointsDraw();
         void bpointsKbdProc(PalKeyCode keyCode);// клавиатурный обработчик секции точек останова

@@ -158,6 +158,7 @@ DebugWindow::DebugWindow(Cpu* cpu)
     codeInit();
     dumpInit();
     regsInit();
+    flagsInit();
     inputInit();
 
     setWindowStyle(WS_AUTOSIZE);
@@ -689,22 +690,8 @@ void DebugWindow::drawHexSeq(int x, int y, uint8_t* seq, uint8_t* old_seq, int l
 
 void DebugWindow::displayCpuStatus()
 {
-    int baseY = m_curLayout->regs.top;
-    int baseX = m_curLayout->flags.left + 5;
-    if (!m_compactMode)
-        baseX++;
-    drawInt(baseX, baseY++, m_states[m_stateNum].fl_c, m_states[m_stateNum].fl_c != m_states[1-m_stateNum].fl_c);
-    drawInt(baseX, baseY++, m_states[m_stateNum].fl_z, m_states[m_stateNum].fl_z != m_states[1-m_stateNum].fl_z);
-    drawInt(baseX, baseY++, m_states[m_stateNum].fl_p, m_states[m_stateNum].fl_p != m_states[1-m_stateNum].fl_p);
-    drawInt(baseX, baseY++, m_states[m_stateNum].fl_m, m_states[m_stateNum].fl_m != m_states[1-m_stateNum].fl_m);
-    drawInt(baseX, baseY++, m_states[m_stateNum].fl_ac, m_states[m_stateNum].fl_ac != m_states[1-m_stateNum].fl_ac);
-    if (m_z80Mode) {
-        drawInt(baseX, baseY++, m_states[m_stateNum].fl_n, m_states[m_stateNum].fl_n != m_states[1-m_stateNum].fl_n);
-        drawInt(baseX, baseY + 1, m_states[m_stateNum].iff, m_states[m_stateNum].iff != m_states[1-m_stateNum].iff);
-    }
-
-    baseY = m_curLayout->stack.top;
-    baseX = m_curLayout->stack.left + 10;
+    int baseY = m_curLayout->stack.top;
+    int baseX = m_curLayout->stack.left + 10;
     drawHexWord(baseX, baseY++, m_states[m_stateNum].stack0, m_states[m_stateNum].stack0 != m_states[1-m_stateNum].stack0);
     drawHexWord(baseX, baseY++, m_states[m_stateNum].stack2, m_states[m_stateNum].stack2 != m_states[1-m_stateNum].stack2);
     drawHexWord(baseX, baseY++, m_states[m_stateNum].stack4, m_states[m_stateNum].stack4 != m_states[1-m_stateNum].stack4);
@@ -781,6 +768,7 @@ void DebugWindow::displayCpuStatus()
     highlight(m_curLayout->regMemSmb.left + 25, m_curLayout->regMemSmb.top + 1, 3, len, true);
 
     regsDraw();
+    flagsDraw();
     dumpDraw();
     codeDraw();
     bpointsDraw();
@@ -796,7 +784,7 @@ void DebugWindow::drawHintBar()
 
     switch (m_mode) {
         case AM_CODE:
-            s = "C/D/R/B,Tab,Esc-Section A-Addr F4-Here F5-B/p F7-Step F8-Over F9-Run";
+            s = "C/D/R/F/B,Tab,Esc-Section A-Addr F4-Here F5-B/p F7-Step F8-Over F9-Run";
             if (!m_compactMode)
                 s += " U-Skip";
             if (!m_z80Mode) {
@@ -807,15 +795,19 @@ void DebugWindow::drawHintBar()
             break;
         case AM_DUMP:
             //s = "C/D/R/B,Tab,Esc-Section A-Addr F2-Edit";
-            s = "C/D/R/B,Tab,Esc-Section A-Addr Enter/F2-Edit";
+            s = "C/D/R/F/B,Tab,Esc-Section A-Addr Enter/F2-Edit";
             break;
         case AM_REGS:
             //s = "C/D/R/B,Tab,Esc-Section F2-Edit";
-            s = "C/D/R/B,Tab,Esc-Section Enter/F2-Edit";
+            s = "C/D/R/F/B,Tab,Esc-Section Enter/F2-Edit";
+            break;
+        case AM_FLAGS:
+            //s = "C/D/R/B,Tab,Esc-Section F2-Edit";
+            s = "C/D/R/F/B,Tab,Esc-Section 0/1/Space-Set";
             break;
         case AM_BPOINTS:
             //s = "C/D/R/B,Tab,Esc-Section F2-Edit Enter-Goto";
-            s = "C/D/R/B,Tab,Esc-Section Enter-Goto";
+            s = "C/D/R/F/B,Tab,Esc-Section Enter-Goto";
             break;
         case AM_INPUT:
             s = "Enter-Enter Esc-Cancel";
@@ -854,6 +846,9 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                 case PK_R:
                     m_mode = AM_REGS;
                     break;
+                case PK_F:
+                    m_mode = AM_FLAGS;
+                    break;
                 case PK_B:
                     if (m_bpList.size() > 0)
                         m_mode = AM_BPOINTS;
@@ -863,7 +858,9 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                         m_mode = AM_DUMP;
                     else if (m_mode == AM_DUMP)
                         m_mode = AM_REGS;
-                    else // if (m_mode == AM_REGS)
+                    else if (m_mode == AM_REGS)
+                        m_mode = AM_FLAGS;
+                    else // if (m_mode == AM_FLAGS)
                         m_mode = AM_CODE;
                     break;
                 case PK_M:
@@ -880,6 +877,9 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                             break;
                         case AM_REGS:
                             regsKbdProc(keyCode);
+                            break;
+                        case AM_FLAGS:
+                            flagsKbdProc(keyCode);
                             break;
                         case AM_BPOINTS:
                             bpointsKbdProc(keyCode);
@@ -901,7 +901,8 @@ void DebugWindow::checkForInput()
                 break;
             case AM_DUMP:
                 dumpProcessInput();
-                break;
+                return; // m_inputFromMode set in dumpProcessInput()
+                //break;
             case AM_REGS:
                 regsProcessInput();
                 break;
@@ -1458,18 +1459,22 @@ void DebugWindow::dumpKbdProc(PalKeyCode keyCode)
 
 void DebugWindow::dumpProcessInput()
 {
+    m_inputFromMode = AM_NONE;
     if (m_dumpInputAddr) {
         m_dumpCurStartAddr = m_inputReturnValue & 0xFFF0;
         m_dumpCurAddr = m_dumpCurStartAddr;
     } else {
         writeByte(m_dumpCurAddr, m_inputReturnValue);
+        dumpKbdProc(PK_RIGHT); // переходим к редактированию следующего байта
+        m_inputFromMode = AM_DUMP;
+        dumpKbdProc(PK_F2);
     }
 }
 
 
 // ######## REGS section methods ########
 
-// отрисовка регистров
+// инициализация секции регистров
 void DebugWindow::regsInit()
 {
     m_regsCurReg = 0;
@@ -1597,6 +1602,7 @@ void DebugWindow::regsSetCurRegValue(uint16_t value)
 }
 
 
+// клавиатурный обработчик секции регистров
 void DebugWindow::regsKbdProc(PalKeyCode keyCode)
 {
     switch (keyCode) {
@@ -1634,6 +1640,82 @@ void DebugWindow::regsKbdProc(PalKeyCode keyCode)
 void DebugWindow::regsProcessInput()
 {
     regsSetCurRegValue(m_inputReturnValue);
+}
+
+
+
+// ######## FLAGS section methods ########
+
+// инициализация секции флагов
+void DebugWindow::flagsInit()
+{
+    m_flagsCurFlag = 0;
+}
+
+
+// отрисовка флагов
+void DebugWindow::flagsDraw()
+{
+    int baseY = m_curLayout->regs.top;
+    int baseX = m_curLayout->flags.left + 5;
+    if (!m_compactMode)
+        baseX++;
+    drawInt(baseX, baseY++, m_states[m_stateNum].fl_c, m_states[m_stateNum].fl_c != m_states[1-m_stateNum].fl_c);
+    drawInt(baseX, baseY++, m_states[m_stateNum].fl_z, m_states[m_stateNum].fl_z != m_states[1-m_stateNum].fl_z);
+    drawInt(baseX, baseY++, m_states[m_stateNum].fl_p, m_states[m_stateNum].fl_p != m_states[1-m_stateNum].fl_p);
+    drawInt(baseX, baseY++, m_states[m_stateNum].fl_m, m_states[m_stateNum].fl_m != m_states[1-m_stateNum].fl_m);
+    drawInt(baseX, baseY++, m_states[m_stateNum].fl_ac, m_states[m_stateNum].fl_ac != m_states[1-m_stateNum].fl_ac);
+    if (m_z80Mode) {
+        drawInt(baseX, baseY++, m_states[m_stateNum].fl_n, m_states[m_stateNum].fl_n != m_states[1-m_stateNum].fl_n);
+        drawInt(baseX, baseY + 1, m_states[m_stateNum].iff, m_states[m_stateNum].iff != m_states[1-m_stateNum].iff);
+    }
+
+    if (m_mode == AM_FLAGS)
+        highlight(m_curLayout->flags.left + 5, 1 + m_flagsCurFlag, 3, 3);
+}
+
+
+// клавиатурный обработчик секции флагов
+void DebugWindow::flagsKbdProc(PalKeyCode keyCode)
+{
+    uint16_t af = m_states[m_stateNum].a << 8 | m_states[m_stateNum].f;
+    int bitNo = m_flagsBits[m_flagsCurFlag];
+
+    switch (keyCode) {
+        case PK_UP:
+            if (m_flagsCurFlag > 0)
+                --m_flagsCurFlag;
+            break;
+        case PK_DOWN:
+            if (m_flagsCurFlag < (m_z80Mode ? 5 : 4))
+                ++m_flagsCurFlag;
+            break;
+        case PK_PGUP:
+        case PK_LEFT:
+            m_flagsCurFlag = 0;
+            break;
+        case PK_PGDN:
+        case PK_RIGHT:
+            m_flagsCurFlag = m_z80Mode ? 5 : 4;
+            break;
+        case PK_1:
+            af |= 1 << bitNo;
+            m_cpu->setAF(af);
+            fillCpuStatus();
+            break;
+        case PK_0:
+            af &= ~1 << bitNo;
+            m_cpu->setAF(af);
+            fillCpuStatus();
+            break;
+        case PK_SPACE:
+            af ^= 1 << bitNo;
+            m_cpu->setAF(af);
+            fillCpuStatus();
+            break;
+        default:
+            break;
+    }
 }
 
 
