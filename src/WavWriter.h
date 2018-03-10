@@ -23,6 +23,7 @@
 
 #include "PalFile.h"
 
+class PlatformCore;
 
 class WavWriter : public ActiveDevice
 {

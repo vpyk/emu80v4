@@ -47,7 +47,7 @@ void TapeRedirector::reset()
 
 void TapeRedirector::assignFile(string fileName, string rwMode)
 {
-    m_permanentFileName = palMakeFullFileName(fileName);
+    m_permanentFileName = fileName;
     m_rwMode = rwMode;
 }
 
@@ -102,6 +102,14 @@ void TapeRedirector::closeFile()
     if (m_wavWriter) {
         delete m_wavWriter;
         m_wavWriter = nullptr;
+    }
+}
+
+
+void TapeRedirector::setFilePos(unsigned pos)
+{
+    if (m_isOpen) {
+        m_file.seek(pos);
     }
 }
 

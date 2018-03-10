@@ -20,6 +20,7 @@
 #define FILELOADER_H
 
 #include "EmuObjects.h"
+#include "TapeRedirector.h"
 
 
 class FileLoader : public EmuObject
@@ -35,11 +36,14 @@ class FileLoader : public EmuObject
         bool chooseAndLoadFile(bool run = false);
         void setFilter(const std::string& filter);
         void attachAddrSpace(AddressableDevice* as);
+        void attachTapeRedirector(TapeRedirector* tapeRedirector);
 
     protected:
         AddressableDevice* m_as = nullptr;
+        TapeRedirector* m_tapeRedirector = nullptr;
         std::string m_filter;
         int m_skipTicks = 2000000;
+        bool m_allowMultiblock = false;
 };
 
 

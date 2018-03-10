@@ -37,6 +37,7 @@ class TapeRedirector : public EmuObject
 
         void openFile();
         void closeFile();
+        void setFilePos(unsigned pos);
 
         void assignFile(std::string fileName, std::string rwMode);
         uint8_t readByte();

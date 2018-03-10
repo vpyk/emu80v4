@@ -30,6 +30,12 @@ void FileLoader::attachAddrSpace(AddressableDevice* as)
 }
 
 
+void FileLoader::attachTapeRedirector(TapeRedirector* tapeRedirector)
+{
+    m_tapeRedirector = tapeRedirector;
+}
+
+
 void FileLoader::setFilter(const std::string& filter)
 {
     m_filter = filter;
@@ -64,6 +70,14 @@ bool FileLoader::setProperty(const std::string& propertyName, const EmuValuesLis
     } else if (propertyName == "skipTicks" && values[0].isInt()) {
         m_skipTicks = values[0].asInt();
         return true;
+    } else if (propertyName == "tapeRedirector") {
+        attachTapeRedirector(static_cast<TapeRedirector*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "allowMultiblock") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_allowMultiblock = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
 }
@@ -75,6 +89,8 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
     uint8_t* buf = palReadFile(fileName, fileSize, false);
     if (!buf)
         return false;
+
+    int fullSize = fileSize;
 
     if (fileSize < 9) {
         delete[] buf;
@@ -104,6 +120,28 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
     for (uint16_t addr = begAddr; addr <= endAddr; addr++)
         m_as->writeByte(addr, *ptr++);
 
+    fileSize -= (endAddr - begAddr + 1);
+
+    // skip CS
+    while (fileSize >0 && (*ptr) != 0xE6) {
+        ++ptr;
+        --fileSize;
+    }
+    if (fileSize > 3) {
+        fileSize -= 3;
+        ptr += 3;
+    } else
+        fileSize = 0;
+
+    // Find next block
+    if (m_allowMultiblock && m_tapeRedirector && fileSize > 0)
+        while (fileSize > 0 && (*ptr) != 0xE6) {
+            ++ptr;
+            --fileSize;
+        }
+    //if (fileSize > 0)
+    //    --fileSize;
+
     if (run) {
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
@@ -112,6 +150,12 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
             g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
             cpu->enableHooks();
             cpu->setPC(begAddr);
+            if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
+                m_tapeRedirector->assignFile(fileName, "r");
+                m_tapeRedirector->openFile();
+                m_tapeRedirector->assignFile("", "r");
+                m_tapeRedirector->setFilePos(fullSize - fileSize);
+            }
         }
     }
 
