@@ -47,6 +47,7 @@ class EurekaRenderer : public CrtRenderer
     public:
         EurekaRenderer();
         void renderFrame() override;
+        void toggleColorMode() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
