@@ -30,7 +30,7 @@ using namespace std;
 
 #ifdef __WIN32__
 
-string palOpenFileDialog(string title, string filter, bool write)
+string palOpenFileDialog(string title, string filter, bool write, PalWindow* window)
 {
     OPENFILENAMEW ofn;
     memset(&ofn, 0, sizeof(ofn));
@@ -76,7 +76,7 @@ string palOpenFileDialog(string title, string filter, bool write)
 
 #else
 
-std::string palOpenFileDialog(std::string title, std::string filter, bool write) {
+std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow*) {
     return "";
 }
 
@@ -85,6 +85,13 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write)
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef) {
     return false;
 }
+
+
+void palGetPalDefines(std::list<std::string>& defineList)
+{
+    defineList.push_back("SDL");
+}
+
 
 void palSetRunFileName(std::string runFileName) {
 }

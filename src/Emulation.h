@@ -50,6 +50,7 @@ class Emulation : public ParentObject
         virtual ~Emulation();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
         void addChild(EmuObject* child) override;
 
         void addObject(EmuObject* obj);
@@ -63,6 +64,7 @@ class Emulation : public ParentObject
         inline void debugRun() {m_debugReqCpu = nullptr;};
 
         void processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
+        void resetKeys(EmuWindow* wnd);
         void draw();
         void sysReq(EmuWindow* wnd, SysReq sr);
         void setWndFocus(EmuWindow* wnd);

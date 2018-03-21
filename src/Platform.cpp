@@ -223,6 +223,12 @@ void Platform::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKe
 }
 
 
+void Platform::resetKeys()
+{
+    m_kbdLayout->resetKeys();
+}
+
+
 void Platform::loadFile(string fileName)
 {
     if (m_loader)

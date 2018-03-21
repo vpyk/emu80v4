@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <limits>
+#include <sstream>
 #include <algorithm>
 
 #include "Pal.h"
@@ -62,15 +62,20 @@ Emulation::Emulation(int argc, char** argv)
     getConfig()->updateConfig();
 
     if (m_platformList.empty()) {
-        PlatformInfo pi;
-        bool newWnd;
-        if (m_config->choosePlatform(pi, "", newWnd, true)) {
-            Platform* platform = new Platform(pi.configFileName, pi.objName);
-            m_platformList.push_back(platform);
-            getConfig()->updateConfig();
-            //m_activePlatform = platform;
-        } else
-            palRequestForQuit();
+        string defPlatformName = palGetDefaultPlatform();
+        if (defPlatformName != "")
+            runPlatform(defPlatformName);
+        else {
+            PlatformInfo pi;
+            bool newWnd;
+            if (m_config->choosePlatform(pi, "", newWnd, true)) {
+                Platform* platform = new Platform(pi.configFileName, pi.objName);
+                m_platformList.push_back(platform);
+                getConfig()->updateConfig();
+                //m_activePlatform = platform;
+            } else
+                palRequestForQuit();
+        }
     }
 
     checkPlatforms();
@@ -302,6 +307,14 @@ void Emulation::processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed, u
 }
 
 
+void Emulation::resetKeys(EmuWindow* wnd)
+{
+    Platform* platform = platformByWindow(wnd);
+    if (platform)
+        platform->resetKeys();
+}
+
+
 void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
 {
     Platform* platform = platformByWindow(wnd);
@@ -361,6 +374,12 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
                     checkPlatforms();
                 }
             }
+            break;
+        case SR_PAUSEON:
+            m_isPaused = true;
+            break;
+        case SR_PAUSEOFF:
+            m_isPaused = false;
             break;
         case SR_PAUSE:
             m_isPaused = !m_isPaused;
@@ -507,4 +526,29 @@ bool Emulation::setProperty(const string& propertyName, const EmuValuesList& val
     }
 
     return false;
+}
+
+
+string Emulation::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "volume") {
+        stringstream stringStream;
+        stringStream << m_mixer->getVolume();
+        stringStream >> res;
+    }/* else if (propertyName == "frameRate") {
+        stringstream stringStream;
+        stringStream << m_frameRate;
+        stringStream >> res;
+    } else if (propertyName == "sampleRate") {
+        stringstream stringStream;
+        stringStream << m_sampleRate;
+        stringStream >> res;
+    }*/
+    return res;
 }

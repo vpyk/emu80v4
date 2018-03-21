@@ -85,6 +85,12 @@ void SoundMixer::setVolume(int volume)
 }
 
 
+int SoundMixer::getVolume()
+{
+    return m_volume;
+}
+
+
 SoundSource::SoundSource()
 {
     g_emulation->getSoundMixer()->addSoundSource(this);

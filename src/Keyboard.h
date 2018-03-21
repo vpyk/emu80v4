@@ -27,7 +27,6 @@ class Keyboard : public EmuObject
     public:
         virtual void resetKeys() = 0;
         virtual void processKey(EmuKey key, bool isPressed) = 0;
-
 };
 
 #endif  // KEYBOARD_H

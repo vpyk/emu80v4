@@ -21,19 +21,22 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 #include "../EmuTypes.h"
 
+class PalWindow;
 
 bool palWxInit(int argc, char** argv);
 void palWxQuit();
 
-std::string palOpenFileDialog(std::string title, std::string filter, bool write);
+std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
 
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false);
 void palSetRunFileName(std::string runFileName);
 void palShowConfigWindow(int curTabId = 0);
 void palUpdateConfig();
+void palGetPalDefines(std::list<std::string>& difineList);
 
 void palAddTabToConfigWindow(int tabId, std::string tabName);
 void palRemoveTabFromConfigWindow(int tabId);

@@ -119,6 +119,7 @@ class KbdLayout : public EmuObject
         void setJcukenMode() {m_mode = KLM_JCUKEN;};
         void setSmartMode()  {m_mode = KLM_SMART;};
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
+        void resetKeys();
 
     protected:
         enum KbdLayoutMode {

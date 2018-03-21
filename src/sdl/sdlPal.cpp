@@ -560,3 +560,9 @@ void palDelay(uint64_t time)
 {
     SDL_Delay(time * 1000 / SDL_GetPerformanceFrequency());
 }
+
+
+string palGetDefaultPlatform()
+{
+    return "";
+}

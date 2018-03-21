@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
 #include <string.h>
 
 #include "EmuWindow.h"
@@ -366,7 +367,7 @@ void EmuWindow::sysReq(SysReq sr)
             g_emulation->getConfig()->updateConfig();
             break;
         case SR_SCREENSHOT:
-            screenshotRequest(palOpenFileDialog("Save screenshot", "BMP files (*.bmp)|*.bmp", true));
+            screenshotRequest(palOpenFileDialog("Save screenshot", "BMP files (*.bmp)|*.bmp", true, this));
             break;
         default:
             break;
@@ -428,6 +429,16 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
     } else if (propertyName == "defaultWindowSize") {
         if (values[0].isInt() && values[1].isInt()) {
             setDefaultWindowSize(values[0].asInt(), values[1].asInt());
+            return true;
+        }
+    } else if (propertyName == "defaultWindowWidth") { // !!!
+        if (values[0].isInt()) {
+            setDefaultWindowSize(values[0].asInt(), m_defWindowHeight);
+            return true;
+        }
+    } else if (propertyName == "defaultWindowHeight") { // !!!
+        if (values[0].isInt()) {
+            setDefaultWindowSize(m_defWindowWidth, values[0].asInt());
             return true;
         }
     } else if (propertyName == "antialiasing") {
@@ -510,6 +521,18 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
         return m_isAntialiased ? "yes" : "no";
     } else if (propertyName == "aspectCorrection") {
         return m_aspectCorrection ? "yes" : "no";
+    } else if (propertyName == "defaultWindowWidth") {
+        string res;
+        stringstream stringStream;
+        stringStream << m_defWindowWidth;
+        stringStream >> res;
+        return res;
+    } else if (propertyName == "defaultWindowHeight") {
+        string res;
+        stringstream stringStream;
+        stringStream << m_defWindowHeight;
+        stringStream >> res;
+        return res;
     }
 
     return "";

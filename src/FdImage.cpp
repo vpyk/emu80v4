@@ -19,6 +19,8 @@
 #include "Pal.h"
 #include "FdImage.h"
 #include "Emulation.h"
+#include "Platform.h"
+#include "EmuWindow.h"
 
 using namespace std;
 
@@ -65,7 +67,7 @@ bool FdImage::assignFileName(string fileName)
 
 void FdImage::chooseFile()
 {
-    string fileName = palOpenFileDialog("Open floppy disk image file", m_filter, false);
+    string fileName = palOpenFileDialog("Open floppy disk image file", m_filter, false, m_platform->getWindow());
     g_emulation->restoreFocus();
     if (fileName != "") {
         m_fileName = fileName;

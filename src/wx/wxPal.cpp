@@ -53,7 +53,7 @@ void palWxQuit()
 }
 
 
-string palOpenFileDialog(string title, string filter, bool write)
+string palOpenFileDialog(string title, string filter, bool write, PalWindow*)
 {
     //palPause();
     wxString wxFilter = wxString::FromUTF8(filter.c_str());
@@ -132,6 +132,14 @@ void palUpdateConfig()
 {
     configWnd->updateConfig();
 }
+
+
+void palGetPalDefines(std::list<std::string>& defineList)
+{
+    defineList.push_back("SDL");
+    defineList.push_back("WX");
+}
+
 
 void palWxProcessMessages()
 {

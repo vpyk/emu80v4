@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "Emulation.h"
 #include "PlatformCore.h"
 #include "WavReader.h"
+#include "Platform.h"
+#include "EmuWindow.h"
 
 #include "TapeRedirector.h"
 
@@ -58,7 +60,7 @@ void TapeRedirector::openFile()
         closeFile();
 
     if (m_permanentFileName == "") {
-        m_fileName = palOpenFileDialog("Open rk file", m_filter + "|Wav Files (*.wav)|*.wav;*.WAV|CSW Files (*.csw)|*.csw;*.CSW", m_rwMode == "w");
+        m_fileName = palOpenFileDialog("Open rk file", m_filter + "|Wav Files (*.wav)|*.wav;*.WAV|CSW Files (*.csw)|*.csw;*.CSW", m_rwMode == "w", m_platform->getWindow());
         g_emulation->restoreFocus();
     }
     else

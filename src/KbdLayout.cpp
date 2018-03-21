@@ -24,6 +24,14 @@
 using namespace std;
 
 
+void KbdLayout::resetKeys()
+{
+    m_platform->getKeyboard()->resetKeys();
+    m_shiftPressed = false;
+    m_lastNonUnicodeKey = EK_NONE;
+}
+
+
 void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey)
 {
     Keyboard* kbd = m_platform->getKeyboard();

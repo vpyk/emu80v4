@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -107,6 +107,23 @@ bool Cpu::setProperty(const string& propertyName, const EmuValuesList& values)
     }
 
     return false;
+}
+
+
+std::string Cpu::getPropertyStringValue(const std::string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "debugOnHalt")
+        return m_debugOnHalt ? "yes" : "no";
+    else if (propertyName == "debugOnIllegalCmd")
+        return m_debugOnIllegalCmd ? "yes" : "no";
+
+    return "";
 }
 
 

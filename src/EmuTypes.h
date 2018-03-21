@@ -71,6 +71,8 @@ enum SysReq
     SR_SPEEDUP,
     SR_SPEEDNORMAL,
     SR_PAUSE,
+    SR_PAUSEON,
+    SR_PAUSEOFF,
     SR_SCREENSHOT,
     SR_MUTE
 };

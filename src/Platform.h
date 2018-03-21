@@ -51,6 +51,7 @@ class Platform : public ParentObject
         void sysReq(SysReq sr);
         virtual void draw();
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
+        void resetKeys();
         /*virtual */void loadFile(std::string fileName);
 
         const std::string& getBaseDir() {return m_baseDir;};

@@ -42,6 +42,7 @@ class Cpu : public ActiveDevice
         virtual CpuType getType() = 0;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
 
         void attachAddrSpace(AddressableDevice* as);
         void attachIoAddrSpace(AddressableDevice* as);

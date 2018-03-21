@@ -54,5 +54,6 @@ void palRequestForQuit();
 
 void palPlaySample(int16_t sample);
 
+std::string palGetDefaultPlatform();
 
 #endif // SDLPAL_H

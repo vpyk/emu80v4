@@ -33,6 +33,12 @@ void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed, unsigned unicod
 }
 
 
+void emuResetKeys(PalWindow* wnd)
+{
+    g_emulation->resetKeys(static_cast<EmuWindow*>(wnd));
+}
+
+
 // System request
 void emuSysReq(PalWindow* wnd, SysReq sr)
 {

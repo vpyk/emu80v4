@@ -83,6 +83,9 @@ class SoundMixer : public ActiveDevice
         // устанавливает громкость (1-5, 5 - max)
         void setVolume(int volume);
 
+        // возвращает текущий уровень громкости
+        int getVolume();
+
     private:
         // Список источников звука
         std::list<SoundSource*> m_soundSources;
@@ -101,6 +104,9 @@ class SoundMixer : public ActiveDevice
 
         // признак беззвучного режима
         bool m_muted = false;
+
+        // Уровень громкости (1-5)
+        int m_volume = 4;
 
         // сдвиг отсчета вправо для уменьшения громкости
         int m_sampleShift = 0;
