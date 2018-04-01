@@ -251,6 +251,7 @@ void Platform::showDebugger()
     if (m_cpu->getType() == Cpu::CPU_8080 || m_cpu->getType() == Cpu::CPU_Z80) {
         if (!m_dbgWindow) {
             m_dbgWindow = new DebugWindow(m_cpu);
+            m_dbgWindow->init();
             m_dbgWindow->setCaption("Debug: " + m_window->getCaption());
         }
         m_dbgWindow->startDebug();

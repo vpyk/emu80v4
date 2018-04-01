@@ -76,13 +76,13 @@ string palOpenFileDialog(string title, string filter, bool write, PalWindow* win
 
 #else
 
-std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow*) {
+std::string palOpenFileDialog(std::string, std::string, bool, PalWindow*) {
     return "";
 }
 
 #endif
 
-bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef) {
+bool palChoosePlatform(std::vector<PlatformInfo>&, int&, bool&, bool, PalWindow*) {
     return false;
 }
 
@@ -93,31 +93,31 @@ void palGetPalDefines(std::list<std::string>& defineList)
 }
 
 
-void palSetRunFileName(std::string runFileName) {
+void palSetRunFileName(std::string) {
 }
 
-void palShowConfigWindow(int curTabId) {
+void palShowConfigWindow(int) {
 }
 
 void palUpdateConfig() {
 }
 
-void palAddTabToConfigWindow(int tabId, std::string tabName) {
+void palAddTabToConfigWindow(int, std::string) {
 }
 
-void palRemoveTabFromConfigWindow(int tabId) {
+void palRemoveTabFromConfigWindow(int) {
 }
 
-void palAddRadioSelectorToTab(int tabId, int column, std::string caption, std::string object, std::string property, SelectItem* items, int nItems) {
+void palAddRadioSelectorToTab(int, int, std::string, std::string, std::string, SelectItem*, int) {
 }
 
-void palSetTabOptFileName(int tabId, string optFileName) {
+void palSetTabOptFileName(int, string) {
 }
 
 void palWxProcessMessages() {
 }
 
-void palLog(std::string s) {
+void palLog(std::string) {
 }
 
 EmuLog& EmuLog::operator<<(string s)

@@ -52,6 +52,12 @@ EmuWindow::~EmuWindow()
 }
 
 
+void EmuWindow::init()
+{
+    initPalWindow();
+}
+
+
 string EmuWindow::getPlatformObjectName()
 {
     if (m_platform)
@@ -120,9 +126,9 @@ void EmuWindow::setFullScreen(bool fullscreen)
 {
     if (fullscreen) {
         m_params.style = PWS_FULLSCREEN;
-        applyParams();
     } else
         setWindowStyle(m_windowStyle);
+    applyParams();
 
     m_isFullscreenMode = fullscreen;
 }

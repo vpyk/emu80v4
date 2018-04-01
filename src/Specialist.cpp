@@ -67,7 +67,7 @@ SpecRenderer::SpecRenderer()
 {
     m_sizeX = m_prevSizeX = 384;
     m_sizeY = m_prevSizeY = 256;
-    m_aspectRatio = m_prevAspectRatio = 12. / 13.;
+    m_aspectRatio = m_prevAspectRatio = 576.0 * 9 / 704 / 8;
     m_bufSize = m_prevBufSize = m_sizeX * m_sizeY;
     m_pixelData = new uint32_t[m_bufSize];
     m_prevPixelData = new uint32_t[m_prevBufSize];

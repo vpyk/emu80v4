@@ -17,7 +17,6 @@
  */
 
 #include "EmuConfig.h"
-#include "EmuConfig.h"
 #include "Emulation.h"
 #include "Platform.h"
 
@@ -43,7 +42,7 @@ void EmuConfig::addExtention(std::string extention, std::string objName)
 }
 
 
-bool EmuConfig::choosePlatform(PlatformInfo& pi, string curPlatformName, bool& newWnd, bool setDefault)
+bool EmuConfig::choosePlatform(PlatformInfo& pi, string curPlatformName, bool& newWnd, bool setDefault, PalWindow* wnd)
 {
     int pos = 0;
     for (unsigned i = 0; i < m_platformVector.size(); i++)
@@ -52,7 +51,7 @@ bool EmuConfig::choosePlatform(PlatformInfo& pi, string curPlatformName, bool& n
         break;
     }
 
-    if (palChoosePlatform(m_platformVector, pos, newWnd, setDefault))
+    if (palChoosePlatform(m_platformVector, pos, newWnd, setDefault, wnd))
     {
         pi = m_platformVector[pos];
         return true;

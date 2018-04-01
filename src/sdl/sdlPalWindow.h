@@ -48,6 +48,7 @@ class PalWindow
 
         PalWindow();
         virtual ~PalWindow();
+        void initPalWindow() {};
 
         static PalWindow* windowById(uint32_t id);
         void bringToFront();

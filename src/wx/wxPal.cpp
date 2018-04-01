@@ -74,7 +74,7 @@ string palOpenFileDialog(string title, string filter, bool write, PalWindow*)
 }
 
 
-bool palChoosePlatform(vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef)
+bool palChoosePlatform(vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef, PalWindow* wnd)
 {
     ChPlatformDlg* dlg = new ChPlatformDlg(0L, _("Choose platform"));
     return dlg->execute(pi, pos, newWnd, runFileName, setDef);

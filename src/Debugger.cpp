@@ -169,9 +169,6 @@ DebugWindow::DebugWindow(Cpu* cpu)
 DebugWindow::~DebugWindow()
 {
     delete[] m_pixels;
-    //SDL_FreeSurface(m_surface);
-    //SDL_DestroyRenderer(m_renderer);
-    //SDL_DestroyWindow(m_window);
     delete[] m_font;
 }
 
@@ -196,7 +193,6 @@ void DebugWindow::setLayout(bool isCompact)
 void DebugWindow::closeRequest()
 {
     run();
-    hide();
 }
 
 
@@ -295,14 +291,6 @@ void DebugWindow::draw()
         }
     }
     m_cursorCounter = (m_cursorCounter + 1) % 30;
-
-    //SDL_UnlockSurface(m_surface);
-
-    //SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer, m_surface);
-    //SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
-    //SDL_RenderCopy(m_renderer, texture, NULL, NULL);
-    //SDL_RenderPresent(m_renderer);
-    //SDL_DestroyTexture(texture);
 
     drawFrame(m_pixelData);
     endDraw();

@@ -359,7 +359,7 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
                 if (platform)
                     curPlatformName = platform->getName();
                 bool newWnd;
-                if (m_config->choosePlatform(pi, curPlatformName, newWnd)) { // если имя платформы было изменено (2 экземпляра), найдено не будет
+                if (m_config->choosePlatform(pi, curPlatformName, newWnd, false, wnd)) { // если имя платформы было изменено (2 экземпляра), найдено не будет
                     // Удяляем активную платформу (как опция можно все - закомментировано)
                     if (!newWnd) {
                         m_platformList.remove(platform);

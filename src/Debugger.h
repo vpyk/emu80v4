@@ -96,6 +96,7 @@ class DebugWindow : private EmuWindow
         void processKey(PalKeyCode keyCode, bool isPressed) override;
         void closeRequest() override;
 
+        void init() {EmuWindow::init();};
         void setCaption(std::string caption) {EmuWindow::setCaption(caption);};
 
         void startDebug();
@@ -169,7 +170,7 @@ class DebugWindow : private EmuWindow
         };
 
         enum ActiveMode {
-            AM_NONE,    // пежим не задан, используется в m_inputFromMode
+            AM_NONE,    // режим не задан, используется в m_inputFromMode
             AM_CODE,    // секция кода
             AM_DUMP,    // секция дампа
             AM_REGS,    // секция регистров

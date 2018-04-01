@@ -47,10 +47,11 @@ void Crt8275Renderer::primaryRenderFrame()
         m_aspectRatio = 1.0;
     else if (frameRate < 55.0) {
         // PAL
-        m_aspectRatio = 288.0 * 4 / 52 / 3 / m_fntCharWidth / freqMHz;
+        //m_aspectRatio = 288.0 * 4 / 52 / 3 / m_fntCharWidth / freqMHz;
+        m_aspectRatio = 576.0 * 9 / 704 / m_fntCharWidth / freqMHz; // 576 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
     } else {
         // NTSC
-        m_aspectRatio = 240.0 * 4 / 52 / 3 / m_fntCharWidth / freqMHz;
+        m_aspectRatio = 480.0 * 9 / 704 / m_fntCharWidth / freqMHz; // 480 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
     }
 
     const Frame* frame = m_crt->getFrame();
@@ -146,7 +147,19 @@ void Crt8275Renderer::primaryRenderFrame()
 
 void Crt8275Renderer::altRenderFrame()
 {
-    m_aspectRatio = 1.0;
+    double frameRate = m_crt->getFrameRate();
+    double freqMHz = g_emulation->getFrequency() / m_crt->getKDiv() / 1000000.0;
+    if (frameRate == 0.0)
+        m_aspectRatio = 1.0;
+    else if (frameRate < 55.0) {
+        // PAL
+        //m_aspectRatio = 288.0 * 4 / 52 / 3 / m_fntCharWidth / freqMHz;
+        m_aspectRatio = 576.0 * 9 / 704 / 8 / freqMHz;
+    } else {
+        // NTSC
+        m_aspectRatio = 480.0 * 9 / 704 / 8 / freqMHz;
+    }
+    //m_aspectRatio = 1.0;
 
     const Frame* frame = m_crt->getFrame();
 
@@ -160,6 +173,8 @@ void Crt8275Renderer::altRenderFrame()
         nLines = 12;
     else
         nLines = 8;
+
+    m_aspectRatio = m_aspectRatio * nLines / frame->nLines;
 
     m_sizeX = nChars * 8;
     m_sizeY = nRows * nLines;

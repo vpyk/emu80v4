@@ -25,6 +25,7 @@
 #include "EmuTypes.h"
 #include "EmuObjects.h"
 
+class PalWindow;
 
 class EmuConfig : public EmuObject
 {
@@ -34,7 +35,8 @@ class EmuConfig : public EmuObject
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        bool choosePlatform(PlatformInfo& pi, std::string curPlatformName, bool& newWnd, bool setDefault = false);
+        bool choosePlatform(PlatformInfo& pi, std::string curPlatformName, bool& newWnd,
+                            bool setDefault = false, PalWindow* wnd = nullptr);
         void showConfigWindow(int configTabId = 0);
         void updateConfig();
 

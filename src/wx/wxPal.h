@@ -32,7 +32,7 @@ void palWxQuit();
 
 std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
 
-bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false);
+bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false, PalWindow* wnd = nullptr);
 void palSetRunFileName(std::string runFileName);
 void palShowConfigWindow(int curTabId = 0);
 void palUpdateConfig();
