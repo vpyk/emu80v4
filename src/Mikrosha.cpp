@@ -202,7 +202,7 @@ void MikroshaPit8253SoundSource::updateStats()
     if (m_pit) {
         m_pit->updateState();
         if (m_gate)
-            m_sumValue += SND_AMP - (m_pit->getCounter(2)->getAvgOut());
+            m_sumValue += m_pit->getCounter(2)->getAvgOut();
         }
 }
 
