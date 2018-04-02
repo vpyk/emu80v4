@@ -447,8 +447,10 @@ void Emulation::setFrameRate(int frameRate)
 
 void Emulation::setSampleRate(int sampleRate)
 {
-    if (palSetSampleRate(sampleRate))
+    if (palSetSampleRate(sampleRate)) {
         m_sampleRate = sampleRate;
+        m_mixer->setFrequency(m_frequency);
+    }
 }
 
 

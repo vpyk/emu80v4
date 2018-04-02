@@ -80,8 +80,10 @@ void SoundMixer::toggleMute()
 
 void SoundMixer::setVolume(int volume)
 {
-    if (volume >= 1 && volume <= 5)
+    if (volume >= 1 && volume <= 5) {
+        m_volume = volume;
         m_sampleShift = 5 - volume;
+    }
 }
 
 
