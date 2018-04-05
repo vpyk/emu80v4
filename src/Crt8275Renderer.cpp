@@ -18,6 +18,7 @@
 
 // Crt8275Renderer.cpp
 
+#include <sstream>
 #include <string.h>
 
 #include "Crt8275Renderer.h"
@@ -271,4 +272,35 @@ bool Crt8275Renderer::setProperty(const string& propertyName, const EmuValuesLis
     }
 
     return false;
+}
+
+
+string Crt8275Renderer::getCrtMode()
+{
+    const Frame* frame = m_crt->getFrame();
+    stringstream ss;
+    if (m_crt->getRasterPresent()) {
+        ss << frame->nCharsPerRow << "×" << frame->nRows << "×" << frame->nLines << "@";
+        ss.precision(2);
+        ss << fixed << m_crt->getFrameRate() << "Hz";
+    } else
+        ss << "No sync";
+
+    return ss.str();
+}
+
+
+string Crt8275Renderer::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "crtMode") {
+        return getCrtMode();
+    }
+
+    return "";
 }

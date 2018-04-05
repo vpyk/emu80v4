@@ -31,6 +31,7 @@ class Crt8275Renderer : public TextCrtRenderer
 
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
 
         void attachCrt(Crt8275* crt);
 
@@ -66,6 +67,9 @@ class Crt8275Renderer : public TextCrtRenderer
 
         void primaryRenderFrame() override;
         void altRenderFrame() override;
+
+    private:
+        std::string getCrtMode();
 };
 
 

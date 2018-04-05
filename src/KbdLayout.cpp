@@ -270,6 +270,7 @@ EmuKey RkKbdLayout::translateKeyQwerty(PalKeyCode keyCode)
         case PK_LCTRL:
             return EK_CTRL;
         case PK_RCTRL:
+        case PK_INS:
             return EK_LANG;
 
         // Клавиши Специалиста
@@ -285,7 +286,6 @@ EmuKey RkKbdLayout::translateKeyQwerty(PalKeyCode keyCode)
             return EK_F10;
         case PK_F11:
             return EK_F11;
-
 
         default:
             return EK_NONE;

@@ -173,7 +173,7 @@ string Rk86Renderer::getPropertyStringValue(const string& propertyName)
 {
     string res;
 
-    res = EmuObject::getPropertyStringValue(propertyName);
+    res = Crt8275Renderer::getPropertyStringValue(propertyName);
     if (res != "")
         return res;
 
