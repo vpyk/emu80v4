@@ -31,6 +31,9 @@ class WavWriter : public ActiveDevice
         WavWriter(Platform* platform, const std::string& fileName, bool cswFormat = false);
         ~WavWriter();
 
+        // derived from EmuObject
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
         // derived from ActiveDevice
         void operate() override;
 
@@ -66,6 +69,7 @@ class WavWriter : public ActiveDevice
 
         unsigned m_ticksPerSample;  // тактов на сэмпл
         PalFile m_file;
+        std::string m_fileName;
         bool m_open = false;
         PlatformCore* m_core;
         unsigned m_size = 0;

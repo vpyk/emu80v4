@@ -226,6 +226,12 @@ bool TapeRedirector::waitForSequence(const uint8_t* seq, int len)
 
 
 
+bool TapeRedirector::isCancelled()
+{
+    return m_cancelled && !m_read;
+}
+
+
 bool TapeRedirector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
@@ -252,7 +258,17 @@ bool TapeRedirector::setProperty(const string& propertyName, const EmuValuesList
 }
 
 
-bool TapeRedirector::isCancelled()
+string TapeRedirector::getPropertyStringValue(const string& propertyName)
 {
-    return m_cancelled && !m_read;
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "currentFile" && m_isOpen) {
+        return m_fileName;
+    }
+
+    return "";
 }

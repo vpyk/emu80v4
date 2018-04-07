@@ -333,6 +333,21 @@ bool WavReader::getCurValue()
 }
 
 
+string WavReader::posToTime(unsigned sampleNo)
+{
+    int sec = sampleNo / m_sampleRate;
+    int min = sec / 60;
+    sec = sec % 60;
+
+    stringstream ss;
+    ss << min << ":";
+    ss.width(2);
+    ss.fill('0');
+    ss << sec;
+    return ss.str();
+}
+
+
 bool WavReader::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
@@ -388,7 +403,14 @@ string WavReader::getPropertyStringValue(const string& propertyName)
         stringstream stringStream;
         stringStream << m_speedUpFactor;
         stringStream >> res;
+    } else if (propertyName == "currentFile" && m_isOpen) {
+        res = m_fileName;
+    } else if (propertyName == "position" && m_isOpen) {
+        res = posToTime(m_curSample);
+        if (!m_cswFormat)
+            res += "/" + posToTime(m_samples);
     }
+
     return res;
 }
 

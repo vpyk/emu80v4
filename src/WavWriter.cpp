@@ -27,6 +27,7 @@ using namespace std;
 
 WavWriter::WavWriter(Platform* platform, const string& fileName, bool cswFormat)
 {
+    setName("wavWriter");
     m_core = platform->getCore();
     m_ticksPerSample = g_emulation->getFrequency() / 44100;
     m_open = m_file.open(fileName, "w");
@@ -35,6 +36,8 @@ WavWriter::WavWriter(Platform* platform, const string& fileName, bool cswFormat)
 
     if (!m_open)
         return;
+
+    m_fileName = fileName;
 
     if (m_cswFormat) {
         m_cswCurValue = m_initialValue;
@@ -105,4 +108,20 @@ void WavWriter::operate()
 
     } else
         m_file.write8(value ? 0xE0 : 0x20);
+}
+
+
+string WavWriter::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "currentFile" && m_open) {
+        return m_fileName;
+    }
+
+    return "";
 }

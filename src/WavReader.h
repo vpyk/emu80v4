@@ -79,6 +79,8 @@ class WavReader : public EmuObject
         void readNextSample();
         void readNextWavSample();
         void readNextCswSample();
+
+        std::string posToTime(unsigned sampleNo);
 };
 
 
