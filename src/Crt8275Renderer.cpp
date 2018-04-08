@@ -294,7 +294,7 @@ string Crt8275Renderer::getPropertyStringValue(const string& propertyName)
 {
     string res;
 
-    res = EmuObject::getPropertyStringValue(propertyName);
+    res = TextCrtRenderer::getPropertyStringValue(propertyName);
     if (res != "")
         return res;
 
