@@ -40,7 +40,8 @@ Emulation::Emulation(int argc, char** argv)
     m_argc = argc;
     m_argv = argv;
 
-    m_frameRate = 0;
+    m_frameRate = 100;
+    m_vsync = true;
     m_sampleRate = 48000;
 
     g_emulation = this;
@@ -436,12 +437,20 @@ void Emulation::setFrequency(int64_t freq)
 }
 
 
-// установка частоты кадров, 0 - vsync
+// установка частоты кадров, 0 - max
 void Emulation::setFrameRate(int frameRate)
 {
     m_frameRate = frameRate;
-    // для изменения "на лету" уьдобавить перебор всех окон и пересоздание рендерера при необходимости
+    // для изменения "на лету" добавить перебор всех окон и пересоздание рендерера при необходимости
     palSetFrameRate(frameRate);
+}
+
+
+// установка vsync
+void Emulation::setVsync(bool vsync)
+{
+    m_vsync = vsync;
+    palSetVsync(vsync);
 }
 
 
@@ -506,12 +515,14 @@ bool Emulation::setProperty(const string& propertyName, const EmuValuesList& val
         setFrequency(values[0].asInt());
         return true;
     } else*/
-    if (propertyName == "frameRate" && values[0].isInt()) {
-        if (values[0].isInt())
-            setFrameRate(values[0].asInt());
-        else if (values[0].asString() == "vsync")
-            setFrameRate(0);
+    if (propertyName == "maxFps" && values[0].isInt()) {
+        setFrameRate(values[0].asInt());
         return true;
+    } else if (propertyName == "vsync") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            setVsync(values[0].asString() == "yes");
+            return true;
+        }
     } else if (propertyName == "sampleRate" && values[0].isInt()) {
         setSampleRate(values[0].asInt());
         return true;

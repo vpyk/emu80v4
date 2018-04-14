@@ -85,8 +85,9 @@ class Emulation : public ParentObject
         int64_t getFrequency() {return m_frequency;};
         void setSampleRate(int sampleRate);             // установка частоты дискретизации звуковой карты
         int getSampleRate() {return m_sampleRate;};
-        void setFrameRate(int frameRate);               // установка частоты кадров, 0 - vsync
-        bool getVsync() {return m_frameRate == 0;};
+        void setFrameRate(int frameRate);               // установка частоты кадров, 0 - max
+        void setVsync(bool vsync);                      // установка vsync
+        bool getVsync() {return m_vsync;};
         void setSpeedUpFactor(unsigned speed);
 
         void processCmdLine();
@@ -106,6 +107,7 @@ class Emulation : public ParentObject
 
         uint64_t m_frequency;
         unsigned m_frameRate;
+        bool m_vsync;
         unsigned m_sampleRate;
 
         std::list<EmuObject*> m_objectList;

@@ -45,6 +45,7 @@ bool palSetSampleRate(int sampleRate);
 int palGetSampleRate();
 
 bool palSetFrameRate(int frameRate);
+bool palSetVsync(bool vsync);
 
 std::string palMakeFullFileName(std::string fileName);
 int palReadFromFile(const std::string& fileName, int first, int size, uint8_t* buffer, bool useBasePath = true);
