@@ -138,6 +138,10 @@ void EurekaRenderer::renderFrame()
     }
 }
 
+void EurekaRenderer::toggleColorMode()
+{
+    m_colorMode = !m_colorMode;
+}
 
 bool EurekaRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
