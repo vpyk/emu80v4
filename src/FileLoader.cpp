@@ -118,7 +118,7 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         return false;
     }
 
-    for (uint16_t addr = begAddr; addr <= endAddr; addr++)
+    for (unsigned addr = begAddr; addr <= endAddr; addr++)
         m_as->writeByte(addr, *ptr++);
 
     fileSize -= (endAddr - begAddr + 1);
