@@ -35,7 +35,7 @@
 #include "lite/litePal.h"
 #endif // PAL_LITE
 
-bool palInit(int argc, char** argv);
+bool palInit(int& argc, char** argv);
 void palQuit();
 void palIdle();
 

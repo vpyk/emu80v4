@@ -18,7 +18,7 @@
 
 #include "Pal.h"
 
-bool palInit(int argc, char** argv)
+bool palInit(int& argc, char** argv)
 {
 #ifdef PAL_SDL
     if (!palSdlInit())
