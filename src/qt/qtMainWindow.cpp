@@ -1,0 +1,1497 @@
+﻿/*
+ *  Emu80 v. 4.x
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <QMenu>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QKeySequence>
+#include <QStatusBar>
+#include <QLabel>
+#include <QActionGroup>
+#include <QKeyEvent>
+#include <QShortcut>
+#include <QMimeData>
+#include <QToolButton>
+#include <QMessageBox>
+
+#include <string>
+
+#include "qtPalWindow.h"
+#include "qtMainWindow.h"
+#include "qtPaintWidget.h"
+#include "qtRenderHelper.h"
+#include "qtToolBtn.h"
+#include "qtSettingsDialog.h"
+#include "qtAboutDialog.h"
+
+#include "qtPal.h"
+#include "../EmuCalls.h"
+
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+{
+    g_renderHelper->addWindow(this);
+
+    setAcceptDrops(true);
+
+    m_paintWidget = new PaintWidget(this);
+    setCentralWidget(m_paintWidget);
+
+    m_fpsTimer.setInterval(250);
+    connect(&m_fpsTimer, SIGNAL(timeout()), this, SLOT(onFpsTimer()));
+    m_fpsTimer.start();
+
+    //setWindowFlags(windowFlags() |= Qt::WindowMaximizeButtonHint);
+}
+
+MainWindow::~MainWindow()
+{
+    g_renderHelper->removeWindow(this);
+    if (m_settingsDialog)
+        delete m_settingsDialog;
+}
+
+
+void MainWindow::setPalWindow(PalWindow* palWindow)
+{
+    m_windowType = palWindow->getWindowType();
+
+    if (!m_palWindow && m_windowType == EWT_EMULATION) {
+        // first emulation window
+        createActions();
+        fillPlatformListMenu();
+    }
+    m_palWindow = palWindow;
+    switch (m_windowType) {
+    case EWT_EMULATION:
+        if (!m_settingsDialog) {
+            m_settingsDialog = new SettingsDialog(this);
+
+            m_fpsLabel = new QLabel("", this);
+            m_kbdLabel = new QLabel("", this);
+            m_colorLabel = new QLabel("", this);
+            m_crtModeLabel = new QLabel("", this);
+            m_crtModeLabel->setVisible(false);
+            m_tapeLabel = new QLabel("", this);
+            m_tapeLabel->setVisible(false);
+            m_wavLabel = new QLabel("", this);
+            m_wavLabel->setVisible(false);
+
+            m_statusBar = statusBar();
+            m_statusBar->addWidget(m_fpsLabel);
+            m_statusBar->addWidget(m_kbdLabel);
+            m_statusBar->addWidget(m_colorLabel);
+            m_statusBar->addWidget(m_tapeLabel);
+            m_statusBar->addWidget(m_wavLabel);
+            m_statusBar->addWidget(m_crtModeLabel);
+        }
+
+        tuneMenu();
+
+        if (m_fullscreenMode)
+            setFullScreen(false);
+
+        adjustClientSize();
+
+        m_settingsDialog->initConfig();
+        updateConfig(); // немного избыточно
+
+        break;
+    case EWT_DEBUG:
+        createDebugActions();
+        //getPaintWidget()->setVsync(false);
+        break;
+    default:
+        break;
+    }
+    m_controlsCreated = true;
+}
+
+
+std::string MainWindow::getPlatformObjectName()
+{
+    if (m_palWindow)
+        return m_palWindow->getPlatformObjectName();
+    else
+        return "";
+}
+
+
+std::string MainWindow::getPlatformGroupName()
+{
+    std::string platform = getPlatformObjectName();
+    std::string::size_type dotPos = platform.find(".",0);
+    return platform.substr(0, dotPos);
+}
+
+
+void MainWindow::setClientSize(int width, int height)
+{
+    m_clientWidth = width;
+    m_clientHeight = height;
+
+    adjustClientSize();
+}
+
+
+void MainWindow::adjustClientSize()
+{
+    bool sizeable = m_clientWidth == 0 && m_clientHeight == 0;
+    if (sizeable || m_fullscreenMode) {
+        m_paintWidget->setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+        setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    } else {
+        m_paintWidget->setFixedSize(m_clientWidth, m_clientHeight);
+        adjustSize();
+        //setFixedSize(width(), height());
+        int w = width();
+        int h = height();
+        if (w > 200 && h > 100) // some workaround, magic numbers from adjustSize docs
+            setFixedSize(w, h);
+    }
+
+    if (m_statusBar)
+        m_statusBar->setSizeGripEnabled(sizeable);
+
+    /*Qt::WindowFlags flags = windowFlags();
+    if (sizeable)
+        flags |= Qt::WindowMaximizeButtonHint;
+    else
+        flags &= ~Qt::WindowMaximizeButtonHint;
+    setWindowFlags(flags);
+    show();*/
+}
+
+
+void MainWindow::showWindow()
+{
+    // workaround for miximize button
+    if (!isVisible()) {
+        setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+        setWindowFlags(windowFlags() |= Qt::WindowMaximizeButtonHint);
+        show();
+        adjustClientSize();
+    }
+}
+
+
+void MainWindow::setFullScreen(bool fullscreen)
+{
+    bool visible = !(m_fullwindowAction->isChecked() || fullscreen);
+
+    if (m_menuBar)
+        m_menuBar->setVisible(visible);
+    if (m_statusBar)
+        m_statusBar->setVisible(visible);
+    if (m_toolBar)
+        m_toolBar->setVisible(visible);
+    if (fullscreen)
+        showFullScreen();
+    else
+        showNormal();
+    m_fullscreenMode = fullscreen;
+    adjustClientSize();
+}
+
+
+void MainWindow::fillPlatformListMenu()
+{
+    const std::vector<PlatformInfo>* platforms = emuGetPlatforms();
+    for (auto it = platforms->begin(); it != platforms->end(); it++) {
+        QAction* action = new QAction(QString::fromUtf8((*it).platformName.c_str()), m_platformListMenu);
+        action->setData(QString::fromUtf8((*it).objName.c_str()));
+        m_platformListMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(onPlatformSelect()));
+    }
+}
+
+
+void MainWindow::createActions()
+{
+    m_menuBar = menuBar();
+    m_menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    m_toolBar = new QToolBar(this);
+    m_toolBar->setFloatable(false);
+    //m_toolBar->setMovable(false);
+    m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    m_toolBar->setIconSize(QSize(16, 16));
+    addToolBar(m_toolBar);
+    m_toolBar->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+
+    // File menu
+    QMenu* fileMenu = m_menuBar->addMenu(tr("File"));
+
+    // Load and run
+    m_loadRunAction = new QAction(QIcon(":/icons/open_run.png"), tr("Load && Run..."), this);
+    m_loadRunAction->setToolTip(tr("Load file and run (Alt-F3)"));
+    QList<QKeySequence> loadRunKeysList;
+    loadRunKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F3));
+    loadRunKeysList.append(QKeySequence(Qt::META + Qt::Key_F3));
+    m_loadRunAction->setShortcuts(loadRunKeysList);
+    addAction(m_loadRunAction);
+    fileMenu->addAction(m_loadRunAction);
+    m_toolBar->addAction(m_loadRunAction);
+    connect(m_loadRunAction, SIGNAL(triggered()), this, SLOT(onLoadRun()));
+
+    // Load
+    m_loadAction = new QAction(QIcon(":/icons/open.png"), tr("Load..."), this);
+    m_loadAction->setToolTip(tr("Load file (Alt-L)"));
+    QList<QKeySequence> loadKeysList;
+    loadKeysList.append(QKeySequence(Qt::ALT + Qt::Key_L));
+    loadKeysList.append(QKeySequence(Qt::META + Qt::Key_L));
+    m_loadAction->setShortcuts(loadKeysList);
+    addAction(m_loadAction);
+    fileMenu->addAction(m_loadAction);
+    m_toolBar->addAction(m_loadAction);
+    connect(m_loadAction, SIGNAL(triggered()), this, SLOT(onLoad()));
+
+    // Load WAV
+    m_loadWavAction = new QAction(QIcon(":/icons/open_wav.png"), tr("Load WAV..."), this);
+    m_loadWavAction->setToolTip(tr("Load and play (or stop playing) WAV file (Alt-W)"));
+    QList<QKeySequence> loadWavKeysList;
+    loadWavKeysList.append(QKeySequence(Qt::ALT + Qt::Key_W));
+    loadWavKeysList.append(QKeySequence(Qt::META + Qt::Key_W));
+    m_loadWavAction->setShortcuts(loadWavKeysList);
+    addAction(m_loadWavAction);
+    fileMenu->addAction(m_loadWavAction);
+    m_toolBar->addAction(m_loadWavAction);
+    connect(m_loadWavAction, SIGNAL(triggered()), this, SLOT(onLoadWav()));
+
+    fileMenu->addSeparator();
+    m_toolBar->addSeparator();
+
+    // Select disk A
+    m_diskAAction = new QAction(QIcon(":/icons/disk_a.png"), tr("Disk A..."), this);
+    m_diskAAction->setToolTip(tr("Load disk A image (Alt-A)"));
+    QList<QKeySequence> diskAKeysList;
+    diskAKeysList.append(QKeySequence(Qt::ALT + Qt::Key_A));
+    diskAKeysList.append(QKeySequence(Qt::META + Qt::Key_A));
+    m_diskAAction->setShortcuts(diskAKeysList);
+    addAction(m_diskAAction);
+    fileMenu->addAction(m_diskAAction);
+    m_toolBar->addAction(m_diskAAction);
+    connect(m_diskAAction, SIGNAL(triggered()), this, SLOT(onDiskA()));
+
+    // Select disk B
+    m_diskBAction = new QAction(QIcon(":/icons/disk_b.png"), tr("Disk B..."), this);
+    m_diskBAction->setToolTip(tr("Load disk B image (Alt-B)"));
+    QList<QKeySequence> diskBKeysList;
+    diskBKeysList.append(QKeySequence(Qt::ALT + Qt::Key_B));
+    diskBKeysList.append(QKeySequence(Qt::META + Qt::Key_B));
+    m_diskBAction->setShortcuts(diskBKeysList);
+    addAction(m_diskBAction);
+    fileMenu->addAction(m_diskBAction);
+    m_toolBar->addAction(m_diskBAction);
+    connect(m_diskBAction, SIGNAL(triggered()), this, SLOT(onDiskB()));
+
+    m_menuDiskSeparator = fileMenu->addSeparator();
+    m_toolbarDiskSeparator = m_toolBar->addSeparator();
+
+    // Exit
+    m_exitAction = new QAction(tr("Exit"), this);
+    m_exitAction->setToolTip(tr("Exit (Alt-X)"));
+    QList<QKeySequence> exitKeysList;
+    exitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_X));
+    exitKeysList.append(QKeySequence(Qt::META + Qt::Key_X));
+    m_exitAction->setShortcuts(exitKeysList);
+    addAction(m_exitAction);
+    fileMenu->addAction(m_exitAction);
+    connect(m_exitAction, SIGNAL(triggered()), this, SLOT(onExit()));
+
+    // Platform menu
+    QMenu* platformMenu = m_menuBar->addMenu(tr("Platform"));
+
+    m_platformListMenu = new QMenu(tr("Platform"), this);
+    m_platformListMenu->setIcon(QIcon(":/icons/computer.png"));
+
+    m_platformSelectAction = m_platformListMenu->menuAction();
+    m_platformSelectAction->setToolTip(tr("Select platform (Alt-F9)"));
+    QList<QKeySequence> platformKeyList;
+    platformKeyList.append(QKeySequence(Qt::ALT + Qt::Key_F9));
+    platformKeyList.append(QKeySequence(Qt::META + Qt::Key_F9));
+    m_platformSelectAction->setShortcuts(platformKeyList);
+    addAction(m_platformSelectAction);
+    connect(m_platformSelectAction, SIGNAL(triggered()), this, SLOT(onPlatform()));
+    // Select platform
+    m_toolBar->addAction(m_platformSelectAction);
+
+    platformMenu->addMenu(m_platformListMenu);
+    // platformMenu->addAction(m_platformSelectAction);
+    platformMenu->addSeparator();
+
+
+    // Reset
+    m_resetAction = new QAction(QIcon(":/icons/reset.png"), tr("Reset"), this);
+    m_resetAction->setToolTip(tr("Reset (Alt-F11)"));
+    QList<QKeySequence> resetKeysList;
+    resetKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F11));
+    resetKeysList.append(QKeySequence(Qt::META + Qt::Key_F11));
+    m_resetAction->setShortcuts(resetKeysList);
+    addAction(m_resetAction);
+    platformMenu->addAction(m_resetAction);
+    m_toolBar->addAction(m_resetAction);
+    connect(m_resetAction, SIGNAL(triggered()), this, SLOT(onReset()));
+
+    // Pause
+    m_pauseAction = new QAction(QIcon(":/icons/pause.png"), tr("Pause"), this);
+    m_pauseAction->setCheckable(true);
+    m_pauseAction->setToolTip(tr("Pause (Pause, Alt-P)"));
+    QList<QKeySequence> pauseKeysList;
+    pauseKeysList.append(QKeySequence(Qt::Key_Pause));
+    pauseKeysList.append(QKeySequence(Qt::ALT + Qt::Key_P));
+    pauseKeysList.append(QKeySequence(Qt::META + Qt::Key_P));
+    m_pauseAction->setShortcuts(pauseKeysList);
+    addAction(m_pauseAction);
+    platformMenu->addAction(m_pauseAction);
+    m_toolBar->addAction(m_pauseAction);
+    connect(m_pauseAction, SIGNAL(triggered()), this, SLOT(onPause()));
+
+    // Fast forward
+    QToolButton* forwardButton = new QToolButton(this);
+    forwardButton->setFocusPolicy(Qt::NoFocus);
+    forwardButton->setIcon(QIcon(":/icons/forward.png"));
+    forwardButton->setToolTip(tr("Fast forward (End)"));
+    m_toolBar->addWidget(forwardButton);
+    connect(forwardButton, SIGNAL(pressed()), this, SLOT(onForwardOn()));
+    connect(forwardButton, SIGNAL(released()), this, SLOT(onForwardOff()));
+
+    platformMenu->addSeparator();
+
+    // Debug
+    m_debugAction = new QAction(QIcon(":/icons/debug.png"), tr("Debug..."), this);
+    m_debugAction->setToolTip(tr("Debug (Alt-D)"));
+    QList<QKeySequence> debugKeysList;
+    debugKeysList.append(QKeySequence(Qt::ALT + Qt::Key_D));
+    debugKeysList.append(QKeySequence(Qt::META + Qt::Key_D));
+    m_debugAction->setShortcuts(debugKeysList);
+    addAction(m_debugAction);
+    platformMenu->addAction(m_debugAction);
+    m_toolBar->addAction(m_debugAction);
+    connect(m_debugAction, SIGNAL(triggered()), this, SLOT(onDebug()));
+
+    m_toolBar->addSeparator();
+
+    // Settings menu
+    QMenu* settingsMenu = m_menuBar->addMenu(tr("Settings"));
+
+    // Settings
+    m_settingsAction = new QAction(QIcon(":/icons/settings.png"), tr("Emulator settings..."), this);
+    m_settingsAction->setToolTip(tr("Emulator settings (Alt-F12)"));
+    QList<QKeySequence> settingsKeysList;
+    settingsKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F12));
+    settingsKeysList.append(QKeySequence(Qt::META + Qt::Key_F12));
+    m_settingsAction->setShortcuts(settingsKeysList);
+    addAction(m_settingsAction);
+    settingsMenu->addAction(m_settingsAction);
+    m_toolBar->addAction(m_settingsAction);
+    connect(m_settingsAction, SIGNAL(triggered()), this, SLOT(onSettings()));
+
+    // Screenshot
+    m_screenshotAction = new QAction(QIcon(":/icons/screenshot.png"), tr("Take screenshot..."), this);
+    m_screenshotAction->setToolTip(tr("Take screenshot (Alt-H)"));
+    QList<QKeySequence> screenshotKeysList;
+    screenshotKeysList.append(QKeySequence(Qt::ALT + Qt::Key_H));
+    screenshotKeysList.append(QKeySequence(Qt::META + Qt::Key_H));
+    m_screenshotAction->setShortcuts(screenshotKeysList);
+    addAction(m_screenshotAction);
+    m_toolBar->addAction(m_screenshotAction);
+    connect(m_screenshotAction, SIGNAL(triggered()), this, SLOT(onScreenshot()));
+
+    m_toolBar->addSeparator();
+
+    settingsMenu->addSeparator();
+
+    // Keyboard layout
+    QMenu* layoutMenu = new QMenu(tr("Kayboard layout"), this);
+    QActionGroup* layoutGroup = new QActionGroup(layoutMenu);
+
+    m_qwertyAction = new QAction("Qwerty", this);
+    m_qwertyAction->setCheckable(true);
+    m_qwertyAction->setToolTip("Qwerty (Alt-Q)");
+    QList<QKeySequence> qwertyKeyList;
+    qwertyKeyList.append(QKeySequence(Qt::ALT + Qt::Key_Q));
+    qwertyKeyList.append(QKeySequence(Qt::META + Qt::Key_Q));
+    m_qwertyAction->setShortcuts(qwertyKeyList);
+    addAction(m_qwertyAction);
+    layoutMenu->addAction(m_qwertyAction);
+    layoutGroup->addAction(m_qwertyAction);
+
+    m_jcukenAction = new QAction(tr("Jcuken"), this);
+    m_jcukenAction->setCheckable(true);
+    m_jcukenAction->setToolTip(tr("Jcuken (Alt-J)"));
+    QList<QKeySequence> jcukenKeyList;
+    jcukenKeyList.append(QKeySequence(Qt::ALT + Qt::Key_J));
+    jcukenKeyList.append(QKeySequence(Qt::META + Qt::Key_J));
+    m_jcukenAction->setShortcuts(jcukenKeyList);
+    addAction(m_jcukenAction);
+    layoutMenu->addAction(m_jcukenAction);
+    layoutGroup->addAction(m_jcukenAction);
+
+    m_smartAction = new QAction(tr("Smart"), this);
+    m_smartAction->setCheckable(true);
+    m_smartAction->setToolTip(tr("Smart (Alt-K)"));
+    QList<QKeySequence> smartKeyList;
+    smartKeyList.append(QKeySequence(Qt::ALT + Qt::Key_K));
+    smartKeyList.append(QKeySequence(Qt::META + Qt::Key_K));
+    m_smartAction->setShortcuts(smartKeyList);
+    addAction(m_smartAction);
+    layoutMenu->addAction(m_smartAction);
+    layoutGroup->addAction(m_smartAction);
+
+    connect(m_qwertyAction, SIGNAL(triggered()), this, SLOT(onQwerty()));
+    connect(m_jcukenAction, SIGNAL(triggered()), this, SLOT(onJcuken()));
+    connect(m_smartAction, SIGNAL(triggered()), this, SLOT(onSmart()));
+    settingsMenu->addMenu(layoutMenu);
+
+    m_layoutButton = new QToolButtonWA(this);
+    m_layoutButton->setFocusPolicy(Qt::NoFocus);
+    //m_layoutButton->setText("Qwerty ");
+    m_layoutButton->setIcon(QIcon(":/icons/keyboard.png"));
+    m_layoutButton->setToolTip(tr("Keyboard layout"));
+    m_layoutButton->setMenu(layoutMenu);
+    m_layoutButton->setPopupMode(QToolButton::InstantPopup);
+    m_toolBar->addWidget(m_layoutButton);
+
+    // Tape hook on/off
+    m_tapeHookAction = new QAction(QIcon(":/icons/tape.png"), tr("Tape hook"), this);
+    m_tapeHookAction->setCheckable(true);
+    m_tapeHookAction->setToolTip(tr("Tape hook"));
+    settingsMenu->addAction(m_tapeHookAction);
+    m_toolBar->addAction(m_tapeHookAction);
+    connect(m_tapeHookAction, SIGNAL(triggered()), this, SLOT(onTapeHook()));
+
+    // Color mode
+    m_colorModeMenu = new QMenu(tr("Color mode"), this);
+    QActionGroup* colorModeGroup = new QActionGroup(m_colorModeMenu);
+
+    m_colorMonoAction = new QAction(QIcon(":/icons/bw.png"), tr("Black && white"), this);
+    m_colorMonoAction->setCheckable(true);
+    m_colorMonoAction->setData("mono");
+    m_colorModeMenu->addAction(m_colorMonoAction);
+    colorModeGroup->addAction(m_colorMonoAction);
+    connect(m_colorMonoAction, SIGNAL(triggered()), this, SLOT(onColorSelect()));
+
+    m_colorColor1Action = new QAction(QIcon(":/icons/color.png"), "Color 1", this);
+    m_colorColor1Action->setCheckable(true);
+    //m_colorColor1Action->setData("color1");
+    m_colorModeMenu->addAction(m_colorColor1Action);
+    colorModeGroup->addAction(m_colorColor1Action);
+    connect(m_colorColor1Action, SIGNAL(triggered()), this, SLOT(onColorSelect()));
+
+    m_colorColor2Action = new QAction(QIcon(":/icons/color.png"),"Color 2", this);
+    m_colorColor2Action->setCheckable(true);
+    //m_colorColor2Action->setData("color2");
+    m_colorModeMenu->addAction(m_colorColor2Action);
+    colorModeGroup->addAction(m_colorColor2Action);
+    connect(m_colorColor2Action, SIGNAL(triggered()), this, SLOT(onColorSelect()));
+
+    m_colorModeMenu->setIcon(QIcon(":/icons/colormode.png"));
+    m_colorMenuAction = m_colorModeMenu->menuAction();
+    m_colorMenuAction->setToolTip(tr("Color mode (Alt-C)"));
+    addAction(m_colorMenuAction);
+    m_toolBar->addAction(m_colorMenuAction);
+    settingsMenu->addAction(m_colorMenuAction);
+
+    QList<QKeySequence> colorKeysList;
+    colorKeysList.append(QKeySequence(Qt::ALT + Qt::Key_C));
+    colorKeysList.append(QKeySequence(Qt::META + Qt::Key_C));
+    m_colorMenuAction->setShortcuts(colorKeysList);
+
+    settingsMenu->addAction(m_colorMenuAction);
+    connect(m_colorMenuAction, SIGNAL(triggered()), this, SLOT(onColorMode()));
+
+    // Aspect
+    m_aspectAction = new QAction(QIcon(":/icons/aspect.png"), tr("Aspect"), this);
+    m_aspectAction->setCheckable(true);
+    m_aspectAction->setToolTip(tr("Original aspect ratio (Alt-R)"));
+    QList<QKeySequence> aspectKeysList;
+    aspectKeysList.append(QKeySequence(Qt::ALT + Qt::Key_R));
+    aspectKeysList.append(QKeySequence(Qt::META + Qt::Key_R));
+    m_aspectAction->setShortcuts(aspectKeysList);
+    //platformMenu->addAction(m_aspectAction);
+    addAction(m_aspectAction);
+    m_toolBar->addAction(m_aspectAction);
+    connect(m_aspectAction, SIGNAL(triggered()), this, SLOT(onAspect()));
+    settingsMenu->addAction(m_aspectAction);
+
+    // Smoothing
+    m_smoothingAction = new QAction(QIcon(":/icons/smooth.png"), tr("Smoothing"), this);
+    m_smoothingAction->setCheckable(true);
+    m_smoothingAction->setToolTip(tr("Smoothing (Alt-S)"));
+    QList<QKeySequence> smoothingKeysList;
+    smoothingKeysList.append(QKeySequence(Qt::ALT + Qt::Key_S));
+    smoothingKeysList.append(QKeySequence(Qt::META + Qt::Key_S));
+    m_smoothingAction->setShortcuts(smoothingKeysList);
+    m_toolBar->addAction(m_smoothingAction);
+    settingsMenu->addAction(m_smoothingAction);
+    connect(m_smoothingAction, SIGNAL(triggered()), this, SLOT(onSmoothing()));
+
+    // Font
+    m_fontAction = new QAction(QIcon(":/icons/font.png"), tr("Font"), this);
+    m_fontAction->setCheckable(true);
+    m_fontAction->setToolTip(tr("Advanced font (Alt-F)"));
+    QList<QKeySequence> fontKeysList;
+    fontKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F));
+    fontKeysList.append(QKeySequence(Qt::META + Qt::Key_F));
+    m_fontAction->setShortcuts(fontKeysList);
+    //platformMenu->addAction(m_fontAction);
+    addAction(m_fontAction);
+    m_toolBar->addAction(m_fontAction);
+    settingsMenu->addAction(m_fontAction);
+    connect(m_fontAction, SIGNAL(triggered()), this, SLOT(onFont()));
+
+    QMenu* viewMenu = m_menuBar->addMenu(tr("View"));
+
+    QMenu* presetMenu = viewMenu->addMenu(tr("Presets"));
+
+    // 1x preset
+    m_preset1xAction = new QAction(tr("Preset: 1x"), this);
+    //m_preset1xAction->setToolTip(tr("Preset: 1x (Alt-1)"));
+    QList<QKeySequence> preset1xKeysList;
+    preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
+    preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
+    m_preset1xAction->setShortcuts(preset1xKeysList);
+    addAction(m_preset1xAction);
+    presetMenu->addAction(m_preset1xAction);
+    connect(m_preset1xAction, SIGNAL(triggered()), this, SLOT(on1x()));
+
+    // 2x preset
+    m_preset2xAction = new QAction(tr("Preset: 2x"), this);
+    //m_preset2xAction->setToolTip(tr("Preset: 2x (Alt-2)"));
+    QList<QKeySequence> preset2xKeysList;
+    preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
+    preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
+    m_preset2xAction->setShortcuts(preset2xKeysList);
+    addAction(m_preset2xAction);
+    presetMenu->addAction(m_preset2xAction);
+    connect(m_preset2xAction, SIGNAL(triggered()), this, SLOT(on2x()));
+
+    // 3x preset
+    m_preset3xAction = new QAction(tr("Preset: 3x"), this);
+    //m_preset3xAction->setToolTip(tr("Preset: 3x (Alt-3)"));
+    QList<QKeySequence> preset3xKeysList;
+    preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
+    preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
+    m_preset3xAction->setShortcuts(preset3xKeysList);
+    addAction(m_preset3xAction);
+    presetMenu->addAction(m_preset3xAction);
+    connect(m_preset3xAction, SIGNAL(triggered()), this, SLOT(on3x()));
+
+    // Fit preset
+    m_presetFitAction = new QAction(tr("Preset: Fit"), this);
+    //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
+    QList<QKeySequence> presetFitKeysList;
+    presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
+    presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
+    m_presetFitAction->setShortcuts(presetFitKeysList);
+    addAction(m_presetFitAction);
+    presetMenu->addAction(m_presetFitAction);
+    connect(m_presetFitAction, SIGNAL(triggered()), this, SLOT(onFit()));
+
+    viewMenu->addSeparator();
+    viewMenu->addAction(m_screenshotAction);
+    viewMenu->addSeparator();
+
+    m_fullscreenAction = new QAction(tr("Fullscreen mode"), this);
+    m_fullscreenAction->setCheckable(true);
+    //setToolTip(tr("Fullscreen mode (Alt-Enter)"));
+    QList<QKeySequence> fullscreenKeysList;
+    fullscreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Return));
+    fullscreenKeysList.append(QKeySequence(Qt::META + Qt::Key_Return));
+    m_fullscreenAction->setShortcuts(fullscreenKeysList);
+    connect(m_fullscreenAction, SIGNAL(triggered()), this, SLOT(onFullscreen()));
+    addAction(m_fullscreenAction);
+    viewMenu->addAction(m_fullscreenAction);
+
+    m_fullwindowAction = new QAction(tr("Full-windowed mode"), this);
+    m_fullwindowAction->setCheckable(true);
+    //setToolTip(tr("Hide menu and buttons (Alt-\\)"));
+    QList<QKeySequence> fullwindowKeysList;
+    fullwindowKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Backslash));
+    fullwindowKeysList.append(QKeySequence(Qt::META + Qt::Key_Backslash));
+    m_fullwindowAction->setShortcuts(fullwindowKeysList);
+    connect(m_fullwindowAction, SIGNAL(triggered()), this, SLOT(onFullwindow()));
+    addAction(m_fullwindowAction);
+    viewMenu->addAction(m_fullwindowAction);
+
+    m_presetButton = new QToolButtonWA(this);
+    m_presetButton->setFocusPolicy(Qt::NoFocus);
+    m_presetButton->setIcon(QIcon(":/icons/preset.png"));
+    m_presetButton->setToolTip(tr("Window preset"));
+    m_presetButton->setMenu(presetMenu);
+    m_presetButton->setPopupMode(QToolButton::InstantPopup);
+    m_toolBar->addWidget(m_presetButton);
+
+    QMenu* helpMenu = m_menuBar->addMenu(tr("Help"));
+
+    m_aboutAction = new QAction(tr("About..."), this);
+    m_aboutAction->setToolTip(tr("About"));
+    helpMenu->addAction(m_aboutAction);
+    connect(m_aboutAction, SIGNAL(triggered()), this, SLOT(onAbout()));
+
+    settingsMenu->addSeparator();
+
+    // Autosave settings
+    m_autosaveAction = new QAction(tr("Auto save settings"), this);
+    m_autosaveAction->setCheckable(true);
+    m_autosaveAction->setChecked(true);
+    m_autosaveAction->setEnabled(false);
+    settingsMenu->addAction(m_autosaveAction);
+
+    settingsMenu->addSeparator();
+
+    // Reset settings
+    QMenu* resetMenu = new QMenu(tr("Reset settings"), this);
+    QAction* resetPlatformAction = new QAction(tr("Current platform settings..."), this);
+    QAction* resetAllAction = new QAction(tr("All settings..."), this);
+    resetMenu->addAction(resetPlatformAction);
+    resetMenu->addAction(resetAllAction);
+    connect(resetPlatformAction, SIGNAL(triggered()), this, SLOT(onResetPlatform()));
+    connect(resetAllAction, SIGNAL(triggered()), this, SLOT(onResetAll()));
+    settingsMenu->addSeparator();
+    settingsMenu->addMenu(resetMenu);
+}
+
+
+void MainWindow::tuneMenu()
+{
+    // Color mode
+    bool hasColor = false;
+    std::string platformGroup = getPlatformGroupName();
+
+    if (platformGroup == "rk86") {
+        hasColor = true;
+        m_colorLabel->setVisible(false);
+
+        m_colorMonoAction->setVisible(true);
+        m_colorMonoAction->setEnabled(true);
+
+        m_colorColor1Action->setVisible(true);
+        m_colorColor1Action->setEnabled(true);
+        m_colorColor1Action->setText(tr("Color (Tolkalin)"));
+        m_colorColor1Action->setData("color1");
+
+        m_colorColor2Action->setVisible(true);
+        m_colorColor2Action->setEnabled(true);
+        m_colorColor2Action->setText(tr("Color (Akimenko)"));
+        m_colorColor2Action->setData("color2");
+    } else if (platformGroup == "apogey" || platformGroup == "orion") {
+        hasColor = true;
+
+        m_colorMonoAction->setVisible(true);
+        m_colorMonoAction->setEnabled(true);
+
+        m_colorColor1Action->setVisible(true);
+        m_colorColor1Action->setEnabled(true);
+        m_colorColor1Action->setText(tr("Color"));
+        m_colorColor1Action->setData("color");
+
+        m_colorColor2Action->setVisible(false);
+        m_colorColor2Action->setEnabled(false);
+    } else if (platformGroup == "spec") {
+        hasColor = true;
+
+        m_colorMonoAction->setVisible(true);
+        m_colorMonoAction->setEnabled(true);
+
+        m_colorColor1Action->setVisible(true);
+        m_colorColor1Action->setEnabled(true);
+        m_colorColor1Action->setText(tr("4-color"));
+        m_colorColor1Action->setData("4color");
+
+        m_colorColor2Action->setVisible(true);
+        m_colorColor2Action->setEnabled(true);
+        m_colorColor2Action->setText(tr("8-color"));
+        m_colorColor2Action->setData("8color");
+    }
+
+    m_colorLabel->setVisible(hasColor);
+    m_colorMenuAction->setVisible(hasColor);
+    m_colorMenuAction->setEnabled(hasColor);
+}
+
+
+void MainWindow::createDebugActions()
+{
+    /*m_menuBar = menuBar();
+    m_menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    m_toolBar = new QToolBar(this);
+    m_toolBar->setFloatable(false);
+    //m_toolBar->setMovable(false);
+    m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    m_toolBar->setIconSize(QSize(16, 16));
+    addToolBar(m_toolBar);
+    m_toolBar->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);*/
+
+    // 1x preset
+    m_preset1xAction = new QAction(tr("Preset: 1x"), this /*m_menuBar*/);
+    //m_preset1xAction->setToolTip(tr("Preset: 1x (Alt-1)"));
+    QList<QKeySequence> preset1xKeysList;
+    preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
+    preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
+    m_preset1xAction->setShortcuts(preset1xKeysList);
+    addAction(m_preset1xAction);
+    //presetMenu->addAction(m_preset1xAction);
+    connect(m_preset1xAction, SIGNAL(triggered()), this, SLOT(on1x()));
+
+    // 2x preset
+    m_preset2xAction = new QAction(tr("Preset: 2x"), this /*m_menuBar*/);
+    //m_preset2xAction->setToolTip(tr("Preset: 2x (Alt-2)"));
+    QList<QKeySequence> preset2xKeysList;
+    preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
+    preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
+    m_preset2xAction->setShortcuts(preset2xKeysList);
+    addAction(m_preset2xAction);
+    //presetMenu->addAction(m_preset2xAction);
+    connect(m_preset2xAction, SIGNAL(triggered()), this, SLOT(on2x()));
+
+    // 3x preset
+    m_preset3xAction = new QAction(tr("Preset: 3x"), this /*m_menuBar*/);
+    //m_preset3xAction->setToolTip(tr("Preset: 3x (Alt-3)"));
+    QList<QKeySequence> preset3xKeysList;
+    preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
+    preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
+    m_preset3xAction->setShortcuts(preset3xKeysList);
+    addAction(m_preset3xAction);
+    //presetMenu->addAction(m_preset3xAction);
+    connect(m_preset3xAction, SIGNAL(triggered()), this, SLOT(on3x()));
+
+    // Fit preset
+    m_presetFitAction = new QAction(tr("Preset: Fit"), this /*m_menuBar*/);
+    //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
+    QList<QKeySequence> presetFitKeysList;
+    presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
+    presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
+    m_presetFitAction->setShortcuts(presetFitKeysList);
+    addAction(m_presetFitAction);
+    //presetMenu->addAction(m_presetFitAction);
+    connect(m_presetFitAction, SIGNAL(triggered()), this, SLOT(onFit()));
+
+    //viewMenu->addSeparator();
+
+    m_fullscreenAction = new QAction(tr("Fullscreen mode"), this /*m_menuBar*/);
+    //m_fullscreenAction->setCheckable(true);
+    //setToolTip(tr("Fullscreen mode (Alt-Enter)"));
+    QList<QKeySequence> fullscreenKeysList;
+    fullscreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Return));
+    fullscreenKeysList.append(QKeySequence(Qt::META + Qt::Key_Return));
+    m_fullscreenAction->setShortcuts(fullscreenKeysList);
+    connect(m_fullscreenAction, SIGNAL(triggered()), this, SLOT(onFullscreen()));
+    addAction(m_fullscreenAction);
+    //viewMenu->addAction(m_fullscreenAction);
+
+    m_fullwindowAction = new QAction(tr("Hide menu and buttons"), this /*m_menuBar*/);
+    //m_fullwindowAction->setCheckable(true);
+    //setToolTip(tr("Hide menu and buttons (Alt-\)"));
+    QList<QKeySequence> fullwindowKeysList;
+    fullwindowKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Backslash));
+    fullwindowKeysList.append(QKeySequence(Qt::META + Qt::Key_Backslash));
+    m_fullwindowAction->setShortcuts(fullwindowKeysList);
+    connect(m_fullwindowAction, SIGNAL(triggered()), this, SLOT(onFullwindow()));
+    addAction(m_fullwindowAction);
+    //viewMenu->addAction(m_fullwindowAction);
+}
+
+
+void MainWindow::incFrameCount()
+{
+    if (m_frameCount == 0)
+        m_firstFpsCoutnerFrameTime = palGetCounter();
+    else
+        m_lastFpsCoutnerFrameTime = palGetCounter();
+    ++m_frameCount;
+};
+
+
+void MainWindow::onFpsTimer()
+{
+    uint64_t delta = m_lastFpsCoutnerFrameTime - m_firstFpsCoutnerFrameTime;
+
+    if (m_windowType != EWT_EMULATION)
+        return;
+
+    QString s;
+    if (delta != 0) {
+        unsigned fps = ((uint64_t)(m_frameCount - 1) * 1000000000 + delta / 2) / delta;
+        if (fps < 1000) {
+            s.setNum(fps);
+            s += " fps";
+        }
+    }
+
+    m_fpsLabel->setText(s);
+    m_frameCount = 0;
+
+    std::string platform = m_palWindow->getPlatformObjectName() + ".";
+
+    std::string crtMode = "";
+    if (m_palWindow)
+        crtMode= emuGetPropertyValue(platform + "crtRenderer", "crtMode");
+    m_crtModeLabel->setText(QString::fromUtf8(crtMode.c_str()));
+    m_crtModeLabel->setVisible(crtMode != "");
+
+    std::string fileName;
+    QString labelText;
+    fileName = emuGetPropertyValue(platform + "tapeInFile", "currentFile");
+    if (fileName != "")
+        labelText = tr("Reading RK file:");
+    else {
+        fileName = emuGetPropertyValue(platform + "tapeOutFile", "currentFile");
+        if (fileName != "")
+            labelText = tr("Writing RK file:");
+         else {
+            fileName = emuGetPropertyValue(platform + "msxTapeInFile", "currentFile");
+            if (fileName != "")
+                labelText = tr("Reading MSX file:");
+            else {
+                fileName = emuGetPropertyValue(platform + "msxTapeOutFile", "currentFile");
+                if (fileName != "")
+                    labelText = tr("Writing MSX file:");
+            }
+        }
+    }
+    if (fileName != "") {
+        QString qFileName = QString::fromUtf8(fileName.c_str());
+        qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+        m_tapeLabel->setText(labelText + " " + qFileName);
+    }
+    m_tapeLabel->setVisible(fileName != "");
+
+    std::string position;
+    fileName = emuGetPropertyValue("wavWriter", "currentFile");
+    if (fileName != "")
+        labelText = tr("Writing wave file:");
+    else {
+        fileName = emuGetPropertyValue("wavReader", "currentFile");
+        if (fileName != "") {
+            labelText = tr("Playing wave file:");
+            position = emuGetPropertyValue("wavReader", "position");
+        }
+    }
+    if (fileName != "") {
+        QString qFileName = QString::fromUtf8(fileName.c_str());
+        qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+        QString qPosition;
+        if (position != "") {
+            qPosition = " [" + QString::fromUtf8(position.c_str()) + "]";
+        }
+        m_wavLabel->setText(labelText + " " + qFileName + qPosition);
+    }
+    m_wavLabel->setVisible(fileName != "");
+}
+
+
+PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
+{
+    int key = evt->key();
+    bool keypad = evt->modifiers() & Qt::KeypadModifier;
+
+    switch (key) {
+    case Qt::Key_A:
+        return PK_A;
+    case Qt::Key_B:
+        return PK_B;
+    case Qt::Key_C:
+        return PK_C;
+    case Qt::Key_D:
+        return PK_D;
+    case Qt::Key_E:
+        return PK_E;
+    case Qt::Key_F:
+        return PK_F;
+    case Qt::Key_G:
+        return PK_G;
+    case Qt::Key_H:
+        return PK_H;
+    case Qt::Key_I:
+        return PK_I;
+    case Qt::Key_J:
+        return PK_J;
+    case Qt::Key_K:
+        return PK_K;
+    case Qt::Key_L:
+        return PK_L;
+    case Qt::Key_M:
+        return PK_M;
+    case Qt::Key_N:
+        return PK_N;
+    case Qt::Key_O:
+        return PK_O;
+    case Qt::Key_P:
+        return PK_P;
+    case Qt::Key_Q:
+        return PK_Q;
+    case Qt::Key_R:
+        return PK_R;
+    case Qt::Key_S:
+        return PK_S;
+    case Qt::Key_T:
+        return PK_T;
+    case Qt::Key_U:
+        return PK_U;
+    case Qt::Key_V:
+        return PK_V;
+    case Qt::Key_W:
+        return PK_W;
+    case Qt::Key_X:
+        return PK_X;
+    case Qt::Key_Y:
+        return PK_Y;
+    case Qt::Key_Z:
+        return PK_Z;
+
+    case Qt::Key_1:
+        return keypad ? PK_KP_1 : PK_1;
+    case Qt::Key_2:
+        return keypad ? PK_KP_2 : PK_2;
+    case Qt::Key_3:
+        return keypad ? PK_KP_3 : PK_3;
+    case Qt::Key_4:
+        return keypad ? PK_KP_4 : PK_4;
+    case Qt::Key_5:
+        return keypad ? PK_KP_5 : PK_5;
+    case Qt::Key_6:
+        return keypad ? PK_KP_6 : PK_6;
+    case Qt::Key_7:
+        return keypad ? PK_KP_7 : PK_7;
+    case Qt::Key_8:
+        return keypad ? PK_KP_8 : PK_8;
+    case Qt::Key_9:
+        return keypad ? PK_KP_9 : PK_9;
+    case Qt::Key_0:
+        return keypad ? PK_KP_0 : PK_0;
+
+    case Qt::Key_Return:
+        return PK_ENTER;
+    case Qt::Key_Escape:
+        return PK_ESC;
+    case Qt::Key_Backspace:
+        return PK_BSP;
+    case Qt::Key_Tab:
+        return PK_TAB;
+    case Qt::Key_Space:
+        return PK_SPACE;
+
+    case Qt::Key_Minus:
+        return keypad ? PK_KP_MINUS : PK_MINUS;
+    case Qt::Key_Equal:
+        return PK_EQU;
+    case Qt::Key_BraceLeft:
+        return PK_LBRACKET;
+    case Qt::Key_BraceRight:
+        return PK_RBRACKET;
+    case Qt::Key_Backslash:
+        return PK_BSLASH;
+    case Qt::Key_Semicolon:
+        return PK_SEMICOLON;
+    case Qt::Key_Apostrophe:
+        return PK_APOSTROPHE;
+    case Qt::Key_QuoteLeft:
+        return PK_TILDE;
+    case Qt::Key_Comma:
+        return PK_COMMA;
+    case Qt::Key_Period:
+        return keypad ? PK_KP_PERIOD : PK_PERIOD;
+    case Qt::Key_Slash:
+        return keypad ? PK_KP_DIV : PK_SLASH;
+
+    case Qt::Key_CapsLock:
+        return PK_CAPSLOCK;
+
+    case Qt::Key_F1:
+        return PK_F1;
+    case Qt::Key_F2:
+        return PK_F2;
+    case Qt::Key_F3:
+        return PK_F3;
+    case Qt::Key_F4:
+        return PK_F4;
+    case Qt::Key_F5:
+        return PK_F5;
+    case Qt::Key_F6:                       
+        return PK_F6;
+    case Qt::Key_F7:
+        return PK_F7;
+    case Qt::Key_F8:
+        return PK_F8;
+    case Qt::Key_F9:
+        return PK_F9;
+    case Qt::Key_F10:
+        return PK_F10;
+    case Qt::Key_F11:
+        return PK_F11;
+    case Qt::Key_F12:
+        return PK_F12;
+
+    case Qt::Key_ScrollLock:
+        return PK_SCRLOCK;
+    case Qt::Key_Pause:
+        return PK_PAUSEBRK;
+
+    case Qt::Key_Insert:
+        return PK_INS;
+    case Qt::Key_Home:
+        return PK_HOME;
+    case Qt::Key_PageUp:
+        return PK_PGUP;
+    case Qt::Key_Delete:
+        return PK_DEL;
+    case Qt::Key_End:
+        return PK_END;
+    case Qt::Key_PageDown:
+        return PK_PGDN;
+    case Qt::Key_Right:
+        return PK_RIGHT;
+    case Qt::Key_Left:
+        return PK_LEFT;
+    case Qt::Key_Down:
+        return PK_DOWN;
+    case Qt::Key_Up:
+        return PK_UP;
+
+    case Qt::Key_NumLock:
+        return PK_NUMLOCK;
+    case Qt::Key_Asterisk:
+        return PK_KP_MUL;
+    case Qt::Key_Plus:
+        return PK_KP_PLUS ;
+    case Qt::Key_Enter:
+        return PK_KP_ENTER;
+
+    case Qt::Key_Control:
+        return PK_LCTRL;
+    case Qt::Key_Shift:
+        return PK_LSHIFT;
+    case Qt::Key_Alt:
+        return PK_LALT;
+    case Qt::Key_Meta:
+        return PK_LWIN;
+
+    /*case SDL_SCANCODE_RCTRL:
+        return PK_RCTRL;
+    case SDL_SCANCODE_RSHIFT:
+        return PK_RSHIFT;
+    case SDL_SCANCODE_RALT:
+        return PK_RALT;
+    case SDL_SCANCODE_RGUI:
+        return PK_RWIN;
+    case SDL_SCANCODE_APPLICATION:
+        return PK_MENU;*/
+
+    default:
+        return PK_NONE;
+    }
+
+}
+
+
+void MainWindow::keyPressEvent(QKeyEvent* evt)
+{
+    if (evt->key() == Qt::Key_End) {
+        emuSysReq(m_palWindow, SR_SPEEDUP);
+        return;
+    }
+    unsigned unicodeKey = evt->text()[0].unicode();
+    emuKeyboard(m_palWindow, translateKey(evt), true, unicodeKey);
+}
+
+
+void MainWindow::keyReleaseEvent(QKeyEvent* evt)
+{
+    if (evt->key() == Qt::Key_End) {
+        emuSysReq(m_palWindow, SR_SPEEDNORMAL);
+        return;
+    }
+    unsigned unicodeKey = evt->text()[0].unicode();
+    emuKeyboard(m_palWindow, translateKey(evt), false, unicodeKey);
+}
+
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    event->ignore();
+    emuSysReq(m_palWindow, SR_CLOSE);
+}
+
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasUrls() && (event->mimeData()->urls().size() == 1))
+        event->acceptProposedAction();
+}
+
+
+void MainWindow::dragMoveEvent(QDragMoveEvent *event)
+{
+    event->accept();
+}
+
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    if (event->mimeData()->hasUrls()) {
+        QString qFileName = event->mimeData()->urls().begin()->toLocalFile();
+        emuDropFile(m_palWindow, qFileName.toUtf8().constData());
+    }
+}
+
+
+void MainWindow::onReset()
+{
+    emuSysReq(m_palWindow, SR_RESET);
+}
+
+
+void MainWindow::onPause()
+{
+    emuSysReq(m_palWindow, SR_PAUSE);
+}
+
+
+void MainWindow::onForwardOn()
+{
+    emuSysReq(m_palWindow, SR_SPEEDUP);
+}
+
+
+void MainWindow::onForwardOff()
+{
+    emuSysReq(m_palWindow, SR_SPEEDNORMAL);
+}
+
+
+void MainWindow::onDebug()
+{
+    emuSysReq(m_palWindow, SR_DEBUG);
+}
+
+
+void MainWindow::onQwerty()
+{
+    emuSysReq(m_palWindow, SR_QUERTY);
+    saveConfig();
+}
+
+
+void MainWindow::onJcuken()
+{
+    emuSysReq(m_palWindow, SR_JCUKEN);
+    //saveConfig(); // don't save jcuken layout
+}
+
+
+void MainWindow::onSmart()
+{
+    emuSysReq(m_palWindow, SR_SMART);
+    saveConfig();
+}
+
+
+void MainWindow::onColorMode()
+{
+    emuSysReq(m_palWindow, SR_COLOR);
+    saveConfig();
+}
+
+
+void MainWindow::onColorSelect()
+{
+    if (!m_colorModeMenu)
+        return;
+
+    QAction* action = (QAction*)sender();
+    std::string colorMode(action->data().toString().toUtf8().constData());
+
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".crtRenderer", "colorMode", colorMode);
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::on1x()
+{
+    emuSysReq(m_palWindow, SR_1X);
+    saveConfig();
+}
+
+
+void MainWindow::on2x()
+{
+    emuSysReq(m_palWindow, SR_2X);
+    saveConfig();
+}
+
+
+void MainWindow::on3x()
+{
+    emuSysReq(m_palWindow, SR_3X);
+    saveConfig();
+}
+
+
+void MainWindow::onFit()
+{
+    emuSysReq(m_palWindow, SR_FIT);
+    saveConfig();
+}
+
+
+void MainWindow::onFullscreen()
+{
+    emuSysReq(m_palWindow, SR_FULLSCREEN);
+}
+
+
+void MainWindow::onFullwindow()
+{
+    bool visible = !(m_fullwindowAction->isChecked() || m_fullscreenMode);
+    if (m_menuBar)
+        m_menuBar->setVisible(visible);
+    if (m_statusBar)
+        m_statusBar->setVisible(visible);
+    if (m_toolBar)
+        m_toolBar->setVisible(visible);
+    if (m_clientWidth != 0 && m_clientHeight != 0) {
+        adjustClientSize();
+    }
+}
+
+
+void MainWindow::onLoad()
+{
+    emuSysReq(m_palWindow, SR_LOAD);
+}
+
+
+void MainWindow::onLoadRun()
+{
+    emuSysReq(m_palWindow, SR_LOADRUN);
+}
+
+
+void MainWindow::onExit()
+{
+    emuSysReq(m_palWindow, SR_EXIT);
+}
+
+
+void MainWindow::onLoadWav()
+{
+    emuSysReq(m_palWindow, SR_LOADWAV);
+}
+
+
+void MainWindow::onDiskA()
+{
+    emuSysReq(m_palWindow, SR_DISKA);
+}
+
+
+void MainWindow::onDiskB()
+{
+    emuSysReq(m_palWindow, SR_DISKB);
+}
+
+
+void MainWindow::onAspect()
+{
+    emuSysReq(m_palWindow, SR_ASPECTCORRECTION);
+    saveConfig();
+}
+
+
+void MainWindow::onFont()
+{
+    emuSysReq(m_palWindow, SR_FONT);
+    saveConfig();
+}
+
+
+void MainWindow::onSmoothing()
+{
+    emuSysReq(m_palWindow, SR_ANTIALIASING);
+    saveConfig();
+}
+
+
+void MainWindow::onPlatformSelect()
+{
+    QAction* action = (QAction*)sender();
+    std::string platform(action->data().toString().toUtf8().constData());
+
+    emuSelectPlatform(platform);
+}
+
+
+void MainWindow::onPlatform()
+{
+    emuSysReq(m_palWindow, SR_CHPLATFORM);
+}
+
+
+void MainWindow::onTapeHook()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".tapeGrp", "enabled", m_tapeHookAction->isChecked() ? "yes" : "no");
+    m_settingsDialog->updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onSettings()
+{
+    if (m_settingsDialog)
+        m_settingsDialog->execute();
+}
+
+
+void MainWindow::onScreenshot()
+{
+    emuSysReq(m_palWindow, SR_SCREENSHOT);
+}
+
+
+void MainWindow::onAbout()
+{
+    AboutDialog* dialog = new AboutDialog(this);
+    dialog->execute();
+}
+
+
+void MainWindow::onResetPlatform()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Emu80: warning"));
+    msgBox.setText(tr("Reset current platform settings?"));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.addButton(QMessageBox::Yes);
+    msgBox.addButton(QMessageBox::No);
+    if (msgBox.exec() == QMessageBox::Yes) {
+        m_settingsDialog->resetPlatformOptions();
+    }
+}
+
+
+void MainWindow::onResetAll()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Emu80 Warning"));
+    msgBox.setText(tr("Reset all settings?"));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.addButton(QMessageBox::Yes);
+    msgBox.addButton(QMessageBox::No);
+    if (msgBox.exec() == QMessageBox::Yes) {
+        m_settingsDialog->resetAllOptions();
+    }
+}
+
+
+void MainWindow::updateConfig()
+{
+    updateActions();
+
+    if (m_settingsDialog) {
+        m_settingsDialog->updateConfig();
+    }
+}
+
+
+void MainWindow::saveConfig()
+{
+    if (m_settingsDialog)
+        m_settingsDialog->saveConfig();
+}
+
+
+void MainWindow::updateActions()
+{
+    std::string platform = "";
+    if (m_palWindow)
+        platform = m_palWindow->getPlatformObjectName();
+    if (platform == "")
+        return;
+
+    platform += ".";
+    std::string val;
+
+    val = emuGetPropertyValue(platform + "diskA", "label");
+    m_diskAAction->setVisible(val != "");
+
+    val = emuGetPropertyValue(platform + "diskB", "label");
+    m_diskBAction->setVisible(val != "");
+
+    bool disksVisible = m_diskAAction->isVisible() || m_diskBAction->isVisible();
+    m_menuDiskSeparator->setVisible(disksVisible);
+    m_toolbarDiskSeparator->setVisible(disksVisible);
+
+    val = emuGetPropertyValue(platform + "crtRenderer", "altRenderer");
+    if (val == "")
+        m_fontAction->setVisible(false);
+    else {
+        m_fontAction->setVisible(true);
+        m_fontAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "window", "aspectCorrection");
+    if (val == "")
+        m_aspectAction->setVisible(false);
+    else {
+        m_aspectAction->setVisible(true);
+        m_aspectAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "window", "antialiasing");
+    if (val == "")
+        m_smoothingAction->setVisible(false);
+    else {
+        m_smoothingAction->setVisible(true);
+        m_smoothingAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "tapeGrp", "enabled");
+    if (val == "")
+        m_tapeHookAction->setVisible(false);
+    else {
+        m_tapeHookAction->setVisible(true);
+        m_tapeHookAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "kbdLayout", "layout");
+    if (val == "jcuken") {
+        m_jcukenAction->setChecked(true);
+        m_kbdLabel->setText(tr("JCUKEN"));
+    } else if (val == "smart") {
+        m_smartAction->setChecked(true);
+        m_kbdLabel->setText(tr("\"Smart\""));
+    } else { // if (val == "qwerty")
+        m_qwertyAction->setChecked(true);
+        m_kbdLabel->setText("QWERTY");
+    }
+
+    val = emuGetPropertyValue(platform + "crtRenderer", "colorMode");
+    if (val != "" && m_colorModeMenu) {
+        QList<QAction*> list = m_colorModeMenu->actions();
+        for (auto it = list.begin(); it != list.end(); it++) {
+            if ((*it)->data().toString().toUtf8().constData() == val) {
+                (*it)->setChecked(true);
+                m_colorLabel->setText((*it)->text());
+                break;
+            }
+        }
+    }
+}

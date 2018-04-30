@@ -2,6 +2,7 @@
 /bin
 /src/*.layout
 /src/*.depend
+/src/*.pro.user*
 *.o
 /Emu80
 /Emu80lite

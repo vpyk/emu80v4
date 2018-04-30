@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/open.png</file>
+        <file>icons/computer.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/reset.png</file>
+        <file>icons/tape.png</file>
+        <file>icons/settings.png</file>
+        <file>icons/color.png</file>
+        <file>icons/bw.png</file>
+        <file>icons/colormode.png</file>
+        <file>icons/open_run.png</file>
+        <file>icons/open_wav.png</file>
+        <file>icons/disk_a.png</file>
+        <file>icons/disk_b.png</file>
+        <file>icons/aspect.png</file>
+        <file>icons/smooth.png</file>
+        <file>icons/debug.png</file>
+        <file>icons/forward.png</file>
+        <file>icons/keyboard.png</file>
+        <file>icons/preset.png</file>
+        <file>icons/font.png</file>
+        <file>icons/screenshot.png</file>
+    </qresource>
+</RCC>
