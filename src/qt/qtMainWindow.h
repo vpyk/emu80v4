@@ -101,6 +101,7 @@ private slots:
     void onSmart();
     void onResetPlatform();
     void onResetAll();
+    void onMute();
 
 private:
     PaintWidget* m_paintWidget;
@@ -178,6 +179,7 @@ private:
     QAction* m_jcukenAction;
     QAction* m_smartAction;
     QAction* m_autosaveAction;
+    QAction* m_muteAction;
 };
 
 #endif // QTMAINWINDOW_H

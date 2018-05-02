@@ -556,6 +556,18 @@ void MainWindow::createActions()
     settingsMenu->addAction(m_fontAction);
     connect(m_fontAction, SIGNAL(triggered()), this, SLOT(onFont()));
 
+    // Mute
+    m_muteAction = new QAction(QIcon(":/icons/mute.png"), tr("Mute"), this);
+    m_muteAction->setCheckable(true);
+    m_muteAction->setToolTip(tr("Mute (Alt-M)"));
+    QList<QKeySequence> muteKeysList;
+    muteKeysList.append(QKeySequence(Qt::ALT + Qt::Key_M));
+    muteKeysList.append(QKeySequence(Qt::META + Qt::Key_M));
+    m_muteAction->setShortcuts(muteKeysList);
+    addAction(m_muteAction);
+    settingsMenu->addAction(m_muteAction);
+    connect(m_muteAction, SIGNAL(triggered()), this, SLOT(onMute()));
+
     QMenu* viewMenu = m_menuBar->addMenu(tr("View"));
 
     QMenu* presetMenu = viewMenu->addMenu(tr("Presets"));
@@ -637,6 +649,8 @@ void MainWindow::createActions()
     m_presetButton->setMenu(presetMenu);
     m_presetButton->setPopupMode(QToolButton::InstantPopup);
     m_toolBar->addWidget(m_presetButton);
+
+    m_toolBar->addAction(m_muteAction);
 
     QMenu* helpMenu = m_menuBar->addMenu(tr("Help"));
 
@@ -1161,6 +1175,12 @@ void MainWindow::onReset()
 void MainWindow::onPause()
 {
     emuSysReq(m_palWindow, SR_PAUSE);
+}
+
+
+void MainWindow::onMute()
+{
+    emuSysReq(m_palWindow, SR_MUTE);
 }
 
 

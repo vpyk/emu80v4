@@ -21,5 +21,6 @@
         <file>icons/preset.png</file>
         <file>icons/font.png</file>
         <file>icons/screenshot.png</file>
+        <file>icons/mute.png</file>
     </qresource>
 </RCC>
