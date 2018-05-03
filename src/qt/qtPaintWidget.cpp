@@ -31,6 +31,11 @@ PaintWidget::PaintWidget(QWidget *parent) :
     //setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_dstRect.setRect(0, 0, width(), height()); // на всякий случай
+
+    m_hideCursorTimer.setInterval(3500);
+    connect(&m_hideCursorTimer, SIGNAL(timeout()), this, SLOT(onHideCursorTimer()));
+    m_hideCursorTimer.start();
+    setMouseTracking(true);
 }
 
 
@@ -170,3 +175,21 @@ void PaintWidget::paintEvent(QPaintEvent*)
     format.setSwapInterval(vsync ? 1 : 0);
     setFormat(format);
 }*/
+
+
+void PaintWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_cursorHidden) {
+        setCursor(Qt::ArrowCursor);
+        m_cursorHidden = false;
+    }
+    m_hideCursorTimer.start();
+}
+
+
+void PaintWidget::onHideCursorTimer()
+{
+    m_hideCursorTimer.stop();
+    setCursor(Qt::BlankCursor);
+    m_cursorHidden = true;
+}

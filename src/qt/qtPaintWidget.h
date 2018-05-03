@@ -43,6 +43,10 @@ class PaintWidget : public QOpenGLWidget
 
     protected:
         void paintEvent(QPaintEvent *);
+        void mouseMoveEvent(QMouseEvent *event);
+
+    private slots:
+        void onHideCursorTimer();
 
     private:
         void paintScreen(QPainter* painter, QRect dstRect);
@@ -58,6 +62,9 @@ class PaintWidget : public QOpenGLWidget
         QRect m_dstRect;
 
         bool m_antialiasing = false;
+
+        QTimer m_hideCursorTimer;
+        bool m_cursorHidden = false;
 };
 
 #endif // QTPAINTWIDGET_H
