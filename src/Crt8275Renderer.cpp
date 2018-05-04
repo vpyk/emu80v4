@@ -27,6 +27,11 @@
 
 using namespace std;
 
+// MSVC issue (utf-8 literals in getCrtMode)
+#ifdef _MSC_VER
+#pragma execution_character_set("utf-8")
+#endif
+
 
 void Crt8275Renderer::attachCrt(Crt8275* crt)
 {
