@@ -616,8 +616,6 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new Ut88MemPageSelector();
     else if (typeName == "Ut88AddrSpaceMapper")
         obj = new Ut88AddrSpaceMapper();
-    else if (typeName == "Ut88MemPageSelector")
-        obj = new Ut88MemPageSelector();
     else if (typeName == "EurekaPpi8255Circuit")
         obj = new EurekaPpi8255Circuit(parameters[0].asString());
     else if (typeName == "PeriodicInt8080")

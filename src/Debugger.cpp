@@ -127,7 +127,7 @@ DebugWindow::DebugWindow(Cpu* cpu)
 
     m_z80Mode = m_z80cpu != nullptr;
 
-    memset(&m_states, sizeof(m_states), 1);
+    memset(&m_states, 0, sizeof(m_states));
 
     int bytesToRead = (256 + 128) * 12;
     m_font = palReadFile("dbgfont.bin", bytesToRead);
@@ -1033,7 +1033,7 @@ void DebugWindow::inputStart(ActiveMode fromMode, int x, int y, int nDigits, boo
     m_inputYPos = y;
     m_inputNDigits = nDigits;
     if (useInitialNumber) {
-        m_inputCurPos = nDigits - 1;
+        //m_inputCurPos = nDigits - 1;
         m_inputCurValue = int2Hex(initialNumber, nDigits);
     } else {
         m_inputCurPos = 0;

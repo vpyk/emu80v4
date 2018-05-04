@@ -67,7 +67,7 @@ void EurekaPpi8255Circuit::setPortC(uint8_t value)
 {
     SpecPpi8255Circuit::setPortC(value);
     m_romDisk->setPortC(value & 0x7f);
-    m_useRomDisk = value && 0x80;
+    m_useRomDisk = value & 0x80;
     m_renderer->setColorMode(value & 0x40);
 }
 
