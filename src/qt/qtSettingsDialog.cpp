@@ -304,6 +304,7 @@ void SettingsDialog::fillControlValues()
     ui->mixingOffRadioButton->setChecked(val == "none");
     ui->mixingMixRadioButton->setChecked(val == "mix");
     ui->mixingInterlaceRadioButton->setChecked(val == "interlace");
+    ui->mixingScanlineRadioButton->setChecked(val == "scanline");
 
     // Alternate font
     val = m_options["crtRenderer.altRenderer"];
@@ -655,6 +656,8 @@ void SettingsDialog::on_applyPushButton_clicked()
             val = "mix";
         else if (ui->mixingInterlaceRadioButton->isChecked())
             val = "interlace";
+        else if (ui->mixingScanlineRadioButton->isChecked())
+            val = "scanline";
     }
     if (val != "")
         m_options["window.fieldsMixing"] = val;

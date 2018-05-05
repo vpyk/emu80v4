@@ -45,7 +45,8 @@ enum FrameScale {
 enum FieldsMixing {
     FM_NONE,
     FM_MIX,
-    FM_INTERLACE
+    FM_INTERLACE,
+    FM_SCANLINE
 };
 
 enum WindowStyle {
@@ -115,6 +116,7 @@ class EmuWindow : public EmuObject, public PalWindow
 
         void calcDstRect(EmuPixelData frame);
         void interlaceFields(EmuPixelData frame);
+        void prepareScanline(EmuPixelData frame);
 
         uint32_t* m_interlacedImage = nullptr;
         int m_interlacedImageSize = 0;

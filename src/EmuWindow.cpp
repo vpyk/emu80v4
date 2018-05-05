@@ -268,6 +268,29 @@ void EmuWindow::interlaceFields(EmuPixelData frame)
 }
 
 
+void EmuWindow::prepareScanline(EmuPixelData frame)
+{
+    int requiredSize = frame.height * 2 * frame.width;
+    if (requiredSize > m_interlacedImageSize) {
+        if (m_interlacedImage)
+            delete m_interlacedImage;
+        m_interlacedImage = new uint32_t[requiredSize];
+        m_interlacedImageSize = requiredSize;
+    }
+
+    for (int i = 0; i < frame.height; i++) {
+        memcpy(m_interlacedImage + frame.width * i * 2, frame.pixelData + i * frame.width, frame.width * 4);
+        memcpy(m_interlacedImage + frame.width * (i * 2 + 1), frame.pixelData + i * frame.width, frame.width * 4);
+        uint8_t* secondLine = (uint8_t*)(m_interlacedImage + frame.width * (i * 2 + 1));
+        for (int x = 0; x < frame.width * 4; x += 4) {
+            int r = secondLine[x]; secondLine[x] = r >> 2;
+            int g = secondLine[x + 1]; secondLine[x + 1] = g >> 2;
+            int b = secondLine[x + 2]; secondLine[x + 2] = b >> 2;
+        }
+    }
+}
+
+
 void EmuWindow::drawFrame(EmuPixelData frame)
 {
     if (frame.width == 0 || frame.height == 0 || !frame.pixelData) {
@@ -289,16 +312,19 @@ void EmuWindow::drawFrame(EmuPixelData frame)
 
     drawFill(0x282828);
 
-    if (m_fieldsMixing != FM_INTERLACE) {
+    if (m_fieldsMixing != FM_INTERLACE && m_fieldsMixing != FM_SCANLINE) {
         drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, m_dstX, m_dstY, m_dstWidth, m_dstHeight, false, false);
         if (m_fieldsMixing == FM_MIX && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) {
             drawImage((uint32_t*)frame.prevPixelData, frame.prevWidth, frame.prevHeight, m_dstX, m_dstY, m_dstWidth, m_dstHeight, true, false);
         }
-    } else if (frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) { // FM_INTERLACE
+    } else if (m_fieldsMixing == FM_INTERLACE && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) { // FM_INTERLACE
         if (frame.frameNo & 1)
             interlaceFields(frame);
         if (m_interlacedImage)
             drawImage(m_interlacedImage, frame.width, frame.height * 2, m_dstX, m_dstY, m_dstWidth, m_dstHeight, false, false);
+    } else { // if (m_fieldsMixing == FM_SCANLINE)
+        prepareScanline(frame);
+        drawImage(m_interlacedImage, frame.width, frame.height * 2, m_dstX, m_dstY, m_dstWidth, m_dstHeight, false, false);
     }
 }
 
@@ -431,6 +457,9 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
         } else if (values[0].asString() == "interlace") {
             setFieldsMixing(FM_INTERLACE);
             return true;
+        } else if (values[0].asString() == "scanline") {
+            setFieldsMixing(FM_SCANLINE);
+            return true;
         }
     } else if (propertyName == "defaultWindowSize") {
         if (values[0].isInt() && values[1].isInt()) {
@@ -521,7 +550,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
                 return "mix";
             case FM_INTERLACE:
                 return "interlace";
-                break;
+            case FM_SCANLINE:
+                return "scanline";
         }
     } else if (propertyName == "antialiasing") {
         return m_isAntialiased ? "yes" : "no";

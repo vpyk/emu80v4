@@ -779,6 +779,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QRadioButton" name="mixingScanlineRadioButton">
+            <property name="text">
+             <string>Scanline</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1117,6 +1124,7 @@
   <tabstop>mixingOffRadioButton</tabstop>
   <tabstop>mixingMixRadioButton</tabstop>
   <tabstop>mixingInterlaceRadioButton</tabstop>
+  <tabstop>mixingScanlineRadioButton</tabstop>
   <tabstop>altFontCheckBox</tabstop>
   <tabstop>wavChannelComboBox</tabstop>
   <tabstop>speedUpCheckBox</tabstop>
@@ -1129,6 +1137,8 @@
   <tabstop>smartRadioButton</tabstop>
   <tabstop>kbdOriginalRadioButton</tabstop>
   <tabstop>kbdRamfosRadioButton</tabstop>
+  <tabstop>maxFpsCheckBox</tabstop>
+  <tabstop>vsyncCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
