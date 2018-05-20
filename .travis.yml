@@ -27,7 +27,7 @@ install:
 before_script:
   - '"$CXX" != clang++ || export QMAKESPEC=linux-clang'
   - '"$CXX" != g++     || export QMAKESPEC=linux-g++'
-  - export QT_SELECT=qt5
+  - '. /opt/qt$QT/bin/qt$QT-env.sh'
 
 script:
   - qmake src/Emu80qt.pro    # Generate Makefile
