@@ -14,7 +14,7 @@ compiler:
 env:
   - QT=56 PPA=beineri/opt-qt563-trusty
   - QT=57 PPA=beineri/opt-qt571-trusty
-  - QT=58 PPA=beineri/opt-qt580-trusty
+#  - QT=58 PPA=beineri/opt-qt580-trusty
   - QT=59 PPA=beineri/opt-qt595-trusty
 
 before_install:
@@ -31,4 +31,5 @@ before_script:
 
 script:
   - qmake src/Emu80qt.pro    # Generate Makefile
+  - cat ./Makefile
   - make                     # Make
