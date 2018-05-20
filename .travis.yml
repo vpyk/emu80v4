@@ -1,0 +1,34 @@
+dist: trusty    # Ubuntu 14.04
+
+sudo: required  # Virtual machine
+
+language: cpp   # C++ enviroment
+
+os:
+  - linux       # Only Linux for now
+
+compiler:
+  - clang
+  - gcc
+
+env:
+  - QT=56 PPA=beineri/opt-qt563-trusty
+  - QT=57 PPA=beineri/opt-qt571-trusty
+  - QT=58 PPA=beineri/opt-qt580-trusty
+  - QT=59 PPA=beineri/opt-qt595-trusty
+
+before_install:
+  - sudo add-apt-repository -y ppa:$PPA    # Add Qt repo
+  - sudo apt-get -qy update                # Update repo
+
+install:
+  - sudo apt-get -qy install qt${QT}base qt${QT}multimedia    # install specific Qt version
+
+before_script:
+  - '"$CXX" != clang++ || export QMAKESPEC=linux-clang'
+  - '"$CXX" != g++     || export QMAKESPEC=linux-g++'
+  - qmake -v
+
+script:
+  - qmake src/Emu80qt.pro
+  - make
