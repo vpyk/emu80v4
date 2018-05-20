@@ -30,5 +30,5 @@ before_script:
   - qmake -v
 
 script:
-  - qmake src/Emu80qt.pro
-  - make
+  - qmake src/Emu80qt.pro    # Generate Makefile
+  - make                     # Make
