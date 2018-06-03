@@ -73,6 +73,7 @@ SOURCES += \
     Platform.cpp \
     PlatformCore.cpp \
     Ppi8255.cpp \
+    RamDisk.cpp \
     Rk86.cpp \
     RkFdd.cpp \
     RkKeyboard.cpp \
@@ -145,6 +146,7 @@ HEADERS  += \
     PlatformCore.h \
     Ppi8255.h \
     Ppi8255Circuit.h \
+    RamDisk.h \
     Rk86.h \
     RkFdd.h \
     RkKeyboard.h \

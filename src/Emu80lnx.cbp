@@ -162,6 +162,8 @@
 		<Unit filename="Ppi8255.cpp" />
 		<Unit filename="Ppi8255.h" />
 		<Unit filename="Ppi8255Circuit.h" />
+		<Unit filename="RamDisk.cpp" />
+		<Unit filename="RamDisk.h" />
 		<Unit filename="Rk86.cpp" />
 		<Unit filename="Rk86.h" />
 		<Unit filename="RkFdd.cpp" />

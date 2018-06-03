@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,22 +16,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef RAMDISK_H
+#define RAMDISK_H
 
-#ifdef PAL_QT
-    #define TARGET "/qt"
-#elif defined PAL_WX
-    #define TARGET ""
-#else
-    #define TARGET "/lite"
-#endif
+#include "EmuObjects.h"
+#include "AddrSpace.h"
+#include "Memory.h"
 
-#define VERSION "4.0.301" TARGET
 
-#define SND_AMP 4096
+class RamDisk : public EmuObject
+{
+    public:
+        RamDisk(unsigned nPages, unsigned pageSize = 0);
+        ~RamDisk();
 
-class Emulation;
-extern Emulation* g_emulation;
+        void attachPage(unsigned pageNo, AddressableDevice* as);
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-#endif // GLOBALS_H
+        bool loadFromFile();
+        bool saveToFile();
+
+    private:
+        unsigned m_nPages;
+        unsigned m_pageSize;
+
+        AddressableDevice** m_pages = nullptr;
+};
+
+
+#endif // RAMDISK_H
