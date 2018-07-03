@@ -64,7 +64,7 @@ Mikro80Renderer::Mikro80Renderer()
     m_sizeY = m_prevSizeY = 320;
     m_aspectRatio = m_prevAspectRatio = 12. / 13.;
     m_bufSize = m_prevBufSize = m_sizeX * m_sizeY;
-    m_pixelData = new uint32_t[512 * 512];
+    m_pixelData = new uint32_t[m_sizeX * m_sizeY];
     m_prevPixelData = new uint32_t[512 * 512];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));

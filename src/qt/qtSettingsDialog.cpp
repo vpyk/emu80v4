@@ -638,7 +638,7 @@ void SettingsDialog::on_applyPushButton_clicked()
                 val = "color1";
             else if (m_platformGroup == "spec")
                 val = "4color";
-        } else if (ui->color1RadioButton->isChecked()) {
+        } else if (ui->color2RadioButton->isChecked()) {
             if (m_platformGroup == "rk86")
                 val = "color2";
             else if (m_platformGroup == "spec")
