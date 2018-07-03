@@ -19,6 +19,8 @@
 #ifndef RAMDISK_H
 #define RAMDISK_H
 
+#include <string>
+
 #include "EmuObjects.h"
 #include "AddrSpace.h"
 #include "Memory.h"
@@ -38,9 +40,11 @@ class RamDisk : public EmuObject
 
     private:
         unsigned m_nPages;
-        unsigned m_pageSize;
+        unsigned m_defPageSize;
 
         AddressableDevice** m_pages = nullptr;
+
+        std::string m_filter;
 };
 
 

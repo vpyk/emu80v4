@@ -36,6 +36,7 @@ class Ram : public AddressableDevice
         uint8_t readByte(int addr) override;
         /*const*/ uint8_t* getDataPtr() {return m_buf ? m_buf : m_extBuf;};
         uint8_t& operator[](int nAddr) {return m_buf[nAddr];}; // no check for borders, use with caution
+        int getSize() {return m_size;};
 
     protected:
 

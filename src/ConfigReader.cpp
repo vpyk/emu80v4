@@ -66,6 +66,7 @@
 #include "RkRomDisk.h"
 #include "FdImage.h"
 #include "Fdc1793.h"
+#include "RamDisk.h"
 #include "EmuConfig.h"
 #include "GenericModules.h"
 //#include "RkSdController.h"
@@ -618,6 +619,8 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new Ut88AddrSpaceMapper();
     else if (typeName == "EurekaPpi8255Circuit")
         obj = new EurekaPpi8255Circuit(parameters[0].asString());
+    else if (typeName == "RamDisk")
+        obj = new RamDisk(parameters[0].asInt(), parameters[1].asInt());
     else if (typeName == "PeriodicInt8080")
         obj = new PeriodicInt8080(static_cast<Cpu8080Compatible*>(g_emulation->findObject(parameters[0].asString())), parameters[1].asInt(), parameters[2].asInt());
     else if (typeName == "PageSelector")

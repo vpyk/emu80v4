@@ -102,6 +102,8 @@ private slots:
     void onResetPlatform();
     void onResetAll();
     void onMute();
+    void onLoadRamDisk();
+    void onSaveRamDisk();
 
 private:
     PaintWidget* m_paintWidget;
@@ -148,8 +150,11 @@ private:
     QAction* m_loadWavAction;
     QAction* m_diskAAction;
     QAction* m_diskBAction;
+    QAction* m_loadRamDiskAction;
+    QAction* m_saveRamDiskAction;
     QAction* m_menuDiskSeparator;
     QAction* m_toolbarDiskSeparator;
+    QAction* m_ramDiskSeparator;
     QAction* m_exitAction;
     QAction* m_platformSelectAction;
     QAction* m_resetAction;

@@ -74,7 +74,9 @@ enum SysReq
     SR_PAUSEON,
     SR_PAUSEOFF,
     SR_SCREENSHOT,
-    SR_MUTE
+    SR_MUTE,
+    SR_LOADRAMDISK,
+    SR_SAVERAMDISK
 };
 
 

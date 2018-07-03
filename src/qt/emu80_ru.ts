@@ -91,169 +91,179 @@
     </message>
     <message>
         <location filename="qtMainWindow.cpp" line="307"/>
+        <source>Load RAM Disk...</source>
+        <translation>Загрузить RAM-диск...</translation>
+    </message>
+    <message>
+        <location filename="qtMainWindow.cpp" line="313"/>
+        <source>Save RAM Disk...</source>
+        <translation>Сохранить RAM-диск...</translation>
+    </message>
+    <message>
+        <location filename="qtMainWindow.cpp" line="321"/>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="308"/>
+        <location filename="qtMainWindow.cpp" line="322"/>
         <source>Exit (Alt-X)</source>
         <translation>Выход (Alt-X)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="318"/>
-        <location filename="qtMainWindow.cpp" line="320"/>
+        <location filename="qtMainWindow.cpp" line="332"/>
+        <location filename="qtMainWindow.cpp" line="334"/>
         <source>Platform</source>
         <translation>Платформа</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="324"/>
+        <location filename="qtMainWindow.cpp" line="338"/>
         <source>Select platform (Alt-F9)</source>
         <oldsource>Select platform</oldsource>
         <translation>Выбор платформы</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="340"/>
+        <location filename="qtMainWindow.cpp" line="354"/>
         <source>Reset</source>
         <translation>Сброс</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="341"/>
+        <location filename="qtMainWindow.cpp" line="355"/>
         <source>Reset (Alt-F11)</source>
         <translation>Сброс (Alt-F11)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="352"/>
+        <location filename="qtMainWindow.cpp" line="366"/>
         <source>Pause</source>
         <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="354"/>
+        <location filename="qtMainWindow.cpp" line="368"/>
         <source>Pause (Pause, Alt-P)</source>
         <translation>Пауза (Pause, Alt-P)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="369"/>
+        <location filename="qtMainWindow.cpp" line="383"/>
         <source>Fast forward (End)</source>
         <translation>Ускорение (End)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="377"/>
+        <location filename="qtMainWindow.cpp" line="391"/>
         <source>Debug...</source>
         <translation>Отладчик...</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="378"/>
+        <location filename="qtMainWindow.cpp" line="392"/>
         <source>Debug (Alt-D)</source>
         <translation>Отладчик (Alt-D)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="391"/>
+        <location filename="qtMainWindow.cpp" line="405"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="394"/>
+        <location filename="qtMainWindow.cpp" line="408"/>
         <source>Emulator settings...</source>
         <translation>Настройки эмулятора...</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="395"/>
+        <location filename="qtMainWindow.cpp" line="409"/>
         <source>Emulator settings (Alt-F12)</source>
         <translation>Настройки эмулятора (Alt-F12)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="406"/>
+        <location filename="qtMainWindow.cpp" line="420"/>
         <source>Take screenshot...</source>
         <translation>Сделать скриншот...</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="407"/>
+        <location filename="qtMainWindow.cpp" line="421"/>
         <source>Take screenshot (Alt-H)</source>
         <translation>Сделать скриншот (Alt-H)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="421"/>
+        <location filename="qtMainWindow.cpp" line="435"/>
         <source>Kayboard layout</source>
         <translation>Раскладка клавиатуры</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="435"/>
+        <location filename="qtMainWindow.cpp" line="449"/>
         <source>Jcuken</source>
         <translation>Йцукен</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="437"/>
+        <location filename="qtMainWindow.cpp" line="451"/>
         <source>Jcuken (Alt-J)</source>
         <translation>Йцукен (Alt-J)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="446"/>
+        <location filename="qtMainWindow.cpp" line="460"/>
         <source>Smart</source>
         <translation>«Умная» раскладка</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="448"/>
+        <location filename="qtMainWindow.cpp" line="462"/>
         <source>Smart (Alt-K)</source>
         <translation>«Умная» раскладка (Alt-K)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="466"/>
+        <location filename="qtMainWindow.cpp" line="480"/>
         <source>Keyboard layout</source>
         <translation>Раскладка клавиатуры</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="472"/>
-        <location filename="qtMainWindow.cpp" line="474"/>
+        <location filename="qtMainWindow.cpp" line="486"/>
+        <location filename="qtMainWindow.cpp" line="488"/>
         <source>Tape hook</source>
         <translation>Перехват магнитофона</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="480"/>
+        <location filename="qtMainWindow.cpp" line="494"/>
         <source>Color mode</source>
         <translation>Режим цвета</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="483"/>
+        <location filename="qtMainWindow.cpp" line="497"/>
         <source>Black &amp;&amp; white</source>
         <translation>Черно-белый</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="560"/>
+        <location filename="qtMainWindow.cpp" line="574"/>
         <source>Mute</source>
         <translation>Без звука</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="562"/>
+        <location filename="qtMainWindow.cpp" line="576"/>
         <source>Mute (Alt-M)</source>
         <translation>Без звука (Alt-M)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="701"/>
+        <location filename="qtMainWindow.cpp" line="715"/>
         <source>Color (Tolkalin)</source>
         <translation>Цветной (схема Толкалина)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="706"/>
+        <location filename="qtMainWindow.cpp" line="720"/>
         <source>Color (Akimenko)</source>
         <translation>Цветной (схема Акименко)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="716"/>
+        <location filename="qtMainWindow.cpp" line="730"/>
         <source>Color</source>
         <translation>Цветной</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="729"/>
+        <location filename="qtMainWindow.cpp" line="743"/>
         <source>4-color</source>
         <translation>4-цветный</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="734"/>
+        <location filename="qtMainWindow.cpp" line="748"/>
         <source>8-color</source>
         <translation>8-цветный</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="506"/>
+        <location filename="qtMainWindow.cpp" line="520"/>
         <source>Color mode (Alt-C)</source>
         <translation>Режим цвета (Alt-C)</translation>
     </message>
@@ -263,183 +273,183 @@
         <translation>Открыть и проиграть  wav-файл (либо остановить проигрывание) (Alt-W)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="520"/>
+        <location filename="qtMainWindow.cpp" line="534"/>
         <source>Aspect</source>
         <translation>Соотношение сторон</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="522"/>
+        <location filename="qtMainWindow.cpp" line="536"/>
         <source>Original aspect ratio (Alt-R)</source>
         <translation>Оригинальное соотношение сторон</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="534"/>
+        <location filename="qtMainWindow.cpp" line="548"/>
         <source>Smoothing</source>
         <translation>Сглаживание</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="536"/>
+        <location filename="qtMainWindow.cpp" line="550"/>
         <source>Smoothing (Alt-S)</source>
         <translation>Сглаживание (Alt-S)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="546"/>
+        <location filename="qtMainWindow.cpp" line="560"/>
         <source>Font</source>
         <translation>Шрифт</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="548"/>
+        <location filename="qtMainWindow.cpp" line="562"/>
         <source>Advanced font (Alt-F)</source>
         <translation>Альтернативный шрифт (Alt-F)</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="571"/>
+        <location filename="qtMainWindow.cpp" line="585"/>
         <source>View</source>
         <translation>Отображение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="573"/>
+        <location filename="qtMainWindow.cpp" line="587"/>
         <source>Presets</source>
         <translation>Предустановки</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="576"/>
-        <location filename="qtMainWindow.cpp" line="757"/>
+        <location filename="qtMainWindow.cpp" line="590"/>
+        <location filename="qtMainWindow.cpp" line="771"/>
         <source>Preset: 1x</source>
         <translation>1x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="623"/>
-        <location filename="qtMainWindow.cpp" line="802"/>
+        <location filename="qtMainWindow.cpp" line="637"/>
+        <location filename="qtMainWindow.cpp" line="816"/>
         <source>Fullscreen mode</source>
         <translation>Полноэкранный режим</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="634"/>
+        <location filename="qtMainWindow.cpp" line="648"/>
         <source>Full-windowed mode</source>
         <translation>Полнооконный режим</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="813"/>
+        <location filename="qtMainWindow.cpp" line="827"/>
         <source>Hide menu and buttons</source>
         <translation>Полнооконный режим</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="648"/>
+        <location filename="qtMainWindow.cpp" line="662"/>
         <source>Window preset</source>
         <translation>Предустановки отображения</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="665"/>
+        <location filename="qtMainWindow.cpp" line="679"/>
         <source>Auto save settings</source>
         <oldsource>Autosave settings</oldsource>
         <translation>Автоматически сохранять настройки</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="674"/>
+        <location filename="qtMainWindow.cpp" line="688"/>
         <source>Reset settings</source>
         <translation>Сброс настроек</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="675"/>
+        <location filename="qtMainWindow.cpp" line="689"/>
         <source>Current platform settings...</source>
         <translation>для текущей платформы...</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="676"/>
+        <location filename="qtMainWindow.cpp" line="690"/>
         <source>All settings...</source>
         <translation>все настройки...</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="867"/>
+        <location filename="qtMainWindow.cpp" line="881"/>
         <source>Reading RK file:</source>
         <translation>Чтение RK-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="871"/>
+        <location filename="qtMainWindow.cpp" line="885"/>
         <source>Writing RK file:</source>
         <translation>Запись RK-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="875"/>
+        <location filename="qtMainWindow.cpp" line="889"/>
         <source>Reading MSX file:</source>
         <translation>Чтение MSX-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="879"/>
+        <location filename="qtMainWindow.cpp" line="893"/>
         <source>Writing MSX file:</source>
         <translation>Запись MSX-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="893"/>
+        <location filename="qtMainWindow.cpp" line="907"/>
         <source>Writing wave file:</source>
         <translation>Чтение wave-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="897"/>
+        <location filename="qtMainWindow.cpp" line="911"/>
         <source>Playing wave file:</source>
         <translation>Проигрывание wave-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1399"/>
+        <location filename="qtMainWindow.cpp" line="1413"/>
         <source>Emu80: warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1413"/>
+        <location filename="qtMainWindow.cpp" line="1427"/>
         <source>Emu80 Warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1400"/>
+        <location filename="qtMainWindow.cpp" line="1414"/>
         <source>Reset current platform settings?</source>
         <translation>Сбросить настройки для текущей платформы?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1414"/>
+        <location filename="qtMainWindow.cpp" line="1428"/>
         <source>Reset all settings?</source>
         <translation>Сбросить все настройки?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1497"/>
+        <location filename="qtMainWindow.cpp" line="1528"/>
         <source>JCUKEN</source>
         <translation>ЙЦУКЕН</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1500"/>
+        <location filename="qtMainWindow.cpp" line="1531"/>
         <source>&quot;Smart&quot;</source>
         <translation>«Умная»</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="587"/>
-        <location filename="qtMainWindow.cpp" line="768"/>
+        <location filename="qtMainWindow.cpp" line="601"/>
+        <location filename="qtMainWindow.cpp" line="782"/>
         <source>Preset: 2x</source>
         <translation>2x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="598"/>
-        <location filename="qtMainWindow.cpp" line="779"/>
+        <location filename="qtMainWindow.cpp" line="612"/>
+        <location filename="qtMainWindow.cpp" line="793"/>
         <source>Preset: 3x</source>
         <translation>3x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="609"/>
-        <location filename="qtMainWindow.cpp" line="790"/>
+        <location filename="qtMainWindow.cpp" line="623"/>
+        <location filename="qtMainWindow.cpp" line="804"/>
         <source>Preset: Fit</source>
         <translation>Изменяемый</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="655"/>
+        <location filename="qtMainWindow.cpp" line="669"/>
         <source>Help</source>
         <translation>Помощь</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="657"/>
+        <location filename="qtMainWindow.cpp" line="671"/>
         <source>About...</source>
         <translation>О программе...</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="658"/>
+        <location filename="qtMainWindow.cpp" line="672"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
@@ -706,7 +716,7 @@
     <message>
         <location filename="qtSettingsDialog.ui" line="785"/>
         <source>Scanline</source>
-        <translation type="unfinished">Эмуляция линий растра</translation>
+        <translation>Эмуляция линий растра</translation>
     </message>
     <message>
         <location filename="qtSettingsDialog.ui" line="795"/>

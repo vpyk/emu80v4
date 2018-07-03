@@ -153,6 +153,17 @@ diskB.filter = "Образы дисков Специалиста (*.odi)|*.odi;*
 fdc.fdImage = 0, &diskA
 fdc.fdImage = 1, &diskB
 
+RamDisk ramDisk = 8, 0x10000
+ramDisk.filter = "Файлы RAM-диска Специалиста-MX (*.ramdisk)|*.ramdisk|Все файлы (*.*)|*"
+ramDisk.page = 0, &ramDisk1
+ramDisk.page = 1, &ramDisk2
+ramDisk.page = 2, &ramDisk3
+ramDisk.page = 3, &ramDisk4
+ramDisk.page = 4, &ramDisk5
+ramDisk.page = 5, &ramDisk6
+ramDisk.page = 6, &ramDisk7
+ramDisk.page = 7, &ramDisk8
+
 
 
 ######## Include Saved Options ########

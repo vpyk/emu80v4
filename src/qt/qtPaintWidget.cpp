@@ -177,7 +177,7 @@ void PaintWidget::paintEvent(QPaintEvent*)
 }*/
 
 
-void PaintWidget::mouseMoveEvent(QMouseEvent *event)
+void PaintWidget::mouseMoveEvent(QMouseEvent*)
 {
     if (m_cursorHidden) {
         setCursor(Qt::ArrowCursor);

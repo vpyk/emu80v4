@@ -303,6 +303,20 @@ void MainWindow::createActions()
     m_menuDiskSeparator = fileMenu->addSeparator();
     m_toolbarDiskSeparator = m_toolBar->addSeparator();
 
+    // Load RAM disk
+    m_loadRamDiskAction = new QAction(tr("Load RAM Disk..."), this);
+    //m_loadRamDiskAction->setToolTip(tr("Load RAM Disk image"));
+    fileMenu->addAction(m_loadRamDiskAction);
+    connect(m_loadRamDiskAction, SIGNAL(triggered()), this, SLOT(onLoadRamDisk()));
+
+    // Save RAM disk
+    m_saveRamDiskAction = new QAction(tr("Save RAM Disk..."), this);
+    //m_saveRamDiskAction->setToolTip(tr("Save RAM Disk image"));
+    fileMenu->addAction(m_saveRamDiskAction);
+    connect(m_saveRamDiskAction, SIGNAL(triggered()), this, SLOT(onSaveRamDisk()));
+
+    m_ramDiskSeparator = fileMenu->addSeparator();
+
     // Exit
     m_exitAction = new QAction(tr("Exit"), this);
     m_exitAction->setToolTip(tr("Exit (Alt-X)"));
@@ -1421,6 +1435,18 @@ void MainWindow::onResetAll()
 }
 
 
+void MainWindow::onLoadRamDisk()
+{
+    emuSysReq(m_palWindow, SR_LOADRAMDISK);
+}
+
+
+void MainWindow::onSaveRamDisk()
+{
+    emuSysReq(m_palWindow, SR_SAVERAMDISK);
+}
+
+
 void MainWindow::updateConfig()
 {
     updateActions();
@@ -1458,6 +1484,11 @@ void MainWindow::updateActions()
     bool disksVisible = m_diskAAction->isVisible() || m_diskBAction->isVisible();
     m_menuDiskSeparator->setVisible(disksVisible);
     m_toolbarDiskSeparator->setVisible(disksVisible);
+
+    bool ramDiskPresent = emuGetPropertyValue(platform + "ramDisk", "name") != "";
+    m_loadRamDiskAction->setVisible(ramDiskPresent);
+    m_saveRamDiskAction->setVisible(ramDiskPresent);
+    m_ramDiskSeparator->setVisible(ramDiskPresent);
 
     val = emuGetPropertyValue(platform + "crtRenderer", "altRenderer");
     if (val == "")

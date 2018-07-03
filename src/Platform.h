@@ -29,6 +29,7 @@
 class EmuWindow;
 class Cpu;
 class FileLoader;
+class RamDisk;
 class PlatformCore;
 class KbdLayout;
 class CrtRenderer;
@@ -81,6 +82,7 @@ class Platform : public ParentObject
         FdImage* m_diskB = nullptr;
         FileLoader* m_loader = nullptr;
         Keyboard* m_keyboard = nullptr;
+        RamDisk* m_ramDisk = nullptr;
 
         int m_defConfigTabId = 0;
 

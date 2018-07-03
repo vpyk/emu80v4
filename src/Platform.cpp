@@ -31,6 +31,7 @@
 #include "FdImage.h"
 #include "FileLoader.h"
 #include "Keyboard.h"
+#include "RamDisk.h"
 #include "Debugger.h"
 
 using namespace std;
@@ -96,6 +97,11 @@ Platform::Platform(string configFileName, string name)
         if ((m_loader = dynamic_cast<FileLoader*>(*it)))
             break;
     }
+
+    // ищем объект - RAM-диск, должен быть единственным
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++)
+        if ((m_ramDisk = dynamic_cast<RamDisk*>(*it)))
+            break;
 
     // ищем объект - закладку в окне конфигурации, должен быть единственным
     for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
@@ -210,6 +216,14 @@ void Platform::sysReq(SysReq sr)
             // show debugger
             g_emulation->debugRequest(m_cpu);
             //showDebugger();
+            break;
+        case SR_LOADRAMDISK:
+            if (m_ramDisk)
+            m_ramDisk->loadFromFile();
+            break;
+        case SR_SAVERAMDISK:
+            if (m_ramDisk)
+            m_ramDisk->saveToFile();
             break;
         default:
             break;

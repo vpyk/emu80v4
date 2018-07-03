@@ -16,16 +16,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Pal.h"
+#include "PalFile.h"
+#include "EmuWindow.h"
 #include "Emulation.h"
+#include "Platform.h"
 #include "RamDisk.h"
 
 using namespace std;
 
 
-RamDisk::RamDisk(unsigned nPages, unsigned pageSize)
+RamDisk::RamDisk(unsigned nPages, unsigned defPageSize)
 {
     m_nPages = nPages;
-    m_pageSize = pageSize;
+    m_defPageSize = defPageSize;
     m_pages = new AddressableDevice* [nPages];
     for (unsigned i = 0; i < nPages; i++)
         m_pages[i] = nullptr;
@@ -52,21 +56,93 @@ bool RamDisk::setProperty(const std::string& propertyName, const EmuValuesList& 
     if (propertyName == "page" && values[0].isInt()) {
             attachPage(values[0].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[1].asString())));
             return true;
+    } else if (propertyName == "filter") {
+        m_filter = values[0].asString();
+        return true;
     }
 
     return false;
 }
 
 
-bool RamDisk::loadFromFile()
+bool RamDisk::saveToFile()
 {
-    //
-    return false;
+    string fileName = palOpenFileDialog("Open RAM disk file", m_filter, true, m_platform->getWindow());
+    g_emulation->restoreFocus();
+    if (fileName == "")
+        return false;
+
+    PalFile file;
+    file.open(fileName, "w");
+    if (!file.isOpen())
+        return false;
+
+    for (unsigned i = 0; i < m_nPages; i++) {
+        unsigned pageSize = m_defPageSize;
+
+        Ram* ram = dynamic_cast<Ram*>(m_pages[i]);
+        if (ram)
+            pageSize = ram->getSize();
+
+        for (unsigned pos = 0; pos < pageSize; pos++)
+            file.write8(m_pages[i]->readByte(pos));
+        if (pageSize < m_defPageSize)
+            for (unsigned pos = 0; pos < m_defPageSize - pageSize; pos++)
+                file.write8(0);
+    }
+
+    file.close();
+    return true;
 }
 
 
-bool RamDisk::saveToFile()
+bool RamDisk::loadFromFile()
 {
-    //
-    return false;
+    string fileName = palOpenFileDialog("Save RAM disk file", m_filter, false, m_platform->getWindow());
+    g_emulation->restoreFocus();
+    if (fileName == "")
+        return false;
+
+    PalFile file;
+    file.open(fileName, "r");
+    if (!file.isOpen())
+        return false;
+
+    unsigned expectedSize = 0;
+    for (unsigned i = 0; i < m_nPages; i++) {
+        unsigned pageSize = m_defPageSize;
+
+        Ram* ram = dynamic_cast<Ram*>(m_pages[i]);
+        if (ram)
+            pageSize = ram->getSize();
+
+        if (pageSize < m_defPageSize)
+            pageSize = m_defPageSize;
+
+        expectedSize += m_defPageSize;
+    }
+
+    if (file.getSize() == expectedSize) {
+
+        for (unsigned i = 0; i < m_nPages; i++) {
+            unsigned pageSize = m_defPageSize;
+
+            Ram* ram = dynamic_cast<Ram*>(m_pages[i]);
+            if (ram)
+                pageSize = ram->getSize();
+
+            for (unsigned pos = 0; pos < pageSize; pos++)
+                m_pages[i]->writeByte(pos, file.read8());
+
+            if (pageSize < m_defPageSize)
+                for (unsigned pos = 0; pos < m_defPageSize - pageSize; pos++)
+                    file.read8();
+        }
+    } else {
+        emuLog << "Invalid file size: " << fileName << "\n";
+    }
+
+
+    file.close();
+    return true;
 }

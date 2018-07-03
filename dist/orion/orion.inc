@@ -170,6 +170,12 @@ diskB.filter = "Образы дисков Ориона (*.odi)|*.odi;*.ODI|Вс�
 fdc.fdImage = 0, &diskA
 fdc.fdImage = 1, &diskB
 
+RamDisk ramDisk = 3, 0xF000
+ramDisk.filter = "Файлы RAM-диска Ориона (*.ramdisk)|*.ramdisk|Все файлы (*.*)|*"
+ramDisk.page = 0, &ram1
+ramDisk.page = 1, &ram2
+ramDisk.page = 2, &ram3
+
 
 
 ######## Include Saved Options ########
