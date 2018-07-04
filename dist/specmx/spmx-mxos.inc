@@ -203,10 +203,10 @@ styleSelector.addItem = fixed, "Фиксированный"
 configTab.addControl = 1, &styleSelector
 
 #window.fieldsMixing
-#ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
-#mixSelector.addItem = none, "Выкл."
-#mixSelector.addItem = mix, "Вкл."
-#configTab.addControl = 2, &mixSelector
+ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
+mixSelector.addItem = none, "Выкл."
+mixSelector.addItem = scanline, "Имитация линий растра"
+configTab.addControl = 2, &mixSelector
 
 #window.aspectCorrection
 ConfigRadioSelector arSelector = &window, aspectCorrection, "Учитывать Aspect Ratio"
