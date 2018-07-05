@@ -1692,7 +1692,7 @@ void DebugWindow::flagsKbdProc(PalKeyCode keyCode)
             fillCpuStatus();
             break;
         case PK_0:
-            af &= ~1 << bitNo;
+            af &= ~((uint16_t)1 << bitNo);
             m_cpu->setAF(af);
             fillCpuStatus();
             break;
