@@ -136,6 +136,7 @@ void SettingsDialog::readRunningConfig()
     // add mnemonics case options here
     loadRunningConfigValue("crtRenderer.colorMode");
     loadRunningConfigValue("crtRenderer.altRenderer");
+    loadRunningConfigValue("crtRenderer.visibleArea");
     loadRunningConfigValue("wavReader.channel");
     loadRunningConfigValue("wavReader.speedUpFactor");
     loadRunningConfigValue("tapeGrp.enabled");
@@ -305,6 +306,11 @@ void SettingsDialog::fillControlValues()
     ui->mixingMixRadioButton->setChecked(val == "mix");
     ui->mixingInterlaceRadioButton->setChecked(val == "interlace");
     ui->mixingScanlineRadioButton->setChecked(val == "scanline");
+
+    // Visible area
+    val = m_options["crtRenderer.visibleArea"];
+    ui->cropCheckBox->setEnabled(val != "");
+    ui->cropCheckBox->setChecked(val == "yes");
 
     // Alternate font
     val = m_options["crtRenderer.altRenderer"];
@@ -621,7 +627,10 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     m_options["window.antialiasing"] = ui->smoothCheckBox->isChecked() ? "yes" : "no";
 
+
     m_options["window.aspectCorrection"] = ui->aspectCheckBox->isChecked() ? "yes" : "no";
+
+    m_options["crtRenderer.visibleArea"] = ui->cropCheckBox->isChecked() ? "yes" : "no";
 
     m_options["cpu.debugOnHalt"] = ui->debugHltCheckBox->isChecked() ? "yes" : "no";
 

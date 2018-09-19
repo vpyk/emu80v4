@@ -604,6 +604,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="cropCheckBox">
+         <property name="text">
+          <string>Show visible area</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1114,6 +1121,7 @@
   <tabstop>stretchPropIntRadioButton</tabstop>
   <tabstop>smoothCheckBox</tabstop>
   <tabstop>aspectCheckBox</tabstop>
+  <tabstop>cropCheckBox</tabstop>
   <tabstop>debugHltCheckBox</tabstop>
   <tabstop>debugIllegalCheckBox</tabstop>
   <tabstop>upperZ80checkBox</tabstop>
@@ -1149,7 +1157,7 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>521</x>
+     <x>440</x>
      <y>440</y>
     </hint>
     <hint type="destinationlabel">

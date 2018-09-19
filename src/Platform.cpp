@@ -77,7 +77,7 @@ Platform::Platform(string configFileName, string name)
         if ((m_kbdLayout = dynamic_cast<KbdLayout*>(*it)))
             break;
 
-    // ищем объект - рендерер, должен быть единственным
+    // ищем объект - рендерер, только первый
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
         if ((m_renderer = dynamic_cast<CrtRenderer*>(*it)))
             break;
@@ -183,6 +183,12 @@ void Platform::sysReq(SysReq sr)
         case SR_FONT:
             if (m_renderer) {
                 m_renderer->toggleRenderingMethod();
+                g_emulation->getConfig()->updateConfig();
+            }
+            break;
+        case SR_CROPTOVISIBLE:
+            if (m_renderer) {
+                m_renderer->toggleCropping();
                 g_emulation->getConfig()->updateConfig();
             }
             break;

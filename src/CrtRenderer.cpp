@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include "Pal.h"
 
+#include "Emulation.h"
 #include "Crt8275Renderer.h"
 
 using namespace std;
@@ -28,6 +29,12 @@ CrtRenderer::~CrtRenderer()
         delete[] m_pixelData;
     if (m_prevPixelData)
         delete[] m_prevPixelData;
+}
+
+
+void CrtRenderer::attachSecondaryRenderer(CrtRenderer* renderer)
+{
+    m_secondaryRenderer = renderer;
 }
 
 
@@ -80,6 +87,20 @@ void CrtRenderer::swapBuffers()
     m_bufSize = bs;
 
     ++m_frameNo;
+}
+
+
+bool CrtRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "secondaryRenderer") {
+        attachSecondaryRenderer(static_cast<CrtRenderer*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
 }
 
 

@@ -188,25 +188,25 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
 
     switch(tempFs) {
         case FS_1X:
-            m_dstWidth = frame.width * aspectRatio;
+            m_dstWidth = frame.width * aspectRatio + .5;
             m_dstHeight = frame.height;
             m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
             m_dstY = (m_curWindowHeight - m_dstHeight) /2;
             break;
         case FS_2X:
-            m_dstWidth = frame.width * 2 * aspectRatio;
+            m_dstWidth = frame.width * 2 * aspectRatio + .5;
             m_dstHeight = frame.height * 2;
             m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
             m_dstY = (m_curWindowHeight - m_dstHeight) /2;
             break;
         case FS_3X:
-            m_dstWidth = frame.width * 3 * aspectRatio;
+            m_dstWidth = frame.width * 3 * aspectRatio + .5;
             m_dstHeight = frame.height * 3;
             m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
             m_dstY = (m_curWindowHeight - m_dstHeight) /2;
             break;
         case FS_BEST_FIT: {
-            int timesX = m_curWindowWidth / (frame.width * aspectRatio);
+            int timesX = m_curWindowWidth / (frame.width * aspectRatio + .5);
             int timesY = m_curWindowHeight / frame.height;
             int times = timesX < timesY ? timesX : timesY;
 
@@ -216,11 +216,11 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
                 m_dstX = 0;
                 m_dstY = 0;
             } else {
-                int dx = (m_curWindowWidth - frame.width * times * aspectRatio) / 2;
+                int dx = int((m_curWindowWidth - frame.width * times * aspectRatio + .5)) / 2;
                 int dy = (m_curWindowHeight - frame.height * times) / 2;
                 m_dstX = dx;
                 m_dstY = dy;
-                m_dstWidth = frame.width * times * aspectRatio;
+                m_dstWidth = frame.width * times * aspectRatio + .5;
                 m_dstHeight = frame.height * times;
             }
             break;
@@ -232,8 +232,8 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
             m_dstY = 0;
             break;
         case FS_FIT_KEEP_AR:
-            int newW = m_curWindowHeight * frame.width * aspectRatio / frame.height;
-            int newH = m_curWindowWidth * frame.height / aspectRatio / frame.width;
+            int newW = m_curWindowHeight * frame.width * aspectRatio / frame.height + .5;
+            int newH = m_curWindowWidth * frame.height / aspectRatio / frame.width + .5;
             if (newW <= m_curWindowWidth) {
                 m_dstWidth = newW;
                 m_dstHeight = m_curWindowHeight;

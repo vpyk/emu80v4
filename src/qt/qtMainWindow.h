@@ -87,6 +87,7 @@ private slots:
     void onExit();
     void onDiskA();
     void onDiskB();
+    void onCrop();
     void onAspect();
     void onFont();
     void onSmoothing();
@@ -170,6 +171,7 @@ private:
     QAction* m_colorColor1Action;
     QAction* m_colorColor2Action;
     QAction* m_bwAction;
+    QAction* m_cropAction;
     QAction* m_aspectAction;
     QAction* m_fontAction;
     QAction* m_fullscreenAction;

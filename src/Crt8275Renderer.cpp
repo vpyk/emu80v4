@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,20 +45,111 @@ bool Crt8275Renderer::isRasterPresent()
 }
 
 
-void Crt8275Renderer::primaryRenderFrame()
+void Crt8275Renderer::setCropping(bool cropping)
 {
-    double frameRate = m_crt->getFrameRate();
-    double freqMHz = g_emulation->getFrequency() / m_crt->getKDiv() / 1000000.0;
-    if (frameRate == 0.0)
+    m_cropping = cropping;
+    if (m_secondaryRenderer)
+        m_secondaryRenderer->setCropping(cropping);
+}
+
+void Crt8275Renderer::toggleCropping()
+{
+    setCropping(!m_cropping);
+}
+
+void Crt8275Renderer::calcAspectRatio(int charWidth)
+{
+    m_frameRate = m_crt->getFrameRate();
+    m_freqMHz = g_emulation->getFrequency() / m_crt->getKDiv() / 1000000.0;
+    if (m_frameRate == 0.0)
         m_aspectRatio = 1.0;
-    else if (frameRate < 55.0) {
+    else if (m_frameRate < 55.0) {
         // PAL
-        //m_aspectRatio = 288.0 * 4 / 52 / 3 / m_fntCharWidth / freqMHz;
-        m_aspectRatio = 576.0 * 9 / 704 / m_fntCharWidth / freqMHz; // 576 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
+        m_aspectRatio = 576.0 * 9 / 704 / charWidth / m_freqMHz; // 576 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
     } else {
         // NTSC
-        m_aspectRatio = 480.0 * 9 / 704 / m_fntCharWidth / freqMHz; // 480 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
+        m_aspectRatio = 480.0 * 9 / 704 / charWidth / m_freqMHz; // 480 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
     }
+}
+
+
+void Crt8275Renderer::trimImage(int charWidth, int charHeight)
+{
+    if (!m_cropping)
+        return;
+
+    if (m_sizeX < 100 || m_sizeY < 100)
+        return;
+
+    int visibleX, visibleY, visibleWidth, visibleHeight;
+
+    //double effectiveFreq = m_freqMHz * m_freqMHz * 64 / (m_crt->getNCharsPerRow() + m_crt->getHrChars());
+
+    if (m_frameRate == 0.0)
+        return;
+    else if (m_frameRate < 55.0) {
+        // 576i
+        double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / 64.;
+        visibleX = (140 * effectiveFreq / 13.5 - m_crt->getHrChars() - 1) * charWidth; //31 //48;
+        //visibleY = 22 - charHeight * m_crt->getVrRows(); //30;
+        visibleY = (22 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
+        visibleWidth = (704 * effectiveFreq * charWidth) / 13.5; // 384;
+        visibleHeight = 288 * charHeight / m_crt->getNLines(); //288; //250;
+    } else {
+        //480i
+        double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / 63.556; //(572. / 9. /*63.(5)*/);
+        visibleX = (130 * effectiveFreq / 13.5 - m_crt->getHrChars() - 1) * charWidth;
+        //visibleY = 19 - charHeight * m_crt->getVrRows();
+        visibleY = (19 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
+        visibleWidth = (704 * effectiveFreq * charWidth) / 13.5;
+        visibleHeight = 240 * charHeight / m_crt->getNLines();
+    }
+
+    int visibleDataSize = visibleWidth * visibleHeight;
+    uint32_t* visibleData = new uint32_t[visibleDataSize];
+
+    for (int i = 0; i < visibleDataSize; i++)
+        visibleData[i] = 0;
+
+    int dstX = 0;
+    int dstY = 0;
+    int copyWidth = visibleWidth;
+    int copyHeight = visibleHeight;
+
+    if (visibleX < 0) {
+        dstX = -visibleX;
+        copyWidth += visibleX;
+        visibleX = 0;
+    }
+
+    if (visibleX + copyWidth > m_sizeX)
+        copyWidth = m_sizeX - visibleX;
+
+    if (visibleY < 0) {
+        dstY = -visibleY;
+        copyHeight += visibleY;
+        visibleY = 0;
+    }
+
+    if (visibleY + copyHeight > m_sizeY)
+        copyHeight = m_sizeY - visibleY;
+
+    for (int i = 0; i < copyHeight; i++)
+        memcpy(visibleData + (i + dstY) * visibleWidth + dstX, m_pixelData + (visibleY + i) * m_sizeX + visibleX, copyWidth * sizeof(uint32_t));
+
+    delete[] m_pixelData;
+    m_pixelData = visibleData;
+    m_sizeX = visibleWidth;
+    m_sizeY = visibleHeight;
+    m_dataSize = visibleWidth * visibleHeight;
+    m_bufSize = m_dataSize;
+    m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
+}
+
+
+void Crt8275Renderer::primaryRenderFrame()
+{
+    calcAspectRatio(m_fntCharWidth);
 
     const Frame* frame = m_crt->getFrame();
 
@@ -148,24 +239,13 @@ void Crt8275Renderer::primaryRenderFrame()
     rowPtr += nLines * nChars * m_fntCharWidth;
     }
 
+    trimImage(m_fntCharWidth, nLines);
 }
 
 
 void Crt8275Renderer::altRenderFrame()
 {
-    double frameRate = m_crt->getFrameRate();
-    double freqMHz = g_emulation->getFrequency() / m_crt->getKDiv() / 1000000.0;
-    if (frameRate == 0.0)
-        m_aspectRatio = 1.0;
-    else if (frameRate < 55.0) {
-        // PAL
-        //m_aspectRatio = 288.0 * 4 / 52 / 3 / m_fntCharWidth / freqMHz;
-        m_aspectRatio = 576.0 * 9 / 704 / 8 / freqMHz;
-    } else {
-        // NTSC
-        m_aspectRatio = 480.0 * 9 / 704 / 8 / freqMHz;
-    }
-    //m_aspectRatio = 1.0;
+    calcAspectRatio(8);
 
     const Frame* frame = m_crt->getFrame();
 
@@ -263,6 +343,8 @@ void Crt8275Renderer::altRenderFrame()
         }
     rowPtr += nLines * nChars * 8;
     }
+
+    trimImage(8, nLines);
 }
 
 
@@ -274,6 +356,11 @@ bool Crt8275Renderer::setProperty(const string& propertyName, const EmuValuesLis
     if (propertyName == "crt") {
         attachCrt(static_cast<Crt8275*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "visibleArea") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            setCropping(values[0].asString() == "yes");
+            return true;
+        }
     }
 
     return false;
@@ -305,6 +392,8 @@ string Crt8275Renderer::getPropertyStringValue(const string& propertyName)
 
     if (propertyName == "crtMode") {
         return getCrtMode();
+    } else if (propertyName == "visibleArea") {
+        return m_cropping ? "yes" : "no";
     }
 
     return "";

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,13 +32,21 @@ class CrtRenderer : public EmuObject
         CrtRenderer() {};
         virtual ~CrtRenderer();
 
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
         virtual void renderFrame() = 0;
         virtual EmuPixelData getPixelData();
 
         virtual void toggleRenderingMethod() {};
         virtual void toggleColorMode() {};
+        virtual void toggleCropping() {};
+        virtual void setCropping(bool cropping) {};
+
+        void attachSecondaryRenderer(CrtRenderer* renderer);
 
     protected:
+        CrtRenderer* m_secondaryRenderer = nullptr;
+
         uint32_t* m_pixelData = nullptr;
         int m_sizeX = 0;
         int m_sizeY = 0;

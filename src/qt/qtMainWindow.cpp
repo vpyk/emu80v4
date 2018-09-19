@@ -530,6 +530,19 @@ void MainWindow::createActions()
     settingsMenu->addAction(m_colorMenuAction);
     connect(m_colorMenuAction, SIGNAL(triggered()), this, SLOT(onColorMode()));
 
+    // Crop
+    m_cropAction = new QAction(QIcon(":/icons/crop.png"), tr("Visible area"), this);
+    m_cropAction->setCheckable(true);
+    m_cropAction->setToolTip(tr("Show only visible area (Alt-V)"));
+    QList<QKeySequence> cropKeysList;
+    cropKeysList.append(QKeySequence(Qt::ALT + Qt::Key_V));
+    cropKeysList.append(QKeySequence(Qt::META + Qt::Key_V));
+    m_cropAction->setShortcuts(cropKeysList);
+    addAction(m_cropAction);
+    m_toolBar->addAction(m_cropAction);
+    connect(m_cropAction, SIGNAL(triggered()), this, SLOT(onCrop()));
+    settingsMenu->addAction(m_cropAction);
+
     // Aspect
     m_aspectAction = new QAction(QIcon(":/icons/aspect.png"), tr("Aspect"), this);
     m_aspectAction->setCheckable(true);
@@ -538,7 +551,6 @@ void MainWindow::createActions()
     aspectKeysList.append(QKeySequence(Qt::ALT + Qt::Key_R));
     aspectKeysList.append(QKeySequence(Qt::META + Qt::Key_R));
     m_aspectAction->setShortcuts(aspectKeysList);
-    //platformMenu->addAction(m_aspectAction);
     addAction(m_aspectAction);
     m_toolBar->addAction(m_aspectAction);
     connect(m_aspectAction, SIGNAL(triggered()), this, SLOT(onAspect()));
@@ -1343,6 +1355,13 @@ void MainWindow::onDiskB()
 }
 
 
+void MainWindow::onCrop()
+{
+    emuSysReq(m_palWindow, SR_CROPTOVISIBLE);
+    saveConfig();
+}
+
+
 void MainWindow::onAspect()
 {
     emuSysReq(m_palWindow, SR_ASPECTCORRECTION);
@@ -1496,6 +1515,14 @@ void MainWindow::updateActions()
     else {
         m_fontAction->setVisible(true);
         m_fontAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "crtRenderer", "visibleArea");
+    if (val == "")
+        m_cropAction->setVisible(false);
+    else {
+        m_cropAction->setVisible(true);
+        m_cropAction->setChecked(val == "yes");
     }
 
     val = emuGetPropertyValue(platform + "window", "aspectCorrection");

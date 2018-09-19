@@ -38,6 +38,9 @@ class Crt8275Renderer : public TextCrtRenderer
         void setFontSetNum(int fontNum) {m_fontNumber = fontNum;};
 
     protected:
+        void toggleCropping() override;
+        void setCropping(bool cropping) override;
+
         virtual const uint8_t* getCurFontPtr(bool, bool, bool) {return nullptr;};
         virtual const uint8_t* getAltFontPtr(bool, bool, bool) {return nullptr;};
         virtual uint32_t getCurFgColor(bool, bool, bool) = 0;
@@ -69,7 +72,13 @@ class Crt8275Renderer : public TextCrtRenderer
         void altRenderFrame() override;
 
     private:
+        double m_freqMHz;
+        double m_frameRate;
+        bool m_cropping = false;
+
         std::string getCrtMode();
+        void calcAspectRatio(int charWidth);
+        void trimImage(int charWidth, int charHeight);
 };
 
 

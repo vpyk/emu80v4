@@ -22,5 +22,6 @@
         <file>icons/font.png</file>
         <file>icons/screenshot.png</file>
         <file>icons/mute.png</file>
+        <file>icons/crop.png</file>
     </qresource>
 </RCC>

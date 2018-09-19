@@ -54,6 +54,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_SMART;
             case PK_F:
                 return SR_FONT;
+            case PK_V:
+                return SR_CROPTOVISIBLE;
             case PK_C:
                 return SR_COLOR;
             case PK_A:
