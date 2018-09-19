@@ -72,6 +72,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_FIT;
             case PK_M:
                 return SR_MAXIMIZE;
+            case PK_S:
+                return SR_ANTIALIASING;
             case PK_R:
                 return SR_ASPECTCORRECTION;
             case PK_P:
