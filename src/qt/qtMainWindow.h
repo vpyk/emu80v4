@@ -112,6 +112,7 @@ private:
     EmuWindowType m_windowType;
     QLabel* m_fpsLabel;
     QLabel* m_crtModeLabel;
+    QLabel* m_imageSizeLabel;
     QLabel* m_kbdLabel;
     QLabel* m_colorLabel;
     QLabel* m_tapeLabel;

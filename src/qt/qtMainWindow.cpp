@@ -43,6 +43,12 @@
 #include "../EmuCalls.h"
 
 
+// MSVC issue (utf-8 literals in getCrtMode)
+#ifdef _MSC_VER
+#pragma execution_character_set("utf-8")
+#endif
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -88,6 +94,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_colorLabel = new QLabel("", this);
             m_crtModeLabel = new QLabel("", this);
             m_crtModeLabel->setVisible(false);
+            m_imageSizeLabel = new QLabel("", this);
             m_tapeLabel = new QLabel("", this);
             m_tapeLabel->setVisible(false);
             m_wavLabel = new QLabel("", this);
@@ -100,6 +107,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_statusBar->addWidget(m_tapeLabel);
             m_statusBar->addWidget(m_wavLabel);
             m_statusBar->addWidget(m_crtModeLabel);
+            m_statusBar->addWidget(m_imageSizeLabel);
         }
 
         tuneMenu();
@@ -885,6 +893,8 @@ void MainWindow::onFpsTimer()
         crtMode= emuGetPropertyValue(platform + "crtRenderer", "crtMode");
     m_crtModeLabel->setText(QString::fromUtf8(crtMode.c_str()));
     m_crtModeLabel->setVisible(crtMode != "");
+
+    m_imageSizeLabel->setText(QString::number(m_paintWidget->getImageWidth()) + "×" +QString::number(m_paintWidget->getImageHeight()));
 
     std::string fileName;
     QString labelText;
