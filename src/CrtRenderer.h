@@ -40,7 +40,7 @@ class CrtRenderer : public EmuObject
         virtual void toggleRenderingMethod() {};
         virtual void toggleColorMode() {};
         virtual void toggleCropping() {};
-        virtual void setCropping(bool cropping) {};
+        virtual void setCropping(bool) {};
 
         void attachSecondaryRenderer(CrtRenderer* renderer);
 
