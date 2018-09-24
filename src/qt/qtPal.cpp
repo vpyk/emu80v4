@@ -178,7 +178,7 @@ void palQtQuit()
 
 static QAudioOutput* audio;
 
-static EmuAudioIoDevice* audioDevice;
+static EmuAudioIoDevice* audioDevice = 0;
 
 void palStart()
 {
@@ -310,7 +310,8 @@ void palRequestForQuit()
 
 void palPlaySample(int16_t sample)
 {
-    audioDevice->addSample(sample);
+    if (audioDevice)
+        audioDevice->addSample(sample);
 }
 
 
