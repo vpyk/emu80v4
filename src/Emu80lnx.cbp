@@ -186,6 +186,7 @@
 		<Unit filename="TapeRedirector.h" />
 		<Unit filename="Ut88.cpp" />
 		<Unit filename="Ut88.h" />
+		<Unit filename="Version.h" />
 		<Unit filename="WavReader.cpp" />
 		<Unit filename="WavReader.h" />
 		<Unit filename="WavWriter.cpp" />

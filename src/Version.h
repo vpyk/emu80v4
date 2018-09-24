@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,25 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef VERSION_H
+#define VERSION_H
 
-#include "Version.h"
+#define VER_STR "4.0.303"
+#define VER_COMMA_SEP 4,0,303,0
 
-#ifdef PAL_QT
-    #define TARGET "/qt"
-#elif defined PAL_WX
-    #define TARGET ""
-#else
-    #define TARGET "/lite"
-#endif
+#define VI_FILE_DESCR "Emu80 main executable"
+#define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2018" 
+#define VI_FILE_NAME "Emu80qt.exe"
+#define VI_PRODUCT "Emu80"      
 
-#define VERSION VER_STR TARGET
-
-
-#define SND_AMP 4096
-
-class Emulation;
-extern Emulation* g_emulation;
-
-#endif // GLOBALS_H
+#endif // VERSION_H

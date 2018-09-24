@@ -1,0 +1,49 @@
+#include <windows.h>
+#include "..\Version.h"
+
+IDI_ICON1	ICON	DISCARDABLE	"icons\\emu80.ico"
+IDI_ICON_01	ICON	DISCARDABLE	"icons\\rk.ico"
+IDI_ICON_02	ICON	DISCARDABLE	"icons\\rkr.ico"
+IDI_ICON_03	ICON	DISCARDABLE	"icons\\gam.ico"
+IDI_ICON_04	ICON	DISCARDABLE	"icons\\rka.ico"
+IDI_ICON_05	ICON	DISCARDABLE	"icons\\rkp.ico"
+IDI_ICON_06	ICON	DISCARDABLE	"icons\\rkm.ico"
+IDI_ICON_07	ICON	DISCARDABLE	"icons\\rk8.ico"
+IDI_ICON_08	ICON	DISCARDABLE	"icons\\rku.ico"
+IDI_ICON_09	ICON	DISCARDABLE	"icons\\rks.ico"
+IDI_ICON_10	ICON	DISCARDABLE	"icons\\rko.ico"
+IDI_ICON_11	ICON	DISCARDABLE	"icons\\bru.ico"
+IDI_ICON_12	ICON	DISCARDABLE	"icons\\ord.ico"
+IDI_ICON_13	ICON	DISCARDABLE	"icons\\cpu.ico"
+IDI_ICON_14	ICON	DISCARDABLE	"icons\\rke.ico"
+
+VS_VERSION_INFO VERSIONINFO
+	FILEVERSION VER_COMMA_SEP
+	PRODUCTVERSION VER_COMMA_SEP
+	FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+	FILEFLAGS VS_FF_DEBUG
+#else
+	FILEFLAGS 0x0L
+#endif
+	FILEOS VOS__WINDOWS32
+	FILETYPE VFT_APP
+	FILESUBTYPE 0x0L
+	BEGIN
+		BLOCK "StringFileInfo"
+		BEGIN
+			BLOCK "040904e4"
+			BEGIN
+				VALUE "FileDescription", VI_FILE_DESCR
+				VALUE "FileVersion", VER_STR
+				VALUE "LegalCopyright", VI_COPYRIGHT 
+				VALUE "OriginalFilename", VI_FILE_NAME 
+				VALUE "ProductName", VI_PRODUCT
+				VALUE "ProductVersion", VER_STR
+			END
+		END
+		BLOCK "VarFileInfo"
+		BEGIN
+			VALUE "Translation", 0x0409, 1252
+		END
+	END

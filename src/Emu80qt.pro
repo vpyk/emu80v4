@@ -4,13 +4,6 @@
 #
 #-------------------------------------------------
 
-VERSION = 4.0.302
-
-QMAKE_TARGET_DESCRIPTION = Emu80 main executable
-QMAKE_TARGET_COPYRIGHT = "Copyright © Viktor Pykhonin, 2016-2018"
-QMAKE_TARGET_PRODUCT = Emu80
-
-
 QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -38,7 +31,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 DEFINES += PAL_QT
-DEFINES += VER=\\\"$$VERSION\\\"
 
 SOURCES += \
     Main.cpp \
@@ -166,6 +158,7 @@ HEADERS  += \
     Specialist.h \
     TapeRedirector.h \
     Ut88.h \
+    Version.h \
     WavReader.h \
     WavWriter.h \
     qt/qtAboutDialog.h \
@@ -193,24 +186,7 @@ FORMS += \
     qt/qtChoosePlatformDialog.ui \
     qt/qtAboutDialog.ui
 
-win32:RC_CODEPAGE = 1252
-win32:RC_LANG = 0x0409
-win32:RC_ICONS = qt/icons/emu80.ico \
-                 qt/icons/rk.ico \
-                 qt/icons/rkr.ico \
-                 qt/icons/gam.ico \
-                 qt/icons/rka.ico \
-                 qt/icons/rkp.ico \
-                 qt/icons/rkm.ico \
-                 qt/icons/rk8.ico \
-                 qt/icons/rku.ico \
-                 qt/icons/rks.ico \
-                 qt/icons/rko.ico \
-                 qt/icons/bru.ico \
-                 qt/icons/ord.ico \
-                 qt/icons/cpu.ico \
-                 qt/icons/rke.ico
-
+win32:RC_FILE = qt/emu80.rc
 
 INSTALLDIR = ~/emu80
 QMAKE_EXTRA_TARGETS += install
