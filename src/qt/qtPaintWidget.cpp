@@ -20,6 +20,8 @@
 #include <QOpenGLContext>
 #include <QPaintEvent>
 //#include <QMessageBox>
+#include <QGuiApplication>
+#include <QClipboard>
 
 #include "qtPaintWidget.h"
 
@@ -55,7 +57,8 @@ void PaintWidget::draw()
     update();
 }
 
-void PaintWidget::screenshot(QString &ssFileName)
+// Save screenshot or copy it to clipboard if filename is empty
+void PaintWidget::screenshot(const QString& ssFileName)
 {
     /*QImage fullImg = grabFramebuffer();
     QImage img = fullImg.copy(m_dstRect);*/
@@ -73,7 +76,10 @@ void PaintWidget::screenshot(QString &ssFileName)
     paintScreen(&painter, QRect(0, 0, width, height));
     painter.end();
 
-    img.save(ssFileName);
+    if (ssFileName != "")
+        img.save(ssFileName);
+    else
+        QGuiApplication::clipboard()->setImage(img);
 
     /*if (!img.save(ssFileName))
     {

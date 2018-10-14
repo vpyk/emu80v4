@@ -435,6 +435,11 @@ void MainWindow::createActions()
     m_toolBar->addAction(m_screenshotAction);
     connect(m_screenshotAction, SIGNAL(triggered()), this, SLOT(onScreenshot()));
 
+    // Copy screen to clipboard
+    m_copyImageAction = new QAction(tr("Copy screenshot"), this);
+    m_screenshotAction->setToolTip(tr("Copy screenshot to clipboard"));
+    connect(m_copyImageAction, SIGNAL(triggered()), this, SLOT(onCopyImage()));
+
     m_toolBar->addSeparator();
 
     settingsMenu->addSeparator();
@@ -652,6 +657,7 @@ void MainWindow::createActions()
 
     viewMenu->addSeparator();
     viewMenu->addAction(m_screenshotAction);
+    viewMenu->addAction(m_copyImageAction);
     viewMenu->addSeparator();
 
     m_fullscreenAction = new QAction(tr("Fullscreen mode"), this);
@@ -1426,6 +1432,12 @@ void MainWindow::onSettings()
 void MainWindow::onScreenshot()
 {
     emuSysReq(m_palWindow, SR_SCREENSHOT);
+}
+
+
+void MainWindow::onCopyImage()
+{
+    m_paintWidget->screenshot("");
 }
 
 

@@ -36,7 +36,7 @@ class PaintWidget : public QOpenGLWidget
         void drawImage(uint32_t* pixels, int imageWidth, int imageHeight, int dstX, int dstY, int dstWidth, int dstHeight, bool blend = false, bool useAlpha = false);
         void colorFill(QColor color);
         void draw();
-        void screenshot(QString& ssFileName);
+        void screenshot(const QString& ssFileName);
 
         void setAntialiasing(bool aa) {m_antialiasing = aa;};
         //void setVsync(bool vsync);
