@@ -21,6 +21,8 @@
 
 #include <wx/app.h>
 #include <wx/filedlg.h>
+#include <wx/dir.h>
+#include <wx/filename.h>
 
 //#include "../PalSdl.h"
 #include "wxPal.h"
@@ -71,6 +73,68 @@ string palOpenFileDialog(string title, string filter, bool write, PalWindow*)
     openFileDialog->Destroy();
     //palResume();
     return res;
+}
+
+
+void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
+{
+    wxString dirName = wxString::FromUTF8(dir.c_str());
+    wxDir aDir(dirName);
+
+    if (!aDir.IsOpened())
+        return;
+
+    wxString fileName;
+
+    bool cont = aDir.GetFirst(&fileName, wxEmptyString, wxDIR_DIRS);
+    while (cont)
+    {
+        PalFileInfo* newFile = new PalFileInfo;
+        newFile->fileName = fileName.utf8_str();
+
+        newFile->isDir = true;
+        newFile->size = 0;
+
+        wxFileName file;
+        file.AssignDir(dirName + fileName);
+
+        wxDateTime fileTime = file.GetModificationTime();
+
+        newFile->year = fileTime.GetYear();
+        newFile->month = fileTime.GetMonth() + 1;
+        newFile->day = fileTime.GetDay();
+        newFile->hour = fileTime.GetHour();
+        newFile->minute = fileTime.GetMinute();
+        newFile->second = fileTime.GetSecond();
+
+        fileList.push_back(newFile);
+
+        cont = aDir.GetNext(&fileName);
+    }
+
+    cont = aDir.GetFirst(&fileName, wxEmptyString, wxDIR_FILES);
+    while (cont)
+    {
+        PalFileInfo* newFile = new PalFileInfo;
+        newFile->fileName = fileName.utf8_str();
+
+        wxFileName file(dirName, fileName);
+
+        newFile->isDir = false;
+        newFile->size = (uint32_t)file.GetSize().ToULong();
+
+        wxDateTime fileTime = file.GetModificationTime();
+
+        newFile->year = fileTime.GetYear();
+        newFile->month = fileTime.GetMonth() + 1;
+        newFile->day = fileTime.GetDay();
+        newFile->hour = fileTime.GetHour();
+        newFile->minute = fileTime.GetMinute();
+        newFile->second = fileTime.GetSecond();
+        fileList.push_back(newFile);
+
+        cont = aDir.GetNext(&fileName);
+    }
 }
 
 

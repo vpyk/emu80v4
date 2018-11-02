@@ -90,4 +90,20 @@ class EmuLog
 
 extern EmuLog emuLog;
 
+struct PalFileInfo {
+    std::string fileName;
+    //char shortLatinFileName[11];
+    bool isDir;
+    unsigned size;
+    int second;
+    int minute;
+    int hour;
+    int day;
+    int month;
+    int year;
+};
+
+void palGetDirContent(const std::string& dir, std::list<PalFileInfo*>& fileList);
+
+
 #endif // QTPAL_H

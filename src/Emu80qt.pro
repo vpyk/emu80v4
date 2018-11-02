@@ -79,6 +79,7 @@ SOURCES += \
     RkKeyboard.cpp \
     RkPpi8255Circuit.cpp \
     RkRomDisk.cpp \
+    RkSdController.cpp \
     RkTapeHooks.cpp \
     Shortcuts.cpp \
     SoundMixer.cpp \
@@ -152,6 +153,7 @@ HEADERS  += \
     RkKeyboard.h \
     RkPpi8255Circuit.h \
     RkRomDisk.h \
+    RkSdController.h \
     RkTapeHooks.h \
     Shortcuts.h \
     SoundMixer.h \

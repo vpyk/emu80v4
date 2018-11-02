@@ -27,6 +27,8 @@
 #include <QSettings>
 #include <QSurfaceFormat>
 #include <QElapsedTimer>
+#include <QDirIterator>
+#include <QDateTime>
 
 #include "qtMainWindow.h"
 #include "qtRenderHelper.h"
@@ -436,6 +438,32 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
     settings.endGroup();
     emuResetKeys(window);
     return fileName.toUtf8().constData();
+}
+
+
+void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
+{
+    QDirIterator it(QString::fromUtf8(dir.c_str()), QDir::AllEntries | QDir::NoDotAndDotDot);
+
+    while (it.hasNext()) {
+        it.next();
+        PalFileInfo* newFile = new PalFileInfo;
+
+        //newFile->fileName = it.fileName().toUtf8().constData();
+        QFileInfo info = it.fileInfo();
+        newFile->fileName = info.fileName().toUtf8().constData();
+        newFile->isDir = info.isDir();
+        newFile->size = info.size();
+        QDateTime dateTime = info.lastModified();
+        newFile->year = dateTime.date().year();
+        newFile->month = dateTime.date().month();
+        newFile->day = dateTime.date().day();
+        newFile->hour = dateTime.time().hour();
+        newFile->minute = dateTime.time().minute();
+        newFile->second = dateTime.time().second();
+
+        fileList.push_back(newFile);
+    }
 }
 
 

@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <string>
 #include <map>
+#include <list>
 
 #include "../EmuTypes.h"
 #include "../PalKeys.h"

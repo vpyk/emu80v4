@@ -69,7 +69,7 @@
 #include "RamDisk.h"
 #include "EmuConfig.h"
 #include "GenericModules.h"
-//#include "RkSdController.h"
+#include "RkSdController.h"
 
 
 using namespace std;
@@ -609,8 +609,8 @@ EmuObject* ConfigReader::createObject(string typeName, string objName, const Emu
         obj = new RkRomDisk(parameters[0].asString());
     else if (typeName == "SpecRomDisk")
         obj = new SpecRomDisk(parameters[0].asString());
-    //else if (typeName == "RkSdController")
-    //    obj = new RkSdController(parameters[0].asString());
+    else if (typeName == "RkSdController")
+        obj = new RkSdController(parameters[0].asString());
     else if (typeName == "ApogeyRomDisk")
         obj = new ApogeyRomDisk(parameters[0].asString());
     else if (typeName == "Ut88MemPageSelector")

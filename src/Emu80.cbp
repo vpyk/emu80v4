@@ -189,6 +189,8 @@
 		<Unit filename="RkPpi8255Circuit.h" />
 		<Unit filename="RkRomDisk.cpp" />
 		<Unit filename="RkRomDisk.h" />
+		<Unit filename="RkSdController.cpp" />
+		<Unit filename="RkSdController.h" />
 		<Unit filename="RkTapeHooks.cpp" />
 		<Unit filename="RkTapeHooks.h" />
 		<Unit filename="Shortcuts.cpp" />

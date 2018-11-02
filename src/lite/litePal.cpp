@@ -19,14 +19,19 @@
 #include <sstream>
 
 #ifdef __WIN32__
-#include <mem.h>
-#include <windows.h>
-#include <commdlg.h>
-#endif // WIN32
+    #include <mem.h>
+    #include <windows.h>
+    #include <commdlg.h>
+#else
+    #include <dirent.h>
+    #include <sys/stat.h>
+    #include <time.h>
+#endif // __WIN32__
 
 #include "litePal.h"
 
 using namespace std;
+
 
 #ifdef __WIN32__
 
@@ -74,13 +79,113 @@ string palOpenFileDialog(string title, string filter, bool write, PalWindow* win
     return "";
 }
 
+
+void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
+{
+    string utf8Mask = dir;
+
+    if (utf8Mask[utf8Mask.size() - 1] != '/' && utf8Mask[utf8Mask.size() - 1] != '\\')
+        utf8Mask += "/";
+
+    utf8Mask += "/*";
+
+    wchar_t* wideMask = new wchar_t[utf8Mask.size() * 4];
+    MultiByteToWideChar(CP_UTF8, 0, utf8Mask.c_str(), -1, wideMask, utf8Mask.size() * 4);
+
+    WIN32_FIND_DATAW fd;
+    HANDLE hf;
+    hf = FindFirstFileW(wideMask, &fd);
+
+    if (hf != INVALID_HANDLE_VALUE) {
+        do {
+            /*if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                continue;*/
+            char* utf8Name = new char[wcslen(fd.cFileName) * 4 + 4];
+            WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, utf8Name, wcslen(fd.cFileName) * 4 + 4, 0, 0);
+
+            if (string(utf8Name) != "." && string(utf8Name) != "..") {
+                PalFileInfo* newFile = new PalFileInfo;
+                newFile->fileName = utf8Name;
+                newFile->isDir = fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+                newFile->size = fd.nFileSizeLow;
+                FILETIME fileTime = fd.ftLastWriteTime;
+                SYSTEMTIME stUtc, stLocal;
+                FileTimeToSystemTime(&fileTime, &stUtc);
+                SystemTimeToTzSpecificLocalTime(NULL, &stUtc, &stLocal);
+                newFile->year = stLocal.wYear;
+                newFile->month = stLocal.wMonth;
+                newFile->day = stLocal.wDay;
+                newFile->hour = stLocal.wHour;
+                newFile->minute = stLocal.wMinute;
+                newFile->second = stLocal.wSecond;
+
+                fileList.push_back(newFile);
+            }
+
+            delete[] utf8Name;
+        } while (FindNextFileW(hf, &fd) != 0);
+        FindClose(hf);
+    }
+
+    delete[] wideMask;
+}
+
+
 #else
 
 std::string palOpenFileDialog(std::string, std::string, bool, PalWindow*) {
     return "";
 }
 
+void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
+{
+    DIR* pDir;
+    dirent* dp;
+
+    string utf8Dir = dir;
+
+    if (utf8Dir[utf8Dir.size() - 1] != '/' && utf8Dir[utf8Dir.size() - 1] != '\\')
+        utf8Dir += "/";
+
+    if ((pDir = opendir(utf8Dir.c_str()))) {
+        while ((dp = readdir(pDir))) {
+            //if ((dp->d_name == '.') || (dp->d_name == '..')
+            //    continue;
+            PalFileInfo* newFile = new PalFileInfo;
+
+            newFile->fileName = dp->d_name;
+
+            if (newFile->fileName == "." || newFile->fileName == "..")
+                continue;
+
+            string fullPath = utf8Dir + newFile->fileName;
+
+            struct stat entryInfo;
+            if( stat( fullPath.c_str(), &entryInfo ) != 0 )
+                continue;
+
+            newFile->isDir = S_ISDIR( entryInfo.st_mode);
+            newFile->size = (uint32_t)entryInfo.st_size;
+
+
+            struct tm *fileDateTime;
+
+            fileDateTime = gmtime(&(entryInfo.st_mtime));
+
+            newFile->year = fileDateTime->tm_year + 1900;
+            newFile->month = fileDateTime->tm_mon + 1;
+            newFile->day = fileDateTime->tm_mday;
+            newFile->hour = fileDateTime->tm_hour;
+            newFile->minute = fileDateTime->tm_min;
+            newFile->second = fileDateTime->tm_sec;
+
+            fileList.push_back(newFile);
+        }
+    }
+}
+
 #endif
+
 
 bool palChoosePlatform(std::vector<PlatformInfo>&, int&, bool&, bool, PalWindow*) {
     return false;
