@@ -437,7 +437,12 @@ void MainWindow::createActions()
 
     // Copy screen to clipboard
     m_copyImageAction = new QAction(tr("Copy screenshot"), this);
-    m_screenshotAction->setToolTip(tr("Copy screenshot to clipboard"));
+    m_screenshotAction->setToolTip(tr("Copy screenshot to clipboard (Alt-Ins)"));
+    QList<QKeySequence> copyImageKeysList;
+    copyImageKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Insert));
+    copyImageKeysList.append(QKeySequence(Qt::META + Qt::Key_Insert));
+    m_copyImageAction->setShortcuts(copyImageKeysList);
+    addAction(m_copyImageAction);
     connect(m_copyImageAction, SIGNAL(triggered()), this, SLOT(onCopyImage()));
 
     m_toolBar->addSeparator();
