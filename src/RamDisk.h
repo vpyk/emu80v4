@@ -22,8 +22,8 @@
 #include <string>
 
 #include "EmuObjects.h"
-#include "AddrSpace.h"
-#include "Memory.h"
+
+class AddressableDevice;
 
 
 class RamDisk : public EmuObject

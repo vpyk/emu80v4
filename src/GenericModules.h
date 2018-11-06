@@ -20,7 +20,7 @@
 #define GENERICMODULES_H
 
 #include "EmuObjects.h"
-#include "AddrSpace.h"
+
 
 class PeriodicInt8080 : public AddressableDevice, public IActive
 {

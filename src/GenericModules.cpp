@@ -21,6 +21,7 @@
 
 #include "Cpu.h"
 #include "Emulation.h"
+#include "AddrSpace.h"
 #include "GenericModules.h"
 
 using namespace std;

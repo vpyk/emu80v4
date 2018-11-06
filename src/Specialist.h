@@ -19,7 +19,6 @@
 #ifndef SPECIALIST_H
 #define SPECIALIST_H
 
-#include "EmuObjects.h"
 #include "Memory.h"
 #include "CrtRenderer.h"
 #include "PlatformCore.h"

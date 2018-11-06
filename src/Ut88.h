@@ -19,7 +19,6 @@
 #ifndef UT88_H
 #define UT88_H
 
-#include "EmuObjects.h"
 #include "AddrSpace.h"
 #include "CrtRenderer.h"
 #include "PlatformCore.h"

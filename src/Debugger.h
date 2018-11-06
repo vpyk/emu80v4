@@ -22,7 +22,6 @@
 #include <list>
 
 #include "PalKeys.h"
-#include "EmuObjects.h"
 #include "CpuHook.h"
 #include "EmuWindow.h"
 

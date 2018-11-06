@@ -19,7 +19,6 @@
 #ifndef ORION_H
 #define ORION_H
 
-#include "EmuObjects.h"
 #include "PlatformCore.h"
 #include "CrtRenderer.h"
 #include "FileLoader.h"

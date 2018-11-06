@@ -18,6 +18,8 @@
 
 #include "Pal.h"
 #include "PalFile.h"
+#include "AddrSpace.h"
+#include "Memory.h"
 #include "EmuWindow.h"
 #include "Emulation.h"
 #include "Platform.h"

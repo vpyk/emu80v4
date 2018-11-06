@@ -21,7 +21,6 @@
 
 #include "PalFile.h"
 
-#include "EmuObjects.h"
 #include "WavWriter.h"
 
 

@@ -19,13 +19,11 @@
 #ifndef RKFDD_H
 #define RKFDD_H
 
-#include "EmuObjects.h"
 #include "Ppi8255Circuit.h"
 
 class FdImage;
-
-
 class RkFddController;
+
 
 class RkFddRegister : public AddressableDevice
 {

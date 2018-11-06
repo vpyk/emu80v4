@@ -20,7 +20,8 @@
 #define FILELOADER_H
 
 #include "EmuObjects.h"
-#include "TapeRedirector.h"
+
+class TapeRedirector;
 
 
 class FileLoader : public EmuObject

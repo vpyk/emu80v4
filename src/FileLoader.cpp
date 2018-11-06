@@ -17,11 +17,12 @@
  */
 
 #include "Pal.h"
-#include "FileLoader.h"
 #include "Emulation.h"
 #include "Platform.h"
 #include "Cpu.h"
 #include "EmuWindow.h"
+#include "TapeRedirector.h"
+#include "FileLoader.h"
 
 using namespace std;
 

@@ -19,7 +19,6 @@
 #ifndef PARTNER_H
 #define PARTNER_H
 
-#include "EmuObjects.h"
 #include "AddrSpace.h"
 #include "PlatformCore.h"
 #include "RkPpi8255Circuit.h"
