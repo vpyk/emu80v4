@@ -140,7 +140,7 @@ void Pit8253Counter::updateState()
 
 //    m_avgOut = 0;
 //    if (curClock != m_prevClock)
-//        m_avgOut = m_tempSumOut * 9 * 4096 / (curClock - m_prevClock + addClock);
+//        m_avgOut = m_tempSumOut * 9 * SND_AMP / (curClock - m_prevClock + addClock);
 
     m_prevClock = curClock;
 }
@@ -151,8 +151,8 @@ int Pit8253Counter::getAvgOut()
     uint64_t curClock = g_emulation->getCurClock();
     m_avgOut = 0;
     if (curClock != m_sampleClock)
-        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * 4096 / (curClock - m_sampleClock);
-        //m_avgOut = m_tempSumOut * 4096 / (curClock / 9 - m_sampleClock / 9);
+        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * SND_AMP / (curClock - m_sampleClock);
+        //m_avgOut = m_tempSumOut * SND_AMP / (curClock / 9 - m_sampleClock / 9);
     return m_avgOut;
 }
 

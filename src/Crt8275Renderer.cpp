@@ -27,11 +27,6 @@
 
 using namespace std;
 
-// MSVC issue (utf-8 literals in getCrtMode)
-#ifdef _MSC_VER
-#pragma execution_character_set("utf-8")
-#endif
-
 
 void Crt8275Renderer::attachCrt(Crt8275* crt)
 {
@@ -372,7 +367,7 @@ string Crt8275Renderer::getCrtMode()
     const Frame* frame = m_crt->getFrame();
     stringstream ss;
     if (m_crt->getRasterPresent()) {
-        ss << frame->nCharsPerRow << "×" << frame->nRows << "×" << frame->nLines << "@";
+        ss << frame->nCharsPerRow << u8"\u00D7" << frame->nRows << u8"\u00D7" << frame->nLines << "@";
         ss.precision(2);
         ss << fixed << m_crt->getFrameRate() << "Hz";
     } else
