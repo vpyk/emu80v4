@@ -82,6 +82,7 @@ class EmuWindow : public EmuObject, public PalWindow
         void setAntialiasing(bool aal);
         void setFullScreen(bool fullscreen);
         void setAspectCorrection(bool aspectCorrection);
+        void setWideScreen(bool wideScreen);
         void toggleFullScreen();
 
         void drawFrame(EmuPixelData frame);
@@ -102,6 +103,7 @@ class EmuWindow : public EmuObject, public PalWindow
         bool m_isAntialiased = false;
         bool m_isFullscreenMode = false;
         bool m_aspectCorrection = false;
+        bool m_wideScreen = false;
 
         std::string m_caption = "";
 

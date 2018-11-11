@@ -161,6 +161,12 @@ void EmuWindow::setAspectCorrection(bool aspectCorrection)
 }
 
 
+void EmuWindow::setWideScreen(bool wideScreen)
+{
+    m_wideScreen = wideScreen;
+}
+
+
 void EmuWindow::show()
 {
     m_params.visible = true;
@@ -177,7 +183,9 @@ void EmuWindow::hide()
 
 void EmuWindow::calcDstRect(EmuPixelData frame)
 {
-    double aspectRatio = m_aspectCorrection ? frame.aspectRatio : 1.0;
+    double aspectRatio = 1.0;
+    if (m_aspectCorrection)
+        aspectRatio = m_wideScreen ? frame.aspectRatio * 4.0 / 3.0 : frame.aspectRatio;
 
     FrameScale tempFs = m_frameScale;
 
@@ -493,12 +501,19 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             return true;
         }
     } else if (propertyName == "aspectCorrection") {
-        string sss = values[0].asString();
         if (values[0].asString() == "no") {
             setAspectCorrection(false);
             return true;
         } else if (values[0].asString() == "yes") {
             setAspectCorrection(true);
+            return true;
+        }
+    } else if (propertyName == "wideScreen") {
+        if (values[0].asString() == "no") {
+            setWideScreen(false);
+            return true;
+        } else if (values[0].asString() == "yes") {
+            setWideScreen(true);
             return true;
         }
     }
@@ -557,6 +572,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
         return m_isAntialiased ? "yes" : "no";
     } else if (propertyName == "aspectCorrection") {
         return m_aspectCorrection ? "yes" : "no";
+    } else if (propertyName == "wideScreen") {
+        return m_wideScreen ? "yes" : "no";
     } else if (propertyName == "defaultWindowWidth") {
         string res;
         stringstream stringStream;
