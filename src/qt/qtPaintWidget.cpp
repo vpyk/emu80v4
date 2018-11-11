@@ -69,7 +69,7 @@ void PaintWidget::screenshot(const QString& ssFileName)
     int width = m_dstRect.width();
     int height = m_dstRect.height();
 
-    QImage img(width, height, QImage::Format_ARGB32);
+    QImage img(width, height, QImage::Format_RGB32);
     QPainter painter;
     painter.begin(&img);
     painter.fillRect(QRect(0, 0, width, height), m_fillColor);
