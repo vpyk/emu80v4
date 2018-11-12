@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>532</width>
-    <height>451</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -604,6 +604,60 @@
         </widget>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <spacer name="horizontalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="wideLabel">
+           <property name="text">
+            <string>Screen format:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="wideComboBox">
+           <item>
+            <property name="text">
+             <string notr="true">4:3</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">16:9</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QCheckBox" name="cropCheckBox">
          <property name="text">
           <string>Show visible area</string>
@@ -1121,6 +1175,7 @@
   <tabstop>stretchPropIntRadioButton</tabstop>
   <tabstop>smoothCheckBox</tabstop>
   <tabstop>aspectCheckBox</tabstop>
+  <tabstop>wideComboBox</tabstop>
   <tabstop>cropCheckBox</tabstop>
   <tabstop>debugHltCheckBox</tabstop>
   <tabstop>debugIllegalCheckBox</tabstop>

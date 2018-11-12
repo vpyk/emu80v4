@@ -89,6 +89,7 @@ private slots:
     void onDiskB();
     void onCrop();
     void onAspect();
+    void onWideScreen();
     void onFont();
     void onSmoothing();
     void onPlatform();
@@ -176,6 +177,7 @@ private:
     QAction* m_bwAction;
     QAction* m_cropAction;
     QAction* m_aspectAction;
+    QAction* m_wideScreenAction;
     QAction* m_fontAction;
     QAction* m_fullscreenAction;
     QAction* m_fullwindowAction;

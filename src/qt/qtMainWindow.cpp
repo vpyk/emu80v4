@@ -431,7 +431,7 @@ void MainWindow::createActions()
 
     // Copy screen to clipboard
     m_copyImageAction = new QAction(tr("Copy screenshot"), this);
-    m_screenshotAction->setToolTip(tr("Copy screenshot to clipboard (Alt-Ins)"));
+    m_copyImageAction->setToolTip(tr("Copy screenshot to clipboard (Alt-Ins)"));
     QList<QKeySequence> copyImageKeysList;
     copyImageKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Insert));
     copyImageKeysList.append(QKeySequence(Qt::META + Qt::Key_Insert));
@@ -444,7 +444,7 @@ void MainWindow::createActions()
     settingsMenu->addSeparator();
 
     // Keyboard layout
-    QMenu* layoutMenu = new QMenu(tr("Kayboard layout"), this);
+    QMenu* layoutMenu = new QMenu(tr("Keyboard layout"), this);
     QActionGroup* layoutGroup = new QActionGroup(layoutMenu);
 
     m_qwertyAction = new QAction("Qwerty", this);
@@ -568,6 +568,19 @@ void MainWindow::createActions()
     connect(m_aspectAction, SIGNAL(triggered()), this, SLOT(onAspect()));
     settingsMenu->addAction(m_aspectAction);
 
+    // Wide screen
+    m_wideScreenAction = new QAction(QIcon(":/icons/wide.png"), tr("Wide screen (16:9)"), this);
+    m_wideScreenAction->setCheckable(true);
+    m_wideScreenAction->setToolTip(tr("Wide screen (16:9) (Alt-E)"));
+    QList<QKeySequence> wideScreenKeysList;
+    wideScreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_E));
+    wideScreenKeysList.append(QKeySequence(Qt::META + Qt::Key_E));
+    m_wideScreenAction->setShortcuts(wideScreenKeysList);
+    addAction(m_wideScreenAction);
+    //m_toolBar->addAction(m_wideScreenAction);
+    connect(m_wideScreenAction, SIGNAL(triggered()), this, SLOT(onWideScreen()));
+    settingsMenu->addAction(m_wideScreenAction);
+
     // Smoothing
     m_smoothingAction = new QAction(QIcon(":/icons/smooth.png"), tr("Smoothing"), this);
     m_smoothingAction->setCheckable(true);
@@ -576,6 +589,7 @@ void MainWindow::createActions()
     smoothingKeysList.append(QKeySequence(Qt::ALT + Qt::Key_S));
     smoothingKeysList.append(QKeySequence(Qt::META + Qt::Key_S));
     m_smoothingAction->setShortcuts(smoothingKeysList);
+    addAction(m_smoothingAction);
     m_toolBar->addAction(m_smoothingAction);
     settingsMenu->addAction(m_smoothingAction);
     connect(m_smoothingAction, SIGNAL(triggered()), this, SLOT(onSmoothing()));
@@ -1384,6 +1398,13 @@ void MainWindow::onAspect()
 }
 
 
+void MainWindow::onWideScreen()
+{
+    emuSysReq(m_palWindow, SR_WIDESCREEN);
+    saveConfig();
+}
+
+
 void MainWindow::onFont()
 {
     emuSysReq(m_palWindow, SR_FONT);
@@ -1552,6 +1573,14 @@ void MainWindow::updateActions()
     else {
         m_aspectAction->setVisible(true);
         m_aspectAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "window", "wideScreen");
+    if (val == "")
+        m_wideScreenAction->setVisible(false);
+    else {
+        m_wideScreenAction->setVisible(true);
+        m_wideScreenAction->setChecked(val == "yes");
     }
 
     val = emuGetPropertyValue(platform + "window", "antialiasing");

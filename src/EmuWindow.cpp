@@ -402,6 +402,10 @@ void EmuWindow::sysReq(SysReq sr)
             m_aspectCorrection = !m_aspectCorrection;
             g_emulation->getConfig()->updateConfig();
             break;
+        case SR_WIDESCREEN:
+            setWideScreen(!m_wideScreen);
+            g_emulation->getConfig()->updateConfig();
+            break;
         case SR_ANTIALIASING:
             setAntialiasing(!m_isAntialiased);
             g_emulation->getConfig()->updateConfig();

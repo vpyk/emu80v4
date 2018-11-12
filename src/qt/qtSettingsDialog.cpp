@@ -128,6 +128,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("window.frameScale");
     loadRunningConfigValue("window.antialiasing");
     loadRunningConfigValue("window.aspectCorrection");
+    loadRunningConfigValue("window.wideScreen");
     loadRunningConfigValue("window.fieldsMixing");
     loadRunningConfigValue("window.defaultWindowWidth");
     loadRunningConfigValue("window.defaultWindowHeight");
@@ -267,6 +268,10 @@ void SettingsDialog::fillControlValues()
     // Aspect ratio
     val = m_options["window.aspectCorrection"];
     ui->aspectCheckBox->setChecked(val == "yes");
+
+    // Wide screen
+    val = m_options["window.wideScreen"];
+    ui->wideComboBox->setCurrentIndex(val == "yes" ? 1 : 0);
 
     // Debug on HLT
     val = m_options["cpu.debugOnHalt"];
@@ -629,6 +634,8 @@ void SettingsDialog::on_applyPushButton_clicked()
 
 
     m_options["window.aspectCorrection"] = ui->aspectCheckBox->isChecked() ? "yes" : "no";
+
+    m_options["window.wideScreen"] = ui->wideComboBox->currentIndex() == 1 ? "yes" : "no";
 
     m_options["crtRenderer.visibleArea"] = ui->cropCheckBox->isChecked() ? "yes" : "no";
 

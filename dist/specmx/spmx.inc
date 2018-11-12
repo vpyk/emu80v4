@@ -31,6 +31,9 @@ window.antialiasing = no
 window.aspectCorrection = no
 #window.aspectCorrection = yes
 
+# Wide screen (16:9) (default = no)
+window.wideScreen = no
+
 
 
 ######## Platform ########
@@ -211,6 +214,12 @@ ConfigRadioSelector arSelector = &window, aspectCorrection, "Учитывать 
 arSelector.addItem = no, "Нет (1:1)"
 arSelector.addItem = yes, "Оригинальный AR"
 configTab.addControl = 2, &arSelector
+
+#window.wideScreen
+ConfigRadioSelector wsSelector = &window, wideScreen, "Формат экрана"
+wsSelector.addItem = no, "4:3"
+wsSelector.addItem = yes, "16:9"
+configTab.addControl = 2, &wsSelector
 
 #kayboard.matrix
 ConfigRadioSelector kbdSelector = &keyboard, matrix, "Тип клавиатуры"
