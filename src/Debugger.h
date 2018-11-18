@@ -95,7 +95,7 @@ class DebugWindow : private EmuWindow
         void processKey(PalKeyCode keyCode, bool isPressed) override;
         void closeRequest() override;
 
-        void init() {EmuWindow::init();};
+        void initDbgWindow() {EmuWindow::init();}
         void setCaption(std::string caption) {EmuWindow::setCaption(caption);};
 
         void startDebug();
