@@ -1,30 +1,32 @@
-﻿ifdef SDCARD
-  @NAME = "Апогей БК-01 (SD card)"
-else
-  @NAME = "Апогей БК-01"
-endif
+﻿@NAME = "Радио-86РК"
 
 # Тактовые частоты
 @CPU_FREQUENCY = 1777777   # ВМ80, ВИ53, ВТ57
 @CRT_FREQUENCY = 1333333   # ВГ75
 
-# Монитор
-@ROM = "apogey/apogey.rom"
-
-# ROM-диск
-@ROM_DISK = "apogey/romdisk512.bin"
-
-# Директория SD-карты
-@SD_DIR = "apogey/sdcard"
+# Основное ПЗУ и адреса перехвата
+@ROM = "rk86/rk86.rom"
+@F806_ADDR = 0xfb98
+@F80C_ADDR = 0xfc46
+@F803_ADDR = 0xfe63
 
 # Знакогенератор
-@SYM_GEN  = "apogey/sga.bin"       
+@SYM_GEN  = "rk86/sgr.bin"       
 
 # Шрифты 8x8, 8x12, 8x16
-@FONT     = "apogey/fonta.bin"
+@FONT     = "rk86/fontr.bin"
+
+# RK-DOS
+@DOS = "rk86/dos29.bin"
 
 # Файл настроек
-@OPT_FILE = "apogey/apogey.opt"
+@OPT_FILE = "rk86/rk86.opt"
+
+# Файл ROM-диска (если не подключен таймер)
+@ROM_DISK = "rk86/romdisk.bin"
+
+# Директория SD-карты
+@SD_DIR = "rk86/sdcard"
 
 
 
@@ -36,12 +38,9 @@ window.caption = @NAME
 # Default window size for window.windowStyle = fixed (default = 800, 600)
 window.defaultWindowSize = 960, 640
 
-# Window style: autosize, sizable, fixed (default = autosise)
+# Window style: autosize, sizable, fixed, fullscreen (default = autosise)
 window.windowStyle = autosize
 #window.windowStyle = sizable
-
-# Window fullscreen mode: yes, no (default = no)
-window.fullscreen = no
 
 # Window scaling option: 1x, 2x, 3x, fit, bestFit, fitKeepAR (default = bestFit)
 window.frameScale = 2x
@@ -62,15 +61,20 @@ window.aspectCorrection = no
 window.wideScreen = no
 
 
-######## Platform ########
 
-Ram ram = 0xEC00
+######## Platform #####
 
-Rom rom = @ROM, 0x1000
+Ram ram = 0x8000
+
+Rom rom = @ROM, 0x800
+Rom fdcRom = @DOS, 0x1000
 
 Ppi8255 ppi1
+Ppi8255 fdcPpi
 
-Ppi8255 ppi2
+ifndef TIMER
+  Ppi8255 ppi2
+endif
 
 Dma8257 dma
 dma.frequency = @CPU_FREQUENCY
@@ -79,32 +83,51 @@ Crt8275 crt
 crt.frequency = @CRT_FREQUENCY
 crt.dma = &dma, 2
 
-ApogeyRenderer crtRenderer
+ifdef TIMER
+  Pit8253 pit
+  pit.frequency = @CPU_FREQUENCY
+ 
+  RkPit8253SoundSource sndSource
+  sndSource.pit = &pit
+endif
+
+Rk86Renderer crtRenderer
 crtRenderer.font = @SYM_GEN
 crtRenderer.altFont = @FONT
 crtRenderer.altRenderer = no
 crtRenderer.visibleArea = no
 crtRenderer.crt = &crt
 
-ApogeyCore core
+Rk86Core core
 core.window = &window
 core.crtRenderer = &crtRenderer
 crt.core = &core
 
-Pit8253 pit
-pit.frequency = @CPU_FREQUENCY
+RkFddRegister fddReg
+RkFddController fdc
+fdc.fddRegister = &fddReg
+fdcPpi.circuit = &fdc
 
-Pit8253SoundSource sndSource
-sndSource.pit = &pit
+AddrSpace fdcAddrSpace
+fdcAddrSpace.range = &fdcPpi, 0, 3
+fdcAddrSpace.range = &fddReg, 4, 4
+fdcAddrSpace.addrMask = 7
 
 AddrSpace addrSpace
-addrSpace.range = &ram, 0, 0xebFF
-addrSpace.range = &pit, 0xec00, 0xecff
-addrSpace.range = &ppi1, 0xed00, 0xedff
-addrSpace.range = &ppi2, 0xee00, 0xeeff
-addrSpace.range = &crt, 0xef00, 0xefff
-addrSpace.writeRange = &dma, 0xf000, 0xffff
-addrSpace.readRange = &rom, 0xf000, 0xffff
+addrSpace.range = &ram, 0, 0x7FFF
+addrSpace.range = &ppi1, 0x8000, 0x9FFF
+
+ifdef TIMER
+  addrSpace.range = &pit, 0xA000, 0xBFFF
+else
+  addrSpace.range = &ppi2, 0xA000, 0xBFFF
+endif
+
+addrSpace.range = &crt, 0xC000, 0xDFFF
+addrSpace.writeRange = &dma, 0xE000, 0xEFFF
+addrSpace.readRange = &fdcRom, 0xE000, 0xEFFF
+addrSpace.range = &fdcAddrSpace, 0xF000, 0xF7FF
+addrSpace.readRange = &rom, 0xF800, 0xFFFF
 
 Cpu8080 cpu
 cpu.frequency = @CPU_FREQUENCY
@@ -125,13 +148,14 @@ ppiCircuit.rkKeyboard = &keyboard
 
 ppi1.circuit = &ppiCircuit
 
+ifdef ROM_DISK
+  RkRomDisk romDisk = @ROM_DISK
+  ppi2.circuit = &romDisk
+endif
 
-ifdef SDCARD
+ifdef SD_CARD
   RkSdController sdCard = @SD_DIR
   ppi2.circuit = &sdCard
-else
-  ApogeyRomDisk romDisk = @ROM_DISK
-  ppi2.circuit = &romDisk
 endif
 
 
@@ -140,71 +164,46 @@ endif
 
 RkFileLoader loader
 loader.addrSpace = &addrSpace
-loader.filter = "Файлы Апогея (*.rka)|*.rka;*.RKA|Файлы RK-совместимых ПК (*.rk?)|*.rk;*.rk?;*.RK;*.RK?|Все файлы (*.*)|*"
+loader.filter = "Файлы РК-86 (*.rkr, *.gam)|*.rkr;*.gam;*.RKR;*.GAM|Файлы RK-совместимых ПК (*.rk?)|*.rk;*.rk?;*.RK;*.RK?|Все файлы (*.*)|*"
 
 TapeRedirector tapeInFile
 tapeInFile.mode = "r"
-tapeInFile.filter = "Файлы Апогея (*.rka)|*.rka;*.RKA|Файлы RK-совместимых ПК (*.rk?)|*.rk;*.rk?;*.RK;*.RK?|Файлы BSM (*.bsm)|*.bsm;*.BSM|Файлы EDM (*.edm)|*.edm;*.EDM|Все файлы (*.*)|*"
-#tapeInFile.fileName = "example.rka"
+tapeInFile.filter = "Файлы РК-86 (*.rkr, *.gam)|*.rkr;*.gam;*.RKR;*.GAM|Файлы RK-совместимых ПК (*.rk?)|*.rk;*.rk?;*.RK;*.RK?|Файлы BSM (*.bsm)|*.bsm;*.BSM|Файлы EDM (*.edm)|*.edm;*.EDM|Все файлы (*.*)|*"
+#tapeInFile.fileName = "program.gam"
 
 TapeRedirector tapeOutFile
 tapeOutFile.mode = "w"
-tapeOutFile.filter = "Файлы Апогея (*.rka)|*.rka|Файлы RK-совместимых ПК (*.rk)|*.rk|Файлы BSM (*.bsm)|*.bsm|Файлы EDM (*.edm)|*.edm|Все файлы (*.*)|*"
+tapeOutFile.filter = "Файлы РК-86 (*.rkr)|*.rkr|Файлы RK-совместимых ПК (*.rk)|*.rk|Файлы BSM (*.bsm)|*.bsm|Файлы EDM (*.edm)|*.edm|Все файлы (*.*)|*"
 
-TapeRedirector msxTapeOutFile
-msxTapeOutFile.mode = "w"
-msxTapeOutFile.filter = "Cas-файлы MSX (*.cas)|*.cas|Все файлы (*.*)|*"
+FdImage diskA = 80, 2, 1, 3125
+diskA.label = A
+diskA.readOnly = yes
+diskA.filter = "Образы дисков РК-86 (*.rkdisk, *.rdi)|*.rkdisk;*.rdi;*.RDI|Все файлы (*.*)|*"
+#diskA.fileName = "rk86/RK86DOS29.rkdisk"
 
-TapeRedirector msxTapeInFile
-msxTapeInFile.mode = "r"
-msxTapeInFile.filter = "Cas-файлы MSX (*.cas)|*.cas;*.CAS|Все файлы (*.*)|*"
+FdImage diskB = 80, 2, 1, 3125
+diskB.label = B
+diskB.filter = "Образы дисков РК-86 (*.rkdisk, *.rdi)|*.rkdisk;*.rdi;*.RDI|Все файлы (*.*)|*"
 
-RkTapeOutHook tapeOutHook = 0xFC46
-tapeOutHook.tapeRedirector = &tapeOutFile
-cpu.addHook = &tapeOutHook
+fdc.fdImage = 0, &diskA
+fdc.fdImage = 1, &diskB
 
-RkTapeInHook tapeInHook = 0xFB98
+RkTapeInHook tapeInHook = @F806_ADDR
 tapeInHook.tapeRedirector = &tapeInFile
 cpu.addHook = &tapeInHook
 
-MsxTapeOutHook msxTapeOutHook = 0xF66F
-msxTapeOutHook.outReg = C
-msxTapeOutHook.tapeRedirector = &msxTapeOutFile
-cpu.addHook = &msxTapeOutHook
+RkTapeOutHook tapeOutHook = @F80C_ADDR
+tapeOutHook.tapeRedirector = &tapeOutFile
+cpu.addHook = &tapeOutHook
 
-MsxTapeOutHeaderHook msxTapeOutShortHeaderHook = 0xF6D3
-msxTapeOutShortHeaderHook.tapeRedirector = &msxTapeOutFile
-cpu.addHook = &msxTapeOutShortHeaderHook
-
-MsxTapeOutHeaderHook msxTapeOutLongHeaderHook = 0xF6DC
-msxTapeOutLongHeaderHook.tapeRedirector = &msxTapeOutFile
-cpu.addHook = &msxTapeOutLongHeaderHook
-
-MsxTapeInHook msxTapeInHook = 0xF536
-msxTapeInHook.tapeRedirector = &msxTapeInFile
-#msxTapeInHook.ignoreHeaders = yes
-msxTapeInHook.apogeyFix = yes
-cpu.addHook = &msxTapeInHook
-
-MsxTapeInHeaderHook msxTapeInLongHeaderHook = 0xF5C6
-msxTapeInLongHeaderHook.tapeRedirector = &msxTapeInFile
-cpu.addHook = &msxTapeInLongHeaderHook
-
-CloseFileHook closeFileHook = 0xFE61
+CloseFileHook closeFileHook = @F803_ADDR
 closeFileHook.addTapeRedirector = &tapeInFile
 closeFileHook.addTapeRedirector = &tapeOutFile
-closeFileHook.addTapeRedirector = &msxTapeInFile
-closeFileHook.addTapeRedirector = &msxTapeOutFile
 cpu.addHook = &closeFileHook
 
 EmuObjectGroup tapeGrp
-tapeGrp.addItem = &tapeInHook
 tapeGrp.addItem = &tapeOutHook
-tapeGrp.addItem = &msxTapeInHook
-tapeGrp.addItem = &msxTapeInLongHeaderHook
-tapeGrp.addItem = &msxTapeOutHook
-tapeGrp.addItem = &msxTapeOutShortHeaderHook
-tapeGrp.addItem = &msxTapeOutLongHeaderHook
+tapeGrp.addItem = &tapeInHook
 tapeGrp.addItem = &closeFileHook
 #tapeGrp.enabled = no
 
@@ -278,8 +277,9 @@ configTab.addControl = 2, &rendSelector
 
 #crtRenderer.colorMode
 ConfigRadioSelector colorSelector = &crtRenderer, colorMode, "Режим цвета"
-colorSelector.addItem = color, "Цветной"
 colorSelector.addItem = mono, "Ч/б"
+colorSelector.addItem = color1, "Цветной (схема Толкалина)"
+colorSelector.addItem = color2, "Самоцвет-М (схема Акименко)"
 configTab.addControl = 2, &colorSelector
 
 #kbdLayout.layout
