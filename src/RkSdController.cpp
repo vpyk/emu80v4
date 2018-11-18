@@ -39,7 +39,7 @@ RkSdController::RkSdController(std::string sdDir)
     m_romBuffer = new uint8_t[c_romBufferSize];
     memset(m_romBuffer, 0xFF, 128);
 
-    palReadFromFile(m_sdDir + "BOOT/boot.rk", 0, c_romBufferSize, m_romBuffer);
+    palReadFromFile(m_sdDir + "BOOT/BOOT.RK", 0, c_romBufferSize, m_romBuffer);
 
     m_inBuffer = new uint8_t[c_inBufferSize];
 }
@@ -230,7 +230,7 @@ bool RkSdController::cmdBoot()
 {
     int pos = 0;
 
-    if (loadRkFile(m_sdDir + "BOOT/sdbios.rk")) {
+    if (loadRkFile(m_sdDir + "BOOT/SDBIOS.RK")) {
         if (m_outBuffer)
             delete[] m_outBuffer;
         m_outBuffer = new uint8_t[m_progLen + 7];
