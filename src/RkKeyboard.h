@@ -36,6 +36,8 @@ class RkKeyboard : public Keyboard
         uint8_t getMatrixData();
         uint8_t getCtrlKeys();
 
+        static EmuObject* create(const EmuValuesList&) {return new RkKeyboard();}
+
     private:
 
     enum RkKbdMatrix {

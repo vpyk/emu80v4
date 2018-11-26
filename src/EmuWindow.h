@@ -67,8 +67,8 @@ class EmuWindow : public EmuObject, public PalWindow
 
         void init() override;
 
-        virtual void processKey(PalKeyCode, bool) {};
-        virtual void closeRequest() {};
+        virtual void processKey(PalKeyCode, bool) {}
+        virtual void closeRequest() {}
 
         void sysReq(SysReq sr);
 
@@ -92,6 +92,8 @@ class EmuWindow : public EmuObject, public PalWindow
         std::string getCaption();
 
         std::string getPlatformObjectName() override;
+
+        static EmuObject* create(const EmuValuesList&) {return new EmuWindow();}
 
     private:
         int m_defWindowWidth = 800;

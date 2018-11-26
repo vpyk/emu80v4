@@ -44,12 +44,14 @@ class PartnerAddrSpace : public AddressableDevice
         virtual ~PartnerAddrSpace();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        void reset()  override {m_mapNum = 0;};
+        void reset()  override {m_mapNum = 0;}
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
 
         void setMemBlock(int blockNum, AddressableDevice* memBlock);
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new PartnerAddrSpace(parameters[0].asString());}
 
         friend PartnerAddrSpaceSelector;
 
@@ -71,8 +73,10 @@ class PartnerAddrSpaceSelector : public AddressableDevice
 
         void attachPartnerAddrSpace(PartnerAddrSpace* partnerAddrSpace) {m_partnerAddrSpace = partnerAddrSpace;}
 
-        void writeByte(int, uint8_t value) override {m_partnerAddrSpace->m_mapNum = (value & 0xf0) >> 4;};
-        uint8_t readByte(int)  override {return 0xff;};
+        void writeByte(int, uint8_t value) override {m_partnerAddrSpace->m_mapNum = (value & 0xf0) >> 4;}
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new PartnerAddrSpaceSelector();}
 
     private:
         PartnerAddrSpace* m_partnerAddrSpace = nullptr;
@@ -83,12 +87,14 @@ class PartnerAddrSpaceSelector : public AddressableDevice
 class PartnerModuleSelector : public AddressableDevice
 {
     public:
-        virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void attachAddrSpaceMappers(AddrSpaceMapper* romWinAddrSpaceMapper, AddrSpaceMapper* ramWinAddrSpaceMapper, AddrSpaceMapper* devWinAddrSpaceMapper);
 
-        virtual void writeByte(int addr, uint8_t value);
-        virtual uint8_t readByte(int) {return 0xff;};
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int) override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new PartnerModuleSelector();}
 
     private:
         AddrSpaceMapper* m_romWinAddrSpaceMapper = nullptr;
@@ -100,11 +106,13 @@ class PartnerModuleSelector : public AddressableDevice
 class PartnerMcpgSelector : public AddressableDevice
 {
     public:
-        virtual void reset() {m_isMcpgEnabled = false;};
-        virtual void writeByte(int addr, uint8_t value);
-        virtual uint8_t readByte(int) {return 0xff;};
+        void reset() override {m_isMcpgEnabled = false;}
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int) override {return 0xff;}
 
-        bool getMcpgEnabled() {return m_isMcpgEnabled;};
+        bool getMcpgEnabled() {return m_isMcpgEnabled;}
+
+        static EmuObject* create(const EmuValuesList&) {return new PartnerMcpgSelector();}
 
     private:
         bool m_isMcpgEnabled = false;
@@ -114,13 +122,15 @@ class PartnerMcpgSelector : public AddressableDevice
 class PartnerRamUpdater : public ActiveDevice
 {
     public:
-        virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        virtual void operate();
+        void operate() override;
 
         void attachDma(Dma8257* dma, int channel);
 
-    private:
+        static EmuObject* create(const EmuValuesList&) {return new PartnerRamUpdater();}
+
+private:
         Dma8257* m_dma;
         int m_dmaChannel;
 };
@@ -133,15 +143,15 @@ class PartnerCore : public PlatformCore
         PartnerCore();
         virtual ~PartnerCore();
 
-        virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
-        virtual void reset();
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        void reset() override;
 
-        virtual void draw();
+        void draw() override;
 
-        virtual void inte(bool isActive);
-        virtual void vrtc(bool isActive);
-        virtual void hrtc(bool isActive, int lc);
-        //virtual void tapeOut(bool isActive);
+        void inte(bool isActive) override;
+        void vrtc(bool isActive) override;
+        void hrtc(bool isActive, int lc) override;
+        //void tapeOut(bool isActive) override;
 
         void setBeepGate(bool isSet);
 
@@ -149,6 +159,8 @@ class PartnerCore : public PlatformCore
         void attach8275Renderer(Crt8275Renderer* crtRenderer);
         void attach8275McpgRenderer(Crt8275Renderer* crtMcpgRenderer);
         void attachMcpgSelector(PartnerMcpgSelector* mcpgSelector);
+
+        static EmuObject* create(const EmuValuesList&) {return new PartnerCore();}
 
     private:
         Cpu8080Compatible* m_cpu = nullptr;
@@ -171,12 +183,14 @@ class PartnerCore : public PlatformCore
 class PartnerPpi8255Circuit : public RkPpi8255Circuit
 {
     public:
-        virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        virtual uint8_t getPortC();
-        virtual void setPortC(uint8_t value);
+        uint8_t getPortC() override;
+        void setPortC(uint8_t value) override;
 
         void attachCore(PartnerCore* core);
+
+        static EmuObject* create(const EmuValuesList&) {return new PartnerPpi8255Circuit();}
 
     private:
         PartnerCore* m_core = nullptr;
@@ -189,13 +203,15 @@ class PartnerRenderer : public Crt8275Renderer
     public:
         PartnerRenderer();
 
-        virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new PartnerRenderer();}
 
     protected:
-        virtual const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt);
-        virtual const uint8_t* getAltFontPtr(bool gpa0, bool gpa1, bool hglt);
-        virtual uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt);
-        virtual uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt);
+        const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt) override;
+        const uint8_t* getAltFontPtr(bool gpa0, bool gpa1, bool hglt) override;
+        uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt) override;
+        uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt) override;
 };
 
 
@@ -205,14 +221,16 @@ class PartnerMcpgRenderer : public Crt8275Renderer
     public:
         PartnerMcpgRenderer();
 
-        virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void attachMcpgRam(Ram* mcpgRam);
 
+        static EmuObject* create(const EmuValuesList&) {return new PartnerMcpgRenderer();}
+
     protected:
-        virtual uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt);
-        virtual uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt);
-        virtual void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt);
+        uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt) override;
+        uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt) override;
+        void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt) override;
 
     private:
         const uint8_t* m_fontPtr = nullptr;
@@ -222,12 +240,14 @@ class PartnerMcpgRenderer : public Crt8275Renderer
 class PartnerFddControlRegister : public AddressableDevice
 {
     public:
-        virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
+        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
 
-        virtual void writeByte(int addr, uint8_t value);
-        virtual uint8_t readByte(int) {return 0xff;};
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int) override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new PartnerFddControlRegister();}
 
     private:
         Fdc1793* m_fdc = nullptr;

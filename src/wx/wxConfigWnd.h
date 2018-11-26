@@ -108,7 +108,7 @@ class ConfigWndRadioSelector
         void revertChoice();
         void rereadChoice();
 
-        inline int getTabId() {return m_tabId;};
+        inline int getTabId() {return m_tabId;}
 
         friend class ConfigWnd;
 

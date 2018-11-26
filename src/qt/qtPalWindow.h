@@ -56,9 +56,9 @@ class PalWindow
         void focusChanged(bool isFocused);
 
         virtual std::string getPlatformObjectName() = 0;
-        virtual EmuWindowType getWindowType() {return m_windowType;};
+        virtual EmuWindowType getWindowType() {return m_windowType;}
 
-        MainWindow* getQtWindow() {return m_qtWindow;};
+        MainWindow* getQtWindow() {return m_qtWindow;}
 
     protected:
         PalWindowParams m_params;

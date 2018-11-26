@@ -38,11 +38,11 @@ class PaintWidget : public QOpenGLWidget
         void draw();
         void screenshot(const QString& ssFileName);
 
-        void setAntialiasing(bool aa) {m_antialiasing = aa;};
+        void setAntialiasing(bool aa) {m_antialiasing = aa;}
         //void setVsync(bool vsync);
 
-        int getImageWidth() {return m_dstRect.width();};
-        int getImageHeight() {return m_dstRect.height();};
+        int getImageWidth() {return m_dstRect.width();}
+        int getImageHeight() {return m_dstRect.height();}
 
     protected:
         void paintEvent(QPaintEvent *);

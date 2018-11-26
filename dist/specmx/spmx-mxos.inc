@@ -142,7 +142,7 @@ cpu.startAddr = 0x0000
 cpu.addrSpace = &addrSpace
 cpu.core = &core
 
-RkKeybLayout kbdLayout
+RkKbdLayout kbdLayout
 SpecKeyboard keyboard
 keyboard.matrix = @KBD
 

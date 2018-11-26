@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "EmuObjects.h"
 
+class Cpu8080Compatible;
 
 class PeriodicInt8080 : public AddressableDevice, public IActive
 {
@@ -34,6 +35,8 @@ class PeriodicInt8080 : public AddressableDevice, public IActive
         // derived from ActiveDevice
         void operate() override;
 
+        static EmuObject* create(const EmuValuesList& parameters) {return new PeriodicInt8080(static_cast<Cpu8080Compatible*>(findObj(parameters[0].asString())), parameters[1].asInt(), parameters[2].asInt());}
+
     private:
         bool m_active = false;    // признак активности
         unsigned m_ticksPerInt;   // тактов на прерывание
@@ -41,6 +44,7 @@ class PeriodicInt8080 : public AddressableDevice, public IActive
         Cpu8080Compatible* m_cpu; // процессор
 };
 
+class AddrSpaceMapper;
 
 class PageSelector : public AddressableDevice
 {
@@ -49,10 +53,12 @@ class PageSelector : public AddressableDevice
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;};
+        void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;}
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new PageSelector();}
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
@@ -69,6 +75,8 @@ class Splitter : public AddressableDevice
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new Splitter();}
 
     private:
         std::vector<AddressableDevice*> m_deviceVector;
@@ -89,6 +97,8 @@ class Translator : public AddressableDevice
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new Translator(static_cast<AddressableDevice*>(findObj(parameters[0].asString())));}
 
     private:
         AddressableDevice* m_device;

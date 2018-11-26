@@ -24,11 +24,13 @@
 class MsxTapeOutHook : public CpuHook
 {
     public:
-        MsxTapeOutHook(uint16_t addr) : CpuHook(addr) {};
-        virtual ~MsxTapeOutHook() {};
+        MsxTapeOutHook(uint16_t addr) : CpuHook(addr) {}
+        virtual ~MsxTapeOutHook() {}
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         bool hookProc() override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new MsxTapeOutHook(parameters[0].asInt()) : nullptr;}
 
     private:
         bool m_regC = false;
@@ -39,21 +41,25 @@ class MsxTapeOutHook : public CpuHook
 class MsxTapeOutHeaderHook : public CpuHook
 {
     public:
-        MsxTapeOutHeaderHook(uint16_t addr) : CpuHook(addr) {};
-        virtual ~MsxTapeOutHeaderHook() {};
+        MsxTapeOutHeaderHook(uint16_t addr) : CpuHook(addr) {}
+        virtual ~MsxTapeOutHeaderHook() {}
 
         bool hookProc() override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new MsxTapeOutHeaderHook(parameters[0].asInt()) : nullptr;}
 };
 
 
 class MsxTapeInHook : public CpuHook
 {
     public:
-        MsxTapeInHook(uint16_t addr) : CpuHook(addr) {};
-        virtual ~MsxTapeInHook() {};
+        MsxTapeInHook(uint16_t addr) : CpuHook(addr) {}
+        virtual ~MsxTapeInHook() {}
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         bool hookProc() override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new MsxTapeInHook(parameters[0].asInt()) : nullptr;}
 
     private:
         bool m_ignoreHeaders = false;
@@ -64,10 +70,12 @@ class MsxTapeInHook : public CpuHook
 class MsxTapeInHeaderHook : public CpuHook
 {
     public:
-        MsxTapeInHeaderHook(uint16_t addr) : CpuHook(addr) {};
-        virtual ~MsxTapeInHeaderHook() {};
+        MsxTapeInHeaderHook(uint16_t addr) : CpuHook(addr) {}
+        virtual ~MsxTapeInHeaderHook() {}
 
         bool hookProc() override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new MsxTapeInHeaderHook(parameters[0].asInt()) : nullptr;}
 };
 
 

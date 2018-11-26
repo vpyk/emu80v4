@@ -25,18 +25,20 @@
 class RkRomDisk : public Ppi8255Circuit
 {
     public:
-        RkRomDisk() {}; // явно не использовать, для производных классов
+        RkRomDisk() {} // явно не использовать, для производных классов
         RkRomDisk(std::string romDiskName);
         virtual ~RkRomDisk();
 
         //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         uint8_t getPortA() override;
-        uint8_t getPortB() override {return 0xff;};
-        uint8_t getPortC() override {return 0xff;};
-        void setPortA(uint8_t) override {};
+        uint8_t getPortB() override {return 0xff;}
+        uint8_t getPortC() override {return 0xff;}
+        void setPortA(uint8_t) override {}
         void setPortB(uint8_t) override;
         void setPortC(uint8_t) override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new RkRomDisk(parameters[0].asString());}
 
     protected:
         uint8_t* m_romDisk;

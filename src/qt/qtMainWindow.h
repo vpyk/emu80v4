@@ -39,8 +39,8 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    //inline RenderHelper* getHelper() {return m_helper;};
-    inline PaintWidget* getPaintWidget() {return m_paintWidget;};
+    //inline RenderHelper* getHelper() {return m_helper;}
+    inline PaintWidget* getPaintWidget() {return m_paintWidget;}
 
     void incFrameCount();
 

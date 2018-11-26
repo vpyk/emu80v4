@@ -35,17 +35,17 @@ class Crt8275Renderer : public TextCrtRenderer
 
         void attachCrt(Crt8275* crt);
 
-        void setFontSetNum(int fontNum) {m_fontNumber = fontNum;};
+        void setFontSetNum(int fontNum) {m_fontNumber = fontNum;}
 
     protected:
         void toggleCropping() override;
         void setCropping(bool cropping) override;
 
-        virtual const uint8_t* getCurFontPtr(bool, bool, bool) {return nullptr;};
-        virtual const uint8_t* getAltFontPtr(bool, bool, bool) {return nullptr;};
+        virtual const uint8_t* getCurFontPtr(bool, bool, bool) {return nullptr;}
+        virtual const uint8_t* getAltFontPtr(bool, bool, bool) {return nullptr;}
         virtual uint32_t getCurFgColor(bool, bool, bool) = 0;
-        virtual uint32_t getCurBgColor(bool, bool, bool) {return 0x000000;};
-        virtual void customDrawSymbolLine(uint32_t*, uint8_t, int, bool, bool, bool, bool, bool, bool) {};
+        virtual uint32_t getCurBgColor(bool, bool, bool) {return 0x000000;}
+        virtual void customDrawSymbolLine(uint32_t*, uint8_t, int, bool, bool, bool, bool, bool, bool) {}
 
         Crt8275* m_crt = nullptr;
 

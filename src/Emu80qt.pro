@@ -64,6 +64,7 @@ SOURCES += \
     Mikro80.cpp \
     Mikrosha.cpp \
     MsxTapeHooks.cpp \
+    ObjectFactory.cpp \
     Orion.cpp \
     Pal.cpp \
     Parameters.cpp \
@@ -134,6 +135,7 @@ HEADERS  += \
     Mikro80.h \
     Mikrosha.h \
     MsxTapeHooks.h \
+    ObjectFactory.h \
     Orion.h \
     Pal.h \
     PalFile.h \

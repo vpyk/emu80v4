@@ -32,11 +32,11 @@ class CpuZ80;
 class CodeBreakpoint : public CpuHook
 {
     public:
-        CodeBreakpoint(uint16_t addr) : CpuHook(addr) {};
+        CodeBreakpoint(uint16_t addr) : CpuHook(addr) {}
         virtual ~CodeBreakpoint();
         bool hookProc() override;
 
-        void setSkipCount(int skips) {m_skipCount = skips;};
+        void setSkipCount(int skips) {m_skipCount = skips;}
 
     private:
         int m_skipCount = 0;
@@ -96,7 +96,7 @@ class DebugWindow : private EmuWindow
         void closeRequest() override;
 
         void initDbgWindow() {EmuWindow::init();}
-        void setCaption(std::string caption) {EmuWindow::setCaption(caption);};
+        void setCaption(std::string caption) {EmuWindow::setCaption(caption);}
 
         void startDebug();
         void draw();
@@ -218,8 +218,8 @@ class DebugWindow : private EmuWindow
 
         void setLayout(bool isCompact);
 
-        void setPos(int x, int y) {m_curX = x; m_curY = y;};
-        void setColors(int fgColor, int bgColor) {m_curFgColor = fgColor; m_curBgColor = bgColor;};
+        void setPos(int x, int y) {m_curX = x; m_curY = y;}
+        void setColors(int fgColor, int bgColor) {m_curFgColor = fgColor; m_curBgColor = bgColor;}
         void putString(int x, int y, std::string s, int fgColor, int bgColor);
         void putString(int x, int y, std::string s);
         void putString(std::string s, int fgColor, int bgColor);
@@ -229,9 +229,9 @@ class DebugWindow : private EmuWindow
         void highlight(int x, int y, int color, int num, bool isVertical = false);
         void clearBlock(int x1, int y1, int x2, int y2, int bgColor);
 
-        inline uint8_t memByte(uint16_t addr) {return m_cpu->getAddrSpace()->readByte(addr);};
-        inline uint16_t memWord(uint16_t addr) {return memByte(addr) + ((uint16_t)memByte(addr + 1) << 8);};
-        inline void writeByte(uint16_t addr, uint8_t value) {m_cpu->getAddrSpace()->writeByte(addr, value);};
+        inline uint8_t memByte(uint16_t addr) {return m_cpu->getAddrSpace()->readByte(addr);}
+        inline uint16_t memWord(uint16_t addr) {return memByte(addr) + ((uint16_t)memByte(addr + 1) << 8);}
+        inline void writeByte(uint16_t addr, uint8_t value) {m_cpu->getAddrSpace()->writeByte(addr, value);}
         std::string getInstructionMnemonic(uint16_t addr);
         int getInstructionLength(uint16_t addr);
         bool getInstructionOverFlag(uint16_t addr);

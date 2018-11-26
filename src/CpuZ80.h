@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CpuZ80 : public Cpu8080Compatible
     public:
         CpuZ80();
 
-        CpuType getType()  override {return Cpu::CPU_Z80;};
+        CpuType getType() override {return Cpu::CPU_Z80;}
 
         void operate() override;
         void reset() override;
@@ -49,13 +49,13 @@ class CpuZ80 : public Cpu8080Compatible
         uint16_t getSP() override;
         uint16_t getPC() override;
 
-        /*int getA()  override {return 0;};
-        int getB()   override {return 0;};
-        int getC()  override {return 0;};
-        int getD()  override {return 0;};
-        int getE()  override {return 0;};
-        int getH()  override {return 0;};
-        int getL()  override {return 0;};*/
+        /*int getA()  override {return 0;}
+        int getB()   override {return 0;}
+        int getC()  override {return 0;}
+        int getD()  override {return 0;}
+        int getE()  override {return 0;}
+        int getH()  override {return 0;}
+        int getL()  override {return 0;}*/
 
         void setAF(uint16_t value) override;
         void setBC(uint16_t value) override;
@@ -84,6 +84,8 @@ class CpuZ80 : public Cpu8080Compatible
         uint8_t  getIM();
         uint8_t  getR();
         uint8_t  getIFF();
+
+        static EmuObject* create(const EmuValuesList&) {return new CpuZ80();}
 
     private:
         /* Z80 registers */

@@ -33,6 +33,8 @@ class EurekaCore : public SpecCore
 
         void inte(bool isActive) override;
 
+        static EmuObject* create(const EmuValuesList&) {return new EurekaCore();}
+
     private:
         GeneralSoundSource* m_inteSoundSource;
 };
@@ -50,8 +52,10 @@ class EurekaRenderer : public CrtRenderer
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachVideoRam(Ram* videoRam) {m_videoRam = videoRam->getDataPtr();};
-        inline void setColorMode(bool colorMode) {m_colorMode = colorMode;};
+        inline void attachVideoRam(Ram* videoRam) {m_videoRam = videoRam->getDataPtr();}
+        inline void setColorMode(bool colorMode) {m_colorMode = colorMode;}
+
+        static EmuObject* create(const EmuValuesList&) {return new EurekaRenderer();}
 
     private:
         const uint8_t* m_videoRam = nullptr;
@@ -72,7 +76,9 @@ class EurekaPpi8255Circuit : public SpecPpi8255Circuit
         uint8_t getPortB() override;
 
         // Подключение объекта - рендерера
-        inline void attachEurekaRenderer(EurekaRenderer* renderer) {m_renderer = renderer;};
+        inline void attachEurekaRenderer(EurekaRenderer* renderer) {m_renderer = renderer;}
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new EurekaPpi8255Circuit(parameters[0].asString());}
 
     private:
         SpecRomDisk* m_romDisk;

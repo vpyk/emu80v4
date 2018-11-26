@@ -140,6 +140,8 @@
 		<Unit filename="Mikrosha.h" />
 		<Unit filename="MsxTapeHooks.cpp" />
 		<Unit filename="MsxTapeHooks.h" />
+		<Unit filename="ObjectFactory.cpp" />
+		<Unit filename="ObjectFactory.h" />
 		<Unit filename="Orion.cpp" />
 		<Unit filename="Orion.h" />
 		<Unit filename="Pal.cpp" />

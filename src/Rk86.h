@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ class Rk86Core : public PlatformCore
 
         void attachCrtRenderer(Crt8275Renderer* crtRenderer);
 
+        static EmuObject* create(const EmuValuesList&) {return new Rk86Core();}
+
     private:
         Crt8275Renderer* m_crtRenderer = nullptr;
         GeneralSoundSource* m_beepSoundSource;
@@ -62,6 +64,8 @@ class Rk86Renderer : public Crt8275Renderer
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
         void toggleColorMode() override;
+
+        static EmuObject* create(const EmuValuesList&) {return new Rk86Renderer();}
 
     protected:
         const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt) override;

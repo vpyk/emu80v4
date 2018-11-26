@@ -37,7 +37,7 @@ class WavWriter : public ActiveDevice
         // derived from ActiveDevice
         void operate() override;
 
-        bool isOpen() {return m_open;};
+        bool isOpen() {return m_open;}
 
     private:
         const uint8_t c_wavHeader[44] = {

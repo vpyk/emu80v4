@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,11 +29,13 @@ class TapeRedirector;
 class CloseFileHook : public CpuHook
 {
     public:
-        CloseFileHook(uint16_t addr) : CpuHook(addr) {};
+        CloseFileHook(uint16_t addr) : CpuHook(addr) {}
         void addTapeRedirector(TapeRedirector* fr);
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         bool hookProc() override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new CloseFileHook(parameters[0].asInt()) : nullptr;}
 
     private:
         std::vector<TapeRedirector*> m_frVector;

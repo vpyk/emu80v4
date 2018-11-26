@@ -113,7 +113,7 @@ cpu.startAddr = 0xF800
 cpu.addrSpace = &addrSpace
 cpu.core = &core
 
-RkKeybLayout kbdLayout
+RkKbdLayout kbdLayout
 RkKeyboard keyboard
 
 RkPpi8255Circuit ppiCircuit

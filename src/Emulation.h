@@ -60,8 +60,8 @@ class Emulation : public ParentObject
         void registerActiveDevice(IActive* device);
         void unregisterActiveDevice(IActive* device);
 
-        inline void debugRequest(Cpu* cpu) {m_debugReqCpu = cpu;};
-        inline void debugRun() {m_debugReqCpu = nullptr;};
+        inline void debugRequest(Cpu* cpu) {m_debugReqCpu = cpu;}
+        inline void debugRun() {m_debugReqCpu = nullptr;}
 
         void processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys(EmuWindow* wnd);
@@ -75,19 +75,19 @@ class Emulation : public ParentObject
         void mainLoopCycle();
         void exec(uint64_t ticks);
 
-        //inline Platform* getPlatform() {return m_platform;}; //!!!
-        inline uint64_t getCurClock() {return m_curClock;};
-        inline SoundMixer* getSoundMixer() {return m_mixer;};
-        inline EmuConfig* getConfig() {return m_config;};
-        inline WavReader* getWavReader() {return m_wavReader;};
+        //inline Platform* getPlatform() {return m_platform;} //!!!
+        inline uint64_t getCurClock() {return m_curClock;}
+        inline SoundMixer* getSoundMixer() {return m_mixer;}
+        inline EmuConfig* getConfig() {return m_config;}
+        inline WavReader* getWavReader() {return m_wavReader;}
 
         void setFrequency(int64_t freq) override;
-        int64_t getFrequency() {return m_frequency;};
+        int64_t getFrequency() {return m_frequency;}
         void setSampleRate(int sampleRate);             // установка частоты дискретизации звуковой карты
-        int getSampleRate() {return m_sampleRate;};
+        int getSampleRate() {return m_sampleRate;}
         void setFrameRate(int frameRate);               // установка частоты кадров, 0 - max
         void setVsync(bool vsync);                      // установка vsync
-        bool getVsync() {return m_vsync;};
+        bool getVsync() {return m_vsync;}
         void setSpeedUpFactor(unsigned speed);
 
         void processCmdLine();

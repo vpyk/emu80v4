@@ -24,11 +24,13 @@
 class RkTapeOutHook : public CpuHook
 {
     public:
-        RkTapeOutHook(uint16_t addr) : CpuHook(addr) {};
-        virtual ~RkTapeOutHook() {};
+        RkTapeOutHook(uint16_t addr) : CpuHook(addr) {}
+        virtual ~RkTapeOutHook() {}
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         bool hookProc() override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new RkTapeOutHook(parameters[0].asInt()) : nullptr;}
 
     private:
         bool m_isSbFound = false;
@@ -39,14 +41,16 @@ class RkTapeOutHook : public CpuHook
 class RkTapeInHook : public CpuHook
 {
     public:
-        RkTapeInHook(uint16_t addr) : CpuHook(addr) {};
-        virtual ~RkTapeInHook() {};
+        RkTapeInHook(uint16_t addr) : CpuHook(addr) {}
+        virtual ~RkTapeInHook() {}
 
         void reset() override;
         bool hookProc() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new RkTapeInHook(parameters[0].asInt()) : nullptr;}
 
     private:
         unsigned m_suspendPeriod = 0;

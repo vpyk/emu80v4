@@ -48,7 +48,7 @@ class PalWindow
 
         PalWindow();
         virtual ~PalWindow();
-        void initPalWindow() {};
+        void initPalWindow() {}
 
         static PalWindow* windowById(uint32_t id);
         void bringToFront();
@@ -56,7 +56,7 @@ class PalWindow
         void focusChanged(bool isFocused);
 
         virtual std::string getPlatformObjectName() = 0;
-        EmuWindowType getWindowType() {return m_windowType;};
+        EmuWindowType getWindowType() {return m_windowType;}
 
     protected:
         SDL_Window* m_window = nullptr;

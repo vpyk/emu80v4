@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,15 +37,15 @@ class CpuHook : public EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
-        virtual void setCpu(Cpu* cpu) {m_cpu = cpu;};
+        virtual void setCpu(Cpu* cpu) {m_cpu = cpu;}
         virtual bool hookProc() = 0; // returns false if continue
 
         void setEnabled(bool isEnabled);
-        inline bool getEnabled() {return m_isEnabled;};
+        inline bool getEnabled() {return m_isEnabled;}
 
-        inline int getHookAddr() {return m_hookAddr;};
+        inline int getHookAddr() {return m_hookAddr;}
 
-        void setTapeRedirector(TapeRedirector* file) {m_file = file;};
+        void setTapeRedirector(TapeRedirector* file) {m_file = file;}
 
     protected:
         Cpu* m_cpu;

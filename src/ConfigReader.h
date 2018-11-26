@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class ConfigReader : public EmuObject
         ConfigReader(std::string configFileName, std::string platformName = "");
         virtual ~ConfigReader();
 
-        //virtual bool setProperty(const string& propertyName, const EmuValuesList& values);
+        //bool setProperty(const string& propertyName, const EmuValuesList& values) override;
 
         void processConfigFile(ParentObject* parent);
 

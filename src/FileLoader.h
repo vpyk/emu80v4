@@ -52,6 +52,8 @@ class RkFileLoader : public FileLoader
 {
     public:
         bool loadFile(const std::string& fileName, bool run = false) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new RkFileLoader();}
 };
 
 

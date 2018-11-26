@@ -16,13 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#include <iostream>
-#include <fstream>
-#include <sstream>
-
-/*#include <algorithm>
+/*#include <iostream>
+#include <algorithm>
 #include <cctype>
 #include <locale>*/
+
+#include <fstream>
+#include <sstream>
 
 #include <string.h>
 
@@ -30,46 +30,9 @@
 
 #include "EmuObjects.h"
 #include "Emulation.h"
-#include "EmuWindow.h"
 #include "ConfigReader.h"
-#include "Cpu8080.h"
-#include "CpuZ80.h"
 #include "Platform.h"
-#include "KbdLayout.h"
-#include "KbdLayout.h"
-#include "RkKeyboard.h"
-#include "Ppi8255Circuit.h"
-#include "RkPpi8255Circuit.h"
-#include "Pit8253.h"
-#include "Pit8253Sound.h"
-#include "Ppi8255.h"
-#include "Dma8257.h"
-#include "Crt8275.h"
-#include "Rk86.h"
-#include "Mikrosha.h"
-#include "Apogey.h"
-#include "Partner.h"
-#include "Orion.h"
-#include "Specialist.h"
-#include "Mikro80.h"
-#include "Ut88.h"
-#include "Eureka.h"
-#include "Globals.h"
-#include "SoundMixer.h"
-#include "RkFdd.h"
-#include "FileLoader.h"
-#include "TapeRedirector.h"
-#include "WavReader.h"
-#include "RkTapeHooks.h"
-#include "MsxTapeHooks.h"
-#include "CloseFileHook.h"
-#include "RkRomDisk.h"
-#include "FdImage.h"
-#include "Fdc1793.h"
-#include "RamDisk.h"
-#include "EmuConfig.h"
-#include "GenericModules.h"
-#include "RkSdController.h"
+#include "ObjectFactory.h"
 
 
 using namespace std;
@@ -440,204 +403,9 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
 EmuObject* ConfigReader::createObject(string typeName, string objName, const EmuValuesList& parameters)
 {
     EmuObject* obj = nullptr;
-
-    if (typeName == "EmuWindow")
-        obj = new EmuWindow();
-    else if (typeName == "EmuObjectGroup")
-        obj = new EmuObjectGroup();
-    else if (typeName == "Platform")
-        obj = new Platform(parameters[0].asString(), objName);
-    else if (typeName == "AddrSpace")
-        obj = new AddrSpace();
-    else if (typeName == "AddrSpaceMapper") {
-        if (parameters[0].isInt())
-            obj = new AddrSpaceMapper(parameters[0].asInt());
-    } else if (typeName == "AddrSpaceShifter") {
-        if (parameters[1].isInt())
-            obj = new AddrSpaceShifter(static_cast<AddressableDevice*>(g_emulation->findObject(parameters[0].asString())), parameters[1].asInt());
-    } else if (typeName == "AddrSpaceInverter") {
-        obj = new AddrSpaceInverter(static_cast<AddressableDevice*>(g_emulation->findObject(parameters[0].asString())));
-    } else if (typeName == "Ram") {
-        if (parameters[0].isInt()) {
-            obj = new Ram(parameters[0].asInt());
-        }
-    } else if (typeName == "Rom") {
-        if (parameters[1].isInt())
-            obj = new Rom(parameters[1].asInt(), parameters[0].asString());
-    } else if (typeName == "NullSpace") {
-        if (parameters[0].isInt())
-            obj = new NullSpace(parameters[0].asInt());
-    } else if (typeName == "Cpu8080")
-        obj = new Cpu8080();
-    else if (typeName == "Cpu8080StatusWordSpace")
-        obj = new Cpu8080StatusWordSpace(static_cast<Cpu8080*>(g_emulation->findObject(parameters[0].asString())));
-    else if (typeName == "CpuZ80")
-        obj = new CpuZ80();
-    else if (typeName == "Ppi8255")
-        obj = new Ppi8255();
-    else if (typeName == "Dma8257")
-        obj = new Dma8257();
-    else if (typeName == "Crt8275")
-        obj = new Crt8275();
-    else if (typeName == "Pit8253")
-        obj = new Pit8253();
-    else if (typeName == "Fdc1793")
-        obj = new Fdc1793();
-    else if (typeName == "Pit8253SoundSource")
-        obj = new Pit8253SoundSource();
-    else if (typeName == "RkPit8253SoundSource")
-        obj = new RkPit8253SoundSource();
-    /*else if (typeName == "MikroshaPit8253SoundSource")
-        obj = new MikroshaPit8253SoundSource();*/
-    else if (typeName == "OrionRenderer")
-        obj = new OrionRenderer();
-    else if (typeName == "SpecRenderer")
-        obj = new SpecRenderer();
-    else if (typeName == "EurekaRenderer")
-        obj = new EurekaRenderer();
-    else if (typeName == "Mikro80Renderer")
-        obj = new Mikro80Renderer();
-    else if (typeName == "Ut88Renderer")
-        obj = new Ut88Renderer();
-    else if (typeName == "RkKeyboard")
-        obj = new RkKeyboard();
-    else if (typeName == "SpecKeyboard")
-        obj = new SpecKeyboard();
-    else if (typeName == "RkKeybLayout")
-        obj = new RkKbdLayout();
-    else if (typeName == "RkPpi8255Circuit")
-        obj = new RkPpi8255Circuit();
-    else if (typeName == "MikroshaCore")
-        obj = new MikroshaCore();
-    else if (typeName == "MikroshaRenderer")
-        obj = new MikroshaRenderer();
-    else if (typeName == "MikroshaPpi8255Circuit")
-        obj = new MikroshaPpi8255Circuit();
-    else if (typeName == "MikroshaPpi2Circuit")
-        obj = new MikroshaPpi2Circuit();
-    else if (typeName == "SpecPpi8255Circuit")
-        obj = new SpecPpi8255Circuit();
-    else if (typeName == "PartnerPpi8255Circuit")
-        obj = new PartnerPpi8255Circuit();
-    else if (typeName == "ApogeyCore")
-        obj = new ApogeyCore();
-    else if (typeName == "ApogeyRenderer")
-        obj = new ApogeyRenderer();
-    else if (typeName == "Rk86Core")
-        obj = new Rk86Core();
-    else if (typeName == "Rk86Renderer")
-        obj = new Rk86Renderer();
-    else if (typeName == "PartnerCore")
-        obj = new PartnerCore();
-    else if (typeName == "PartnerRenderer")
-        obj = new PartnerRenderer();
-    else if (typeName == "PartnerMcpgRenderer")
-        obj = new PartnerMcpgRenderer();
-    else if (typeName == "OrionCore")
-        obj = new OrionCore();
-    else if (typeName == "SpecCore")
-        obj = new SpecCore();
-    else if (typeName == "EurekaCore")
-        obj = new EurekaCore();
-    else if (typeName == "Mikro80Core")
-        obj = new Mikro80Core();
-    else if (typeName == "Ut88Core")
-        obj = new Ut88Core();
-    else if (typeName == "Mikro80TapeRegister")
-        obj = new Mikro80TapeRegister();
-    else if (typeName == "RkFddRegister")
-        obj = new RkFddRegister();
-    else if (typeName == "RkFddController")
-        obj = new RkFddController();
-    else if (typeName == "PartnerRamUpdater")
-        obj = new PartnerRamUpdater();
-    else if (typeName == "PartnerMcpgSelector")
-        obj = new PartnerMcpgSelector();
-    else if (typeName == "PartnerModuleSelector")
-        obj = new PartnerModuleSelector();
-    else if (typeName == "PartnerAddrSpace")
-        obj = new PartnerAddrSpace(parameters[0].asString());
-    else if (typeName == "PartnerAddrSpaceSelector")
-        obj = new PartnerAddrSpaceSelector();
-    else if (typeName == "PartnerFddControlRegister")
-        obj = new PartnerFddControlRegister();
-    else if (typeName == "OrionMemPageSelector")
-        obj = new OrionMemPageSelector();
-    else if (typeName == "OrionScreenSelector")
-        obj = new OrionScreenSelector();
-    else if (typeName == "OrionColorModeSelector")
-        obj = new OrionColorModeSelector();
-    else if (typeName == "OrionFddControlRegister")
-        obj = new OrionFddControlRegister();
-    else if (typeName == "OrionFddQueryRegister")
-        obj = new OrionFddQueryRegister();
-    else if (typeName == "SpecMxMemPageSelector")
-        obj = new SpecMxMemPageSelector();
-    else if (typeName == "SpecMxFddControlRegisters")
-        obj = new SpecMxFddControlRegisters();
-    else if (typeName == "SpecVideoRam")
-        obj = new SpecVideoRam(parameters[0].asInt());
-    else if (typeName == "SpecMxColorRegister")
-        obj = new SpecMxColorRegister();
-    else if (typeName == "RkFileLoader")
-        obj = new RkFileLoader();
-    else if (typeName == "SpecFileLoader")
-        obj = new SpecFileLoader();
-    else if (typeName == "SpecMxFileLoader")
-        obj = new SpecMxFileLoader();
-    else if (typeName == "OrionFileLoader")
-        obj = new OrionFileLoader();
-    else if (typeName == "TapeRedirector")
-        obj = new TapeRedirector();
-    else if (typeName == "FdImage")
-        obj = new FdImage(parameters[0].asInt(), parameters[1].asInt(), parameters[2].asInt(), parameters[3].asInt());
-    else if (typeName == "RkTapeOutHook")
-        obj = new RkTapeOutHook(parameters[0].asInt());
-    else if (typeName == "RkTapeInHook")
-        obj = new RkTapeInHook(parameters[0].asInt());
-    else if (typeName == "MsxTapeOutHook")
-        obj = new MsxTapeOutHook(parameters[0].asInt());
-    else if (typeName == "MsxTapeInHook")
-        obj = new MsxTapeInHook(parameters[0].asInt());
-    else if (typeName == "MsxTapeOutHeaderHook")
-        obj = new MsxTapeOutHeaderHook(parameters[0].asInt());
-    else if (typeName == "MsxTapeInHeaderHook")
-        obj = new MsxTapeInHeaderHook(parameters[0].asInt());
-    else if (typeName == "CloseFileHook")
-        obj = new CloseFileHook(parameters[0].asInt());
-    else if (typeName == "RkRomDisk")
-        obj = new RkRomDisk(parameters[0].asString());
-    else if (typeName == "SpecRomDisk")
-        obj = new SpecRomDisk(parameters[0].asString());
-    else if (typeName == "RkSdController")
-        obj = new RkSdController(parameters[0].asString());
-    else if (typeName == "ApogeyRomDisk")
-        obj = new ApogeyRomDisk(parameters[0].asString());
-    else if (typeName == "Ut88MemPageSelector")
-        obj = new Ut88MemPageSelector();
-    else if (typeName == "Ut88AddrSpaceMapper")
-        obj = new Ut88AddrSpaceMapper();
-    else if (typeName == "EurekaPpi8255Circuit")
-        obj = new EurekaPpi8255Circuit(parameters[0].asString());
-    else if (typeName == "RamDisk")
-        obj = new RamDisk(parameters[0].asInt(), parameters[1].asInt());
-    else if (typeName == "PeriodicInt8080")
-        obj = new PeriodicInt8080(static_cast<Cpu8080Compatible*>(g_emulation->findObject(parameters[0].asString())), parameters[1].asInt(), parameters[2].asInt());
-    else if (typeName == "PageSelector")
-        obj = new PageSelector();
-    else if (typeName == "Splitter")
-        obj = new Splitter();
-    else if (typeName == "Translator")
-        obj = new Translator(static_cast<AddressableDevice*>(g_emulation->findObject(parameters[0].asString())));
-    else if (typeName == "ConfigTab")
-        obj = new EmuConfigTab(parameters[0].asString());
-    else if (typeName == "ConfigRadioSelector")
-        obj = new EmuConfigRadioSelector(parameters[0].asString(), parameters[1].asString(), parameters[2].asString());
-
-    if (obj) {
+    obj = ObjectFactory::get()->createObject(typeName, parameters);
+    if (obj)
         obj->setName(objName);
-    }
-
     return obj;
 }
 

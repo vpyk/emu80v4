@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -51,17 +51,19 @@ class Ppi8255 : public AddressableDevice
         // Подключение объекта - обвязки ВВ55
         void attachPpi8255Circuit(Ppi8255Circuit* circuit);
 
+        static EmuObject* create(const EmuValuesList&) {return new Ppi8255();}
+
         /*
-        void setPortA(uint8_t bValue) {m_portA = bValue;};
-        void setPortB(uint8_t bValue) {m_portB = bValue;};
-        void setPortC(uint8_t bValue) {m_portC = bValue;};
-        uint8_t getPortA() {return m_portA;};
-        uint8_t getPortB() {return m_portB;};
-        uint8_t getPortC() {return m_portC;};
-        PpiChMode getChAMode() {return m_chAMode;};
-        PpiChMode getChBMode() {return m_chBMode;};
-        PpiChMode getChCHiMode() {return m_chCHiMode;};
-        PpiChMode getChCLowMode() {return m_chCLowMode;};
+        void setPortA(uint8_t bValue) {m_portA = bValue;}
+        void setPortB(uint8_t bValue) {m_portB = bValue;}
+        void setPortC(uint8_t bValue) {m_portC = bValue;}
+        uint8_t getPortA() {return m_portA;}
+        uint8_t getPortB() {return m_portB;}
+        uint8_t getPortC() {return m_portC;}
+        PpiChMode getChAMode() {return m_chAMode;}
+        PpiChMode getChBMode() {return m_chBMode;}
+        PpiChMode getChCHiMode() {return m_chCHiMode;}
+        PpiChMode getChCLowMode() {return m_chCLowMode;}
         */
     private:
         // обвязка ВВ55

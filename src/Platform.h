@@ -55,19 +55,19 @@ class Platform : public ParentObject
         void resetKeys();
         /*virtual */void loadFile(std::string fileName);
 
-        const std::string& getBaseDir() {return m_baseDir;};
+        const std::string& getBaseDir() {return m_baseDir;}
 
-        EmuWindow* getWindow() {return m_window;};
-        Cpu* getCpu() {return m_cpu;};
-        FileLoader* getLoader() {return m_loader;};
-        PlatformCore* getCore() {return m_core;};
-        KbdLayout* getKbdLayout() {return m_kbdLayout;};
-        CrtRenderer* getRenderer() {return m_renderer;};
-        Keyboard* getKeyboard() {return m_keyboard;};
+        EmuWindow* getWindow() {return m_window;}
+        Cpu* getCpu() {return m_cpu;}
+        FileLoader* getLoader() {return m_loader;}
+        PlatformCore* getCore() {return m_core;}
+        KbdLayout* getKbdLayout() {return m_kbdLayout;}
+        CrtRenderer* getRenderer() {return m_renderer;}
+        Keyboard* getKeyboard() {return m_keyboard;}
 
         void showDebugger();
 
-        int getDefConfigTabId() {return m_defConfigTabId;};
+        int getDefConfigTabId() {return m_defConfigTabId;}
 
     private:
         std::string m_baseDir;

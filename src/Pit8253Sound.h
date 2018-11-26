@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@ class Pit8253SoundSource : public SoundSource
 
         void attachPit(Pit8253* pit);
 
+        static EmuObject* create(const EmuValuesList&) {return new Pit8253SoundSource();}
+
     protected:
         Pit8253* m_pit = nullptr;
 };
@@ -44,6 +46,8 @@ class RkPit8253SoundSource : public Pit8253SoundSource
 {
     public:
         int calcValue() override;
+
+        static EmuObject* create(const EmuValuesList&) {return new RkPit8253SoundSource();}
 };
 
 

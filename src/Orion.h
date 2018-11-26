@@ -36,10 +36,12 @@ class OrionMemPageSelector : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;};
+        void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;}
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new OrionMemPageSelector();}
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
@@ -75,12 +77,14 @@ class OrionRenderer : public CrtRenderer
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
-        void toggleColorMode()  override {m_isColorMode = !m_isColorMode;};
+        void toggleColorMode()  override {m_isColorMode = !m_isColorMode;}
 
         void attachScreenMemory(Ram* screenMemory);
         void attachColorMemory(Ram* colorMemory);
         void setScreenBase(uint16_t base);
         void setColorModeByte(uint8_t modeByte);
+
+        static EmuObject* create(const EmuValuesList&) {return new OrionRenderer();}
 
     private:
         const uint8_t* m_screenMemory = nullptr;
@@ -97,10 +101,12 @@ class OrionScreenSelector : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachCrtRenderer(OrionRenderer* renderer) {m_renderer = renderer;};
+        inline void attachCrtRenderer(OrionRenderer* renderer) {m_renderer = renderer;}
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new OrionScreenSelector();}
 
     private:
         OrionRenderer* m_renderer = nullptr;
@@ -112,10 +118,12 @@ class OrionColorModeSelector : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachCrtRenderer(OrionRenderer* renderer) {m_renderer = renderer;};
+        inline void attachCrtRenderer(OrionRenderer* renderer) {m_renderer = renderer;}
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new OrionColorModeSelector();}
 
     private:
         OrionRenderer* m_renderer = nullptr;
@@ -132,10 +140,12 @@ class OrionFddControlRegister : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
+        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int)  override {return 0xff;};
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new OrionFddControlRegister();}
 
     private:
         Fdc1793* m_fdc = nullptr;
@@ -148,10 +158,12 @@ class OrionFddQueryRegister : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
+        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
 
-        void writeByte(int, uint8_t)  override {};
+        void writeByte(int, uint8_t)  override {}
         uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new OrionFddQueryRegister();}
 
     private:
         Fdc1793* m_fdc = nullptr;
@@ -171,6 +183,8 @@ class OrionCore : public PlatformCore
 
         void attachCrtRenderer(OrionRenderer* crtRenderer);
 
+        static EmuObject* create(const EmuValuesList&) {return new OrionCore();}
+
     private:
         OrionRenderer* m_crtRenderer = nullptr;
 
@@ -183,6 +197,8 @@ class OrionFileLoader : public FileLoader
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         bool loadFile(const std::string& fileName, bool run = false) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new OrionFileLoader();}
 
     private:
         AddressableDevice* m_ramDisk = nullptr;

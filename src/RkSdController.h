@@ -41,6 +41,8 @@ class RkSdController : public Ppi8255Circuit
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t) override {}
 
+        static EmuObject* create(const EmuValuesList& parameters) {return new RkSdController(parameters[0].asString());}
+
     private:
 
     enum CommandStage {

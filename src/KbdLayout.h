@@ -115,9 +115,9 @@ class KbdLayout : public EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
-        void setQwertyMode() {m_mode = KLM_QWERTY;};
-        void setJcukenMode() {m_mode = KLM_JCUKEN;};
-        void setSmartMode()  {m_mode = KLM_SMART;};
+        void setQwertyMode() {m_mode = KLM_QWERTY;}
+        void setJcukenMode() {m_mode = KLM_JCUKEN;}
+        void setSmartMode()  {m_mode = KLM_SMART;}
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys();
 
@@ -146,6 +146,8 @@ class RkKbdLayout : public KbdLayout
         EmuKey translateKeyQwerty(PalKeyCode keyCode) override;
         EmuKey translateKeyJcuken(PalKeyCode keyCode) override;
         EmuKey translateKeySmart(unsigned unicodeKey, bool& shift) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new RkKbdLayout();}
 };
 
 #endif  // KBDLAYOUT_H

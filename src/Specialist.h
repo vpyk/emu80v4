@@ -36,12 +36,14 @@ class SpecMxMemPageSelector : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;};
+        inline void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;}
 
         void reset() override;
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecMxMemPageSelector();}
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
@@ -57,9 +59,11 @@ class SpecVideoRam : public Ram
 
         void writeByte(int addr, uint8_t value) override;
         void reset() override;
-        uint8_t* getColorDataPtr() {return m_colorBuf;};
+        uint8_t* getColorDataPtr() {return m_colorBuf;}
 
         void setCurColor(uint8_t color);
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new SpecVideoRam(parameters[0].asInt()) : nullptr;}
 
     private:
         int m_memSize;
@@ -74,10 +78,12 @@ class SpecMxColorRegister : public AddressableDevice
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // Подключение видео-ОЗУ для записи цвета
-        void attachVideoRam(SpecVideoRam* videoRam) {m_videoRam = videoRam;};
+        void attachVideoRam(SpecVideoRam* videoRam) {m_videoRam = videoRam;}
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecMxColorRegister();}
 
     private:
         SpecVideoRam* m_videoRam = nullptr;
@@ -118,7 +124,9 @@ class SpecRenderer : public CrtRenderer
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
-        inline void attachScreenMemory(SpecVideoRam* videoMemory) {m_screenMemory = videoMemory->getDataPtr(); m_colorMemory = videoMemory->getColorDataPtr();};
+        inline void attachScreenMemory(SpecVideoRam* videoMemory) {m_screenMemory = videoMemory->getDataPtr(); m_colorMemory = videoMemory->getColorDataPtr();}
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecRenderer();}
 
     private:
         const uint8_t* m_screenMemory = nullptr;
@@ -140,6 +148,8 @@ class SpecCore : public PlatformCore
 
         void attachCrtRenderer(CrtRenderer* crtRenderer);
 
+        static EmuObject* create(const EmuValuesList&) {return new SpecCore();}
+
     private:
         CrtRenderer* m_crtRenderer = nullptr;
 };
@@ -150,10 +160,12 @@ class SpecMxFddControlRegisters : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;};
+        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecMxFddControlRegisters();}
 
     private:
         Fdc1793* m_fdc = nullptr;
@@ -176,6 +188,8 @@ class SpecKeyboard : public Keyboard
         void setHMatrixMask(uint8_t mask);
         uint16_t getHMatrixData();
         bool getShift();
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecKeyboard();}
 
     private:
         const EmuKey m_keyMatrix[12][6] = {
@@ -246,6 +260,7 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
         // Подключение видео-ОЗУ для записи цвета
         void attachVideoRam(SpecVideoRam* videoRam);
 
+        static EmuObject* create(const EmuValuesList&) {return new SpecPpi8255Circuit();}
 
     protected:
         // Источник звука - вывод на магнитофон
@@ -267,16 +282,18 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
 class SpecRomDisk : public Ppi8255Circuit
 {
     public:
-        SpecRomDisk() {}; // явно не использовать, для производных классов
+        SpecRomDisk() {} // явно не использовать, для производных классов
         SpecRomDisk(std::string romDiskName);
         virtual ~SpecRomDisk();
 
-        uint8_t getPortA() override {return 0xff;};
+        uint8_t getPortA() override {return 0xff;}
         uint8_t getPortB() override;
-        uint8_t getPortC() override {return 0xff;};
+        uint8_t getPortC() override {return 0xff;}
         void setPortA(uint8_t) override;
-        void setPortB(uint8_t) override {};
+        void setPortB(uint8_t) override {}
         void setPortC(uint8_t) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecRomDisk();}
 
     protected:
         uint8_t* m_romDisk;
@@ -288,6 +305,8 @@ class SpecFileLoader : public FileLoader
 {
     public:
         bool loadFile(const std::string& fileName, bool run = false) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecFileLoader();}
 };
 
 
@@ -296,6 +315,8 @@ class SpecMxFileLoader : public FileLoader
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         bool loadFile(const std::string& fileName, bool run = false) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecMxFileLoader();}
 
     private:
         AddressableDevice* m_ramDisk = nullptr;

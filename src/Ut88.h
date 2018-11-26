@@ -36,6 +36,8 @@ class Ut88Renderer : public TextCrtRenderer
 
         void attachScreenMemory(Ram* screenMemory);
 
+        static EmuObject* create(const EmuValuesList&) {return new Ut88Renderer();}
+
     private:
         const uint8_t* m_screenMemory = nullptr;
 
@@ -53,6 +55,8 @@ class Ut88Core : public PlatformCore
 
         void attachCrtRenderer(Ut88Renderer* crtRenderer);
 
+        static EmuObject* create(const EmuValuesList&) {return new Ut88Core();}
+
     private:
         Ut88Renderer* m_crtRenderer = nullptr;
 };
@@ -61,12 +65,14 @@ class Ut88Core : public PlatformCore
 class Ut88AddrSpaceMapper : public AddrSpaceMapper
 {
     public:
-        Ut88AddrSpaceMapper() : AddrSpaceMapper(5) {};
+        Ut88AddrSpaceMapper() : AddrSpaceMapper(5) {}
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new Ut88AddrSpaceMapper();}
 
     private:
         Cpu8080* m_cpu;
@@ -78,10 +84,12 @@ class Ut88MemPageSelector : public AddressableDevice
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;};
+        void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;}
 
         void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int) override {return 0xff;};
+        uint8_t readByte(int) override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new Ut88MemPageSelector();}
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;

@@ -50,6 +50,8 @@ class TapeRedirector : public EmuObject
         bool isOpen();
         bool isCancelled();
 
+        static EmuObject* create(const EmuValuesList&) {return new TapeRedirector();}
+
     private:
         std::string m_fileName;
         std::string m_permanentFileName;

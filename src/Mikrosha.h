@@ -35,6 +35,8 @@ class MikroshaCore : public PlatformCore
 
         void attachCrtRenderer(Crt8275Renderer* crtRenderer);
 
+        static EmuObject* create(const EmuValuesList&) {return new MikroshaCore();}
+
     private:
         Crt8275Renderer* m_crtRenderer = nullptr;
 };
@@ -46,6 +48,8 @@ class MikroshaPit8253SoundSource : public Pit8253SoundSource
         int calcValue() override;
 
         void setGate(bool gate);
+
+        //static EmuObject* create(const EmuValuesList&) {return new MikroshaPit8253SoundSource();}
 
     private:
         bool m_gate = false;
@@ -59,7 +63,7 @@ class MikroshaPit8253SoundSource : public Pit8253SoundSource
 class MikroshaPpi8255Circuit : public RkPpi8255Circuit
 {
     public:
-        MikroshaPpi8255Circuit() : RkPpi8255Circuit() {};
+        MikroshaPpi8255Circuit() : RkPpi8255Circuit() {}
         virtual ~MikroshaPpi8255Circuit();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -68,11 +72,13 @@ class MikroshaPpi8255Circuit : public RkPpi8255Circuit
         uint8_t getPortA() override;
         uint8_t getPortB() override;
         //uint8_t getPortC() override;
-        void setPortA(uint8_t) override {};
+        void setPortA(uint8_t) override {}
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
 
         void attachPit(Pit8253* pit);
+
+        static EmuObject* create(const EmuValuesList&) {return new MikroshaPpi8255Circuit();}
 
     private:
         Pit8253* m_pit = nullptr;
@@ -91,6 +97,8 @@ class MikroshaPpi2Circuit : public Ppi8255Circuit
 
         void attachCrtRenderer(Crt8275Renderer* crtRenderer);
 
+        static EmuObject* create(const EmuValuesList&) {return new MikroshaPpi2Circuit();}
+
     private:
         Crt8275Renderer* m_crtRenderer = nullptr;
 };
@@ -100,6 +108,8 @@ class MikroshaRenderer : public Crt8275Renderer
 {
     public:
         MikroshaRenderer();
+
+        static EmuObject* create(const EmuValuesList&) {return new MikroshaRenderer();}
 
     protected:
         const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt) override;

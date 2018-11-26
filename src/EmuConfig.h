@@ -40,8 +40,8 @@ class EmuConfig : public EmuObject
         void showConfigWindow(int configTabId = 0);
         void updateConfig();
 
-        const std::vector<PlatformInfo>* getPlatformInfos() {return &m_platformVector;};
-        std::map<std::string, std::string>* getExtentionMap() {return &m_extentionMap;};
+        const std::vector<PlatformInfo>* getPlatformInfos() {return &m_platformVector;}
+        std::map<std::string, std::string>* getExtentionMap() {return &m_extentionMap;}
 
     private:
         std::vector<PlatformInfo> m_platformVector;
@@ -71,6 +71,8 @@ class EmuConfigRadioSelector : public EmuConfigControl
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
+        static EmuObject* create(const EmuValuesList& parameters) {return new EmuConfigRadioSelector(parameters[0].asString(), parameters[1].asString(), parameters[2].asString());}
+
     private:
         std::string m_objName;
         std::string m_propName;
@@ -94,9 +96,11 @@ class EmuConfigTab : public EmuObject
         ~EmuConfigTab();
 
         void addControl(int column, EmuConfigControl* control);
-        int getTabId() {return m_tabId;};
+        int getTabId() {return m_tabId;}
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new EmuConfigTab(parameters[0].asString());}
 
     private:
         static int s_curId;

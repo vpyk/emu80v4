@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class Dma8257 : public AddressableDevice
 
     public:
         Dma8257();
-        virtual ~Dma8257() {};
+        virtual ~Dma8257() {}
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         void reset() override;
@@ -56,6 +56,8 @@ class Dma8257 : public AddressableDevice
         bool dmaRequest(int channel, uint8_t &value, uint64_t clock = 0);
 
         uint8_t getMR();
+        static EmuObject* create(const EmuValuesList&) {return new Dma8257();}
+
 /*
         void getBlock(int channel, int len, uint8_t* buf);
 */

@@ -16,38 +16,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RAMDISK_H
-#define RAMDISK_H
+#ifndef OBJECTFACTORY_H
+#define OBJECTFACTORY_H
 
 #include <string>
+#include <map>
 
 #include "EmuObjects.h"
 
-class AddressableDevice;
+typedef EmuObject* (*CreateObjectFunc)(const EmuValuesList& parameters);
 
-
-class RamDisk : public EmuObject
+class ObjectFactory
 {
     public:
-        RamDisk(unsigned nPages, unsigned pageSize = 0);
-        ~RamDisk();
+        ~ObjectFactory() {m_objectMap.clear();}
 
-        void attachPage(unsigned pageNo, AddressableDevice* as);
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        static ObjectFactory *get()
+        {
+            static ObjectFactory instance;
+            return &instance;
+        }
 
-        bool loadFromFile();
-        bool saveToFile();
-
-        static EmuObject* create(const EmuValuesList& parameters) {return new RamDisk(parameters[0].asInt(), parameters[1].asInt());} // add checks !
+        EmuObject* createObject(const std::string& objectClassName, const EmuValuesList& parameters);
 
     private:
-        unsigned m_nPages;
-        unsigned m_defPageSize;
+        ObjectFactory();
+        ObjectFactory(const ObjectFactory&) { }
+        ObjectFactory &operator=(const ObjectFactory&) {return *this;}
 
-        AddressableDevice** m_pages = nullptr;
+        void reg(const std::string& objectClassName, CreateObjectFunc pfnCreate);
 
-        std::string m_filter;
+        std::map<std::string, CreateObjectFunc> m_objectMap;
 };
 
-
-#endif // RAMDISK_H
+#endif // OBJECTFACTORY

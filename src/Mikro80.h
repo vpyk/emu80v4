@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@ class Mikro80Renderer : public TextCrtRenderer
 
         void attachScreenMemory(Ram* screenMemory);
 
+        static EmuObject* create(const EmuValuesList&) {return new Mikro80Renderer();}
+
     private:
         const uint8_t* m_screenMemory = nullptr;
 
@@ -53,7 +55,9 @@ class Mikro80Core : public PlatformCore
 
         void attachCrtRenderer(Mikro80Renderer* crtRenderer);
 
-    private:
+        static EmuObject* create(const EmuValuesList&) {return new Mikro80Core();}
+
+private:
         Mikro80Renderer* m_crtRenderer = nullptr;
 };
 
@@ -67,6 +71,8 @@ class Mikro80TapeRegister : public AddressableDevice
         // derived from AddressableDevice
         void writeByte(int nAddr, uint8_t value) override;
         uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new Mikro80TapeRegister();}
 
     private:
         // Источник звука - вывод на магнитофон

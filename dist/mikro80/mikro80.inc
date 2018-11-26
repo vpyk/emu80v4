@@ -75,7 +75,7 @@ cpu.addrSpace = &addrSpace
 cpu.ioAddrSpace = &ioAddrSpace
 cpu.core = &core
 
-RkKeybLayout kbdLayout
+RkKbdLayout kbdLayout
 RkKeyboard keyboard
 keyboard.matrix = "mikro80"
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,14 +50,14 @@ class Pit8253Counter : public EmuObject //PassiveDevice
         bool getOut();
 
         int getAvgOut();
-        int getSumOutTicks() {return m_sumOutTicks;};
+        int getSumOutTicks() {return m_sumOutTicks;}
         void resetStats();
 
         void updateState();
         void operateForTicks(int ticks);
 
-        void setExtClockMode(bool extClockMode) {m_extClockMode = extClockMode;};
-        inline bool getExtClockMode() {return m_extClockMode;};
+        void setExtClockMode(bool extClockMode) {m_extClockMode = extClockMode;}
+        inline bool getExtClockMode() {return m_extClockMode;}
 
         friend class Pit8253;
 
@@ -117,7 +117,9 @@ class Pit8253 : public AddressableDevice
         void setGate(int counter, bool gate);
         bool getOut(int counter);
 
-        Pit8253Counter* getCounter(int counterNum) {return m_counters[counterNum];};
+        Pit8253Counter* getCounter(int counterNum) {return m_counters[counterNum];}
+
+        static EmuObject* create(const EmuValuesList&) {return new Pit8253();}
 
     private:
         Pit8253Counter* m_counters[3];

@@ -29,7 +29,7 @@ class CrtRenderer : public EmuObject
 {
 
     public:
-        CrtRenderer() {};
+        CrtRenderer() {}
         virtual ~CrtRenderer();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -37,10 +37,10 @@ class CrtRenderer : public EmuObject
         virtual void renderFrame() = 0;
         virtual EmuPixelData getPixelData();
 
-        virtual void toggleRenderingMethod() {};
-        virtual void toggleColorMode() {};
-        virtual void toggleCropping() {};
-        virtual void setCropping(bool) {};
+        virtual void toggleRenderingMethod() {}
+        virtual void toggleColorMode() {}
+        virtual void toggleCropping() {}
+        virtual void setCropping(bool) {}
 
         void attachSecondaryRenderer(CrtRenderer* renderer);
 
@@ -59,7 +59,7 @@ class CrtRenderer : public EmuObject
         int m_prevBufSize = 0;
         double m_prevAspectRatio = 1.0;
 
-        virtual bool isRasterPresent() {return true;};
+        virtual bool isRasterPresent() {return true;}
         void swapBuffers();
 
     private:

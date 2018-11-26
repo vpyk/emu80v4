@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class Fdc1793 : public AddressableDevice
         void setDrive(int drive);
         void setHead(int head);
 
-        bool getIrq() {return m_irq;};
+        bool getIrq() {return m_irq;}
         bool getDrq();
 
 
@@ -63,6 +63,8 @@ class Fdc1793 : public AddressableDevice
 
         // Подключение рбраза диска
         void attachFdImage(int driveNum, FdImage* image);
+
+        static EmuObject* create(const EmuValuesList&) {return new Fdc1793();}
 
     private:
         FdImage* m_images[MAX_DRIVES];   // Disk images

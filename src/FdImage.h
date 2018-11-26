@@ -42,7 +42,7 @@ class FdImage : public EmuObject
 
         bool getReadyStatus();
         bool getWriteProtectStatus();
-        bool getImagePresent() {return m_file.isOpen();};
+        bool getImagePresent() {return m_file.isOpen();}
 
         void setCurTrack(int track);
         void setCurHead(int head);
@@ -53,6 +53,8 @@ class FdImage : public EmuObject
 
         void writeNextByte(uint8_t bt);
         void writeByte(int offset, uint8_t bt);
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new FdImage(parameters[0].asInt(), parameters[1].asInt(), parameters[2].asInt(), parameters[3].asInt());} // add check!
 
     private:
         int m_nTracks;

@@ -47,20 +47,20 @@ class Cpu : public ActiveDevice
         void attachAddrSpace(AddressableDevice* as);
         void attachIoAddrSpace(AddressableDevice* as);
         void attachCore(PlatformCore* core);
-        void setStartAddr(unsigned addr) {m_startAddr = addr;};
+        void setStartAddr(unsigned addr) {m_startAddr = addr;}
 
         //virtual int doInstruction() = 0;
-        virtual void interrupt(int) {};
-        virtual void hrq(int) {};
+        virtual void interrupt(int) {}
+        virtual void hrq(int) {}
 
         virtual void addHook(CpuHook* hook);
         virtual void removeHook(CpuHook* hook);
-        void disableHooks() {m_hooksDisabled = true;};
-        void enableHooks() {m_hooksDisabled = false;};
+        void disableHooks() {m_hooksDisabled = true;}
+        void enableHooks() {m_hooksDisabled = false;}
 
-        void debugStepRequest() {m_stepReq = true;};
+        void debugStepRequest() {m_stepReq = true;}
 
-        AddressableDevice* getAddrSpace() {return m_addrSpace;};
+        AddressableDevice* getAddrSpace() {return m_addrSpace;}
 
     protected:
         AddressableDevice* m_addrSpace = nullptr;

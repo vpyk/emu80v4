@@ -125,16 +125,18 @@ class Crt8275 : public AddressableDevice, public IActive
         void attachCore(PlatformCore* core);
         void attachDMA(Dma8257* dma, int channel);
 
-        const Frame* getFrame() {return &m_frame;};
-        bool getRasterStarted() {return m_isRasterStarted;};
+        const Frame* getFrame() {return &m_frame;}
+        bool getRasterStarted() {return m_isRasterStarted;}
         bool getVsyncOccured();
-        int getNRows() {return m_nRows;};
-        int getNLines() {return m_nLines;};
-        int getNCharsPerRow() {return m_nCharsPerRow;};
-        int getHrChars() {return m_nHrChars;};
-        int getVrRows() {return m_nVrRows;};
-        bool getRasterPresent() {return m_isRasterStarted;};
+        int getNRows() {return m_nRows;}
+        int getNLines() {return m_nLines;}
+        int getNCharsPerRow() {return m_nCharsPerRow;}
+        int getHrChars() {return m_nHrChars;}
+        int getVrRows() {return m_nVrRows;}
+        bool getRasterPresent() {return m_isRasterStarted;}
         double getFrameRate();
+
+        static EmuObject* create(const EmuValuesList&) {return new Crt8275();}
 
         friend Crt8275Raster;
 

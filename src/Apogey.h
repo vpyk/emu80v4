@@ -42,6 +42,8 @@ class ApogeyCore : public PlatformCore
 
         void attachCrtRenderer(Crt8275Renderer* crtRenderer);
 
+        static EmuObject* create(const EmuValuesList&) {return new ApogeyCore();}
+
     private:
         Crt8275Renderer* m_crtRenderer = nullptr;
         SoundSource* m_beepSoundSource;
@@ -57,6 +59,8 @@ class ApogeyRenderer : public Crt8275Renderer
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
         void toggleColorMode() override;
+
+        static EmuObject* create(const EmuValuesList&) {return new ApogeyRenderer();}
 
     protected:
         const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt) override;
@@ -77,6 +81,9 @@ class ApogeyRomDisk : public RkRomDisk
         uint8_t getPortA() override;
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new ApogeyRomDisk(parameters[0].asString());}
+
     private:
         bool m_oldA15 = false;
 };

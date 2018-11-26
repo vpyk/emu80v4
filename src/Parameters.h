@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class EmuValue {
 
 class EmuValuesList {
     public:
-        EmuValuesList() {};
+        EmuValuesList() {}
         EmuValuesList(std::string value1);
         EmuValuesList(std::string value1, std::string value2);
         EmuValuesList(std::string value1, std::string value2, std::string value3);

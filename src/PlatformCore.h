@@ -41,14 +41,14 @@ class PlatformCore : public EmuObject
         void attachKeyboard(Keyboard* kbd);
         void attachKbdLayout(KbdLayout* lt);
 
-        virtual void hrtc(bool, int) {};
-        virtual void vrtc(bool) {};
-        virtual void inte(bool) {};
-        virtual void tapeOut(bool isActive) {m_tapeOut = isActive;};
+        virtual void hrtc(bool, int) {}
+        virtual void vrtc(bool) {}
+        virtual void inte(bool) {}
+        virtual void tapeOut(bool isActive) {m_tapeOut = isActive;}
 
-        virtual bool getTapeOut() {return m_tapeOut;};
+        virtual bool getTapeOut() {return m_tapeOut;}
 
-        virtual void draw() {};
+        virtual void draw() {}
 
     protected:
         EmuWindow* m_window = nullptr;

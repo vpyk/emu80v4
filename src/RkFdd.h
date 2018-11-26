@@ -29,7 +29,9 @@ class RkFddRegister : public AddressableDevice
 {
     public:
         uint8_t readByte(int addr) override;
-        void writeByte(int, uint8_t) override {};
+        void writeByte(int, uint8_t) override {}
+
+        static EmuObject* create(const EmuValuesList&) {return new RkFddRegister();}
 
         friend RkFddController;
 
@@ -37,7 +39,7 @@ class RkFddRegister : public AddressableDevice
         uint8_t m_value;
         RkFddController* m_fdd;
 
-        void setValue(uint8_t value) {m_value = value;};
+        void setValue(uint8_t value) {m_value = value;}
 };
 
 class RkFddController : public Ppi8255Circuit
@@ -48,19 +50,21 @@ class RkFddController : public Ppi8255Circuit
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        uint8_t getPortA()  override {return 0xff;};
-        uint8_t getPortC()  override {return 0xff;};
+        uint8_t getPortA()  override {return 0xff;}
+        uint8_t getPortC()  override {return 0xff;}
         uint8_t getPortB() override;
         void setPortA(uint8_t value) override;
-        void setPortB(uint8_t) override {};
+        void setPortB(uint8_t) override {}
         void setPortC(uint8_t value) override;
 
-        void attachRkFddRegister(RkFddRegister* reg) {m_fddReg = reg; reg->m_fdd = this;};
+        void attachRkFddRegister(RkFddRegister* reg) {m_fddReg = reg; reg->m_fdd = this;}
         uint8_t readCurByte();
         void writeCurByte(uint8_t bt);
 
         // Подключение образа диска
         void attachFdImage(int driveNum, FdImage* image);
+
+        static EmuObject* create(const EmuValuesList&) {return new RkFddController();}
 
         friend RkFddRegister;
 

@@ -138,7 +138,7 @@ cpu.core = &core
 dma.addrSpace = &addrSpace
 dma.cpu = &cpu
 
-RkKeybLayout kbdLayout
+RkKbdLayout kbdLayout
 kbdLayout.layout = smart
 
 RkKeyboard keyboard
