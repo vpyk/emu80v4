@@ -156,6 +156,8 @@ ObjectFactory::ObjectFactory()
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
+
+    reg("RkKeybLayout", &RkKbdLayout::create); // compatibility issue, old configs may contain rkKeybLayout instead of rkKbdLayout
 }
 
 
