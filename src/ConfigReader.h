@@ -51,7 +51,8 @@ class ConfigReader : public EmuObject
         int m_curLine;
         std::map<std::string, std::string> m_varMap;
         std::stack<ConfigReaderState> m_stateStack;
-        //std::stack<bool> m_condStack; // стек условий
+        std::stack<bool> m_condStack; // стек условий
+        int m_condLevel = 0; // уровень условий
         bool m_ifCondition = true; // условное выполнение
 
         void openFile();

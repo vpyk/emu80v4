@@ -82,7 +82,7 @@ void ConfigReader::openFile()
 
 ConfigReader::~ConfigReader()
 {
-    if (m_inputStream)
+     if (m_inputStream)
         delete m_inputStream;
 }
 
@@ -252,6 +252,10 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
         first = token;
 
         if (first == "ifdef" || first == "ifndef") {
+            if (!m_ifCondition) {
+                m_condLevel++;
+                continue;
+            }
             bool cond = (first == "ifdef");
             EmuValuesList defines;
             fillValuesList(s, &defines);
@@ -263,42 +267,48 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
             }
             string var = defines[0].asString();
             auto it = m_varMap.find(var);
+            m_condStack.push(m_ifCondition);
             if (it != m_varMap.end())
                 m_ifCondition = cond;
-                //m_condStack.push(cond);
             else
                 m_ifCondition = !cond;
-                //m_condStack.push(!cond);
             continue;
         }
 
         if (first == "else") {
             // else implementation
-            /*if (m_condStack.empty()) {
+            if (m_condLevel)
+                continue;
+
+            if (m_condStack.empty()) {
                 logPrefix();
                 emuLog << "error: else without if(n)def" << "\n";
                 stop();
-            }*/
+            }
 
-            //bool cond = m_condStack.top();
-            //m_condStack.pop();
-            //m_condStack.push(!cond);
             m_ifCondition = !m_ifCondition;
             continue;
         }
 
         if (first == "endif") {
-            // else implementation
-            /*if (m_condStack.empty()) {
+            if (m_condLevel) {
+                m_condLevel--;
+                continue;
+            }
+
+            if (m_condStack.empty()) {
                 logPrefix();
                 emuLog << "error: endif without if(n)def" << "\n";
                 stop();
-            }*/
+            }
 
-            m_ifCondition = true;
-            //m_condStack.pop();
+            m_ifCondition = m_condStack.top();;
+            m_condStack.pop();
             continue;
         }
+
+        if (!m_ifCondition)
+            continue;
 
         if (first == "define") {
             EmuValuesList defines;
@@ -313,10 +323,6 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
             m_varMap[var] = "";
             continue;
         }
-
-        //if (!m_condStack.empty() && !m_condStack.top())
-        if (!m_ifCondition)
-            continue; // пропускаем из if...
 
         if (first == "include") {
             EmuValuesList includeFiles;
