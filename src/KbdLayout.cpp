@@ -58,7 +58,7 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
                 if (emuKey != EK_SHIFT) // SDL issue, see below
                     m_lastNonUnicodeKey = emuKey;
             } else {
-                // Workaround for SDL: unocode and ordinary codes go separately
+                // Workaround for SDL: unicode and ordinary codes go separately
                 if (keyCode == PK_NONE && m_lastNonUnicodeKey != EK_NONE)
                     kbd->processKey(m_lastNonUnicodeKey, false);
                 m_lastNonUnicodeKey = EK_NONE;
