@@ -29,6 +29,7 @@
 #include <QElapsedTimer>
 #include <QDirIterator>
 #include <QDateTime>
+#include <QDebug>
 
 #include "qtMainWindow.h"
 #include "qtRenderHelper.h"
@@ -52,7 +53,6 @@ static int frameRate = 100;
 static bool vsync = true;
 
 static bool isRunning = false;
-
 
 static QElapsedTimer timer;
 static QApplication* application;
@@ -498,8 +498,19 @@ void palGetPalDefines(std::list<std::string>& defineList)
     defineList.push_back("QT");
 }
 
+static string logStr = "";
 
-void palLog(std::string) {
+void palLog(std::string str) {
+    logStr += str;
+    string::size_type pos = logStr.find("\n");
+    while (pos != string::npos) {
+        qDebug() << logStr.substr(0, pos).c_str();
+        if (pos < logStr.size())
+            logStr = logStr.substr(pos + 1);
+        else
+            logStr = "";
+        pos = logStr.find("\n");
+    }
 }
 
 
