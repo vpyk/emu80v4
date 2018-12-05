@@ -1027,24 +1027,44 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
 
     case Qt::Key_1:
         return keypad ? PK_KP_1 : PK_1;
+    case Qt::Key_Exclam:
+        return PK_1;
     case Qt::Key_2:
         return keypad ? PK_KP_2 : PK_2;
+    case Qt::Key_At:
+        return PK_2;
     case Qt::Key_3:
         return keypad ? PK_KP_3 : PK_3;
+    case Qt::Key_NumberSign:
+        return PK_3;
     case Qt::Key_4:
         return keypad ? PK_KP_4 : PK_4;
+    case Qt::Key_Dollar:
+        return PK_4;
     case Qt::Key_5:
         return keypad ? PK_KP_5 : PK_5;
+    case Qt::Key_Percent:
+        return PK_5;
     case Qt::Key_6:
         return keypad ? PK_KP_6 : PK_6;
+    case Qt::Key_AsciiCircum:
+        return PK_6;
     case Qt::Key_7:
         return keypad ? PK_KP_7 : PK_7;
+    case Qt::Key_Ampersand:
+        return PK_7;
     case Qt::Key_8:
         return keypad ? PK_KP_8 : PK_8;
+    case Qt::Key_Asterisk:
+        return keypad ? PK_KP_MUL : PK_8;
     case Qt::Key_9:
         return keypad ? PK_KP_9 : PK_9;
+    case Qt::Key_ParenLeft:
+        return PK_9;
     case Qt::Key_0:
         return keypad ? PK_KP_0 : PK_0;
+    case Qt::Key_ParenRight:
+        return PK_0;
 
     case Qt::Key_Return:
         return PK_ENTER;
@@ -1059,25 +1079,39 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
 
     case Qt::Key_Minus:
         return keypad ? PK_KP_MINUS : PK_MINUS;
+    case Qt::Key_Underscore:
+        return PK_MINUS;
     case Qt::Key_Equal:
         return PK_EQU;
+    case Qt::Key_Plus:
+        return keypad ? PK_KP_PLUS : PK_EQU;
+    case Qt::Key_BracketLeft:
     case Qt::Key_BraceLeft:
         return PK_LBRACKET;
+    case Qt::Key_BracketRight:
     case Qt::Key_BraceRight:
         return PK_RBRACKET;
     case Qt::Key_Backslash:
+    case Qt::Key_Bar:
         return PK_BSLASH;
     case Qt::Key_Semicolon:
+    case Qt::Key_Colon:
         return PK_SEMICOLON;
     case Qt::Key_Apostrophe:
+    case Qt::Key_QuoteDbl:
         return PK_APOSTROPHE;
     case Qt::Key_QuoteLeft:
+    case Qt::Key_AsciiTilde:
         return PK_TILDE;
     case Qt::Key_Comma:
+    case Qt::Key_Less:
         return PK_COMMA;
     case Qt::Key_Period:
         return keypad ? PK_KP_PERIOD : PK_PERIOD;
+    case Qt::Key_Greater:
+        return PK_PERIOD;
     case Qt::Key_Slash:
+    case Qt::Key_Question:
         return keypad ? PK_KP_DIV : PK_SLASH;
 
     case Qt::Key_CapsLock:
@@ -1136,10 +1170,10 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
 
     case Qt::Key_NumLock:
         return PK_NUMLOCK;
-    case Qt::Key_Asterisk:
+    /*case Qt::Key_Asterisk:
         return PK_KP_MUL;
     case Qt::Key_Plus:
-        return PK_KP_PLUS ;
+        return PK_KP_PLUS;*/
     case Qt::Key_Enter:
         return PK_KP_ENTER;
 
