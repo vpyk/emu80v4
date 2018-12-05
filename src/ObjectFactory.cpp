@@ -53,6 +53,7 @@
 #include "RkSdController.h"
 #include "RamDisk.h"
 #include "GenericModules.h"
+#include "Pk8000.h"
 
 #include "EmuConfig.h"
 
@@ -153,6 +154,17 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(PageSelector)
     REG_EMU_CLASS(Splitter)
     REG_EMU_CLASS(Translator)
+    REG_EMU_CLASS(Pk8000Renderer)
+    REG_EMU_CLASS(Pk8000Core)
+    REG_EMU_CLASS(Pk8000FileLoader)
+    REG_EMU_CLASS(Pk8000ColorSelector)
+    REG_EMU_CLASS(Pk8000TxtBufSelector)
+    REG_EMU_CLASS(Pk8000SymGenBufSelector)
+    REG_EMU_CLASS(Pk8000GrBufSelector)
+    REG_EMU_CLASS(Pk8000ColBufSelector)
+    REG_EMU_CLASS(Pk8000Keyboard)
+    REG_EMU_CLASS(Pk8000Ppi8255Circuit1)
+    REG_EMU_CLASS(Pk8000Ppi8255Circuit2)
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

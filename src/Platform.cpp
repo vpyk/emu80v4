@@ -239,13 +239,15 @@ void Platform::sysReq(SysReq sr)
 
 void Platform::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey)
 {
-    m_kbdLayout->processKey(keyCode, isPressed, unicodeKey);
+    if (m_kbdLayout)
+        m_kbdLayout->processKey(keyCode, isPressed, unicodeKey);
 }
 
 
 void Platform::resetKeys()
 {
-    m_kbdLayout->resetKeys();
+    if (m_kbdLayout)
+        m_kbdLayout->resetKeys();
 }
 
 

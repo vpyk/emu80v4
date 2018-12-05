@@ -71,6 +71,7 @@ SOURCES += \
     Partner.cpp \
     Pit8253.cpp \
     Pit8253Sound.cpp \
+    Pk8000.cpp \
     Platform.cpp \
     PlatformCore.cpp \
     Ppi8255.cpp \
@@ -145,6 +146,7 @@ HEADERS  += \
     Partner.h \
     Pit8253.h \
     Pit8253Sound.h \
+    Pk8000.h \
     Platform.h \
     PlatformCore.h \
     Ppi8255.h \

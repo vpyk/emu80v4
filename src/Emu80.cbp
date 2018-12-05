@@ -172,6 +172,8 @@
 		<Unit filename="Pit8253.h" />
 		<Unit filename="Pit8253Sound.cpp" />
 		<Unit filename="Pit8253Sound.h" />
+		<Unit filename="Pk8000.cpp" />
+		<Unit filename="Pk8000.h" />
 		<Unit filename="Platform.cpp" />
 		<Unit filename="Platform.h" />
 		<Unit filename="PlatformCore.cpp" />
