@@ -144,6 +144,8 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
     //if (fileSize > 0)
     //    --fileSize;
 
+    delete[] buf;
+
     if (run) {
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());

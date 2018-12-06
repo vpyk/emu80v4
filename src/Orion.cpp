@@ -366,6 +366,7 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
             return false;
         }
 
+
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu) {
@@ -380,6 +381,9 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
             m_ramDisk->writeByte(addr, *ptr++);
         m_ramDisk->writeByte(len, 0xff);
     }
+
+    delete[] buf;
+
     return true;
 }
 
