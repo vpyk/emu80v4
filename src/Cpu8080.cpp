@@ -299,6 +299,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 g_emulation->debugRequest(this);
                 break;
             }
+            /* Falls through. */
         case 0x00:            /* nop */
             cpu_cycles = 4;
             break;
@@ -1285,6 +1286,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 g_emulation->debugRequest(this);
                 break;
             }
+            /* Falls through. */
         case 0xC3:            /* jmp addr */
             cpu_cycles = 10;
             PC = RD_WORD(PC);
@@ -1331,6 +1333,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 g_emulation->debugRequest(this);
                 break;
             }
+            /* Falls through. */
         case 0xC9:            /* ret */
             cpu_cycles = 10;
             POP(PC);
@@ -1364,6 +1367,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 g_emulation->debugRequest(this);
                 break;
             }
+            /* Falls through. */
         case 0xCD:            /* call addr */
             cpu_cycles = 17;
             CALL;
