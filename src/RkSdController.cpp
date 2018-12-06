@@ -429,7 +429,7 @@ bool RkSdController::cmdLseek()
     case 101:
     case 102:
         createErrorAnswer(ERR_INVALID_COMMAND);
-        /* Falls through. */
+        break;
     default:
         if (mode == 0)
             m_filePos = offset;

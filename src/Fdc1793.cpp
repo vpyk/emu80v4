@@ -250,7 +250,7 @@ uint8_t Fdc1793::readByte(int addr)
                 case 7:
                 case 0xD:
                     m_status = m_track == 0 ? 0x24 : 0x20;
-                    /* Falls through. */
+                    break;
                 case 8:
                 case 9:
                     if (m_dma && m_accessMode == FAM_READING) {
