@@ -416,72 +416,140 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
     ptr += 8;
     fileSize -= 8;
 
-    for (int i = 0; i < 10; i++)
-        if (*ptr != 0xD0) {
+    if (*ptr == 0xD0) {
+        // Binary file
+        for (int i = 0; i < 10; i++)
+            if (*ptr != 0xD0) {
+                delete[] buf;
+                return false;
+            }
+
+        ptr += 16;
+        fileSize -= 16;
+
+        if (*ptr != headerSeq[0]) {
+            ptr += 8;
+            fileSize -= 8;
+        }
+
+        if (fileSize < 15 || memcmp(ptr, headerSeq, 8) != 0) {
             delete[] buf;
             return false;
         }
 
-    ptr += 16;
-    fileSize -= 16;
-
-    if (*ptr != 0x1F) {
         ptr += 8;
         fileSize -= 8;
-    }
 
-    if (fileSize < 15 || memcmp(ptr, headerSeq, 8) != 0) {
-        delete[] buf;
-        return false;
-    }
+        uint16_t begAddr = (ptr[1] << 8) | ptr[0];
+        uint16_t endAddr = (ptr[3] << 8) | ptr[2];
+        uint16_t startAddr = (ptr[5] << 8) | ptr[4];
 
-    ptr += 8;
-    fileSize -= 8;
+        ptr += 6;
+        fileSize -= 6;
 
-    uint16_t begAddr = (ptr[1] << 8) | ptr[0];
-    uint16_t endAddr = (ptr[3] << 8) | ptr[2];
-    uint16_t startAddr = (ptr[5] << 8) | ptr[4];
+        endAddr--; // PK8000 feature?
 
-    ptr += 6;
-    fileSize -= 6;
+        uint16_t progLen = endAddr - begAddr + 1;
 
-    endAddr--; // PK8000 feature?
+        if (progLen > fileSize) {
+            delete[] buf;
+            return false;
+        }
 
-    uint16_t progLen = endAddr - begAddr + 1;
+        for (unsigned addr = begAddr; addr <= endAddr; addr++)
+            m_as->writeByte(addr, *ptr++);
 
-    if (progLen > fileSize) {
-        delete[] buf;
-        return false;
-    }
+        fileSize -= (endAddr - begAddr + 1);
 
-    for (unsigned addr = begAddr; addr <= endAddr; addr++)
-        m_as->writeByte(addr, *ptr++);
+        // Find next block
+    /*    if (m_allowMultiblock && m_tapeRedirector && fileSize > 0)
+            while (fileSize > 0 && (*ptr) != 0xE6) {
+                ++ptr;
+                --fileSize;
+            }*/
+        //if (fileSize > 0)
+        //    --fileSize;
 
-    fileSize -= (endAddr - begAddr + 1);
+        if (run) {
+            m_platform->reset();
+            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+            if (cpu) {
+                cpu->disableHooks();
+                g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+                cpu->enableHooks();
+                cpu->setPC(startAddr);
+                /*if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
+                    m_tapeRedirector->assignFile(fileName, "r");
+                    m_tapeRedirector->openFile();
+                    m_tapeRedirector->assignFile("", "r");
+                    m_tapeRedirector->setFilePos(fullSize - fileSize);
+                }*/
+            }
+        }
+    } else if (*ptr == 0xD3) {
+        // Basic file
+        for (int i = 0; i < 10; i++)
+            if (*ptr != 0xD3) {
+                delete[] buf;
+                return false;
+            }
 
-    // Find next block
-/*    if (m_allowMultiblock && m_tapeRedirector && fileSize > 0)
-        while (fileSize > 0 && (*ptr) != 0xE6) {
-            ++ptr;
-            --fileSize;
-        }*/
-    //if (fileSize > 0)
-    //    --fileSize;
+        ptr += 16;
+        fileSize -= 16;
 
-    if (run) {
-        m_platform->reset();
+        if (*ptr != headerSeq[0]) {
+            ptr += 8;
+            fileSize -= 8;
+        }
+
+        if (fileSize < 10 || memcmp(ptr, headerSeq, 8) != 0) {
+            delete[] buf;
+            return false;
+        }
+
+        ptr += 8;
+        fileSize -= 8;
+
+        if (fileSize >= 0xAF00) {
+            delete[] buf;
+            return false;
+        }
+
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+
+        m_as->writeByte(0x4000, 0);
+        m_as->writeByte(0x4001, 0);
+        m_platform->reset();
         if (cpu) {
             cpu->disableHooks();
             g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
             cpu->enableHooks();
-            cpu->setPC(startAddr);
-            /*if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
-                m_tapeRedirector->assignFile(fileName, "r");
-                m_tapeRedirector->openFile();
-                m_tapeRedirector->assignFile("", "r");
-                m_tapeRedirector->setFilePos(fullSize - fileSize);
-            }*/
+        }
+
+        uint16_t memLimit = 0x4000 + fileSize + 0x100;
+
+        m_as->writeByte(0x4000, 0);
+        for (unsigned addr = 0x4001; fileSize; addr++, fileSize--)
+            m_as->writeByte(addr, *ptr++);
+
+        if (cpu) {
+            m_as->writeByte(0xF930, memLimit & 0xFF);
+            m_as->writeByte(0xF931, memLimit >> 8);
+            m_as->writeByte(0xF932, memLimit & 0xFF);
+            m_as->writeByte(0xF933, memLimit >> 8);
+            m_as->writeByte(0xF934, memLimit & 0xFF);
+            m_as->writeByte(0xF935, memLimit >> 8);
+            if (run) {
+                uint16_t kbdBuf = m_as->readByte(0xFA2C) | (m_as->readByte(0xFA2D) << 8);
+                m_as->writeByte(kbdBuf++, 0x52);
+                m_as->writeByte(kbdBuf++, 0x55);
+                m_as->writeByte(kbdBuf++, 0x4E);
+                m_as->writeByte(kbdBuf++, 0x0D);
+                m_as->writeByte(0xFA2A, kbdBuf & 0xFF);
+                m_as->writeByte(0xFA2B, kbdBuf >> 8);
+            }
+            //cpu->setSP(0xF7FD);
+            cpu->setPC(0x030D);
         }
     }
 
