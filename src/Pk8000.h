@@ -27,6 +27,7 @@
 
 class AddrSpaceMapper;
 class Ram;
+class GeneralSoundSource;
 
 
 class Pk8000Renderer : public CrtRenderer
@@ -49,6 +50,9 @@ class Pk8000Renderer : public CrtRenderer
         void setGraphicsBufferBase(uint16_t base) {m_grBase = base;}
         void setColorBufferBase(uint16_t base) {m_colBase = base;}
 
+        void setColorReg(unsigned addr, uint8_t value);
+        uint8_t getColorReg(unsigned addr);
+
         static EmuObject* create(const EmuValuesList&) {return new Pk8000Renderer();}
 
     private:
@@ -60,6 +64,7 @@ class Pk8000Renderer : public CrtRenderer
         };
 
         const uint8_t* m_screenMemoryBanks[4];
+        Ram* m_screenMemoryRamBanks[4];
         unsigned m_bank = 0;
         unsigned m_mode = 0;
         uint16_t m_txtBase = 0;
@@ -68,6 +73,24 @@ class Pk8000Renderer : public CrtRenderer
         uint16_t m_colBase = 0;
         uint32_t m_fgColor = 0xC0C0C0;
         uint32_t m_bgColor = 0x000000;
+};
+
+
+// Ports A0h-BFh
+class Pk8000Mode1ColorMem : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        inline void attachCrtRenderer(Pk8000Renderer* renderer) {m_renderer = renderer;}
+
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000Mode1ColorMem();}
+
+    private:
+        Pk8000Renderer* m_renderer = nullptr;
 };
 
 
@@ -239,7 +262,7 @@ class Pk8000Ppi8255Circuit1 : public Ppi8255Circuit
 {
     public:
         Pk8000Ppi8255Circuit1();
-        //virtual ~Pk8000Ppi8255Circuit1();
+        virtual ~Pk8000Ppi8255Circuit1();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
@@ -255,7 +278,10 @@ class Pk8000Ppi8255Circuit1 : public Ppi8255Circuit
 
     protected:
         // Источник звука - вывод на магнитофон
-        //GeneralSoundSource* m_tapeSoundSource;
+        GeneralSoundSource* m_tapeSoundSource;
+
+        // Источник звука - встроенный резонатор
+        GeneralSoundSource* m_beepSoundSource;
 
         Pk8000Keyboard* m_kbd = nullptr;
         AddrSpaceMapper* m_addrSpaceMappers[4];

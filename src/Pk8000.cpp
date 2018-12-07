@@ -23,7 +23,7 @@
 #include "Platform.h"
 #include "Globals.h"
 #include "EmuWindow.h"
-//#include "SoundMixer.h"
+#include "SoundMixer.h"
 #include "Memory.h"
 #include "AddrSpace.h"
 #include "Cpu.h"
@@ -79,8 +79,10 @@ bool Pk8000Core::setProperty(const string& propertyName, const EmuValuesList& va
 
 Pk8000Renderer::Pk8000Renderer()
 {
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) {
         m_screenMemoryBanks[i] = nullptr;
+        m_screenMemoryRamBanks[i] = nullptr;
+    }
 
     m_sizeX = m_prevSizeX = 256;
     m_sizeY = m_prevSizeY = 192;
@@ -96,8 +98,10 @@ Pk8000Renderer::Pk8000Renderer()
 
 void Pk8000Renderer::attachScreenMemoryBank(int bank, Ram* screenMemoryBank)
 {
-    if (bank >= 0 && bank < 4)
+    if (bank >= 0 && bank < 4) {
         m_screenMemoryBanks[bank] = screenMemoryBank->getDataPtr();
+        m_screenMemoryRamBanks[bank] = screenMemoryBank;
+    }
 }
 
 
@@ -112,6 +116,18 @@ void Pk8000Renderer::setMode(unsigned mode)
 {
     if (mode < 3)
         m_mode = mode;
+}
+
+
+void Pk8000Renderer::setColorReg(unsigned addr, uint8_t value)
+{
+    m_screenMemoryRamBanks[m_bank]->writeByte(0x400 + addr, value);
+}
+
+
+uint8_t Pk8000Renderer::getColorReg(unsigned addr)
+{
+    return m_screenMemoryBanks[m_bank][0x400 + addr];
 }
 
 
@@ -195,8 +211,18 @@ bool Pk8000Renderer::setProperty(const string& propertyName, const EmuValuesList
 
 Pk8000Ppi8255Circuit1::Pk8000Ppi8255Circuit1()
 {
+    m_beepSoundSource = new GeneralSoundSource;
+    m_tapeSoundSource = new GeneralSoundSource;
+
     for (int i = 0; i < 4; i++)
         m_addrSpaceMappers[i] = nullptr;
+}
+
+
+Pk8000Ppi8255Circuit1::~Pk8000Ppi8255Circuit1()
+{
+    delete m_beepSoundSource;
+    delete m_tapeSoundSource;
 }
 
 
@@ -230,6 +256,10 @@ void Pk8000Ppi8255Circuit1::setPortC(uint8_t value)
 {
     if (m_kbd)
         m_kbd->setMatrixRowNo(value & 0x0F);
+
+    m_beepSoundSource->setValue(value & 0x80 ? 1 : 0);
+    m_tapeSoundSource->setValue(value & 0x40 ? 1 : 0);
+    m_platform->getCore()->tapeOut(value & 0x80);
 }
 
 
@@ -263,6 +293,35 @@ void Pk8000Ppi8255Circuit2::setPortA(uint8_t value)
 
 
 bool Pk8000Ppi8255Circuit2::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "crtRenderer") {
+        attachCrtRenderer(static_cast<Pk8000Renderer*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
+}
+
+
+void Pk8000Mode1ColorMem::writeByte(int addr, uint8_t value)
+{
+    if (m_renderer)
+        m_renderer->setColorReg(addr & 0x1F, value);
+}
+
+
+uint8_t Pk8000Mode1ColorMem::readByte(int addr)
+{
+    if (m_renderer)
+        return m_renderer->getColorReg(addr & 0x1F);
+    return 0;
+}
+
+
+bool Pk8000Mode1ColorMem::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
