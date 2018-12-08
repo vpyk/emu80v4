@@ -127,22 +127,43 @@ void Pit8253Counter::operateForTicks(int ticks)
 void Pit8253Counter::updateState()
 {
     uint64_t curClock = g_emulation->getCurClock();
+
+#ifndef LESS_64BIT_DIVS
     int ticks = curClock / m_kDiv - m_prevClock / m_kDiv;
+#else
+    int dt = g_emulation->getCurClock() - m_prevClock;
+     if (m_prevFastClock >= m_kDiv * 1024) {
+        m_prevFastClock -= m_kDiv * 1024;
+    }
+     const uint32_t curFastClock = m_prevFastClock + dt;
+    int ticks = curFastClock / m_kDiv - m_prevFastClock / m_kDiv;
+#endif
 
     if (m_out || !m_isCounting)
+#ifndef LESS_64BIT_DIVS
         m_tempAddOutClocks -= (m_prevClock % m_kDiv);
+#else
+        m_tempAddOutClocks -= (m_prevFastClock % m_kDiv);
+#endif
         //m_tempAddOutClocks += (m_kDiv - m_prevClock % m_kDiv) % m_kDiv;
 
     operateForTicks(ticks);
 
     if (m_out || !m_isCounting)
+#ifndef LESS_64BIT_DIVS
         m_tempAddOutClocks += (curClock % m_kDiv);
+#else
+        m_tempAddOutClocks += curFastClock % m_kDiv;
+#endif
 
 //    m_avgOut = 0;
 //    if (curClock != m_prevClock)
 //        m_avgOut = m_tempSumOut * 9 * SND_AMP / (curClock - m_prevClock + addClock);
 
     m_prevClock = curClock;
+#ifdef LESS_64BIT_DIVS
+    m_prevFastClock = curFastClock;
+#endif
 }
 
 
@@ -150,8 +171,14 @@ int Pit8253Counter::getAvgOut()
 {
     uint64_t curClock = g_emulation->getCurClock();
     m_avgOut = 0;
-    if (curClock != m_sampleClock)
+    if (curClock != m_sampleClock) {
+#ifndef LESS_64BIT_DIVS
         m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * SND_AMP / (curClock - m_sampleClock);
+#else
+        uint32_t dt = curClock - m_sampleClock;
+        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * 4096 / dt;
+#endif
+    }
         //m_avgOut = m_tempSumOut * SND_AMP / (curClock / 9 - m_sampleClock / 9);
     return m_avgOut;
 }
@@ -164,6 +191,9 @@ void Pit8253Counter::resetStats()
     m_tempAddOutClocks = 0;
     m_prevClock = g_emulation->getCurClock();
     m_sampleClock = m_prevClock;
+#ifdef LESS_64BIT_DIVS
+    m_prevFastClock = 0;
+#endif
 }
 
 

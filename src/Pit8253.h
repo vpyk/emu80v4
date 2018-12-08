@@ -23,6 +23,10 @@
 
 #include "EmuObjects.h"
 
+// Uncomment for Raspberry Pi etc.
+// Thanks to Viacheslav Slavinsky aka svofski
+//#define LESS_64BIT_DIVS
+
 class Pit8253;
 
 
@@ -73,6 +77,10 @@ class Pit8253Counter : public EmuObject //PassiveDevice
         int m_sumOutTicks = 0;
         int m_tempSumOut = 0;
         int m_tempAddOutClocks = 0;
+
+#ifdef LESS_64BIT_DIVS
+        uint32_t m_prevFastClock = 0;
+#endif
 
         int m_mode;
         bool m_gate;
