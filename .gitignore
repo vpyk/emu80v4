@@ -6,3 +6,6 @@
 *.o
 /Emu80
 /Emu80lite
+/build
+.qmake.stash
+Makefile
