@@ -419,7 +419,7 @@
     <message>
         <location filename="qtMainWindow.cpp" line="948"/>
         <source>Writing wave file:</source>
-        <translation>Чтение wave-файла:</translation>
+        <translation>Запись wave-файла:</translation>
     </message>
     <message>
         <location filename="qtMainWindow.cpp" line="952"/>
@@ -427,32 +427,32 @@
         <translation>Проигрывание wave-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1474"/>
+        <location filename="qtMainWindow.cpp" line="1508"/>
         <source>Emu80: warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1488"/>
+        <location filename="qtMainWindow.cpp" line="1522"/>
         <source>Emu80 Warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1475"/>
+        <location filename="qtMainWindow.cpp" line="1509"/>
         <source>Reset current platform settings?</source>
         <translation>Сбросить настройки для текущей платформы?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1489"/>
+        <location filename="qtMainWindow.cpp" line="1523"/>
         <source>Reset all settings?</source>
         <translation>Сбросить все настройки?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1605"/>
+        <location filename="qtMainWindow.cpp" line="1639"/>
         <source>JCUKEN</source>
         <translation>ЙЦУКЕН</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1608"/>
+        <location filename="qtMainWindow.cpp" line="1642"/>
         <source>&quot;Smart&quot;</source>
         <translation>«Умная»</translation>
     </message>
