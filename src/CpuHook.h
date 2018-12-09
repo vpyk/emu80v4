@@ -19,6 +19,8 @@
 #ifndef CPUHOOK_H
 #define CPUHOOK_H
 
+#include <vector>
+
 #include "Cpu.h"
 
 
@@ -46,15 +48,20 @@ class CpuHook : public EmuObject
         inline int getHookAddr() {return m_hookAddr;}
 
         void setTapeRedirector(TapeRedirector* file) {m_file = file;}
+        void setSignature(std::string signature);
 
     protected:
         Cpu* m_cpu;
         bool m_isEnabled = true;
         TapeRedirector* m_file = nullptr;
+        bool m_hasSignature = false;
+        bool checkSignature();
 
     private:
         int m_hookAddr;
-        //uint8_t m_memCheckByte;
+        std::vector<uint8_t> m_signature;
+        unsigned m_signatureLen = 0;
+        uint8_t* m_signatureBytes = nullptr;
 };
 
 #endif //CPUHOOK_H

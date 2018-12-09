@@ -30,7 +30,7 @@ static const uint8_t headerSeq[8] = {0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0
 
 bool MsxTapeOutHook::hookProc()
 {
-    if (!m_isEnabled)
+    if (!m_isEnabled || m_hasSignature && !checkSignature())
         return false;
 
     if (g_emulation->getWavReader()->isPlaying())
@@ -78,7 +78,7 @@ bool MsxTapeOutHook::setProperty(const string& propertyName, const EmuValuesList
 
 bool MsxTapeOutHeaderHook::hookProc()
 {
-    if (!m_isEnabled)
+    if (!m_isEnabled || m_hasSignature && !checkSignature())
         return false;
 
     if (m_file->isCancelled())
@@ -113,7 +113,7 @@ bool MsxTapeOutHeaderHook::hookProc()
 
 bool MsxTapeInHook::hookProc()
 {
-    if (!m_isEnabled)
+    if (!m_isEnabled || m_hasSignature && !checkSignature())
         return false;
 
     if (g_emulation->getWavReader()->isPlaying())
@@ -170,7 +170,7 @@ bool MsxTapeInHook::setProperty(const string& propertyName, const EmuValuesList&
 
 bool MsxTapeInHeaderHook::hookProc()
 {
-    if (!m_isEnabled)
+    if (!m_isEnabled || m_hasSignature && !checkSignature())
         return false;
 
     if (g_emulation->getWavReader()->isPlaying())

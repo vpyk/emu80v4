@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include "Emulation.h"
 #include "CpuHook.h"
 #include "TapeRedirector.h"
@@ -35,6 +37,31 @@ CpuHook::~CpuHook()
 }
 
 
+void CpuHook::setSignature(std::string signature)
+{
+    unsigned bt;
+    for (unsigned i = 0; i <= signature.size() - 2; i += 2) {
+        string sByte = signature.substr(i, 2);
+        istringstream iss(sByte);
+        iss >> hex >> bt;
+        m_signature.push_back(bt);
+    }
+    m_signatureLen = m_signature.size();
+    m_signatureBytes = m_signature.data();
+    m_hasSignature = m_signatureLen > 0 ? true : false;
+}
+
+
+bool CpuHook::checkSignature()
+{
+    AddressableDevice* as = m_cpu->getAddrSpace();
+    for (unsigned i = 0; i < m_signatureLen; i++)
+        if (m_signatureBytes[i] != as->readByte(m_hookAddr + i))
+            return false;
+    return true;
+}
+
+
 bool CpuHook::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
@@ -48,6 +75,9 @@ bool CpuHook::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
     } else if (propertyName == "tapeRedirector") {
         setTapeRedirector(static_cast<TapeRedirector*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "signature") {
+        setSignature(values[0].asString());
         return true;
     }
 
