@@ -27,6 +27,7 @@
 #include "Memory.h"
 #include "AddrSpace.h"
 #include "Cpu.h"
+#include "WavReader.h"
 
 using namespace std;
 
@@ -259,7 +260,7 @@ void Pk8000Ppi8255Circuit1::setPortC(uint8_t value)
 
     m_beepSoundSource->setValue(value & 0x80 ? 1 : 0);
     m_tapeSoundSource->setValue(value & 0x40 ? 1 : 0);
-    m_platform->getCore()->tapeOut(value & 0x80);
+    m_platform->getCore()->tapeOut(value & 0x40);
 }
 
 
@@ -661,4 +662,10 @@ void Pk8000Keyboard::setMatrixRowNo(uint8_t row)
 uint8_t Pk8000Keyboard::getMatrixRowState()
 {
     return ~m_keys[m_rowNo];
+}
+
+
+uint8_t Pk8000InputRegister2::readByte(int)
+{
+    return g_emulation->getWavReader()->getCurValue() ? 0x80 : 0x00;
 }

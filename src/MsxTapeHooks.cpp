@@ -127,7 +127,7 @@ bool MsxTapeInHook::hookProc()
     Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_cpu);
     uint16_t af = cpu->getAF() & 0xfffe;
 
-    if (!m_file || m_file->isEof())
+    if (!m_file->isOpen() || m_file->isEof())
         af |= 0x0001; // set C
 
     //int pos = m_file->getPos();
@@ -185,10 +185,18 @@ bool MsxTapeInHeaderHook::hookProc()
     if (m_file->isCancelled())
         return false;
 
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_cpu);
+    uint16_t af = cpu->getAF() & 0xfffe;
+
+    if (!m_file->isOpen() || m_file->isEof())
+        af |= 0x0001; // set C
+
     //int pos = m_file->getPos();
 
     if (m_file)
         m_file->waitForSequence(headerSeq, 8);
+
+    cpu->setAF((af));
 
     static_cast<Cpu8080Compatible*>(m_cpu)->ret();
 

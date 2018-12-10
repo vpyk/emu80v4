@@ -312,5 +312,16 @@ class Pk8000Ppi8255Circuit2 : public Ppi8255Circuit
 };
 
 
+// Port 8Dh
+class Pk8000InputRegister2 : public AddressableDevice
+{
+    public:
+        uint8_t readByte(int) override;
+        void writeByte(int, uint8_t) override {}
+
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000InputRegister2();}
+};
+
+
 #endif // PK8000_H
 
