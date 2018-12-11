@@ -724,6 +724,10 @@ EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, bool& shift, bo
     EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
     if (key >= EK_0 && key <= EK_9)
         shift = !shift;
-    lang = false;
+    if (unicodeKey == L'_') {
+        key = EK_UNDSCR;
+        shift = true;
+        lang = false;
+    }
     return key;
 }

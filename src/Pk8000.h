@@ -237,20 +237,15 @@ class Pk8000Keyboard : public Keyboard
         const EmuKey m_keyMatrix[10][8] = {
             { EK_0,        EK_1,       EK_2,        EK_3,     EK_4,      EK_5,        EK_6,         EK_7     },
             { EK_8,        EK_9,       EK_COMMA,    EK_MINUS, EK_PERIOD, EK_COLON,    EK_SEMICOLON, EK_SLASH },
-            { EK_LBRACKET, EK_BKSLASH, EK_RBRACKET, EK_CARET, EK_NONE,   EK_AT,       EK_A,         EK_B     },
+            { EK_LBRACKET, EK_BKSLASH, EK_RBRACKET, EK_CARET, EK_UNDSCR, EK_AT,       EK_A,         EK_B     },
             { EK_C,        EK_D,       EK_E,        EK_F,     EK_G,      EK_H,        EK_I,         EK_J     },
             { EK_K,        EK_L,       EK_M,        EK_N,     EK_O,      EK_P,        EK_Q,         EK_R     },
             { EK_S,        EK_T,       EK_U,        EK_V,     EK_W,      EK_X,        EK_Y,         EK_Z     },
-            { EK_SHIFT,    EK_CTRL,    EK_NONE,     EK_LANG,  EK_NONE,   EK_F1,       EK_F2,        EK_F3    },
-            { EK_F4,       EK_F5,      EK_ESC,      EK_TAB,   EK_NONE,   EK_BSP,      EK_NONE,      EK_CR    },
-            { EK_SPACE,    EK_CLEAR,   EK_NONE,     EK_NONE,  EK_LEFT,   EK_UP,       EK_DOWN,      EK_RIGHT },
-            { EK_HOME,     EK_NONE,    EK_NONE,     EK_NONE,  EK_NONE,   EK_NONE,     EK_NONE,      EK_SPACE }
+            { EK_SHIFT,    EK_CTRL,    EK_GRAPH,    EK_LANG,  EK_FIX,    EK_F1,       EK_F2,        EK_F3    },
+            { EK_F4,       EK_F5,      EK_ESC,      EK_TAB,   EK_STOP,   EK_BSP,      EK_SEL,       EK_CR    },
+            { EK_SPACE,    EK_CLEAR,   EK_INS,      EK_DEL,   EK_LEFT,   EK_UP,       EK_DOWN,      EK_RIGHT },
+            { EK_SHOME,    EK_SEND,    EK_MENU,     EK_HOME,  EK_END,    EK_PEND,     EK_PHOME,     EK_SPACE }
         };
-
-            /*{ EK_SHIFT,    EK_CTRL,   ?(ГРАФ),     EK_LANG,  ?(ФИКС),   EK_F1,       EK_F2,        EK_F3     },
-            { EK_F4,       EK_F5,     EK_ESC,      EK_TAB,   ?(STOP),   EK_BSP,      ?(СЕЛ),       EK_CR     },
-            { EK_SPACE,    EK_CLEAR,  ?(INS),      ?(DEL),   ?EK_LEFT,  ?EK_UP,      ?EK_DOWN,     ?EK_RIGHT },
-            { ?EK_HOME,    ?EK_END,   ?(MENU),     ?N1,      ?N3,       ?N.,         ?N0,          EK_SPACE  }*/
 
         uint8_t m_keys[10];
         uint8_t m_rowNo;
