@@ -26,7 +26,8 @@ enum EmuKey
 {
     EK_NONE,
 
-    EK_SEMICOLON,
+    // Common keys
+    EK_0,
     EK_1,
     EK_2,
     EK_3,
@@ -36,75 +37,80 @@ enum EmuKey
     EK_7,
     EK_8,
     EK_9,
-    EK_0,
-    EK_MINUS,
-    EK_TAB,
-    EK_LF,
 
-    EK_J,
+    EK_A,
+    EK_B,
     EK_C,
-    EK_U,
-    EK_K,
+    EK_D,
     EK_E,
-    EK_N,
+    EK_F,
     EK_G,
+    EK_H,
+    EK_I,
+    EK_J,
+    EK_K,
+    EK_L,
+    EK_M,
+    EK_N,
+    EK_O,
+    EK_P,
+    EK_Q,
+    EK_R,
+    EK_S,
+    EK_T,
+    EK_U,
+    EK_V,
+    EK_W,
+    EK_X,
+    EK_Y,
+    EK_Z,
+
     EK_LBRACKET,
     EK_RBRACKET,
-    EK_Z,
-    EK_H,
-    EK_COLON,
-    EK_CR,
-
-    EK_F,
-    EK_Y,
-    EK_W,
-    EK_A,
-    EK_P,
-    EK_R,
-    EK_O,
-    EK_L,
-    EK_D,
-    EK_V,
     EK_BKSLASH,
-    EK_PERIOD,
-    EK_BSP,
-
-    EK_Q,
     EK_CARET,
-    EK_S,
-    EK_M,
-    EK_I,
-    EK_T,
-    EK_X,
-    EK_B,
     EK_AT,
+
+    EK_SEMICOLON,
+    EK_MINUS,
+    EK_COLON,
+    EK_PERIOD,
     EK_COMMA,
     EK_SLASH,
-
     EK_SPACE,
+
+    EK_ESC,
+    EK_TAB,
+    EK_CR,
+    EK_BSP,
 
     EK_F1,
     EK_F2,
     EK_F3,
     EK_F4,
     EK_F5,
+    EK_LEFT,
+    EK_UP,
+    EK_RIGHT,
+    EK_DOWN,
+
+    EK_SHIFT,
+    EK_CTRL,
+    EK_LANG,
+
+    // Added in RK86
+    EK_LF,
+    EK_HOME,
+    EK_CLEAR,
+
+    // Added in Specialist
     EK_F6,
     EK_F7,
     EK_F8,
     EK_F9,
     EK_F10,
     EK_F11,
-    EK_HOME,
-    EK_CLEAR,
-    EK_LEFT,
-    EK_UP,
-    EK_RIGHT,
-    EK_DOWN,
-    EK_ESC,
-
-    EK_SHIFT,
-    EK_CTRL,
-    EK_LANG
+    EK_RPT
 };
 
 
@@ -129,24 +135,30 @@ class KbdLayout : public EmuObject
         };
 
         KbdLayoutMode m_mode = KLM_QWERTY;
-        virtual EmuKey translateKeyQwerty(PalKeyCode keyCode) = 0;
-        virtual EmuKey translateKeyJcuken(PalKeyCode keyCode) = 0;
-        virtual EmuKey translateKeySmart(unsigned unicodeKey, bool& shift) = 0;
+        virtual EmuKey translateKey(PalKeyCode keyCode) {return translateCommonKeys(keyCode);}
+        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
+
+        EmuKey translateCommonKeys(PalKeyCode keyCode);
+        EmuKey translateCommonUnicodeKeys(unsigned unicodeKey, bool& shift, bool& lang);
 
     private:
         bool m_shiftPressed = false;
+        bool m_langPressed = false;
         EmuKey m_lastNonUnicodeKey = EK_NONE;
+
+        EmuKey translateCommonKeysQwerty(PalKeyCode keyCode);
+        EmuKey translateCommonKeysJcuken(PalKeyCode keyCode);
 };
 
 
 
 class RkKbdLayout : public KbdLayout
 {
-    public:
-        EmuKey translateKeyQwerty(PalKeyCode keyCode) override;
-        EmuKey translateKeyJcuken(PalKeyCode keyCode) override;
-        EmuKey translateKeySmart(unsigned unicodeKey, bool& shift) override;
+    protected:
+        virtual EmuKey translateKey(PalKeyCode keyCode);
+        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang);
 
+    public:
         static EmuObject* create(const EmuValuesList&) {return new RkKbdLayout();}
 };
 
