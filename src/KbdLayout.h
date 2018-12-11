@@ -155,8 +155,8 @@ class KbdLayout : public EmuObject
 class RkKbdLayout : public KbdLayout
 {
     protected:
-        virtual EmuKey translateKey(PalKeyCode keyCode);
-        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang);
+        EmuKey translateKey(PalKeyCode keyCode) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) override;
 
     public:
         static EmuObject* create(const EmuValuesList&) {return new RkKbdLayout();}
