@@ -669,3 +669,61 @@ uint8_t Pk8000InputRegister2::readByte(int)
 {
     return g_emulation->getWavReader()->getCurValue() ? 0x80 : 0x00;
 }
+
+
+EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
+{
+    EmuKey key = translateCommonKeys(keyCode);
+    if (key != EK_NONE)
+        return key;
+
+    switch (keyCode) {
+    case PK_KP_1:
+        return EK_HOME;
+    case PK_PGUP:
+        return EK_CLEAR;
+    case PK_LCTRL:
+    case PK_RCTRL:
+        return EK_CTRL;
+
+    case PK_F6:
+        return EK_UNDSCR;
+    case PK_F10:
+        return EK_GRAPH;
+    case PK_F8:
+        return EK_FIX;
+    case PK_F12:
+        return EK_STOP;
+    case PK_F11:
+        return EK_SEL;
+    case PK_KP_MUL:
+        return EK_INS;
+    case PK_KP_DIV:
+        return EK_DEL;
+    case PK_KP_7:
+        return EK_SHOME; //7
+    case PK_KP_9:
+        return EK_SEND;  // 9
+    case PK_KP_3:
+        return EK_END;   // 3
+    case PK_KP_PERIOD:
+        return EK_PHOME; // .
+    case PK_KP_0:
+        return EK_PEND;  // 0
+    case PK_KP_5:
+        return EK_MENU;  // 5
+
+    default:
+        return translateCommonKeys(keyCode);
+    }
+}
+
+
+EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang)
+{
+    EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
+    if (key >= EK_0 && key <= EK_9)
+        shift = !shift;
+    lang = false;
+    return key;
+}

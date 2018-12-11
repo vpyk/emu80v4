@@ -110,7 +110,22 @@ enum EmuKey
     EK_F9,
     EK_F10,
     EK_F11,
-    EK_RPT
+    EK_RPT,
+
+    // Added in Pk8000
+    EK_UNDSCR,
+    EK_GRAPH,
+    EK_FIX,
+    EK_STOP,
+    EK_SEL,
+    EK_INS,
+    EK_DEL,
+    EK_SHOME, // 7
+    EK_SEND,  // 9
+    EK_END,   // 3
+    EK_PHOME, // .
+    EK_PEND,  // 0
+    EK_MENU  // 5
 };
 
 

@@ -323,5 +323,16 @@ class Pk8000InputRegister2 : public AddressableDevice
 };
 
 
+class Pk8000KbdLayout : public KbdLayout
+{
+    protected:
+        EmuKey translateKey(PalKeyCode keyCode) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) override;
+
+    public:
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000KbdLayout();}
+};
+
+
 #endif // PK8000_H
 

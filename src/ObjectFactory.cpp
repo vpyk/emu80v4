@@ -167,6 +167,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Pk8000Ppi8255Circuit2)
     REG_EMU_CLASS(Pk8000Mode1ColorMem)
     REG_EMU_CLASS(Pk8000InputRegister2)
+    REG_EMU_CLASS(Pk8000KbdLayout)
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
