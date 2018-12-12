@@ -120,6 +120,7 @@ class SpecRenderer : public CrtRenderer
         void renderFrame() override;
 
         void toggleColorMode() override;
+        void toggleCropping() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
@@ -133,6 +134,7 @@ class SpecRenderer : public CrtRenderer
         const uint8_t* m_colorMemory = nullptr;
 
         SpecColorMode m_colorMode = SCM_8COLOR;
+        bool m_showBorder = false;
 };
 
 
