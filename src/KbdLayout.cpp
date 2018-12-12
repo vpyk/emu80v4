@@ -398,6 +398,7 @@ EmuKey KbdLayout::translateCommonUnicodeKeys(unsigned unicodeKey, bool& shift, b
             break;
         case L'@':
             key = EK_AT;
+            shift = true;
             break;
         case L',':
             key = EK_COMMA;
@@ -856,6 +857,8 @@ EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& 
         if (lang &&
             (key == EK_LBRACKET || key == EK_RBRACKET || key == EK_BKSLASH || key == EK_CARET || key == EK_AT))
             shift = lang;
+        else if (key == EK_AT)
+            shift = !shift;
     }
     lang = false;
     return key;
