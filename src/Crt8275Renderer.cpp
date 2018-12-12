@@ -86,8 +86,8 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
         // 576i
         double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / 64.;
         visibleX = (140 * effectiveFreq / 13.5 - m_crt->getHrChars() - 1) * charWidth; //31 //48;
-        //visibleY = 22 - charHeight * m_crt->getVrRows(); //30;
-        visibleY = (22 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
+        //visibleY = 23 - charHeight * m_crt->getVrRows(); //30;
+        visibleY = (23 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
         visibleWidth = (704 * effectiveFreq * charWidth) / 13.5; // 384;
         visibleHeight = 288 * charHeight / m_crt->getNLines(); //288; //250;
     } else {
