@@ -27,6 +27,7 @@
 #include "Memory.h"
 #include "AddrSpace.h"
 #include "Cpu.h"
+#include "Fdc1793.h"
 #include "WavReader.h"
 
 using namespace std;
@@ -730,4 +731,46 @@ EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, bool& shift, bo
         lang = false;
     }
     return key;
+}
+
+
+void Pk8000FddControlRegister::writeByte(int, uint8_t value)
+{
+    m_fdc->setDrive(value & 0x40 ? 1 : 0); // пока так
+    m_fdc->setHead((value & 0x10) >> 4);
+}
+
+
+bool Pk8000FddControlRegister::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "fdc") {
+        attachFdc1793(static_cast<Fdc1793*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
+}
+
+
+uint8_t Pk8000FdcStatusRegisters::readByte(int addr)
+{
+    //return (m_bytes[addr & 0x3] & 0x7E) | (m_fdc->getDrq() ? 0 : 1) | (m_fdc->getIrq() ? 0 : 0x80);
+    return m_bytes[(m_fdc->getIrq() ? 0x01 : 0) | (m_fdc->getDrq() ? 0x02 : 0)];
+}
+
+
+bool Pk8000FdcStatusRegisters::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "fdc") {
+        attachFdc1793(static_cast<Fdc1793*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
 }

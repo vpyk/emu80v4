@@ -168,6 +168,8 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Pk8000Mode1ColorMem)
     REG_EMU_CLASS(Pk8000InputRegister2)
     REG_EMU_CLASS(Pk8000KbdLayout)
+    REG_EMU_CLASS(Pk8000FddControlRegister)
+    REG_EMU_CLASS(Pk8000FdcStatusRegisters)
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

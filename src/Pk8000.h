@@ -27,6 +27,7 @@
 
 class AddrSpaceMapper;
 class Ram;
+class Fdc1793;
 class GeneralSoundSource;
 
 
@@ -326,6 +327,41 @@ class Pk8000KbdLayout : public KbdLayout
 
     public:
         static EmuObject* create(const EmuValuesList&) {return new Pk8000KbdLayout();}
+};
+
+
+class Pk8000FddControlRegister : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
+
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000FddControlRegister();}
+
+    private:
+        Fdc1793* m_fdc = nullptr;
+};
+
+
+class Pk8000FdcStatusRegisters : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
+
+        void writeByte(int addr, uint8_t value)  override {m_bytes[addr & 0x03] = value;}
+        uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000FdcStatusRegisters();}
+
+    private:
+        Fdc1793* m_fdc = nullptr;
+        uint8_t m_bytes[4];
 };
 
 
