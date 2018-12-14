@@ -212,16 +212,8 @@ uint8_t Fdc1793::readByte(int addr)
     switch(addr) {
         case 0: {
             // status register
-            /*m_irq = false;
-            uint8_t res = m_accessMode == FAM_WAITING ? 0 : 0x3;
-            if (m_lastCommand == 0 && m_track == 0)
-                res |= 0x4;*/
+            m_irq = false;
 
-            /*if (m_busy) {
-                res |= 1;
-                m_busy = false;
-            }*/
-            //return res;
             if (!(m_images[m_disk]) || !m_images[m_disk]->getImagePresent())
                 m_status |= 0x80;
             else
