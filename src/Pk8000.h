@@ -31,16 +31,22 @@ class Fdc1793;
 class GeneralSoundSource;
 
 
-class Pk8000Renderer : public CrtRenderer
+class Pk8000Renderer : public CrtRenderer, public IActive
 {
     public:
         Pk8000Renderer();
 
         void renderFrame() override;
 
+        // derived from EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        // derived from CrtRenderer
         void toggleCropping() override;
+
+        // derived from ActiveDevice
+        void operate() override;
 
         void attachScreenMemoryBank(int bankN, Ram* screenMemoryBank);
         void setScreenBank(unsigned bank);
@@ -78,6 +84,7 @@ class Pk8000Renderer : public CrtRenderer
         uint32_t m_bgColor = 0x000000;
         bool m_showBorder = false;
         bool m_blanking = false;
+        uint64_t m_ticksPerInt;   // тактов на прерывание
 };
 
 
@@ -203,6 +210,8 @@ class Pk8000Core : public PlatformCore
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void draw() override;
+        void reset() override;
+        void vrtc(bool isActive) override;
         void inte(bool isActive) override;
 
         void attachCrtRenderer(Pk8000Renderer* crtRenderer);
@@ -210,8 +219,7 @@ class Pk8000Core : public PlatformCore
         static EmuObject* create(const EmuValuesList&) {return new Pk8000Core();}
     private:
         Pk8000Renderer* m_crtRenderer = nullptr;
-
-        //GeneralSoundSource* m_beepSoundSource;
+        bool m_intReq = false;
 };
 
 

@@ -46,9 +46,15 @@ Pk8000Core::~Pk8000Core()
 }
 
 
+void Pk8000Core::reset()
+{
+    m_intReq = false;
+}
+
+
 void Pk8000Core::draw()
 {
-    m_crtRenderer->renderFrame();
+    //m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -56,7 +62,24 @@ void Pk8000Core::draw()
 
 void Pk8000Core::inte(bool isActive)
 {
-    //m_beepSoundSource->setValue(isActive ? 1 : 0);
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    if (isActive && m_intReq && cpu->getInte()) {
+        m_intReq = false;
+        cpu->intRst(7);
+    }
+}
+
+
+void Pk8000Core::vrtc(bool isActive)
+{
+    if (isActive) {
+        Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+        m_intReq = true;
+        if (cpu->getInte()) {
+            m_intReq = false;
+            cpu->intRst(7);
+        }
+    }
 }
 
 
@@ -97,6 +120,15 @@ Pk8000Renderer::Pk8000Renderer()
     m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
+    m_ticksPerInt = g_emulation->getFrequency() / 1000000 * 312 * 64;
+}
+
+
+void Pk8000Renderer::operate()
+{
+    renderFrame();
+    m_curClock += m_ticksPerInt;
+    m_platform->getCore()->vrtc(true);
 }
 
 
