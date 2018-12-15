@@ -139,7 +139,7 @@ void Pk8000Renderer::renderFrame()
 {
     swapBuffers();
 
-    if (m_showBorder) {
+    if (m_showBorder || m_blanking) {
         for (unsigned i = 0; i < 261 * 288; i++)
             m_pixelData[i] = m_bgColor;
         m_sizeY = 288; }
@@ -150,93 +150,95 @@ void Pk8000Renderer::renderFrame()
     int offsetY = m_showBorder ? 48 : 0;
     int offset;
 
-    switch (m_mode) {
-    case 0:
-        if (m_showBorder) {
-            m_sizeX = 261;
-            offsetX = 21;
-        } else {
-            m_sizeX = 240;
-            offsetX = 0;
-        }
-
-        offset = offsetX + offsetY * m_sizeX;
-        for (int row = 0; row < 24; row++)
-            for (int pos = 0; pos < 40; pos++) {
-                uint8_t chr = m_screenMemoryBanks[m_bank][(m_txtBase & ~0x0400) + row * 64 + pos];
-                for (int line = 0; line < 8; line++) {
-                    uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
-                    for (int i = 0; i < 6; i++) {
-                        uint32_t color = bt & 0x80 ? m_fgColor : m_bgColor;
-                        m_pixelData[offset + m_sizeX * 8 * row + m_sizeX * line + pos * 6 + i] = color;
-                        bt <<= 1;
-                    }
-                }
+    if (!m_blanking)
+        switch (m_mode) {
+        case 0:
+            if (m_showBorder) {
+                m_sizeX = 261;
+                offsetX = 21;
+            } else {
+                m_sizeX = 240;
+                offsetX = 0;
             }
-        break;
-    case 1:
-        if (m_showBorder) {
-            m_sizeX = 261;
-            offsetX = 5;
-        } else {
-            m_sizeX = 256;
-            offsetX = 0;
-        }
 
-        offset = offsetX + offsetY * m_sizeX;
-        for (int row = 0; row < 24; row++)
-            for (int pos = 0; pos < 32; pos++) {
-                uint8_t chr = m_screenMemoryBanks[m_bank][m_txtBase + row * 32 + pos];
-                unsigned colorCode = m_screenMemoryBanks[m_bank][0x400 + (chr >> 3)];
-                uint32_t fgColor = c_pk8000ColorPalette[colorCode & 0x0F];
-                uint32_t bgColor = c_pk8000ColorPalette[colorCode >> 4];
-                for (int line = 0; line < 8; line++) {
-                    uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
-                    for (int i = 0; i < 8; i++) {
-                        uint32_t color = bt & 0x80 ? fgColor : bgColor;
-                        m_pixelData[offset + m_sizeX * 8 * row + m_sizeX * line + pos * 8 + i] = color;
-                        bt <<= 1;
-                    }
-                }
-            }
-        break;
-    case 2:
-        if (m_showBorder) {
-            m_sizeX = 261;
-            offsetX = 5;
-        } else {
-            m_sizeX = 256;
-            offsetX = 0;
-        }
-
-        offset = offsetX + offsetY * m_sizeX;
-        for (int part = 0; part < 3; part++)
-            for (int row = 0; row < 8; row++)
-                for (int pos = 0; pos < 32; pos++) {
-                    uint8_t chr = m_screenMemoryBanks[m_bank][m_sgBase + part * 256 + row * 32 + pos];
+            offset = offsetX + offsetY * m_sizeX;
+            for (int row = 0; row < 24; row++)
+                for (int pos = 0; pos < 40; pos++) {
+                    uint8_t chr = m_screenMemoryBanks[m_bank][(m_txtBase & ~0x0400) + row * 64 + pos];
                     for (int line = 0; line < 8; line++) {
-                        unsigned colorCode = m_screenMemoryBanks[m_bank][m_colBase + part * 0x800 + chr * 8 + line];
-                        uint32_t fgColor = c_pk8000ColorPalette[colorCode & 0x0F];
-                        uint32_t bgColor = c_pk8000ColorPalette[colorCode >> 4];
-                        uint8_t bt = m_screenMemoryBanks[m_bank][m_grBase + part * 0x800 + chr * 8 + line];
-                        for (int i = 0; i < 8; i++) {
-                            uint32_t color = bt & 0x80 ? fgColor : bgColor;
-                            m_pixelData[offset + m_sizeX * 8 * 8 * part + m_sizeX * 8 * row + m_sizeX * line + pos * 8 + i] = color;
+                        uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
+                        for (int i = 0; i < 6; i++) {
+                            uint32_t color = bt & 0x80 ? m_fgColor : m_bgColor;
+                            m_pixelData[offset + m_sizeX * 8 * row + m_sizeX * line + pos * 6 + i] = color;
                             bt <<= 1;
                         }
                     }
                 }
+            break;
+        case 1:
+            if (m_showBorder) {
+                m_sizeX = 261;
+                offsetX = 5;
+            } else {
+                m_sizeX = 256;
+                offsetX = 0;
+            }
 
-        break;
-    default:
-        break;
-    }
+            offset = offsetX + offsetY * m_sizeX;
+            for (int row = 0; row < 24; row++)
+                for (int pos = 0; pos < 32; pos++) {
+                    uint8_t chr = m_screenMemoryBanks[m_bank][m_txtBase + row * 32 + pos];
+                    unsigned colorCode = m_screenMemoryBanks[m_bank][0x400 + (chr >> 3)];
+                    uint32_t fgColor = c_pk8000ColorPalette[colorCode & 0x0F];
+                    uint32_t bgColor = c_pk8000ColorPalette[colorCode >> 4];
+                    for (int line = 0; line < 8; line++) {
+                        uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
+                        for (int i = 0; i < 8; i++) {
+                            uint32_t color = bt & 0x80 ? fgColor : bgColor;
+                            m_pixelData[offset + m_sizeX * 8 * row + m_sizeX * line + pos * 8 + i] = color;
+                            bt <<= 1;
+                        }
+                    }
+                }
+            break;
+        case 2:
+            if (m_showBorder) {
+                m_sizeX = 261;
+                offsetX = 5;
+            } else {
+                m_sizeX = 256;
+                offsetX = 0;
+            }
+
+            offset = offsetX + offsetY * m_sizeX;
+            for (int part = 0; part < 3; part++)
+                for (int row = 0; row < 8; row++)
+                    for (int pos = 0; pos < 32; pos++) {
+                        uint8_t chr = m_screenMemoryBanks[m_bank][m_sgBase + part * 256 + row * 32 + pos];
+                        for (int line = 0; line < 8; line++) {
+                            unsigned colorCode = m_screenMemoryBanks[m_bank][m_colBase + part * 0x800 + chr * 8 + line];
+                            uint32_t fgColor = c_pk8000ColorPalette[colorCode & 0x0F];
+                            uint32_t bgColor = c_pk8000ColorPalette[colorCode >> 4];
+                            uint8_t bt = m_screenMemoryBanks[m_bank][m_grBase + part * 0x800 + chr * 8 + line];
+                            for (int i = 0; i < 8; i++) {
+                                uint32_t color = bt & 0x80 ? fgColor : bgColor;
+                                m_pixelData[offset + m_sizeX * 8 * 8 * part + m_sizeX * 8 * row + m_sizeX * line + pos * 8 + i] = color;
+                                bt <<= 1;
+                            }
+                        }
+                    }
+
+            break;
+        default:
+            break;
+        }
 
     if (m_showBorder) {
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
     } else {
         m_aspectRatio = 576.0 * 9 / 704 / 5;
     }
+
 }
 
 
@@ -319,6 +321,7 @@ void Pk8000Ppi8255Circuit1::attachAddrSpaceMapper(int bank, AddrSpaceMapper* add
 }
 
 
+// port 80h
 void Pk8000Ppi8255Circuit1::setPortA(uint8_t value)
 {
     m_addrSpaceMappers[0]->setCurPage(value & 0x03);
@@ -328,6 +331,7 @@ void Pk8000Ppi8255Circuit1::setPortA(uint8_t value)
 };
 
 
+// port 81h
 uint8_t Pk8000Ppi8255Circuit1::getPortB()
 {
     if (m_kbd)
@@ -338,6 +342,7 @@ uint8_t Pk8000Ppi8255Circuit1::getPortB()
 }
 
 
+// port 82h
 void Pk8000Ppi8255Circuit1::setPortC(uint8_t value)
 {
     if (m_kbd)
@@ -366,6 +371,7 @@ bool Pk8000Ppi8255Circuit1::setProperty(const string& propertyName, const EmuVal
 }
 
 
+// port 84h
 void Pk8000Ppi8255Circuit2::setPortA(uint8_t value)
 {
     if (m_renderer) {
@@ -374,6 +380,15 @@ void Pk8000Ppi8255Circuit2::setPortA(uint8_t value)
         else
             m_renderer->setMode(value & 0x20 ? 0 : 1);
         m_renderer->setScreenBank((value & 0xc0) >> 6);
+    }
+}
+
+
+// port 86h
+void Pk8000Ppi8255Circuit2::setPortC(uint8_t value)
+{
+    if (m_renderer) {
+        m_renderer->setBlanking(!(value & 0x10));
     }
 }
 
@@ -392,6 +407,7 @@ bool Pk8000Ppi8255Circuit2::setProperty(const string& propertyName, const EmuVal
 }
 
 
+// ports A0-BFh
 void Pk8000Mode1ColorMem::writeByte(int addr, uint8_t value)
 {
     if (m_renderer)
@@ -399,6 +415,7 @@ void Pk8000Mode1ColorMem::writeByte(int addr, uint8_t value)
 }
 
 
+// ports A0-BFh
 uint8_t Pk8000Mode1ColorMem::readByte(int addr)
 {
     if (m_renderer)
@@ -421,6 +438,7 @@ bool Pk8000Mode1ColorMem::setProperty(const string& propertyName, const EmuValue
 }
 
 
+// port 88h
 void Pk8000ColorSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
@@ -445,6 +463,7 @@ bool Pk8000ColorSelector::setProperty(const string& propertyName, const EmuValue
 }
 
 
+// port 90h
 void Pk8000TxtBufSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
@@ -468,6 +487,7 @@ bool Pk8000TxtBufSelector::setProperty(const string& propertyName, const EmuValu
 }
 
 
+// port 91h
 void Pk8000SymGenBufSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
@@ -491,6 +511,7 @@ bool Pk8000SymGenBufSelector::setProperty(const string& propertyName, const EmuV
 }
 
 
+// port 93h
 void Pk8000GrBufSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
@@ -514,6 +535,7 @@ bool Pk8000GrBufSelector::setProperty(const string& propertyName, const EmuValue
 }
 
 
+// port 92h
 void Pk8000ColBufSelector::writeByte(int, uint8_t value)
 {
     m_value = value;

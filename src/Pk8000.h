@@ -51,6 +51,7 @@ class Pk8000Renderer : public CrtRenderer
         void setSymGenBufferBase(uint16_t base) {m_sgBase = base;}
         void setGraphicsBufferBase(uint16_t base) {m_grBase = base;}
         void setColorBufferBase(uint16_t base) {m_colBase = base;}
+        void setBlanking(bool blanking) {m_blanking = blanking;}
 
         void setColorReg(unsigned addr, uint8_t value);
         uint8_t getColorReg(unsigned addr);
@@ -76,6 +77,7 @@ class Pk8000Renderer : public CrtRenderer
         uint32_t m_fgColor = 0xC0C0C0;
         uint32_t m_bgColor = 0x000000;
         bool m_showBorder = false;
+        bool m_blanking = false;
 };
 
 
@@ -265,9 +267,9 @@ class Pk8000Ppi8255Circuit1 : public Ppi8255Circuit
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // derived from Ppi8255Circuit
-        uint8_t getPortB() override;
-        void setPortA(uint8_t value) override;
-        void setPortC(uint8_t value) override;
+        uint8_t getPortB() override; // port 81h
+        void setPortA(uint8_t value) override; // port 80h
+        void setPortC(uint8_t value) override; //port 82h
 
         /*virtual */void attachKeyboard(Pk8000Keyboard* kbd) {m_kbd = kbd;}
         void attachAddrSpaceMapper(int bank, AddrSpaceMapper* addrSpaceMapper);
@@ -297,9 +299,9 @@ class Pk8000Ppi8255Circuit2 : public Ppi8255Circuit
         void attachCrtRenderer(Pk8000Renderer* renderer) {m_renderer = renderer;}
 
         // derived from Ppi8255Circuit
-        void setPortA(uint8_t value) override;
-        //void setPortB(uint8_t value) override;
-        //void setPortC(uint8_t value) override;
+        void setPortA(uint8_t value) override; // port 84h
+        //void setPortB(uint8_t value) override; // port 85h
+        void setPortC(uint8_t value) override; // port 86h
 
         void attachAddrSpaceMapper(int bank, AddrSpaceMapper* addrSpaceMapper);
 
