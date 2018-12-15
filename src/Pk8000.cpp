@@ -86,13 +86,15 @@ Pk8000Renderer::Pk8000Renderer()
         m_screenMemoryRamBanks[i] = nullptr;
     }
 
+    const int pixelFreq = 5; // MHz
+    const int maxBufSize = 261 * 288; // 261 = 704 / 13.5 * pixelFreq
+
     m_sizeX = m_prevSizeX = 256;
     m_sizeY = m_prevSizeY = 192;
-    //m_aspectRatio = m_prevAspectRatio = 576.0 * 9 / 704 / 10;
-    m_aspectRatio = m_prevAspectRatio = 1;
+    m_aspectRatio = m_prevAspectRatio = 5184. / 704 / pixelFreq;
     m_bufSize = m_prevBufSize = m_sizeX * m_sizeY;
-    m_pixelData = new uint32_t[m_bufSize];
-    m_prevPixelData = new uint32_t[m_prevBufSize];
+    m_pixelData = new uint32_t[maxBufSize];
+    m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
 }
@@ -137,9 +139,28 @@ void Pk8000Renderer::renderFrame()
 {
     swapBuffers();
 
+    if (m_showBorder) {
+        for (unsigned i = 0; i < 261 * 288; i++)
+            m_pixelData[i] = m_bgColor;
+        m_sizeY = 288; }
+    else
+        m_sizeY = 192;
+
+    int offsetX;
+    int offsetY = m_showBorder ? 48 : 0;
+    int offset;
+
     switch (m_mode) {
     case 0:
-        m_sizeX = 240;
+        if (m_showBorder) {
+            m_sizeX = 261;
+            offsetX = 21;
+        } else {
+            m_sizeX = 240;
+            offsetX = 0;
+        }
+
+        offset = offsetX + offsetY * m_sizeX;
         for (int row = 0; row < 24; row++)
             for (int pos = 0; pos < 40; pos++) {
                 uint8_t chr = m_screenMemoryBanks[m_bank][(m_txtBase & ~0x0400) + row * 64 + pos];
@@ -147,14 +168,22 @@ void Pk8000Renderer::renderFrame()
                     uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
                     for (int i = 0; i < 6; i++) {
                         uint32_t color = bt & 0x80 ? m_fgColor : m_bgColor;
-                        m_pixelData[40 * 6 * 8 * row + 40 * 6 * line + pos * 6 + i] = color;
+                        m_pixelData[offset + m_sizeX * 8 * row + m_sizeX * line + pos * 6 + i] = color;
                         bt <<= 1;
                     }
                 }
             }
         break;
     case 1:
-        m_sizeX = 256;
+        if (m_showBorder) {
+            m_sizeX = 261;
+            offsetX = 5;
+        } else {
+            m_sizeX = 256;
+            offsetX = 0;
+        }
+
+        offset = offsetX + offsetY * m_sizeX;
         for (int row = 0; row < 24; row++)
             for (int pos = 0; pos < 32; pos++) {
                 uint8_t chr = m_screenMemoryBanks[m_bank][m_txtBase + row * 32 + pos];
@@ -165,14 +194,22 @@ void Pk8000Renderer::renderFrame()
                     uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
                     for (int i = 0; i < 8; i++) {
                         uint32_t color = bt & 0x80 ? fgColor : bgColor;
-                        m_pixelData[32 * 8 * 8 * row + 32 * 8 * line + pos * 8 + i] = color;
+                        m_pixelData[offset + m_sizeX * 8 * row + m_sizeX * line + pos * 8 + i] = color;
                         bt <<= 1;
                     }
                 }
             }
         break;
     case 2:
-        m_sizeX = 256;
+        if (m_showBorder) {
+            m_sizeX = 261;
+            offsetX = 5;
+        } else {
+            m_sizeX = 256;
+            offsetX = 0;
+        }
+
+        offset = offsetX + offsetY * m_sizeX;
         for (int part = 0; part < 3; part++)
             for (int row = 0; row < 8; row++)
                 for (int pos = 0; pos < 32; pos++) {
@@ -184,7 +221,7 @@ void Pk8000Renderer::renderFrame()
                         uint8_t bt = m_screenMemoryBanks[m_bank][m_grBase + part * 0x800 + chr * 8 + line];
                         for (int i = 0; i < 8; i++) {
                             uint32_t color = bt & 0x80 ? fgColor : bgColor;
-                            m_pixelData[8 * 32 * 8 * 8 * part + 32 * 8 * 8 * row + 32 * 8 * line + pos * 8 + i] = color;
+                            m_pixelData[offset + m_sizeX * 8 * 8 * part + m_sizeX * 8 * row + m_sizeX * line + pos * 8 + i] = color;
                             bt <<= 1;
                         }
                     }
@@ -194,6 +231,18 @@ void Pk8000Renderer::renderFrame()
     default:
         break;
     }
+
+    if (m_showBorder) {
+        m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
+    } else {
+        m_aspectRatio = 576.0 * 9 / 704 / 5;
+    }
+}
+
+
+void Pk8000Renderer::toggleCropping()
+{
+    m_showBorder = !m_showBorder;
 }
 
 
@@ -205,9 +254,44 @@ bool Pk8000Renderer::setProperty(const string& propertyName, const EmuValuesList
     if (propertyName == "screenMemoryBank") {
         attachScreenMemoryBank(values[0].asInt(), static_cast<Ram*>(g_emulation->findObject(values[1].asString())));
         return true;
+    } else if (propertyName == "visibleArea") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_showBorder = values[0].asString() == "yes";
+            return true;
+        }
     }
 
     return false;
+}
+
+
+string Pk8000Renderer::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "visibleArea") {
+        return m_showBorder ? "yes" : "no";
+    } else if (propertyName == "crtMode") {
+        switch (m_mode) {
+        case 0:
+            return "Mode 0: 40\u00D76\u00D724\u00D78@50.08Hz";
+            break;
+        case 1:
+            return "Mode 1: 32\u00D78\u00D724\u00D78@50.08Hz";
+            break;
+        case 2:
+            return "Mode 2: 256\u00D7192@50.08Hz";
+            break;
+        default:
+            return "Mode 3";
+        }
+    }
+
+    return "";
 }
 
 

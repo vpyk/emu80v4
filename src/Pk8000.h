@@ -35,11 +35,12 @@ class Pk8000Renderer : public CrtRenderer
 {
     public:
         Pk8000Renderer();
+
         void renderFrame() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        //std::string getPropertyStringValue(const std::string& propertyName) override;
-        //void toggleColorMode()  override {m_isColorMode = !m_isColorMode;}
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+        void toggleCropping() override;
 
         void attachScreenMemoryBank(int bankN, Ram* screenMemoryBank);
         void setScreenBank(unsigned bank);
@@ -74,6 +75,7 @@ class Pk8000Renderer : public CrtRenderer
         uint16_t m_colBase = 0;
         uint32_t m_fgColor = 0xC0C0C0;
         uint32_t m_bgColor = 0x000000;
+        bool m_showBorder = false;
 };
 
 
