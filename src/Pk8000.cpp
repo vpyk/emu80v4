@@ -29,6 +29,7 @@
 #include "Cpu.h"
 #include "Fdc1793.h"
 #include "WavReader.h"
+#include "TapeRedirector.h"
 
 using namespace std;
 
@@ -600,6 +601,8 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
     if (!buf)
         return false;
 
+    int fullSize = fileSize;
+
     if (fileSize < 39) {
         delete[] buf;
         return false;
@@ -643,10 +646,28 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
         uint16_t endAddr = (ptr[3] << 8) | ptr[2];
         uint16_t startAddr = (ptr[5] << 8) | ptr[4];
 
+        endAddr--; // PK8000 feature?
+
         ptr += 6;
         fileSize -= 6;
 
-        endAddr--; // PK8000 feature?
+        if (begAddr == 0xF6D0 /*&& endAddr == 0xF88E*/) {
+            // программы с автозапуском
+            if (fileSize < 0x60) {
+                delete[] buf;
+                return false;
+            }
+
+            ptr += 0x5B;
+
+            begAddr = (ptr[1] << 8) | ptr[0];
+            uint16_t len = (ptr[3] << 8) | ptr[2];
+            endAddr = begAddr + len - 1;
+            startAddr = (ptr[5] << 8) | ptr[4];
+
+            ptr += 6;
+            fileSize -= 6;
+        }
 
         uint16_t progLen = endAddr - begAddr + 1;
 
@@ -655,21 +676,9 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
             return false;
         }
 
-        for (unsigned addr = begAddr; addr <= endAddr; addr++)
-            m_as->writeByte(addr, *ptr++);
-
-        fileSize -= (endAddr - begAddr + 1);
-
-        // Find next block
-    /*    if (m_allowMultiblock && m_tapeRedirector && fileSize > 0)
-            while (fileSize > 0 && (*ptr) != 0xE6) {
-                ++ptr;
-                --fileSize;
-            }*/
-        //if (fileSize > 0)
-        //    --fileSize;
-
         if (run) {
+            m_as->writeByte(0x4000, 0);
+            m_as->writeByte(0x4001, 0);
             m_platform->reset();
             Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
             if (cpu) {
@@ -677,14 +686,23 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
                 g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
                 cpu->enableHooks();
                 cpu->setPC(startAddr);
-                /*if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
-                    m_tapeRedirector->assignFile(fileName, "r");
-                    m_tapeRedirector->openFile();
-                    m_tapeRedirector->assignFile("", "r");
-                    m_tapeRedirector->setFilePos(fullSize - fileSize);
-                }*/
             }
         }
+
+        for (unsigned addr = begAddr; addr <= endAddr; addr++)
+            m_as->writeByte(addr, *ptr++);
+        if (begAddr != 0xF6D0)
+            fileSize -= (endAddr - begAddr + 1);
+        else
+            fileSize -= 0x61;
+
+        if (run && m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
+            m_tapeRedirector->assignFile(fileName, "r");
+            m_tapeRedirector->openFile();
+            m_tapeRedirector->assignFile("", "r");
+            m_tapeRedirector->setFilePos(fullSize - fileSize);
+        }
+
     } else if (*ptr == 0xD3) {
         // Basic file
         for (int i = 0; i < 10; i++)
@@ -725,11 +743,29 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
             cpu->enableHooks();
         }
 
-        uint16_t memLimit = 0x4000 + fileSize + 0x100;
-
         m_as->writeByte(0x4000, 0);
-        for (unsigned addr = 0x4001; fileSize; addr++, fileSize--)
-            m_as->writeByte(addr, *ptr++);
+        /*for (unsigned addr = 0x4001; fileSize; addr++, fileSize--)
+            m_as->writeByte(addr, *ptr++);*/
+
+        uint16_t addr, nextAddr;
+        addr = nextAddr = 0x4001;
+        for(;;) {
+            if (addr == nextAddr + 1)
+                nextAddr = (ptr[0] << 8) | ptr[-1];
+            m_as->writeByte(addr++, *ptr++);
+            fileSize--;
+            if (nextAddr == 0 || fileSize == 0 || addr >= 0xEEFF)
+                break;
+        }
+
+        uint16_t memLimit = addr + 0x100;
+
+        if (run && m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
+            m_tapeRedirector->assignFile(fileName, "r");
+            m_tapeRedirector->openFile();
+            m_tapeRedirector->assignFile("", "r");
+            m_tapeRedirector->setFilePos(fullSize - fileSize);
+        }
 
         if (cpu) {
             m_as->writeByte(0xF930, memLimit & 0xFF);
@@ -749,6 +785,11 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
             }
             //cpu->setSP(0xF7FD);
             cpu->setPC(0x030D);
+
+            // Workaround to suppress closing file by CloseFileHook
+            cpu->disableHooks();
+            g_emulation->exec((int64_t)cpu->getKDiv() * 100000);
+            cpu->enableHooks();
         }
     }
 

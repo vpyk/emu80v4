@@ -85,6 +85,22 @@ bool FileLoader::setProperty(const std::string& propertyName, const EmuValuesLis
 }
 
 
+string FileLoader::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    else if (propertyName == "allowMultiblock") {
+        return m_allowMultiblock ? "yes" : "no";
+    }
+
+    return "";
+}
+
+
 bool RkFileLoader::loadFile(const std::string& fileName, bool run)
 {
     int fileSize;

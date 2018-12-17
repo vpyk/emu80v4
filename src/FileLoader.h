@@ -31,6 +31,7 @@ class FileLoader : public EmuObject
         //~FileLoader();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
 
         virtual bool loadFile(const std::string& fileName, bool run = false) = 0;
 
