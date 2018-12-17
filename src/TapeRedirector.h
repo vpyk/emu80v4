@@ -23,6 +23,7 @@
 
 #include "WavWriter.h"
 
+class ElapsedTimer;
 
 // Файловый редиректор. Обеспечивает перенаправление ф файл или из файла различных обращений эмулируемой платформы
 class TapeRedirector : public EmuObject
@@ -61,9 +62,13 @@ class TapeRedirector : public EmuObject
         PalFile m_file;
         bool m_isOpen = false;
         bool m_cancelled = false;
-        bool m_read = false;
+        //bool m_read = false;
 
         WavWriter* m_wavWriter = nullptr;
+
+        int m_timeout = 0;
+        ElapsedTimer* m_timer = nullptr;
+        void updateTimer();
 };
 
 

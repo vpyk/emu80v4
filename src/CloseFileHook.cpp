@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Pal.h"
+
 #include "CloseFileHook.h"
 #include "Emulation.h"
 #include "TapeRedirector.h"
@@ -53,4 +55,42 @@ bool CloseFileHook::setProperty(const string& propertyName, const EmuValuesList&
     }
 
     return false;
+}
+
+
+ElapsedTimer::ElapsedTimer()
+{
+    pause();
+}
+
+void ElapsedTimer::start(unsigned ms)
+{
+    uint64_t curTime = g_emulation->getCurClock();
+    m_curClock = curTime + ms * palGetCounterFreq() / 1000;
+    resume();
+}
+
+
+void ElapsedTimer::stop()
+{
+    pause();
+}
+
+
+void ElapsedTimer::operate()
+{
+    pause();
+    onElapse();
+}
+
+
+CloseFileTimer::CloseFileTimer(TapeRedirector* tr)
+{
+    m_tr = tr;
+}
+
+
+void CloseFileTimer::onElapse()
+{
+    m_tr->closeFile();
 }

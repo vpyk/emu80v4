@@ -23,6 +23,7 @@
 #include "WavReader.h"
 #include "Platform.h"
 #include "EmuWindow.h"
+#include "CloseFileHook.h" // ElapsedTimer
 
 #include "TapeRedirector.h"
 
@@ -88,7 +89,9 @@ void TapeRedirector::openFile()
     m_isOpen = m_file.isOpen();
 
     m_cancelled = !m_isOpen;
-    m_read = false;
+    //m_read = false;
+
+    updateTimer();
 }
 
 
@@ -99,12 +102,14 @@ void TapeRedirector::closeFile()
         m_isOpen = false;
     }
     m_cancelled = false;
-    m_read = false;
+    //m_read = false;
 
     if (m_wavWriter) {
         delete m_wavWriter;
         m_wavWriter = nullptr;
     }
+
+    updateTimer();
 }
 
 
@@ -127,9 +132,10 @@ uint8_t TapeRedirector::readByte()
     uint8_t buf = m_file.read8();
     if (isEof()) {
         closeFile();
-        m_cancelled = true;
-        m_read = true;
+        //m_read = true;
     }
+
+    updateTimer();
 
     return buf;
 }
@@ -180,6 +186,8 @@ void TapeRedirector::writeByte(uint8_t bt)
     if (m_isOpen) {
         m_file.write8(bt);
     }
+
+    updateTimer();
 }
 
 
@@ -228,7 +236,7 @@ bool TapeRedirector::waitForSequence(const uint8_t* seq, int len)
 
 bool TapeRedirector::isCancelled()
 {
-    return m_cancelled && !m_read;
+    return m_cancelled/* && !m_read*/;
 }
 
 
@@ -248,11 +256,13 @@ bool TapeRedirector::setProperty(const string& propertyName, const EmuValuesList
     } else if (propertyName == "filter") {
         m_filter = values[0].asString();
         return true;
-    /*} else if (propertyName == "delayed") {
-        if (values[0].asString() == "yes") {
-            m_delayAfterReset = true;
-            return true;*/
-        }
+    } else if (propertyName == "timeout") {
+        if (values[0].isInt()) {
+            m_timeout = values[0].asInt();
+            return true;
+        } else
+            return false;
+    }
 
     return false;
 }
@@ -271,4 +281,23 @@ string TapeRedirector::getPropertyStringValue(const string& propertyName)
     }
 
     return "";
+}
+
+
+void TapeRedirector::updateTimer()
+{
+    if (m_timer && !m_isOpen) {
+        m_timer->stop();
+        delete m_timer;
+        m_timer = nullptr;
+        return;
+    }
+
+     if (m_timeout == 0 || !m_isOpen)
+        return;
+
+    if (!m_timer)
+        m_timer = new CloseFileTimer(this);
+
+    m_timer->start(m_timeout);
 }
