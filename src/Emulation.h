@@ -90,6 +90,8 @@ class Emulation : public ParentObject
         bool getVsync() {return m_vsync;}
         void setSpeedUpFactor(unsigned speed);
 
+        unsigned getSpeedUpFactor() {return m_speedUpFactor;}
+
         void processCmdLine();
 
     private:

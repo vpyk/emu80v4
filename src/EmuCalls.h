@@ -32,5 +32,6 @@ bool emuSetPropertyValue(const std::string& objName, const std::string& propName
 std::string emuGetPropertyValue(const std::string& objName, const std::string& propName);
 const std::vector<PlatformInfo>* emuGetPlatforms();
 void emuSelectPlatform(const std::string& platform);
+unsigned emuGetEmulationSpeedFactor();
 
 #endif // EMUCALLS_H

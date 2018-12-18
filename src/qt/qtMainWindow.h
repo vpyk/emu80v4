@@ -113,6 +113,7 @@ private:
     PalWindow* m_palWindow = nullptr;
     EmuWindowType m_windowType;
     QLabel* m_fpsLabel;
+    QLabel* m_speedLabel;
     QLabel* m_crtModeLabel;
     QLabel* m_imageSizeLabel;
     QLabel* m_kbdLabel;

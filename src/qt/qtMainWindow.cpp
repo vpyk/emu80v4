@@ -84,6 +84,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_settingsDialog = new SettingsDialog(this);
 
             m_fpsLabel = new QLabel("", this);
+            m_speedLabel = new QLabel("", this);
             m_kbdLabel = new QLabel("", this);
             m_colorLabel = new QLabel("", this);
             m_crtModeLabel = new QLabel("", this);
@@ -96,6 +97,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
 
             m_statusBar = statusBar();
             m_statusBar->addWidget(m_fpsLabel);
+            m_statusBar->addWidget(m_speedLabel);
             m_statusBar->addWidget(m_kbdLabel);
             m_statusBar->addWidget(m_colorLabel);
             m_statusBar->addWidget(m_tapeLabel);
@@ -742,6 +744,8 @@ void MainWindow::tuneMenu()
     bool hasColor = false;
     std::string platformGroup = getPlatformGroupName();
 
+    m_speedLabel->setVisible(false);
+
     if (platformGroup == "rk86") {
         hasColor = true;
         m_colorLabel->setVisible(false);
@@ -904,6 +908,12 @@ void MainWindow::onFpsTimer()
 
     m_fpsLabel->setText(s);
     m_frameCount = 0;
+
+
+    unsigned speed = emuGetEmulationSpeedFactor();
+    m_speedLabel->setVisible(speed != 1);
+    m_speedLabel->setText(QString::number(speed) + "x");
+
 
     std::string platform = m_palWindow->getPlatformObjectName() + ".";
 

@@ -101,3 +101,9 @@ void emuSelectPlatform(const std::string& platform)
 {
     g_emulation->newPlatform(platform);
 }
+
+// Returns current emulation speed factor
+unsigned emuGetEmulationSpeedFactor()
+{
+    return g_emulation->getSpeedUpFactor();
+}
