@@ -45,6 +45,7 @@ class FileLoader : public EmuObject
         TapeRedirector* m_tapeRedirector = nullptr;
         std::string m_filter;
         int m_skipTicks = 2000000;
+        bool m_multiblockAvailable = false;
         bool m_allowMultiblock = false;
 };
 
@@ -52,6 +53,7 @@ class FileLoader : public EmuObject
 class RkFileLoader : public FileLoader
 {
     public:
+        RkFileLoader() {m_multiblockAvailable = true;}
         bool loadFile(const std::string& fileName, bool run = false) override;
 
         static EmuObject* create(const EmuValuesList&) {return new RkFileLoader();}

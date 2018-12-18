@@ -94,7 +94,7 @@ string FileLoader::getPropertyStringValue(const string& propertyName)
         return res;
 
     else if (propertyName == "allowMultiblock") {
-        return m_allowMultiblock ? "yes" : "no";
+        return m_multiblockAvailable ? m_allowMultiblock ? "yes" : "no" : "";
     }
 
     return "";

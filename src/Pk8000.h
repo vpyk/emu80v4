@@ -227,6 +227,7 @@ class Pk8000Core : public PlatformCore
 class Pk8000FileLoader : public FileLoader
 {
 public:
+    Pk8000FileLoader() {m_multiblockAvailable = true;}
     bool loadFile(const std::string& fileName, bool run = false) override;
 
     static EmuObject* create(const EmuValuesList&) {return new Pk8000FileLoader();}
