@@ -84,8 +84,9 @@ OrionRenderer::OrionRenderer()
     m_sizeY = m_prevSizeY = 256;
     m_aspectRatio = m_prevAspectRatio = 576.0 * 9 / 704 / 10;
     m_bufSize = m_prevBufSize = m_sizeX * m_sizeY;
-    m_pixelData = new uint32_t[m_bufSize];
-    m_prevPixelData = new uint32_t[m_prevBufSize];
+    int maxBufSize = 521 * 288;
+    m_pixelData = new uint32_t[maxBufSize];
+    m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
 }
@@ -119,6 +120,25 @@ void OrionRenderer::renderFrame()
 {
     swapBuffers();
 
+    int offsetX = 0;
+    int offsetY = 0;
+
+    if (m_showBorder) {
+        m_sizeX = 521;
+        m_sizeY = 288;
+        memset(m_pixelData, 0, m_sizeX * m_sizeY * sizeof(uint32_t));
+        offsetX = 76;
+        offsetY = 5;
+        m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
+    } else {
+        m_sizeX = 384;
+        m_sizeY = 256;
+        offsetX = offsetY = 0;
+        m_aspectRatio = 576.0 * 9 / 704 / 10;
+    }
+
+    int offset = offsetY * m_sizeX + offsetX;
+
     for (int row = 0; row < 256; row++)
         for (int col = 0; col < 48; col++) {
             int addr = m_screenBase + col * 256 + row;
@@ -144,7 +164,7 @@ void OrionRenderer::renderFrame()
                     bgColor = bgColor & 0x2 ? 7 : 0;
                 }
                 for (int pt = 0; pt < 8; pt++, bt<<=1)
-                    m_pixelData[row * 384 + col * 8 + pt] = (bt & 0x80) ? orion16ColorPalette[fgColor] : orion16ColorPalette[bgColor];
+                    m_pixelData[offset + row * m_sizeX + col * 8 + pt] = (bt & 0x80) ? orion16ColorPalette[fgColor] : orion16ColorPalette[bgColor];
                 } else {
                 // 4 color mode
                     uint8_t bt1 = m_screenMemory[addr];
@@ -153,10 +173,16 @@ void OrionRenderer::renderFrame()
                         int color = ((bt1 & 0x80) >> 6) | ((bt2 & 0x80) >> 7);
                         if (!m_isColorMode)
                             color = color & 0x2 ? 4 : 0;
-                        m_pixelData[row * 384 + col * 8 + pt] = orion4ColorPalettes[m_palette][color];
+                        m_pixelData[offset + row * m_sizeX + col * 8 + pt] = orion4ColorPalettes[m_palette][color];
                     }
                 }
         }
+}
+
+
+void OrionRenderer::toggleCropping()
+{
+    m_showBorder = !m_showBorder;
 }
 
 
@@ -179,6 +205,11 @@ bool OrionRenderer::setProperty(const string& propertyName, const EmuValuesList&
         else
             return false;
         return true;
+    } else if (propertyName == "visibleArea") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_showBorder = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
 }
@@ -194,6 +225,19 @@ string OrionRenderer::getPropertyStringValue(const string& propertyName)
 
     if (propertyName == "colorMode")
         return m_isColorMode ? "color" : "mono";
+    else if (propertyName == "visibleArea")
+        return m_showBorder ? "yes" : "no";
+    else if (propertyName == "crtMode")
+        switch (m_colorMode) {
+        case OCM_MONO:
+            return u8"2-color 384\u00D7256@50.08Hz";
+        case OCM_4COLOR:
+            return u8"4-color 384\u00D7256@50.08Hz";
+        case OCM_16COLOR:
+            return u8"16-color 384\u00D7256@50.08Hz";
+        default:
+            return "384\u00D7256@50.08Hz";
+        }
 
     return "";
 }

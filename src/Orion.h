@@ -78,6 +78,7 @@ class OrionRenderer : public CrtRenderer
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
         void toggleColorMode()  override {m_isColorMode = !m_isColorMode;}
+        void toggleCropping() override;
 
         void attachScreenMemory(Ram* screenMemory);
         void attachColorMemory(Ram* colorMemory);
@@ -93,6 +94,7 @@ class OrionRenderer : public CrtRenderer
         OrionColorMode m_colorMode = (OrionColorMode)0;
         int m_palette = 0;
         bool m_isColorMode = true;
+        bool m_showBorder = false;
 };
 
 
