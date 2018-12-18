@@ -34,7 +34,7 @@ void CloseFileHook::addTapeRedirector(TapeRedirector* fr)
 
 bool CloseFileHook::hookProc()
 {
-    if (!m_isEnabled || m_hasSignature && !checkSignature())
+    if (!m_isEnabled || (m_hasSignature && !checkSignature()))
         return false;
 
     for (int i=0; i<m_nFr; i++)
