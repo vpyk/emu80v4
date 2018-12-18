@@ -62,6 +62,7 @@ class Emulation : public ParentObject
 
         inline void debugRequest(Cpu* cpu) {m_debugReqCpu = cpu;}
         inline void debugRun() {m_debugReqCpu = nullptr;}
+        inline bool isDebuggerActive() {return m_debugReqCpu;}
 
         void processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys(EmuWindow* wnd);

@@ -82,6 +82,7 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         uint16_t m_colBase = 0;
         uint32_t m_fgColor = 0xC0C0C0;
         uint32_t m_bgColor = 0x000000;
+        uint8_t m_colorRegs[32];
         bool m_showBorder = false;
         bool m_blanking = false;
         uint64_t m_ticksPerInt;   // тактов на прерывание
@@ -219,7 +220,7 @@ class Pk8000Core : public PlatformCore
         static EmuObject* create(const EmuValuesList&) {return new Pk8000Core();}
     private:
         Pk8000Renderer* m_crtRenderer = nullptr;
-        bool m_intReq = false;
+        //bool m_intReq = false;
 };
 
 

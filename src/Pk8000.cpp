@@ -49,25 +49,26 @@ Pk8000Core::~Pk8000Core()
 
 void Pk8000Core::reset()
 {
-    m_intReq = false;
+    //m_intReq = false;
 }
 
 
 void Pk8000Core::draw()
 {
-    //m_crtRenderer->renderFrame();
+    if (g_emulation->isDebuggerActive())
+        m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
 
 
-void Pk8000Core::inte(bool isActive)
+void Pk8000Core::inte(bool/* isActive*/)
 {
-    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    /*Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
     if (isActive && m_intReq && cpu->getInte()) {
         m_intReq = false;
         cpu->intRst(7);
-    }
+    }*/
 }
 
 
@@ -75,9 +76,9 @@ void Pk8000Core::vrtc(bool isActive)
 {
     if (isActive) {
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
-        m_intReq = true;
+        //m_intReq = true;
         if (cpu->getInte()) {
-            m_intReq = false;
+            //m_intReq = false;
             cpu->intRst(7);
         }
     }
@@ -109,6 +110,8 @@ Pk8000Renderer::Pk8000Renderer()
         m_screenMemoryBanks[i] = nullptr;
         m_screenMemoryRamBanks[i] = nullptr;
     }
+
+    memset(m_colorRegs, 0, 32);
 
     const int pixelFreq = 5; // MHz
     const int maxBufSize = 261 * 288; // 261 = 704 / 13.5 * pixelFreq
@@ -158,13 +161,15 @@ void Pk8000Renderer::setMode(unsigned mode)
 
 void Pk8000Renderer::setColorReg(unsigned addr, uint8_t value)
 {
-    m_screenMemoryRamBanks[m_bank]->writeByte(0x400 + addr, value);
+    //m_screenMemoryRamBanks[m_bank]->writeByte(0x400 + addr, value);
+    m_colorRegs[addr & 0x1F] = value;
 }
 
 
 uint8_t Pk8000Renderer::getColorReg(unsigned addr)
 {
-    return m_screenMemoryBanks[m_bank][0x400 + addr];
+    //return m_screenMemoryBanks[m_bank][0x400 + addr];
+    return m_colorRegs[addr & 0x1F];
 }
 
 
@@ -221,7 +226,8 @@ void Pk8000Renderer::renderFrame()
             for (int row = 0; row < 24; row++)
                 for (int pos = 0; pos < 32; pos++) {
                     uint8_t chr = m_screenMemoryBanks[m_bank][m_txtBase + row * 32 + pos];
-                    unsigned colorCode = m_screenMemoryBanks[m_bank][0x400 + (chr >> 3)];
+                    //unsigned colorCode = m_screenMemoryBanks[m_bank][0x400 + (chr >> 3)];
+                    unsigned colorCode = m_colorRegs[chr >> 3];
                     uint32_t fgColor = c_pk8000ColorPalette[colorCode & 0x0F];
                     uint32_t bgColor = c_pk8000ColorPalette[colorCode >> 4];
                     for (int line = 0; line < 8; line++) {
@@ -934,7 +940,7 @@ bool Pk8000FddControlRegister::setProperty(const string& propertyName, const Emu
 }
 
 
-uint8_t Pk8000FdcStatusRegisters::readByte(int addr)
+uint8_t Pk8000FdcStatusRegisters::readByte(int)
 {
     //return (m_bytes[addr & 0x3] & 0x7E) | (m_fdc->getDrq() ? 0 : 1) | (m_fdc->getIrq() ? 0 : 0x80);
     return m_bytes[(m_fdc->getIrq() ? 0x01 : 0) | (m_fdc->getDrq() ? 0x02 : 0)];
