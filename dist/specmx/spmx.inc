@@ -13,7 +13,7 @@ window.caption = @name
 window.defaultWindowSize = 800, 600
 
 # Window style: autosize, sizable, fixed, fullscreen (default = autosise)
-window.windowStyle = fixed
+window.windowStyle = autosize
 #window.windowStyle = sizable
 
 # Window scaling option: 1x, 2x, 3x, fit, bestFit, fitKeepAR (default = bestFit)
@@ -220,6 +220,12 @@ ConfigRadioSelector wsSelector = &window, wideScreen, "Формат экрана
 wsSelector.addItem = no, "4:3"
 wsSelector.addItem = yes, "16:9"
 configTab.addControl = 2, &wsSelector
+
+#crtRenderer.visibleArea
+ConfigRadioSelector cropSelector = &crtRenderer, visibleArea, "Отображать реальный бордюр"
+cropSelector.addItem = no, "Нет"
+cropSelector.addItem = yes, "Да"
+configTab.addControl = 1, &cropSelector
 
 #kayboard.matrix
 ConfigRadioSelector kbdSelector = &keyboard, matrix, "Тип клавиатуры"
