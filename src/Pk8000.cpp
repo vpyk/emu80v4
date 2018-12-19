@@ -177,12 +177,11 @@ void Pk8000Renderer::renderFrame()
 {
     swapBuffers();
 
-    if (m_showBorder || m_blanking) {
+    if (m_showBorder || m_blanking)
         for (unsigned i = 0; i < 261 * 288; i++)
             m_pixelData[i] = m_bgColor;
-        m_sizeY = 288; }
-    else
-        m_sizeY = 192;
+
+    m_sizeY = m_showBorder ? 288 : 192;
 
     int offsetX;
     int offsetY = m_showBorder ? 48 : 0;
