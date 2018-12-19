@@ -50,7 +50,10 @@ class EurekaRenderer : public CrtRenderer
         EurekaRenderer();
         void renderFrame() override;
 
+        void toggleCropping() override;
+
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
 
         inline void attachVideoRam(Ram* videoRam) {m_videoRam = videoRam->getDataPtr();}
         inline void setColorMode(bool colorMode) {m_colorMode = colorMode;}
@@ -60,6 +63,7 @@ class EurekaRenderer : public CrtRenderer
     private:
         const uint8_t* m_videoRam = nullptr;
         bool m_colorMode = false;
+        bool m_showBorder = false;
 };
 
 
