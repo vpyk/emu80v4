@@ -192,7 +192,7 @@ void ConfigWnd::Save()
                 if ((*it)->m_tabId == tabId) {
                     wxString obj = (*it)->m_object;
                     if (obj.Find('.') != wxNOT_FOUND)
-                        obj = obj.AfterFirst('.');
+                        obj = obj.AfterLast('.');
                     wxString line = obj + "." + (*it)->m_property + " = " + (*it)->m_values[(*it)->m_selectedItem] + "\n";
                     file.Write(line);
                 }

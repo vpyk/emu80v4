@@ -19,12 +19,12 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VER_STR "4.0.310"
-#define VER_COMMA_SEP 4,0,310,0
+#define VER_STR "4.0.311"
+#define VER_COMMA_SEP 4,0,311,0
 
 #define VI_FILE_DESCR "Emu80 main executable"
-#define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2018" 
+#define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2018"
 #define VI_FILE_NAME "Emu80qt.exe"
-#define VI_PRODUCT "Emu80"      
+#define VI_PRODUCT "Emu80"
 
 #endif // VERSION_H
