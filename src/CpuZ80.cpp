@@ -838,13 +838,8 @@ unsigned CpuZ80::simz80()
             (AF & 0xc4) | ((AF >> 15) & 1);
         break;
     case 0x08:          /* EX AF,AF' */
-    {
-        uint16_t tmp = af[af_sel];
-        af[af_sel] = af[1 - af_sel];
-        af[1 - af_sel] = tmp;
         af_sel = 1 - af_sel;
         break;
-    }
     case 0x09:          /* ADD HL,BC */
         HL &= 0xffff;
         BC &= 0xffff;
@@ -1953,24 +1948,8 @@ unsigned CpuZ80::simz80()
         if (TSTFLAG(C)) POP(PC);
         break;
     case 0xD9:          /* EXX */
-    {
-        uint16_t tmp;
-
-        tmp = regs[regs_sel].bc;
-        regs[regs_sel].bc = regs[1 - regs_sel].bc;
-        regs[1 - regs_sel].bc = tmp;
-
-        tmp = regs[regs_sel].de;
-        regs[regs_sel].de = regs[1 - regs_sel].de;
-        regs[1 - regs_sel].de = tmp;
-
-        tmp = regs[regs_sel].hl;
-        regs[regs_sel].hl = regs[1 - regs_sel].hl;
-        regs[1 - regs_sel].hl = tmp;
-
         regs_sel = 1 - regs_sel;
         break;
-    }
     case 0xDA:          /* JP C,nnnn */
         JPC(TSTFLAG(C));
         break;
