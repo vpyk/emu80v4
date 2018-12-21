@@ -62,13 +62,13 @@ void Pk8000Core::draw()
 }
 
 
-void Pk8000Core::inte(bool/* isActive*/)
+void Pk8000Core::inte(bool isActive)
 {
-    /*Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
     if (isActive && m_intReq && cpu->getInte()) {
         m_intReq = false;
         cpu->intRst(7);
-    }*/
+    }
 }
 
 
@@ -76,9 +76,9 @@ void Pk8000Core::vrtc(bool isActive)
 {
     if (isActive) {
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
-        //m_intReq = true;
+        m_intReq = true;
         if (cpu->getInte()) {
-            //m_intReq = false;
+            m_intReq = false;
             cpu->intRst(7);
         }
     }
@@ -554,7 +554,7 @@ void Pk8000GrBufSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
     if (m_renderer) {
-        m_renderer->setGraphicsBufferBase((value & 0x08) << 10);
+        m_renderer->setGraphicsBufferBase((~value & 0x08) << 10);
     }
 }
 
@@ -578,7 +578,7 @@ void Pk8000ColBufSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
     if (m_renderer) {
-        m_renderer->setColorBufferBase((value & 0x08) << 10);
+        m_renderer->setColorBufferBase((~value & 0x08) << 10);
     }
 }
 
@@ -813,6 +813,7 @@ void Pk8000Keyboard::resetKeys()
     for (int i = 0; i < 10; i++)
         m_keys[i] = 0;
     m_rowNo = 0;
+    m_joystickKeys = 0;
 }
 
 
@@ -822,6 +823,30 @@ void Pk8000Keyboard::processKey(EmuKey key, bool isPressed)
         return;
 
     int i, j;
+
+    // Joystick
+    switch (key) {
+    case EK_UP:
+        m_joystickKeys = isPressed ? m_joystickKeys | 0x01 : m_joystickKeys & ~0x01;
+        break;
+    case EK_DOWN:
+        m_joystickKeys = isPressed ? m_joystickKeys | 0x02 : m_joystickKeys & ~0x02;
+        break;
+    case EK_LEFT:
+        m_joystickKeys = isPressed ? m_joystickKeys | 0x04 : m_joystickKeys & ~0x04;
+        break;
+    case EK_RIGHT:
+        m_joystickKeys = isPressed ? m_joystickKeys | 0x08 : m_joystickKeys & ~0x08;
+        break;
+    case EK_SPACE:
+        m_joystickKeys = isPressed ? m_joystickKeys | 0x10 : m_joystickKeys & ~0x10;
+        break;
+    case EK_CR:
+        m_joystickKeys = isPressed ? m_joystickKeys | 0x20 : m_joystickKeys & ~0x20;
+        break;
+    default:
+        break;
+    }
 
     // Основная матрица
     for (i = 0; i < 10; i++)
@@ -847,6 +872,26 @@ void Pk8000Keyboard::setMatrixRowNo(uint8_t row)
 uint8_t Pk8000Keyboard::getMatrixRowState()
 {
     return ~m_keys[m_rowNo];
+}
+
+
+uint8_t Pk8000InputRegister1::readByte(int)
+{
+    return m_kbd->getJoystickState() & 0x3F;
+}
+
+
+bool Pk8000InputRegister1::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "keyboard") {
+        attachKeyboard(static_cast<Pk8000Keyboard*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
 }
 
 

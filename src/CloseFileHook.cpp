@@ -16,8 +16,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Pal.h"
-
 #include "CloseFileHook.h"
 #include "Emulation.h"
 #include "TapeRedirector.h"

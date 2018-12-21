@@ -220,7 +220,7 @@ class Pk8000Core : public PlatformCore
         static EmuObject* create(const EmuValuesList&) {return new Pk8000Core();}
     private:
         Pk8000Renderer* m_crtRenderer = nullptr;
-        //bool m_intReq = false;
+        bool m_intReq = false;
 };
 
 
@@ -244,6 +244,7 @@ class Pk8000Keyboard : public Keyboard
 
         void setMatrixRowNo(uint8_t row);
         uint8_t getMatrixRowState();
+        uint8_t getJoystickState() {return m_joystickKeys;}
 
         static EmuObject* create(const EmuValuesList&) {return new Pk8000Keyboard();}
 
@@ -265,6 +266,7 @@ class Pk8000Keyboard : public Keyboard
         uint8_t m_keys[10];
         uint8_t m_rowNo;
 
+        uint8_t m_joystickKeys = 0;
 };
 
 
@@ -319,6 +321,24 @@ class Pk8000Ppi8255Circuit2 : public Ppi8255Circuit
 
     protected:
         Pk8000Renderer* m_renderer = nullptr;
+};
+
+
+// Port 8Ch
+class Pk8000InputRegister1 : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        uint8_t readByte(int) override;
+        void writeByte(int, uint8_t) override {}
+
+        void attachKeyboard(Pk8000Keyboard* kbd) {m_kbd = kbd;}
+
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000InputRegister1();}
+
+    private:
+        Pk8000Keyboard* m_kbd = nullptr;
 };
 
 
