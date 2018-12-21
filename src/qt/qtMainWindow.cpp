@@ -1036,43 +1036,43 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
         return PK_Z;
 
     case Qt::Key_1:
-        return keypad ? PK_KP_1 : PK_1;
+        return PK_1;
     case Qt::Key_Exclam:
         return PK_1;
     case Qt::Key_2:
-        return keypad ? PK_KP_2 : PK_2;
+        return PK_2;
     case Qt::Key_At:
         return PK_2;
     case Qt::Key_3:
-        return keypad ? PK_KP_3 : PK_3;
+        return PK_3;
     case Qt::Key_NumberSign:
         return PK_3;
     case Qt::Key_4:
-        return keypad ? PK_KP_4 : PK_4;
+        return PK_4;
     case Qt::Key_Dollar:
         return PK_4;
     case Qt::Key_5:
-        return keypad ? PK_KP_5 : PK_5;
+        return PK_5;
     case Qt::Key_Percent:
         return PK_5;
     case Qt::Key_6:
-        return keypad ? PK_KP_6 : PK_6;
+        return PK_6;
     case Qt::Key_AsciiCircum:
         return PK_6;
     case Qt::Key_7:
-        return keypad ? PK_KP_7 : PK_7;
+        return PK_7;
     case Qt::Key_Ampersand:
         return PK_7;
     case Qt::Key_8:
-        return keypad ? PK_KP_8 : PK_8;
+        return PK_8;
     case Qt::Key_Asterisk:
-        return keypad ? PK_KP_MUL : PK_8;
+        return PK_8;
     case Qt::Key_9:
-        return keypad ? PK_KP_9 : PK_9;
+        return PK_9;
     case Qt::Key_ParenLeft:
         return PK_9;
     case Qt::Key_0:
-        return keypad ? PK_KP_0 : PK_0;
+        return PK_0;
     case Qt::Key_ParenRight:
         return PK_0;
 
@@ -1114,10 +1114,11 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
     case Qt::Key_AsciiTilde:
         return PK_TILDE;
     case Qt::Key_Comma:
+        return PK_COMMA;
     case Qt::Key_Less:
         return PK_COMMA;
     case Qt::Key_Period:
-        return keypad ? PK_KP_PERIOD : PK_PERIOD;
+        return PK_PERIOD;
     case Qt::Key_Greater:
         return PK_PERIOD;
     case Qt::Key_Slash:
@@ -1158,25 +1159,27 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
         return PK_PAUSEBRK;
 
     case Qt::Key_Insert:
-        return PK_INS;
+        return keypad ? PK_KP_0 :PK_INS;
     case Qt::Key_Home:
-        return PK_HOME;
+        return keypad ? PK_KP_7 :PK_HOME;
     case Qt::Key_PageUp:
-        return PK_PGUP;
+        return keypad ? PK_KP_9 :PK_PGUP;
     case Qt::Key_Delete:
-        return PK_DEL;
+        return keypad ? PK_KP_PERIOD : PK_DEL;
     case Qt::Key_End:
-        return PK_END;
+        return keypad ? PK_KP_1 :PK_END;
     case Qt::Key_PageDown:
-        return PK_PGDN;
+        return keypad ? PK_KP_3 :PK_PGDN;
     case Qt::Key_Right:
-        return PK_RIGHT;
+        return keypad ? PK_KP_6 :PK_RIGHT;
     case Qt::Key_Left:
-        return PK_LEFT;
+        return keypad ? PK_KP_4 :PK_LEFT;
     case Qt::Key_Down:
-        return PK_DOWN;
+        return keypad ? PK_KP_2 :PK_DOWN;
     case Qt::Key_Up:
-        return PK_UP;
+        return keypad ? PK_KP_8 :PK_UP;
+    case Qt::Key_Clear:
+        return PK_KP_5;
 
     case Qt::Key_NumLock:
         return PK_NUMLOCK;
@@ -1216,7 +1219,7 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
 
 void MainWindow::keyPressEvent(QKeyEvent* evt)
 {
-    if (evt->key() == Qt::Key_End) {
+    if (evt->key() == Qt::Key_End && !(evt->modifiers() & Qt::KeypadModifier)) {
         emuSysReq(m_palWindow, SR_SPEEDUP);
         return;
     }
@@ -1227,7 +1230,7 @@ void MainWindow::keyPressEvent(QKeyEvent* evt)
 
 void MainWindow::keyReleaseEvent(QKeyEvent* evt)
 {
-    if (evt->key() == Qt::Key_End) {
+    if (evt->key() == Qt::Key_End && !(evt->modifiers() & Qt::KeypadModifier)) {
         emuSysReq(m_palWindow, SR_SPEEDNORMAL);
         return;
     }
