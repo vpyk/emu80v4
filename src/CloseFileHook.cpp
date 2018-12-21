@@ -66,7 +66,7 @@ ElapsedTimer::ElapsedTimer()
 void ElapsedTimer::start(unsigned ms)
 {
     uint64_t curTime = g_emulation->getCurClock();
-    m_curClock = curTime + ms * palGetCounterFreq() / 1000;
+    m_curClock = curTime + ms * g_emulation->getFrequency() / 1000;
     resume();
 }
 
