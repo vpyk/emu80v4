@@ -49,7 +49,7 @@ Pk8000Core::~Pk8000Core()
 
 void Pk8000Core::reset()
 {
-    //m_intReq = false;
+    m_intReq = false;
 }
 
 
@@ -177,9 +177,12 @@ void Pk8000Renderer::renderFrame()
 {
     swapBuffers();
 
-    if (m_showBorder || m_blanking)
-        for (unsigned i = 0; i < 261 * 288; i++)
-            m_pixelData[i] = m_bgColor;
+    if (m_showBorder || m_blanking) {
+        uint32_t* ptr = m_pixelData;
+        for (unsigned i = 0; i < 288; i++)
+            for (unsigned j = 0; j < 261; j++)
+                *ptr++ = m_bgColor;
+    }
 
     m_sizeY = m_showBorder ? 288 : 192;
 
@@ -270,6 +273,15 @@ void Pk8000Renderer::renderFrame()
         default:
             break;
         }
+
+    if (m_showBorder) {
+        uint32_t* ptr = m_pixelData;
+        for (unsigned i = 0; i < 288; i++) {
+            for (unsigned j = 0; j < offsetX; j++)
+                *ptr++ = 0;
+            ptr += (m_sizeX - offsetX);
+        }
+    }
 
     if (m_showBorder) {
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
