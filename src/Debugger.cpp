@@ -451,7 +451,6 @@ void DebugWindow::drawDbgFrame()
         putString(m_curLayout->flags.left + 2, m_curLayout->flags.top + 3, "S =");
         putString(m_curLayout->flags.left + 2, m_curLayout->flags.top + 4, "H =");
         putString(m_curLayout->flags.left + 2, m_curLayout->flags.top + 5, "N =");
-        putString(m_curLayout->flags.left + 1, m_curLayout->flags.top + 7, "IFF=");
     } else {
         int offset = m_compactMode ? 1 : 2;
         putString(m_curLayout->flags.left + offset, m_curLayout->flags.top, "C =");
@@ -463,6 +462,9 @@ void DebugWindow::drawDbgFrame()
         else
             putString(m_curLayout->flags.left + 1, m_curLayout->flags.top + 4, "AC =");
     }
+
+    if (!m_compactMode)
+        putString(m_curLayout->flags.left + 1, m_curLayout->flags.top + (m_z80Mode ? 7 : 6), "IFF=");
 
     putString(m_curLayout->stack.left + 1, m_curLayout->stack.top, "SP     : ");
     putString(m_curLayout->stack.left + 1, m_curLayout->stack.top + 1, "SP+0002: ");
@@ -522,6 +524,7 @@ void DebugWindow::fillCpuStatus()
     m_states[m_stateNum].hl = m_cpu->getHL();
     m_states[m_stateNum].sp = m_cpu->getSP();
     m_states[m_stateNum].pc = m_cpu->getPC();
+    m_states[m_stateNum].iff = m_cpu->getInte();
     m_states[m_stateNum].a = (m_states[m_stateNum].af & 0xff00) >> 8;
     m_states[m_stateNum].f = m_states[m_stateNum].af & 0xff;
     m_states[m_stateNum].b = (m_states[m_stateNum].bc & 0xff00) >> 8;
@@ -576,7 +579,6 @@ void DebugWindow::fillCpuStatus()
         m_states[m_stateNum].fl_n = m_states[m_stateNum].af & 0b00000010 ? 1 : 0;
         m_states[m_stateNum].r = m_z80cpu->getR();
         m_states[m_stateNum].im = m_z80cpu->getIM();
-        m_states[m_stateNum].iff = m_z80cpu->getIFF();
     }
 }
 
@@ -1653,10 +1655,10 @@ void DebugWindow::flagsDraw()
     drawInt(baseX, baseY++, m_states[m_stateNum].fl_p, m_states[m_stateNum].fl_p != m_states[1-m_stateNum].fl_p);
     drawInt(baseX, baseY++, m_states[m_stateNum].fl_m, m_states[m_stateNum].fl_m != m_states[1-m_stateNum].fl_m);
     drawInt(baseX, baseY++, m_states[m_stateNum].fl_ac, m_states[m_stateNum].fl_ac != m_states[1-m_stateNum].fl_ac);
-    if (m_z80Mode) {
+    if (m_z80Mode)
         drawInt(baseX, baseY++, m_states[m_stateNum].fl_n, m_states[m_stateNum].fl_n != m_states[1-m_stateNum].fl_n);
+    if (!m_compactMode)
         drawInt(baseX, baseY + 1, m_states[m_stateNum].iff, m_states[m_stateNum].iff != m_states[1-m_stateNum].iff);
-    }
 
     if (m_mode == AM_FLAGS)
         highlight(m_curLayout->flags.left + 5, 1 + m_flagsCurFlag, 3, 3);
