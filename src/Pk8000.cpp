@@ -186,7 +186,7 @@ void Pk8000Renderer::renderFrame()
 
     m_sizeY = m_showBorder ? 288 : 192;
 
-    int offsetX;
+    int offsetX = m_showBorder ? 5 : 0;
     int offsetY = m_showBorder ? 48 : 0;
     int offset;
 
@@ -271,7 +271,6 @@ void Pk8000Renderer::renderFrame()
 
             break;
         default:
-            offsetX = m_showBorder ? 5 : 0;
             break;
         }
 
