@@ -39,10 +39,6 @@ void SoundMixer::operate()
     else
         palPlaySample(0);
 
-   sample = 0;
-   for(auto it = m_soundSources.begin(); it != m_soundSources.end(); it++)
-       sample += (*it)->calcValue();
-
     m_curClock += m_ticksPerSample;
 
     m_error += m_ticksPerSampleRemainder;
