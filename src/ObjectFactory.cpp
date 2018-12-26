@@ -54,6 +54,7 @@
 #include "RamDisk.h"
 #include "GenericModules.h"
 #include "Pk8000.h"
+#include "Psg3910.h"
 
 #include "EmuConfig.h"
 
@@ -171,6 +172,8 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Pk8000KbdLayout)
     REG_EMU_CLASS(Pk8000FddControlRegister)
     REG_EMU_CLASS(Pk8000FdcStatusRegisters)
+    REG_EMU_CLASS(Psg3910)
+    REG_EMU_CLASS(Psg3910SoundSource)
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
