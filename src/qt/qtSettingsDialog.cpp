@@ -144,6 +144,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("tapeInHook.suspendAfterResetForMs");
     loadRunningConfigValue("loader.allowMultiblock");
     loadRunningConfigValue("kbdLayout.layout");
+    loadRunningConfigValue("kbdLayout.numpadJoystick");
     loadRunningConfigValue("keyboard.matrix");
 }
 
@@ -358,6 +359,11 @@ void SettingsDialog::fillControlValues()
     ui->qwertyRadioButton->setChecked(val == "qwerty");
     ui->jcukenRadioButton->setChecked(val == "jcuken");
     ui->smartRadioButton->setChecked(val == "smart");
+
+    // Numpad joystick
+    val = m_options["kbdLayout.numpadJoystick"];
+    ui->numpadJoystickCheckBox->setVisible(val != "");
+    ui->numpadJoystickCheckBox->setChecked(val == "yes");
 
     // Keyboard matrix
     val = m_options["keyboard.matrix"];
@@ -712,6 +718,9 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     if (ui->tapeMultiblockCheckBox->isVisible())
         m_options["loader.allowMultiblock"] = ui->tapeMultiblockCheckBox->isChecked() ? "yes" : "no";
+
+    if (ui->numpadJoystickCheckBox->isVisible())
+        m_options["kbdLayout.numpadJoystick"] = ui->numpadJoystickCheckBox->isChecked() ? "yes" : "no";
 
     val = "";
     if (ui->qwertyRadioButton->isChecked())

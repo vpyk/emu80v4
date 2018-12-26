@@ -125,7 +125,15 @@ enum EmuKey
     EK_END,   // 3
     EK_PHOME, // .
     EK_PEND,  // 0
-    EK_MENU  // 5
+    EK_MENU,  // 5
+
+    // Joystick
+    EK_JS_UP,
+    EK_JS_DOWN,
+    EK_JS_LEFT,
+    EK_JS_RIGHT,
+    EK_JS_BTN1,
+    EK_JS_BTN2
 };
 
 
@@ -142,6 +150,8 @@ class KbdLayout : public EmuObject
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys();
 
+        bool getNumpadJoystickMode() {return m_numpadJoystick;}
+
     protected:
         enum KbdLayoutMode {
             KLM_QWERTY,
@@ -150,6 +160,8 @@ class KbdLayout : public EmuObject
         };
 
         KbdLayoutMode m_mode = KLM_QWERTY;
+        bool m_numpadJoystick = false;
+
         virtual EmuKey translateKey(PalKeyCode keyCode) {return translateCommonKeys(keyCode);}
         virtual EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
 

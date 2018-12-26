@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -1055,6 +1055,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="numpadJoystickCheckBox">
+         <property name="toolTip">
+          <string>Joystick only assigned to arrow keys, 5 and Ins on the numpad instead of combining with keyboard arrows, Space and Enter</string>
+         </property>
+         <property name="text">
+          <string>Joystick on numpad only</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_7">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1153,6 +1163,8 @@
  <tabstops>
   <tabstop>langComboBox</tabstop>
   <tabstop>fpsSpinBox</tabstop>
+  <tabstop>maxFpsCheckBox</tabstop>
+  <tabstop>vsyncCheckBox</tabstop>
   <tabstop>srComboBox</tabstop>
   <tabstop>muteCheckBox</tabstop>
   <tabstop>volumeSpinBox</tabstop>
@@ -1200,8 +1212,7 @@
   <tabstop>smartRadioButton</tabstop>
   <tabstop>kbdOriginalRadioButton</tabstop>
   <tabstop>kbdRamfosRadioButton</tabstop>
-  <tabstop>maxFpsCheckBox</tabstop>
-  <tabstop>vsyncCheckBox</tabstop>
+  <tabstop>numpadJoystickCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections>

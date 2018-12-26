@@ -1,7 +1,12 @@
-﻿######## Configuration Window ########
-
-# Файл настроек
+﻿# Файл настроек
 @OPT_FILE = "pk8000/pk8000.opt"
+
+######## Include Saved Options ########
+
+include @OPT_FILE
+
+
+######## Configuration Window ########
 
 ConfigTab configTab = @NAME
 configTab.optFileName = @OPT_FILE
@@ -54,12 +59,17 @@ laSelector.addItem = jcuken, "Йцукен"
 laSelector.addItem = smart, "«Умная» раскладка"
 configTab.addControl = 2, &laSelector
 
+#kbdLayout.numpadJoystick
+ConfigRadioSelector njSelector = &kbdLayout, numpadJoystick, "Клавиши джойстика"
+njSelector.addItem = no, "Совмещены с клавиатурой (стрелки, пробел, Enter)"
+njSelector.addItem = yes, "Доп. цифр. клавиатура (стрелки, 5, Ins)"
+configTab.addControl = 2, &njSelector
+
 ConfigRadioSelector tapeSelector = &tapeGrp, enabled, "Перехват магнитофона"
 tapeSelector.addItem = yes, "Вкл."
 tapeSelector.addItem = no, "Выкл."
 configTab.addControl = 2, &tapeSelector
 
-loader.allowMultiblock = yes
 ConfigRadioSelector multiblockSelector = &loader, allowMultiblock, "Мультиблочная загрузка"
 multiblockSelector.addItem = yes, "Вкл."
 multiblockSelector.addItem = no, "Выкл."

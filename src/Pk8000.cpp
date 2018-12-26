@@ -276,8 +276,8 @@ void Pk8000Renderer::renderFrame()
 
     if (m_showBorder) {
         uint32_t* ptr = m_pixelData;
-        for (unsigned i = 0; i < 288; i++) {
-            for (unsigned j = 0; j < offsetX; j++)
+        for (int i = 0; i < 288; i++) {
+            for (int j = 0; j < offsetX; j++)
                 *ptr++ = 0;
             ptr += (m_sizeX - offsetX);
         }
@@ -837,28 +837,52 @@ void Pk8000Keyboard::processKey(EmuKey key, bool isPressed)
     int i, j;
 
     // Joystick
-    switch (key) {
-    case EK_UP:
-        m_joystickKeys = isPressed ? m_joystickKeys | 0x01 : m_joystickKeys & ~0x01;
-        break;
-    case EK_DOWN:
-        m_joystickKeys = isPressed ? m_joystickKeys | 0x02 : m_joystickKeys & ~0x02;
-        break;
-    case EK_LEFT:
-        m_joystickKeys = isPressed ? m_joystickKeys | 0x04 : m_joystickKeys & ~0x04;
-        break;
-    case EK_RIGHT:
-        m_joystickKeys = isPressed ? m_joystickKeys | 0x08 : m_joystickKeys & ~0x08;
-        break;
-    case EK_SPACE:
-        m_joystickKeys = isPressed ? m_joystickKeys | 0x10 : m_joystickKeys & ~0x10;
-        break;
-    case EK_CR:
-        m_joystickKeys = isPressed ? m_joystickKeys | 0x20 : m_joystickKeys & ~0x20;
-        break;
-    default:
-        break;
-    }
+    if (m_platform->getKbdLayout()->getNumpadJoystickMode())
+        switch (key) {
+        case EK_JS_UP:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x01 : m_joystickKeys & ~0x01;
+            break;
+        case EK_JS_DOWN:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x02 : m_joystickKeys & ~0x02;
+            break;
+        case EK_JS_LEFT:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x04 : m_joystickKeys & ~0x04;
+            break;
+        case EK_JS_RIGHT:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x08 : m_joystickKeys & ~0x08;
+            break;
+        case EK_JS_BTN1:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x10 : m_joystickKeys & ~0x10;
+            break;
+        case EK_JS_BTN2:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x20 : m_joystickKeys & ~0x20;
+            break;
+        default:
+            break;
+        }
+    else
+        switch (key) {
+        case EK_UP:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x01 : m_joystickKeys & ~0x01;
+            break;
+        case EK_DOWN:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x02 : m_joystickKeys & ~0x02;
+            break;
+        case EK_LEFT:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x04 : m_joystickKeys & ~0x04;
+            break;
+        case EK_RIGHT:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x08 : m_joystickKeys & ~0x08;
+            break;
+        case EK_SPACE:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x10 : m_joystickKeys & ~0x10;
+            break;
+        case EK_CR:
+            m_joystickKeys = isPressed ? m_joystickKeys | 0x20 : m_joystickKeys & ~0x20;
+            break;
+        default:
+            break;
+        }
 
     // Основная матрица
     for (i = 0; i < 10; i++)
@@ -887,13 +911,13 @@ uint8_t Pk8000Keyboard::getMatrixRowState()
 }
 
 
-uint8_t Pk8000InputRegister1::readByte(int)
+uint8_t Pk8000InputRegister::readByte(int)
 {
-    return m_kbd->getJoystickState() & 0x3F;
+    return (m_kbd->getJoystickState() & 0x3F) | (g_emulation->getWavReader()->getCurValue() ? 0x80 : 0x00);
 }
 
 
-bool Pk8000InputRegister1::setProperty(const string& propertyName, const EmuValuesList& values)
+bool Pk8000InputRegister::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
@@ -904,12 +928,6 @@ bool Pk8000InputRegister1::setProperty(const string& propertyName, const EmuValu
     }
 
     return false;
-}
-
-
-uint8_t Pk8000InputRegister2::readByte(int)
-{
-    return g_emulation->getWavReader()->getCurValue() ? 0x80 : 0x00;
 }
 
 
@@ -972,6 +990,37 @@ EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, bool& shift, bo
         lang = false;
     }
     return key;
+}
+
+
+bool Pk8000KbdLayout::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (KbdLayout::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "numpadJoystick") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_numpadJoystick = values[0].asString() == "yes";
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+string Pk8000KbdLayout::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = KbdLayout::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "numpadJoystick")
+        return m_numpadJoystick ? "yes" : "no";
+
+    return "";
 }
 
 

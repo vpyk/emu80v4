@@ -187,23 +187,32 @@ EmuKey KbdLayout::translateCommonKeys(PalKeyCode keyCode)
     case PK_ESC:
         return EK_ESC;
     case PK_UP:
-    case PK_KP_8:
         return EK_UP;
+    case PK_KP_8:
+        return m_numpadJoystick ? EK_JS_UP : EK_UP;
     case PK_DOWN:
-    case PK_KP_2:
         return EK_DOWN;
+    case PK_KP_2:
+        return m_numpadJoystick ? EK_JS_DOWN : EK_DOWN;
     case PK_LEFT:
-    case PK_KP_4:
         return EK_LEFT;
+    case PK_KP_4:
+        return m_numpadJoystick ? EK_JS_LEFT : EK_LEFT;
     case PK_RIGHT:
-    case PK_KP_6:
         return EK_RIGHT;
+    case PK_KP_6:
+        return m_numpadJoystick ? EK_JS_RIGHT : EK_RIGHT;
+    case PK_KP_5:
+        return m_numpadJoystick ? EK_JS_BTN2 : EK_NONE;
     case PK_COMMA:
         return EK_COMMA;
 
     case PK_LSHIFT:
     case PK_RSHIFT:
         return EK_SHIFT;
+
+    case PK_KP_0:
+        return m_numpadJoystick ? EK_JS_BTN2 : EK_LANG;
 
     case PK_RCTRL:
     case PK_INS:

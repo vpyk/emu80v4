@@ -324,8 +324,8 @@ class Pk8000Ppi8255Circuit2 : public Ppi8255Circuit
 };
 
 
-// Port 8Ch
-class Pk8000InputRegister1 : public AddressableDevice
+// Port 8Dh
+class Pk8000InputRegister : public AddressableDevice
 {
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -335,32 +335,24 @@ class Pk8000InputRegister1 : public AddressableDevice
 
         void attachKeyboard(Pk8000Keyboard* kbd) {m_kbd = kbd;}
 
-        static EmuObject* create(const EmuValuesList&) {return new Pk8000InputRegister1();}
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000InputRegister();}
 
     private:
         Pk8000Keyboard* m_kbd = nullptr;
 };
 
 
-// Port 8Dh
-class Pk8000InputRegister2 : public AddressableDevice
-{
-    public:
-        uint8_t readByte(int) override;
-        void writeByte(int, uint8_t) override {}
-
-        static EmuObject* create(const EmuValuesList&) {return new Pk8000InputRegister2();}
-};
-
-
 class Pk8000KbdLayout : public KbdLayout
 {
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new Pk8000KbdLayout();}
+
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
         EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) override;
-
-    public:
-        static EmuObject* create(const EmuValuesList&) {return new Pk8000KbdLayout();}
 };
 
 
