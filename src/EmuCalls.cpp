@@ -105,5 +105,5 @@ void emuSelectPlatform(const std::string& platform)
 // Returns current emulation speed factor
 unsigned emuGetEmulationSpeedFactor()
 {
-    return g_emulation->getSpeedUpFactor();
+    return g_emulation->getPausedState() ? 0 : g_emulation->getSpeedUpFactor();
 }

@@ -92,6 +92,7 @@ class Emulation : public ParentObject
         void setSpeedUpFactor(unsigned speed);
 
         unsigned getSpeedUpFactor() {return m_speedUpFactor;}
+        bool getPausedState() {return m_isPaused;}
 
         void processCmdLine();
 

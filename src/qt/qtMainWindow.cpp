@@ -912,7 +912,7 @@ void MainWindow::onFpsTimer()
 
     unsigned speed = emuGetEmulationSpeedFactor();
     m_speedLabel->setVisible(speed != 1);
-    m_speedLabel->setText(QString::number(speed) + "x");
+    m_speedLabel->setText(speed ? QString::number(speed) + "x" : tr("Paused"));
 
 
     std::string platform = m_palWindow->getPlatformObjectName() + ".";
