@@ -124,7 +124,7 @@ Pk8000Renderer::Pk8000Renderer()
     m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
-    m_ticksPerInt = g_emulation->getFrequency() / 1000000 * 312 * 64;
+    m_ticksPerInt = g_emulation->getFrequency() / 1000000 * 308 * 64;
 }
 
 
