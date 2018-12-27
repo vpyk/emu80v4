@@ -43,7 +43,6 @@ class Psg3910 : public AddressableDevice
 {
     public:
         Psg3910();
-        virtual ~Psg3910();
 
         // derived from EmuObject
         void reset() override;

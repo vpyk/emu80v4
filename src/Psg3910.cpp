@@ -32,13 +32,9 @@ using namespace std;
 
 Psg3910::Psg3910()
 {
+    m_prevClock = g_emulation->getCurClock();
+    m_discreteClock = m_prevClock - m_prevClock % (m_kDiv * 8);
     reset();
-}
-
-
-Psg3910::~Psg3910()
-{
-    //
 }
 
 
