@@ -25,6 +25,8 @@
 class Keyboard : public EmuObject
 {
     public:
+        void reset() override {resetKeys();}
+
         virtual void resetKeys() = 0;
         virtual void processKey(EmuKey key, bool isPressed) = 0;
 };
