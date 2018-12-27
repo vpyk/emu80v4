@@ -35,6 +35,7 @@ class Pk8000Renderer : public CrtRenderer, public IActive
 {
     public:
         Pk8000Renderer();
+        ~Pk8000Renderer();
 
         void renderFrame() override;
 
@@ -85,7 +86,14 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         uint8_t m_colorRegs[32];
         bool m_showBorder = false;
         bool m_blanking = false;
-        uint64_t m_ticksPerInt;   // тактов на прерывание
+        uint64_t m_ticksPerScanLine;   // тактов на скан-линию
+
+        int m_curLine = 0;
+        int m_offsetX = 0;
+        int m_offsetY = 0;
+        uint32_t* m_frameBuf;
+        void prepareFrame();
+        void renderLine(int nLine);
 };
 
 
