@@ -1748,8 +1748,10 @@ void Cpu8080::intRst(int vect) {
     if (IFF != 0) {
         IFF = 0;
         m_core->inte(false);
-        if (RD_BYTE(PC) == 0x76)
+        if (RD_BYTE(PC) == 0x76) {
             PC++;
+            m_curClock = g_emulation->getCurClock();
+        }
         RST(vect * 8);
         m_curClock += m_kDiv * 11; // уточнить!
     }

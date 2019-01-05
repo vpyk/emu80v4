@@ -2573,8 +2573,10 @@ void CpuZ80::intRst(int vect)
     if (IFF != 0) {
         IFF = 0;
         m_core->inte(false);
-        if (GetBYTE(PC) == 0x76)
+        if (GetBYTE(PC) == 0x76) {
             PC++;
+            m_curClock = g_emulation->getCurClock();
+        }
         PUSH(PC); PC = vect * 8;
         m_curClock += m_kDiv * 11; // óòî÷íèòü!
     }
