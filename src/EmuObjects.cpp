@@ -107,6 +107,16 @@ void IActive::syncronize()
 //    return (m_curClock == -1);
 //}
 
+int AddressableDevice::m_lastTag;
+
+uint8_t AddressableDevice::readByteEx(int addr, int& tag)
+{
+    AddressableDevice::m_lastTag = 0;
+    uint8_t read = readByte(addr);
+    tag = AddressableDevice::m_lastTag;
+    return read;
+}
+
 
 bool AddressableDevice::setProperty(const string& propertyName, const EmuValuesList& values)
 {
@@ -115,6 +125,9 @@ bool AddressableDevice::setProperty(const string& propertyName, const EmuValuesL
 
     if (propertyName == "addrMask" && values[0].isInt()) {
             setAddrMask(values[0].asInt());
+            return true;
+    } else if (propertyName == "tag" && m_supportsTags && values[0].isInt()) {
+            m_tag = values[0].asInt();
             return true;
     }
 

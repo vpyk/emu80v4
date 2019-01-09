@@ -25,6 +25,7 @@
 
 
 class CpuHook;
+class CpuWaits;
 class PlatformCore;
 
 
@@ -76,6 +77,8 @@ class Cpu : public ActiveDevice
 
         bool m_debugOnHalt = false;
         bool m_debugOnIllegalCmd = false;
+
+        CpuWaits* m_waits = nullptr;
 };
 
 

@@ -92,6 +92,7 @@
 		<Unit filename="Cpu8080dasm.h" />
 		<Unit filename="CpuHook.cpp" />
 		<Unit filename="CpuHook.h" />
+		<Unit filename="CpuWaits.h" />
 		<Unit filename="CpuZ80.cpp" />
 		<Unit filename="CpuZ80.h" />
 		<Unit filename="CpuZ80dasm.cpp" />

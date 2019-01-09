@@ -24,12 +24,13 @@
 #include "CrtRenderer.h"
 #include "FileLoader.h"
 #include "Keyboard.h"
+#include "CpuWaits.h"
 
 class AddrSpaceMapper;
 class Ram;
 class Fdc1793;
 class GeneralSoundSource;
-
+class Pk8000CpuWaits;
 
 class Pk8000Renderer : public CrtRenderer, public IActive
 {
@@ -53,7 +54,7 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         void setScreenBank(unsigned bank);
         void setMode(unsigned mode);
         void setFgColor(unsigned color) {m_fgColor = c_pk8000ColorPalette[color];}
-        void setBgColor(unsigned color) {m_bgColor = c_pk8000ColorPalette[color];}
+        void setBgColor(unsigned color);
         void setTextBufferBase(uint16_t base) {m_txtBase = base;}
         void setSymGenBufferBase(uint16_t base) {m_sgBase = base;}
         void setGraphicsBufferBase(uint16_t base) {m_grBase = base;}
@@ -75,8 +76,10 @@ class Pk8000Renderer : public CrtRenderer, public IActive
 
         const uint8_t* m_screenMemoryBanks[4];
         Ram* m_screenMemoryRamBanks[4];
+        Pk8000CpuWaits* m_waits = nullptr;
         unsigned m_bank = 0;
         unsigned m_mode = 0;
+        bool m_wideBorder = true;
         uint16_t m_txtBase = 0;
         uint16_t m_sgBase = 0;
         uint16_t m_grBase = 0;
@@ -86,7 +89,10 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         uint8_t m_colorRegs[32];
         bool m_showBorder = false;
         bool m_blanking = false;
-        uint64_t m_ticksPerScanLine;   // тактов на скан-линию
+        bool m_activeArea = false;
+        uint64_t m_ticksPerScanLineActiveArea;   // тактов на активную часть скан-линии
+        uint64_t m_ticksPerScanLineSideBorder;   // тактов на боковой бордюр скан-линии
+        unsigned m_ticksPerPixel;
 
         int m_curLine = 0;
         int m_offsetX = 0;
@@ -94,6 +100,10 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         uint32_t* m_frameBuf;
         void prepareFrame();
         void renderLine(int nLine);
+
+        uint64_t m_curScanlineClock;
+        int m_curScanlinePixel;
+        uint32_t m_borderScanlinePixels[320];
 };
 
 
@@ -398,6 +408,18 @@ class Pk8000FdcStatusRegisters : public AddressableDevice
         uint8_t m_bytes[4];
 };
 
+
+class Pk8000CpuWaits : public CpuWaits
+{
+public:
+    int getCpuWaitStates(int memTag, int opcode, int normalClocks) override;
+    inline void setState(bool scr03activeArea) {m_scr03activeArea = scr03activeArea;}
+
+    static EmuObject* create(const EmuValuesList&) {return new Pk8000CpuWaits();}
+
+private:
+    bool m_scr03activeArea = false;
+};
 
 #endif // PK8000_H
 

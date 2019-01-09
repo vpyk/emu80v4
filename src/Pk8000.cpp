@@ -64,10 +64,12 @@ void Pk8000Core::draw()
 
 void Pk8000Core::inte(bool isActive)
 {
+    // actually this is not VTRC, but this proc is called onece per frame on interrupt
     Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
     if (isActive && m_intReq && cpu->getInte()) {
         m_intReq = false;
         cpu->intRst(7);
+        cpu->hrq(cpu->getKDiv() * 7); // syncronize interrupt with waits
     }
 }
 
@@ -80,6 +82,7 @@ void Pk8000Core::vrtc(bool isActive)
         if (cpu->getInte()) {
             m_intReq = false;
             cpu->intRst(7);
+            cpu->hrq(cpu->getKDiv() * 7); // syncronize interrupt with waits
         }
     }
 }
@@ -124,7 +127,11 @@ Pk8000Renderer::Pk8000Renderer()
     m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
-    m_ticksPerScanLine = g_emulation->getFrequency() / 1000000 * 64;
+    m_ticksPerPixel = g_emulation->getFrequency() / 5000000;
+    setMode(0);
+
+    m_curScanlineClock = m_curClock;
+    memset(m_borderScanlinePixels, 0, 320 * sizeof(uint32_t));
 
     m_frameBuf = new uint32_t[maxBufSize];
 
@@ -138,17 +145,30 @@ Pk8000Renderer::~Pk8000Renderer()
 }
 
 
-    void Pk8000Renderer::operate()
+void Pk8000Renderer::operate()
 {
-    renderLine(m_curLine);
-    if (m_curLine == 262)
-        m_platform->getCore()->vrtc(true);
-    if (++m_curLine == 308) {
-        m_curLine = 0;
-        renderFrame();
+    if (m_activeArea) {
+        renderLine(m_curLine);
+        if (++m_curLine == 308) {
+            m_curLine = 0;
+            renderFrame();
+        }
+
+        // New scanline
+        m_curScanlineClock = m_curClock;
+        m_curScanlinePixel = 0;
+
+        m_curClock += m_ticksPerScanLineSideBorder;
+    } else {
+        if (m_curLine == 263)
+            m_platform->getCore()->vrtc(true);
+        m_curClock += m_ticksPerScanLineActiveArea;
     }
 
-    m_curClock += m_ticksPerScanLine;
+    m_activeArea = !m_activeArea;
+
+    if (m_waits)
+        m_waits->setState(m_activeArea && m_wideBorder);
 }
 
 
@@ -172,6 +192,27 @@ void Pk8000Renderer::setMode(unsigned mode)
 {
     if (mode < 4)
         m_mode = mode;
+    m_wideBorder = (mode == 0) || (mode == 3);
+
+    if (m_wideBorder) {
+        m_ticksPerScanLineActiveArea = g_emulation->getFrequency() * 240 / 5000000;
+        m_ticksPerScanLineSideBorder = g_emulation->getFrequency() * 80 / 5000000;
+    } else {
+        m_ticksPerScanLineActiveArea = g_emulation->getFrequency() * 256 / 5000000;
+        m_ticksPerScanLineSideBorder = g_emulation->getFrequency() * 64 / 5000000;
+    }
+}
+
+
+void Pk8000Renderer::setBgColor(unsigned color)
+{
+    int curPixel = (g_emulation->getCurClock() - m_curScanlineClock) / m_ticksPerPixel;
+    if (curPixel < 320) { // should olways be
+        for (int i = m_curScanlinePixel; i < curPixel; i++)
+            m_borderScanlinePixels[i] = m_bgColor;
+        m_curScanlinePixel = curPixel;
+    }
+    m_bgColor = c_pk8000ColorPalette[color];
 }
 
 
@@ -205,8 +246,11 @@ void Pk8000Renderer::renderLine(int nLine)
             *linePtr++ = 0;
 
         if (nLine < 71 || nLine > 262 || m_blanking || m_mode > 2) {
+            for (int i = m_curScanlinePixel; i < 320; i++)
+                m_borderScanlinePixels[i] = m_bgColor;
+            uint32_t* borderPixels = m_borderScanlinePixels + 33 + m_offsetX;
             for(int i = 0; i < m_sizeX - m_offsetX; i++)
-                *linePtr++ = m_bgColor;
+                *linePtr++ = *borderPixels++;
             return;
         }
     } else {
@@ -327,6 +371,9 @@ bool Pk8000Renderer::setProperty(const string& propertyName, const EmuValuesList
             m_showBorder = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "cpuWaits") {
+        m_waits = (static_cast<Pk8000CpuWaits*>(g_emulation->findObject(values[0].asString())));
+        return true;
     }
 
     return false;
@@ -1079,4 +1126,102 @@ bool Pk8000FdcStatusRegisters::setProperty(const string& propertyName, const Emu
     }
 
     return false;
+}
+
+
+int Pk8000CpuWaits::getCpuWaitStates(int memTag, int opcode, int normalClocks)
+{
+    static const int waits12Ram[256] = {
+        4,6,5,10,3,3,5,4,4,2,5,3,3,3,5,4,
+        4,6,5,10,3,3,5,4,4,2,5,3,3,3,5,4,
+        4,6,16,10,3,3,5,4,4,2,8,3,3,3,5,4,
+        4,6,11,10,10,10,10,4,4,2,7,3,3,3,5,4,
+        3,3,3,3,3,3,5,3,3,3,3,3,3,3,5,3,
+        3,3,3,3,3,3,5,3,3,3,3,3,3,3,5,3,
+        3,3,3,3,3,3,5,3,3,3,3,3,3,3,5,3,
+        5,5,5,5,5,5,4,5,3,3,3,3,3,3,5,3,
+        4,4,4,4,4,4,5,4,4,4,4,4,4,4,5,4,
+        4,4,4,4,4,4,5,4,4,4,4,4,4,4,5,4,
+        4,4,4,4,4,4,5,4,4,4,4,4,4,4,5,4,
+        4,4,4,4,4,4,5,4,4,4,4,4,4,4,5,4,
+        3,6,6,6,5,9,5,9,3,6,6,6,5,15,5,9,
+        3,6,6,10,5,9,5,9,3,6,6,6,5,15,5,9,
+        3,6,6,18,5,9,5,9,3,3,6,4,5,15,5,9,
+        3,6,6,4,5,9,5,9,3,3,6,4,5,15,5,9
+    };
+
+    static const int waits03Ram[256] = {
+        2,8,5,8,1,1,5,2,2,2,5,1,1,1,5,2,
+        2,8,5,8,1,1,5,2,2,2,5,1,1,1,5,2,
+        2,8,14,8,1,1,5,2,2,2,14,1,1,1,5,2,
+        2,8,11,8,8,8,8,2,2,2,11,1,1,1,5,2,
+        1,1,1,1,1,1,5,1,1,1,1,1,1,1,5,1,
+        1,1,1,1,1,1,5,1,1,1,1,1,1,1,5,1,
+        1,1,1,1,1,1,5,1,1,1,1,1,1,1,5,1,
+        5,5,5,5,5,5,2,5,1,1,1,1,1,1,5,1,
+        2,2,2,2,2,2,5,2,2,2,2,2,2,2,5,2,
+        2,2,2,2,2,2,5,2,2,2,2,2,2,2,5,2,
+        2,2,2,2,2,2,5,2,2,2,2,2,2,2,5,2,
+        2,2,2,2,2,2,5,2,2,2,2,2,2,2,5,2,
+        1,8,8,8,7,10,5,10,1,8,8,8,7,13,5,10,
+        1,8,8,5,7,10,5,10,1,8,8,5,7,13,5,10,
+        1,8,8,12,7,10,5,10,1,1,8,2,7,13,5,10,
+        1,8,8,2,7,10,5,10,1,1,8,2,7,13,5,10
+    };
+
+    static const int waits12Rom[256] = {
+        1,3,5,6,1,1,2,1,1,1,2,1,1,1,2,1,
+        1,3,5,6,1,1,2,1,1,1,2,1,1,1,2,1,
+        1,3,12,6,1,1,2,1,1,1,5,1,1,1,2,1,
+        1,3,7,6,6,6,6,1,1,1,4,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        5,5,5,5,5,5,1,5,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,3,3,3,3,9,2,8,1,3,3,3,3,11,2,8,
+        1,3,3,4,3,9,2,8,1,3,3,3,3,11,2,8,
+        1,3,3,10,3,9,2,8,1,1,3,1,3,11,2,8,
+        1,3,3,1,3,9,2,8,1,1,3,1,3,11,2,8
+    };
+
+    static const int waits03Rom[256] = {
+        1,3,5,5,1,1,2,1,1,1,2,1,1,1,2,1,
+        1,3,5,5,1,1,2,1,1,1,2,1,1,1,2,1,
+        1,3,8,5,1,1,2,1,1,1,5,1,1,1,2,1,
+        1,3,5,5,5,5,5,1,1,1,4,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        5,5,5,5,5,5,1,5,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,
+        1,3,3,3,3,7,2,6,1,3,3,3,3,9,2,6,
+        1,3,3,4,3,7,2,6,1,3,3,3,3,9,2,6,
+        1,3,3,9,3,7,2,6,1,1,3,1,3,9,2,6,
+        1,3,3,1,3,7,2,6,1,1,3,1,3,9,2,6
+    };
+
+    int addClocks;
+
+    if (memTag) {
+        addClocks = m_scr03activeArea ? waits03Ram[opcode] : waits12Ram[opcode];
+        if ((opcode & 0xC7) == 0xC0) //Rxx
+            addClocks = normalClocks == 5 ? (m_scr03activeArea ? 1 : 3) : (m_scr03activeArea ? 7 : 5);
+        else if ((opcode & 0xC7) == 0xC4) //Cxx
+            addClocks = normalClocks == 11 ? (m_scr03activeArea ? 7 : 5) : (m_scr03activeArea ? 13 : 15);
+    } else {
+        addClocks = m_scr03activeArea ? waits03Rom[opcode] : waits12Rom[opcode];
+        if ((opcode & 0xC7) == 0xC0) //Rxx
+            addClocks = normalClocks == 5 ? 1 : 3;
+        else if ((opcode & 0xC7) == 0xC4) //Cxx
+            addClocks = normalClocks == 11 ? 14 : (m_scr03activeArea ? 9 : 11);
+    }
+
+    return addClocks;
 }

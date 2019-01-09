@@ -112,6 +112,7 @@ HEADERS  += \
     Cpu8080.h \
     Cpu8080dasm.h \
     CpuHook.h \
+    CpuWaits.h \
     CpuZ80.h \
     CpuZ80dasm.h \
     Crt8275.h \

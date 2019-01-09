@@ -20,6 +20,7 @@
 
 #include "Cpu.h"
 #include "CpuHook.h"
+#include "CpuWaits.h"
 #include "Emulation.h"
 #include "PlatformCore.h"
 
@@ -104,6 +105,9 @@ bool Cpu::setProperty(const string& propertyName, const EmuValuesList& values)
             m_debugOnIllegalCmd = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "cpuWaits") {
+        m_waits = (static_cast<CpuWaits*>(g_emulation->findObject(values[0].asString())));
+        return true;
     }
 
     return false;

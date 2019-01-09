@@ -35,6 +35,7 @@ using namespace std;
 
 Ram::Ram(unsigned memSize)
 {
+    m_supportsTags = true;
     m_extBuf = nullptr;
     m_buf = new uint8_t [memSize];
     memset(m_buf, 0, memSize);
@@ -45,6 +46,7 @@ Ram::Ram(unsigned memSize)
 
 Ram::Ram(uint8_t* buf, unsigned memSize)
 {
+    m_supportsTags = true;
     m_extBuf = buf;
     m_buf = buf;
     m_size = memSize;
@@ -75,6 +77,7 @@ Ram::~Ram()
 
 void Ram::writeByte(int addr, uint8_t value)
 {
+    //m_lastTag = m_tag;
     if (m_addrMask)
         addr &= m_addrMask;
     if (m_buf && addr < m_size)
@@ -85,6 +88,7 @@ void Ram::writeByte(int addr, uint8_t value)
 
 uint8_t Ram::readByte(int addr)
 {
+    m_lastTag = m_tag;
     if (m_addrMask)
         addr &= m_addrMask;
     if (m_buf && addr < m_size)

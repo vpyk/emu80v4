@@ -22,6 +22,7 @@
 #include "Cpu.h"
 #include "Cpu8080.h"
 #include "CpuHook.h"
+#include "CpuWaits.h"
 #include "Platform.h"
 #include "PlatformCore.h"
 #include "Emulation.h"
@@ -1730,7 +1731,14 @@ void Cpu8080::operate() {
     }
 
     m_statusWord = 0xA2;
-    m_curClock += m_kDiv * i8080_execute(RD_BYTE(PC++));
+
+    if (m_waits) {
+        int tag;
+        int opcode = m_addrSpace->readByteEx(PC++, tag);
+        int clocks = i8080_execute(opcode);
+        m_curClock += m_kDiv * (clocks + m_waits->getCpuWaitStates(tag, opcode, clocks));
+    } else
+        m_curClock += m_kDiv * i8080_execute(RD_BYTE(PC++));
 
     if (m_stepReq) {
         m_stepReq = false;

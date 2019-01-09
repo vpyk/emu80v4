@@ -70,10 +70,16 @@ class AddressableDevice : public EmuObject
         virtual void writeByte(int addr, uint8_t value) = 0;
         virtual uint8_t readByte(int) {return 0xFF;}
 
+        uint8_t readByteEx(int addr, int& tag);
+
         void setAddrMask(int mask) {m_addrMask = mask;}
 
     protected:
         int m_addrMask = 0;
+
+        bool m_supportsTags = false;
+        int m_tag = 0;
+        static int m_lastTag;
 
     private:
 };
