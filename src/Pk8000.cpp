@@ -277,7 +277,7 @@ void Pk8000Renderer::renderLine(int nLine)
             uint8_t chr = m_screenMemoryBanks[m_bank][(m_txtBase & ~0x0400) + row * 64 + pos];
             uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
             for (int i = 0; i < 6; i++) {
-                uint32_t color = bt & 0x80 ? m_fgColor : m_bgColor;
+                uint32_t color = bt & 0x80 ? m_fgColor : m_borderScanlinePixels[33 + m_offsetX + pos * 6 + i];
                 *linePtr++ = color;
                 bt <<= 1;
             }
