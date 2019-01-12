@@ -409,13 +409,13 @@ string Pk8000Renderer::getPropertyStringValue(const string& propertyName)
     } else if (propertyName == "crtMode") {
         switch (m_mode) {
         case 0:
-            return "Mode 0: 40\u00D76\u00D724\u00D78@50.08Hz";
+            return "Mode 0: 40\u00D76\u00D724\u00D78@50.73Hz";
             break;
         case 1:
-            return "Mode 1: 32\u00D78\u00D724\u00D78@50.08Hz";
+            return "Mode 1: 32\u00D78\u00D724\u00D78@50.73Hz";
             break;
         case 2:
-            return "Mode 2: 256\u00D7192@50.08Hz";
+            return "Mode 2: 256\u00D7192@50.73Hz";
             break;
         default:
             return "Mode 3";
