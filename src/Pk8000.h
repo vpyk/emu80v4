@@ -53,16 +53,15 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         void attachScreenMemoryBank(int bankN, Ram* screenMemoryBank);
         void setScreenBank(unsigned bank);
         void setMode(unsigned mode);
-        void setFgColor(unsigned color) {m_fgColor = c_pk8000ColorPalette[color];}
-        void setBgColor(unsigned color);
+        void setFgBgColors(unsigned fgColor, unsigned bgColor);
         void setTextBufferBase(uint16_t base) {m_txtBase = base;}
-        void setSymGenBufferBase(uint16_t base) {m_sgBase = base;}
+        void setSymGenBufferBase(uint16_t base);
         void setGraphicsBufferBase(uint16_t base) {m_grBase = base;}
         void setColorBufferBase(uint16_t base) {m_colBase = base;}
         void setBlanking(bool blanking) {m_blanking = blanking;}
-
         void setColorReg(unsigned addr, uint8_t value);
         uint8_t getColorReg(unsigned addr);
+        bool isBorderWide() {return m_wideBorder;}
 
         static EmuObject* create(const EmuValuesList&) {return new Pk8000Renderer();}
 
@@ -90,9 +89,12 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         bool m_showBorder = false;
         bool m_blanking = false;
         bool m_activeArea = false;
+        unsigned m_ticksPerPixel;
+        uint16_t m_nextLineSgBase = 0;
+
         uint64_t m_ticksPerScanLineActiveArea;   // тактов на активную часть скан-линии
         uint64_t m_ticksPerScanLineSideBorder;   // тактов на боковой бордюр скан-линии
-        unsigned m_ticksPerPixel;
+        int m_pixelsPerOutInstruction = 30;
 
         int m_curLine = 0;
         int m_offsetX = 0;
@@ -103,7 +105,8 @@ class Pk8000Renderer : public CrtRenderer, public IActive
 
         uint64_t m_curScanlineClock;
         int m_curScanlinePixel;
-        uint32_t m_borderScanlinePixels[320];
+        uint32_t m_bgScanlinePixels[320];
+        uint32_t m_fgScanlinePixels[320];
 };
 
 

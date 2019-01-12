@@ -82,7 +82,8 @@ void Pk8000Core::vrtc(bool isActive)
         if (cpu->getInte()) {
             m_intReq = false;
             cpu->intRst(7);
-            cpu->hrq(cpu->getKDiv() * 7); // syncronize interrupt with waits
+            // add waits to RST and consider one character offset (wide border 21-3-11=7, narrow border 20-4-11=5)
+            cpu->hrq(cpu->getKDiv() * (m_crtRenderer->isBorderWide() ? 7 : 5)); // syncronize interrupt with waits
         }
     }
 }
@@ -131,7 +132,8 @@ Pk8000Renderer::Pk8000Renderer()
     setMode(0);
 
     m_curScanlineClock = m_curClock;
-    memset(m_borderScanlinePixels, 0, 320 * sizeof(uint32_t));
+    memset(m_bgScanlinePixels, 0, 320 * sizeof(uint32_t));
+    memset(m_fgScanlinePixels, 0, 320 * sizeof(uint32_t));
 
     m_frameBuf = new uint32_t[maxBufSize];
 
@@ -157,6 +159,7 @@ void Pk8000Renderer::operate()
         // New scanline
         m_curScanlineClock = m_curClock;
         m_curScanlinePixel = 0;
+        m_sgBase = m_nextLineSgBase;
 
         m_curClock += m_ticksPerScanLineSideBorder;
     } else {
@@ -188,6 +191,15 @@ void Pk8000Renderer::setScreenBank(unsigned bank)
 }
 
 
+void Pk8000Renderer::setSymGenBufferBase(uint16_t base)
+{
+    int curPixel = (g_emulation->getCurClock() - m_curScanlineClock) / m_ticksPerPixel;
+    m_nextLineSgBase = base;
+    if (curPixel < 320 - m_pixelsPerOutInstruction) // for ease, actually exact value must be used, w/o correction
+        m_sgBase = base;
+}
+
+
 void Pk8000Renderer::setMode(unsigned mode)
 {
     if (mode < 4)
@@ -197,35 +209,36 @@ void Pk8000Renderer::setMode(unsigned mode)
     if (m_wideBorder) {
         m_ticksPerScanLineActiveArea = g_emulation->getFrequency() * 240 / 5000000;
         m_ticksPerScanLineSideBorder = g_emulation->getFrequency() * 80 / 5000000;
+        m_pixelsPerOutInstruction = 30 - 4; // 4 - correction from real
     } else {
         m_ticksPerScanLineActiveArea = g_emulation->getFrequency() * 256 / 5000000;
         m_ticksPerScanLineSideBorder = g_emulation->getFrequency() * 64 / 5000000;
+        m_pixelsPerOutInstruction = 40 - 8; // 8 - correction from real
     }
 }
 
 
-void Pk8000Renderer::setBgColor(unsigned color)
+void Pk8000Renderer::setFgBgColors(unsigned fgColor, unsigned bgColor)
 {
     int curPixel = (g_emulation->getCurClock() - m_curScanlineClock) / m_ticksPerPixel;
-    if (curPixel < 320) { // should olways be
-        for (int i = m_curScanlinePixel; i < curPixel; i++)
-            m_borderScanlinePixels[i] = m_bgColor;
-        m_curScanlinePixel = curPixel;
+    for (int i = m_curScanlinePixel; i < curPixel; i++) {
+        m_bgScanlinePixels[(i + m_pixelsPerOutInstruction) % 320] = m_bgColor;
+        m_fgScanlinePixels[(i + m_pixelsPerOutInstruction) % 320] = m_fgColor;
     }
-    m_bgColor = c_pk8000ColorPalette[color];
+    m_curScanlinePixel = curPixel;
+    m_fgColor = c_pk8000ColorPalette[fgColor];
+    m_bgColor = c_pk8000ColorPalette[bgColor];
 }
 
 
 void Pk8000Renderer::setColorReg(unsigned addr, uint8_t value)
 {
-    //m_screenMemoryRamBanks[m_bank]->writeByte(0x400 + addr, value);
     m_colorRegs[addr & 0x1F] = value;
 }
 
 
 uint8_t Pk8000Renderer::getColorReg(unsigned addr)
 {
-    //return m_screenMemoryBanks[m_bank][0x400 + addr];
     return m_colorRegs[addr & 0x1F];
 }
 
@@ -237,6 +250,11 @@ void Pk8000Renderer::renderLine(int nLine)
     if (nLine < 23 || nLine >= 303)
         return;
 
+    for (int i = m_curScanlinePixel; i < 320; i++) {
+        m_bgScanlinePixels[(i + m_pixelsPerOutInstruction) % 320] = m_bgColor;
+        m_fgScanlinePixels[(i + m_pixelsPerOutInstruction) % 320] = m_fgColor;
+    }
+
     uint32_t* linePtr;
 
     if (m_showBorder) {
@@ -246,9 +264,7 @@ void Pk8000Renderer::renderLine(int nLine)
             *linePtr++ = 0;
 
         if (nLine < 71 || nLine > 262 || m_blanking || m_mode > 2) {
-            for (int i = m_curScanlinePixel; i < 320; i++)
-                m_borderScanlinePixels[i] = m_bgColor;
-            uint32_t* borderPixels = m_borderScanlinePixels + 33 + m_offsetX;
+            uint32_t* borderPixels = m_bgScanlinePixels + 59 + m_offsetX;
             for(int i = 0; i < m_sizeX - m_offsetX; i++)
                 *linePtr++ = *borderPixels++;
             return;
@@ -277,7 +293,7 @@ void Pk8000Renderer::renderLine(int nLine)
             uint8_t chr = m_screenMemoryBanks[m_bank][(m_txtBase & ~0x0400) + row * 64 + pos];
             uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
             for (int i = 0; i < 6; i++) {
-                uint32_t color = bt & 0x80 ? m_fgColor : m_borderScanlinePixels[33 + m_offsetX + pos * 6 + i];
+                uint32_t color = (bt & 0x80 ? m_fgScanlinePixels : m_bgScanlinePixels)[59 + m_offsetX + pos * 6 + i];
                 *linePtr++ = color;
                 bt <<= 1;
             }
@@ -556,8 +572,7 @@ void Pk8000ColorSelector::writeByte(int, uint8_t value)
 {
     m_value = value;
     if (m_renderer) {
-        m_renderer->setFgColor(value & 0x0F);
-        m_renderer->setBgColor(value >> 4);
+        m_renderer->setFgBgColors(value & 0x0F, value >> 4);
     }
 }
 
