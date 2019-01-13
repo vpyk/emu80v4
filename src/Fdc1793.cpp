@@ -66,7 +66,7 @@ void Fdc1793::reset()
 {
     m_accessMode = FAM_WAITING;
     m_track = 0; // регистр дорожки
-    m_sector = 0; // регистр сектора
+    m_sector = 1; // регистр сектора
     m_data = 0; // регистр данных
     m_directionIn = true; // направление движения true=in, false=out
 }

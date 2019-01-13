@@ -1104,6 +1104,8 @@ string Pk8000KbdLayout::getPropertyStringValue(const string& propertyName)
 
 void Pk8000FddControlRegister::writeByte(int, uint8_t value)
 {
+    if (value & 0x80)
+        m_fdc->reset();
     m_fdc->setDrive(value & 0x40 ? 1 : 0); // пока так
     m_fdc->setHead((value & 0x10) >> 4);
 }
