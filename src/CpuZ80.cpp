@@ -2578,7 +2578,7 @@ void CpuZ80::intRst(int vect)
             m_curClock = g_emulation->getCurClock();
         }
         PUSH(PC); PC = vect * 8;
-        m_curClock += m_kDiv * 11; // óòî÷íèòü!
+        m_curClock += m_kDiv * 11; // уточнить!
     }
 }
 

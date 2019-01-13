@@ -242,6 +242,7 @@ void Cpu8080::reset() {
     PC = m_startAddr;
 
     IFF = 0;
+    m_iffPendingCnt = 0;
     m_core->inte(false);
 }
 
@@ -1668,7 +1669,8 @@ int Cpu8080::i8080_execute(int opcode) {
 
         case 0xFB:            /* ei */
             cpu_cycles = 4;
-            IFF = 1;
+            m_iffPendingCnt = 2;
+            IFF = 0; // check if this is necessary
             m_core->inte(true);
             break;
 
@@ -1697,6 +1699,14 @@ int Cpu8080::i8080_execute(int opcode) {
             cpu_cycles = -1;  /* Shouldn't be really here. */
             break;
     }
+
+    if (m_iffPendingCnt)
+        if (!--m_iffPendingCnt) {
+            IFF = 1;
+            m_core->inte(true);
+        }
+
+
     return cpu_cycles;
 }
 

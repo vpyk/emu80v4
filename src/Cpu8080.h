@@ -123,6 +123,7 @@ private:
         int i8080_execute(int opcode);
 
         uint8_t m_statusWord;
+        int m_iffPendingCnt = 0;
 };
 
 
