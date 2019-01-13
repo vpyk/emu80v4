@@ -69,7 +69,7 @@ Emulation::Emulation(int argc, char** argv)
         else {
             PlatformInfo pi;
             bool newWnd;
-            if (m_config->choosePlatform(pi, "", newWnd, true)) {
+            if (!m_config->getPlatformInfos()->empty() && m_config->choosePlatform(pi, "", newWnd, true)) {
                 Platform* platform = new Platform(pi.configFileName, pi.objName);
                 m_platformList.push_back(platform);
                 getConfig()->updateConfig();

@@ -53,6 +53,7 @@ static int frameRate = 100;
 static bool vsync = true;
 
 static bool isRunning = false;
+static bool dontRun = false;
 
 static QElapsedTimer timer;
 static QApplication* application;
@@ -222,7 +223,8 @@ void palResume()
 
 void palExecute()
 {
-    application->exec();
+    if (!dontRun)
+        application->exec();
 }
 
 
@@ -306,7 +308,10 @@ uint8_t* palReadFile(const string& fileName, int &fileSize, bool useBasePath)
 
 void palRequestForQuit()
 {
-    application->quit();
+    if (isRunning)
+        application->quit();
+    else
+        dontRun = true;
 }
 
 
