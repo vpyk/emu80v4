@@ -209,11 +209,11 @@ void Pk8000Renderer::setMode(unsigned mode)
     if (m_wideBorder) {
         m_ticksPerScanLineActiveArea = g_emulation->getFrequency() * 240 / 5000000;
         m_ticksPerScanLineSideBorder = g_emulation->getFrequency() * 80 / 5000000;
-        m_pixelsPerOutInstruction = 30 - 4; // 4 - correction from real
+        m_pixelsPerOutInstruction = 30 - 3; // 3 (3.5) - correction from real
     } else {
         m_ticksPerScanLineActiveArea = g_emulation->getFrequency() * 256 / 5000000;
         m_ticksPerScanLineSideBorder = g_emulation->getFrequency() * 64 / 5000000;
-        m_pixelsPerOutInstruction = 40 - 8; // 8 - correction from real
+        m_pixelsPerOutInstruction = 40 - 7; // 7 (7.5) - correction from real
     }
 }
 
