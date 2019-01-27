@@ -19,7 +19,8 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <vector>
+//#include <vector>
+#include <list>
 
 #include "EmuObjects.h"
 
@@ -85,6 +86,8 @@ class Cpu : public ActiveDevice
 class Cpu8080Compatible : public Cpu
 {
     public:
+        Cpu8080Compatible();
+
         void addHook(CpuHook* hook) override;
         void removeHook(CpuHook* hook) override;
 
@@ -119,11 +122,10 @@ class Cpu8080Compatible : public Cpu
         virtual bool getInte() = 0;
 
     protected:
-        std::vector<uint16_t>m_hookAddrVector;
-        uint16_t* m_hookAddresses = nullptr;
-
         int io_input(int port);
         void io_output(int port, int value);
+
+        std::list<CpuHook*>* m_hookArray[65536];
 };
 
 #endif // CPU_H

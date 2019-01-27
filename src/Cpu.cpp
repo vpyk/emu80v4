@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include "string.h"
 
 #include "Cpu.h"
 #include "CpuHook.h"
@@ -131,25 +132,33 @@ std::string Cpu::getPropertyStringValue(const std::string& propertyName)
 }
 
 
+Cpu8080Compatible::Cpu8080Compatible()
+{
+    memset(m_hookArray, 0, 65536 * sizeof(CpuHook*));
+}
+
+
 void Cpu8080Compatible::addHook(CpuHook* hook)
 {
-    Cpu::addHook(hook);
-    m_hookAddrVector.push_back(hook->getHookAddr());
-    m_hookAddresses = m_hookAddrVector.data();
+    hook->setCpu(this);
+    uint16_t addr = hook->getHookAddr();
+    if (!m_hookArray[addr])
+        m_hookArray[addr] = new list<CpuHook*>;
+    m_hookArray[addr]->push_back(hook);
 }
 
 
 void Cpu8080Compatible::removeHook(CpuHook* hook)
 {
-    Cpu::removeHook(hook);
-    //m_hookAddrVector.erase(remove(m_hookAddrVector.begin(), m_hookAddrVector.end(), hook->getHookAddr()), m_hookAddrVector.end());
-    // удаляем только один элемент, если несколько одинаковых
-    for (auto it = m_hookAddrVector.begin(); it != m_hookAddrVector.end(); it++)
-    if (*it == hook->getHookAddr()) {
-        m_hookAddrVector.erase(it);
-        break;
+    uint16_t addr = hook->getHookAddr();
+    list<CpuHook*>* hookList = m_hookArray[addr];
+    if (hookList) {
+        hookList->remove(hook);
+        if (hookList->empty()) {
+            delete hookList;
+            m_hookArray[addr] = nullptr;
+        }
     }
-    m_hookAddresses = m_hookAddrVector.data();
 }
 
 

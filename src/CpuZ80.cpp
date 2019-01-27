@@ -2520,17 +2520,13 @@ CpuZ80::CpuZ80()
 
 void CpuZ80::operate()
 {
-    bool retFlag = false;
-    // можно сделать упорядоченный список, чтобы не перебирать все
     if (!m_hooksDisabled) {
-        for (int i = 0; i < m_nHooks; i++) {
-            if (PC == m_hookAddresses[i]) {
-                if (m_hookVector[i]->hookProc())
-                    retFlag = true;
-                    //return; // поменять, если необходимо несколько ловушек на один адрес
-            }
+        bool retFlag = false;
+        list<CpuHook*>* hookList = m_hookArray[PC];
+        if (hookList) {
+            for (auto it = hookList->begin(); it != hookList->end(); it++)
+                retFlag = retFlag || (*it)->hookProc();
         }
-
         if (retFlag)
             return;
     }
