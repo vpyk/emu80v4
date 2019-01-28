@@ -18,6 +18,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 #include <string.h>
 
@@ -258,6 +259,11 @@ void DebugWindow::putString(string s)
 
 void DebugWindow::draw()
 {
+    const DebuggerOptions& debOpt = g_emulation->getDebuggerOptions();
+    m_mnemo8080UpperCase = debOpt.mnemo8080UpperCase;
+    m_mnemoZ80UpperCase = debOpt.mnemoZ80UpperCase;
+    m_swapF5F9 = debOpt.swapF5F9;
+
     checkForInput();
 
     drawDbgFrame();
@@ -585,6 +591,8 @@ void DebugWindow::fillCpuStatus()
 
 string DebugWindow::getInstructionMnemonic(uint16_t addr)
 {
+    string mnemo;
+
     uint8_t buf[4];
     buf[0] = memByte(addr);
     buf[1] = memByte(addr + 1);
@@ -592,12 +600,19 @@ string DebugWindow::getInstructionMnemonic(uint16_t addr)
     buf[3] = memByte(addr + 3); // Z80
 
     if (!m_z80Mode && !m_z80Mnemonics) {
-        return i8080GetInstructionMnemonic(buf);
+        mnemo = i8080GetInstructionMnemonic(buf);
+        if (!m_mnemo8080UpperCase)
+            transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::tolower);
+        return mnemo;
+    } else {
+        unsigned length;
+        STEP_FLAG flag;
+        mnemo = cpu_disassemble_z80(addr, buf, length, flag);
+        if (m_mnemoZ80UpperCase)
+            transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::toupper);
     }
 
-    unsigned length;
-    STEP_FLAG flag;
-    return cpu_disassemble_z80(addr, buf, length, flag);
+    return mnemo;
 }
 
 
@@ -774,7 +789,10 @@ void DebugWindow::drawHintBar()
 
     switch (m_mode) {
         case AM_CODE:
-            s = "C/D/R/F/B,Tab,Esc-Section A-Addr F4-Here F5-B/p F7-Step F8-Over F9-Run";
+            if (!m_swapF5F9)
+                s = "C/D/R/F/B,Tab,Esc-Section A-Addr F4-Here F5-B/p F7-Step F8-Over F9-Run";
+            else
+                s = "C/D/R/F/B,Tab,Esc-Section A-Addr F4-Here F5-Run F7-Step F8-Over F9-B/p";
             if (!m_compactMode)
                 s += " U-Skip";
             if (!m_z80Mode) {
@@ -1326,7 +1344,7 @@ void DebugWindow::codeKbdProc(PalKeyCode keyCode)
             here();
             break;
         case PK_F5:
-            breakpoint();
+            m_swapF5F9 ? run() : breakpoint();
             break;
         case PK_F7:
             step();
@@ -1335,7 +1353,7 @@ void DebugWindow::codeKbdProc(PalKeyCode keyCode)
             over();
             break;
         case PK_F9:
-            run();
+            m_swapF5F9 ? breakpoint() : run();
             break;
         case PK_U:
             skip();

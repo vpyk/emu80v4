@@ -124,6 +124,9 @@ void SettingsDialog::readRunningConfig()
     m_platformGroup = QString::fromUtf8(m_mainWindow->getPlatformGroupName().c_str());
 
     loadRunningConfigValue("emulation.volume");
+    loadRunningConfigValue("emulation.debug8080MnemoUpperCase");
+    loadRunningConfigValue("emulation.debugZ80MnemoUpperCase");
+    loadRunningConfigValue("emulation.debugSwapF5F9");
     loadRunningConfigValue("window.windowStyle");
     loadRunningConfigValue("window.frameScale");
     loadRunningConfigValue("window.antialiasing");
@@ -188,6 +191,13 @@ void SettingsDialog::loadSavedConfig()
             m_options[option] = settings.value(option).toString();
     }
     settings.endGroup();
+
+    settings.beginGroup("common");
+    foreach (QString option, m_options.keys()) {
+        if (settings.contains(option))
+            m_options[option] = settings.value(option).toString();
+    }
+    settings.endGroup();
 }
 
 
@@ -224,6 +234,11 @@ void SettingsDialog::fillControlValues()
     // Sample rate
     val = m_options["sampleRate"];
     ui->srComboBox->setCurrentText(val);
+
+    // Debugger options
+    ui->upper8080checkBox->setChecked(m_options["emulation.debug8080MnemoUpperCase"] == "yes");
+    ui->upperZ80checkBox->setChecked(m_options["emulation.debugZ80MnemoUpperCase"] == "yes");
+    ui->swapF5F9checkBox->setChecked(m_options["emulation.debugSwapF5F9"] == "yes");
 
     // Volume
     val = m_options["emulation.volume"];
@@ -610,6 +625,10 @@ void SettingsDialog::on_applyPushButton_clicked()
         rebootFlag = true;
     }
 
+    m_options["emulation.debug8080MnemoUpperCase"] = ui->upper8080checkBox->isChecked() ? "yes" : "no";
+    m_options["emulation.debugZ80MnemoUpperCase"] = ui->upperZ80checkBox->isChecked() ? "yes" : "no";
+    m_options["emulation.debugSwapF5F9"] = ui->swapF5F9checkBox->isChecked() ? "yes" : "no";
+
     val = QString::number(ui->volumeSlider->value());
     m_options["emulation.volume"] = val;
 
@@ -768,7 +787,8 @@ void SettingsDialog::saveStoredConfig()
     settings.beginGroup(m_platformGroup);
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (value != "" && option != "locale" /*&& option != "glDriver"*/ && option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync")
+        if (option.left(10) != "emulation." && value != "" && option != "locale" /*&& option != "glDriver"*/ &&
+                option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync")
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -776,7 +796,15 @@ void SettingsDialog::saveStoredConfig()
     settings.beginGroup("system");
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (value != "" && (option == "locale" /*|| option == "glDriver"*/ || option == "maxFps" || option == "limitFps" || option == "sampleRate" || option == "vsync"))
+        if (option.left(10) != "emulation." && value != "" && (option == "locale" /*|| option == "glDriver"*/ || option == "maxFps" || option == "limitFps" || option == "sampleRate" || option == "vsync"))
+            settings.setValue(option, value);
+    }
+    settings.endGroup();
+
+    settings.beginGroup("common");
+    foreach (QString option, m_options.keys()) {
+        QString value = m_options.value(option);
+        if (option.left(10) == "emulation.")
             settings.setValue(option, value);
     }
     settings.endGroup();

@@ -328,6 +328,11 @@ class DebugWindow : private EmuWindow
         unsigned m_curBpoint = 0;                    // номер текущей точки останова
         void bpointsDraw();
         void bpointsKbdProc(PalKeyCode keyCode);// клавиатурный обработчик секции точек останова
+
+        // debugger options
+        bool m_mnemo8080UpperCase;
+        bool m_mnemoZ80UpperCase;
+        bool m_swapF5F9;
 };
 
 

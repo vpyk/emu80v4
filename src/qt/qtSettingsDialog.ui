@@ -722,7 +722,7 @@
        <item>
         <widget class="QGroupBox" name="mnemonicsGroupBox">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -731,11 +731,14 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Mnemonics</string>
+          <string>Mnemonics (all platforms)</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <widget class="QCheckBox" name="upper8080checkBox">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -755,8 +758,30 @@
           </item>
           <item>
            <widget class="QCheckBox" name="upperZ80checkBox">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Z80 upper case mnemonics</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="controlGroupBox">
+         <property name="title">
+          <string>Control (all platforms)</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_16">
+          <item>
+           <widget class="QCheckBox" name="swapF5F9checkBox">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use F5 for &amp;quot;Run&amp;quot; and F9 for &amp;quot;Set breakpoint&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Swap F5 and F9 (VS like)</string>
             </property>
            </widget>
           </item>
@@ -767,6 +792,9 @@
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1191,8 +1219,9 @@
   <tabstop>cropCheckBox</tabstop>
   <tabstop>debugHltCheckBox</tabstop>
   <tabstop>debugIllegalCheckBox</tabstop>
-  <tabstop>upperZ80checkBox</tabstop>
   <tabstop>upper8080checkBox</tabstop>
+  <tabstop>upperZ80checkBox</tabstop>
+  <tabstop>swapF5F9checkBox</tabstop>
   <tabstop>bwRadioButton</tabstop>
   <tabstop>color1RadioButton</tabstop>
   <tabstop>color2RadioButton</tabstop>

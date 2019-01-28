@@ -42,6 +42,12 @@ class Platform;
     DevListItem* next;
 };*/
 
+struct DebuggerOptions {
+    bool mnemo8080UpperCase = true;
+    bool mnemoZ80UpperCase = false;
+    bool swapF5F9 = true;
+};
+
 class Emulation : public ParentObject
 {
     public:
@@ -96,6 +102,8 @@ class Emulation : public ParentObject
 
         void processCmdLine();
 
+        const DebuggerOptions& getDebuggerOptions() {return m_debuggerOptions;}
+
     private:
         std::vector<IActive*> m_activeDevVector;
         IActive** m_activeDevices = nullptr;
@@ -135,6 +143,8 @@ class Emulation : public ParentObject
 
         bool m_platformCreatedFromCmdLine = false;
         void runPlatform (const std::string& platformName);
+
+        DebuggerOptions m_debuggerOptions;
 };
 
 

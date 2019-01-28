@@ -536,6 +536,21 @@ bool Emulation::setProperty(const string& propertyName, const EmuValuesList& val
     } else if (propertyName == "processCmdLine") {
         processCmdLine();
         return true;
+    } else if (propertyName == "debug8080MnemoUpperCase") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_debuggerOptions.mnemo8080UpperCase = values[0].asString() == "yes";
+            return true;
+        }
+    } else if (propertyName == "debugZ80MnemoUpperCase") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_debuggerOptions.mnemoZ80UpperCase = values[0].asString() == "yes";
+            return true;
+        }
+    } else if (propertyName == "debugSwapF5F9") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_debuggerOptions.swapF5F9 = values[0].asString() == "yes";
+            return true;
+        }
     }
 
     return false;
@@ -554,7 +569,13 @@ string Emulation::getPropertyStringValue(const string& propertyName)
         stringstream stringStream;
         stringStream << m_mixer->getVolume();
         stringStream >> res;
-    }/* else if (propertyName == "frameRate") {
+    } else if (propertyName == "debug8080MnemoUpperCase")
+        res = m_debuggerOptions.mnemo8080UpperCase ? "yes" : "no";
+    else if (propertyName == "debugZ80MnemoUpperCase")
+        res = m_debuggerOptions.mnemoZ80UpperCase ? "yes" : "no";
+    else if (propertyName == "debugSwapF5F9")
+        res = m_debuggerOptions.swapF5F9 ? "yes" : "no";
+    /* else if (propertyName == "frameRate") {
         stringstream stringStream;
         stringStream << m_frameRate;
         stringStream >> res;
