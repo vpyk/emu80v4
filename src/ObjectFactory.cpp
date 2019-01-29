@@ -55,6 +55,8 @@
 #include "GenericModules.h"
 #include "Pk8000.h"
 #include "Psg3910.h"
+#include "PpiAtaAdapter.h"
+#include "AtaDrive.h"
 
 #include "EmuConfig.h"
 
@@ -174,6 +176,8 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Psg3910)
     REG_EMU_CLASS(Psg3910SoundSource)
     REG_EMU_CLASS(Pk8000CpuWaits)
+    REG_EMU_CLASS(PpiAtaAdapter)
+    REG_EMU_CLASS(AtaDrive)
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

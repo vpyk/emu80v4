@@ -30,7 +30,13 @@ bool PalFile::open(string fileName, string mode)
         qmode = QIODevice::WriteOnly;
     else if (mode == "r")
         qmode = QIODevice::ReadOnly;
-    else //if (mode == "rw")
+    else if (mode == "r+") {
+        // flag below since qt 5.11 so use exists()
+        //qmode = QIODevice::ReadWrite | QIODevice::ExistingOnly;
+        if (!m_file->exists())
+            return false;
+        qmode = QIODevice::ReadWrite;
+    } else //if (mode == "rw")
         qmode = QIODevice::ReadWrite;
     if (m_file->open(qmode))
         return true;

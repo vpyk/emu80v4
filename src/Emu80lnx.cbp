@@ -80,6 +80,8 @@
 		<Unit filename="AddrSpace.h" />
 		<Unit filename="Apogey.cpp" />
 		<Unit filename="Apogey.h" />
+		<Unit filename="AtaDrive.cpp" />
+		<Unit filename="AtaDrive.h" />
 		<Unit filename="CloseFileHook.cpp" />
 		<Unit filename="CloseFileHook.h" />
 		<Unit filename="ConfigReader.cpp" />
@@ -167,6 +169,8 @@
 		<Unit filename="Ppi8255.cpp" />
 		<Unit filename="Ppi8255.h" />
 		<Unit filename="Ppi8255Circuit.h" />
+		<Unit filename="PpiAtaAdapter.cpp" />
+		<Unit filename="PpiAtaAdapter.h" />
 		<Unit filename="RamDisk.cpp" />
 		<Unit filename="RamDisk.h" />
 		<Unit filename="Rk86.cpp" />

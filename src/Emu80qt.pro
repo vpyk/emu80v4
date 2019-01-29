@@ -36,6 +36,7 @@ SOURCES += \
     Main.cpp \
     AddrSpace.cpp \
     Apogey.cpp \
+    AtaDrive.cpp \
     CloseFileHook.cpp \
     ConfigReader.cpp \
     Cpu.cpp \
@@ -75,6 +76,7 @@ SOURCES += \
     Platform.cpp \
     PlatformCore.cpp \
     Ppi8255.cpp \
+    PpiAtaAdapter.cpp \
     Psg3910.cpp \
     RamDisk.cpp \
     Rk86.cpp \
@@ -106,6 +108,7 @@ SOURCES += \
 HEADERS  += \
     AddrSpace.h \
     Apogey.h \
+    AtaDrive.h \
     CloseFileHook.h \
     ConfigReader.h \
     Cpu.h \
@@ -153,6 +156,7 @@ HEADERS  += \
     PlatformCore.h \
     Ppi8255.h \
     Ppi8255Circuit.h \
+    PpiAtaAdapter.h \
     Psg3910.h \
     RamDisk.h \
     Rk86.h \

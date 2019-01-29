@@ -32,6 +32,7 @@ class Fdc1793;
 class GeneralSoundSource;
 class Pk8000CpuWaits;
 
+
 class Pk8000Renderer : public CrtRenderer, public IActive
 {
     public:
@@ -425,4 +426,3 @@ private:
 };
 
 #endif // PK8000_H
-
