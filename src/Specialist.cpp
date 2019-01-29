@@ -467,7 +467,6 @@ void SpecKeyboard::resetKeys()
         m_vKeys[i] = 0;
     for (int i = 0; i < 6; i++)
         m_hKeys[i] = 0;
-    m_vMask = 0;
     m_shift = false;
 }
 
