@@ -57,7 +57,7 @@ void FdImage::reset()
 bool FdImage::assignFileName(string fileName)
 {
     m_fileName = palMakeFullFileName(fileName);
-    m_file.open(m_fileName.c_str(), m_isWriteProtected ? "r" : "rw");
+    m_file.open(m_fileName.c_str(), m_isWriteProtected ? "r" : "r+");
 
     reset();
 
@@ -73,7 +73,7 @@ void FdImage::chooseFile()
         m_fileName = fileName;
         if (m_file.isOpen())
             m_file.close();
-        m_file.open(m_fileName.c_str(), m_isWriteProtected ? "r" : "rw");
+        m_file.open(m_fileName.c_str(), m_isWriteProtected ? "r" : "r+");
 
     reset();
     }
