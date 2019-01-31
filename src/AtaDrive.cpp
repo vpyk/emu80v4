@@ -37,6 +37,8 @@ using namespace std;
 
 bool AtaDrive::assignFileName(string fileName)
 {
+    m_fileName = fileName;
+
     fileName = palMakeFullFileName(fileName);
     m_file.open(fileName.c_str(), m_readOnly ? "r" : "r+");
 
@@ -67,7 +69,7 @@ void AtaDrive::writeReg(int reg, uint16_t value)
         // data port
         if (m_dataCounter) {
             *(m_dataPtr++) = value;
-            if (!(--m_dataCounter)) {
+            if (!(--m_dataCounter) && !m_readOnly) {
                 for (int i = 0; i < 256; i++) {
                     m_file.write8(m_sectorBuf[i] & 0xFF);
                     m_file.write8(m_sectorBuf[i] >> 8);
@@ -145,6 +147,16 @@ uint16_t AtaDrive::readReg(int reg)
 }
 
 
+void AtaDrive::setReadOnly(bool ro)
+{
+    if (ro != m_readOnly) {
+        m_readOnly = ro;
+        if (m_fileName != "")
+            assignFileName(m_fileName);
+    }
+}
+
+
 bool AtaDrive::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
@@ -152,6 +164,11 @@ bool AtaDrive::setProperty(const string& propertyName, const EmuValuesList& valu
 
     if (propertyName == "imageFile")
         return assignFileName(values[0].asString());
+    else if (propertyName == "readOnly")
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            setReadOnly(values[0].asString() == "yes");
+            return true;
+    }
 
     return false;
 }

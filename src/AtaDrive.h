@@ -48,6 +48,7 @@ class AtaDrive : public EmuObject
     private:
         PalFile m_file;
         bool m_readOnly = false;
+        std::string m_fileName = "";
 
         int m_dev = 0; // ignore for now
         bool m_lba = false;
@@ -64,6 +65,8 @@ class AtaDrive : public EmuObject
         void identify();
         void readSectors();
         void writeSectors();
+
+        void setReadOnly(bool ro);
 };
 
 
