@@ -18,7 +18,7 @@
 
 #include "Emulation.h"
 #include "PpiAtaAdapter.h"
-#include "Atadrive.h"
+#include "AtaDrive.h"
 
 using namespace std;
 
