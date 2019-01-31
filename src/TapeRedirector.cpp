@@ -73,7 +73,7 @@ void TapeRedirector::openFile()
     if (ext == ".wav" || ext == ".WAV" || ext == ".csw" || ext == ".CSW") {
         m_cancelled = true;
         if (m_rwMode == "r")
-            g_emulation->getWavReader()->loadFile(m_fileName);
+            g_emulation->getWavReader()->loadFile(m_fileName, this);
         else if (m_rwMode == "w") {
             m_wavWriter = new WavWriter(m_platform, m_fileName, ext == ".csw" || ext == ".CSW");
         }

@@ -26,6 +26,7 @@
 
 
 class WavSoundSource;
+class TapeRedirector;
 
 class WavReader : public EmuObject
 {
@@ -43,7 +44,7 @@ class WavReader : public EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
-        bool loadFile(const std::string& fileName);
+        bool loadFile(const std::string& fileName, TapeRedirector* tapeRedirecotr = nullptr);
         bool chooseAndLoadFile();
         bool isPlaying() {return m_isOpen;}
 
@@ -72,6 +73,8 @@ class WavReader : public EmuObject
         unsigned m_speedUpFactor = 1;
 
         WavSoundSource* m_wavSource;
+
+        TapeRedirector* m_tapeRedirector = nullptr;
 
         void reportError(const std::string& errorStr);
         bool tryWavFormat();

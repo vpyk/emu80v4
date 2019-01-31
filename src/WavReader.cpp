@@ -20,6 +20,7 @@
 
 #include "Pal.h"
 #include "WavReader.h"
+#include "TapeRedirector.h"
 #include "Emulation.h"
 
 using namespace std;
@@ -60,7 +61,7 @@ void WavReader::reportError(const std::string& errorStr)
 
 
 
-bool WavReader::loadFile(const std::string& fileName)
+bool WavReader::loadFile(const std::string& fileName, TapeRedirector* tapeRedirector)
 {
     m_fileName = fileName;
 
@@ -74,6 +75,7 @@ bool WavReader::loadFile(const std::string& fileName)
         res = tryCswFormat();
 
     if (res) {
+        m_tapeRedirector = tapeRedirector;
         m_startClock = g_emulation->getCurClock();
         m_curSample = 0;
         m_isOpen = true;
@@ -328,6 +330,8 @@ bool WavReader::getCurValue()
         m_isOpen = false;
         m_file.close();
         g_emulation->setSpeedUpFactor(1);
+        if (m_tapeRedirector)
+            m_tapeRedirector->closeFile();
         return false;
     }
 }
