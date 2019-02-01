@@ -1,2 +1,2 @@
 rem Desktop OpenGL
-Emu80qt.exe -opengl
+start Emu80qt.exe -opengl
