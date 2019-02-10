@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ void SettingsDialog::writeInitialSavedConfig()
     settings.beginGroup(m_platformGroup);
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (value != "" && option != "locale" /*&& option != "glDriver"*/ &&
+        if (value != "" && option != "locale" && option != "showHelp" &&
                 option != "maxFps" && option != "sampleRate" && option != "vsync" && option != "limitFps" &&
                 !settings.contains(option))
             settings.setValue(option, value);
@@ -183,6 +183,7 @@ void SettingsDialog::loadSavedConfig()
     m_options["limitFps"] = settings.value("limitFps").toString();
     m_options["vsync"] = settings.value("vsync").toString();
     m_options["sampleRate"] = settings.value("sampleRate").toString();
+    m_options["showHelp"] = settings.value("showHelp", "yes").toString();
     settings.endGroup();
 
     settings.beginGroup(m_platformGroup);
@@ -214,6 +215,9 @@ void SettingsDialog::fillControlValues()
         ui->langComboBox->setCurrentIndex(2);
     else // if (val == "system")
         ui->langComboBox->setCurrentIndex(0);
+
+    // Show help
+    ui->showHelpCheckBox->setChecked(m_options["showHelp"] == "yes");
 
     // OpenGL driver
     /*val = m_options["glDriver"];
@@ -601,6 +605,8 @@ void SettingsDialog::on_applyPushButton_clicked()
         rebootFlag = true;
     }*/
 
+    m_options["showHelp"] = ui->showHelpCheckBox->isChecked() ? "yes" : "no";
+
     val = QString::number(ui->fpsSpinBox->value());
     if (val != m_options["maxFps"]) {
         m_options["maxFps"] = val;
@@ -771,7 +777,7 @@ void SettingsDialog::saveRunningConfig()
 {
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (value != "" && option != "locale" /*&& option != "glDriver"*/ && option != "maxFps" &&
+        if (value != "" && option != "locale" && option != "showHelp" && option != "maxFps" &&
                            option != "limitFps" && option != "sampleRate" && option != "vsync") {
             setRunningConfigValue(option, value);
         }
@@ -787,7 +793,7 @@ void SettingsDialog::saveStoredConfig()
     settings.beginGroup(m_platformGroup);
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (option.left(10) != "emulation." && value != "" && option != "locale" /*&& option != "glDriver"*/ &&
+        if (option.left(10) != "emulation." && value != "" && option != "locale" && option != "showHelp" &&
                 option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync")
             settings.setValue(option, value);
     }
@@ -796,7 +802,7 @@ void SettingsDialog::saveStoredConfig()
     settings.beginGroup("system");
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (option.left(10) != "emulation." && value != "" && (option == "locale" /*|| option == "glDriver"*/ || option == "maxFps" || option == "limitFps" || option == "sampleRate" || option == "vsync"))
+        if (option.left(10) != "emulation." && value != "" && (option == "locale" || option == "showHelp" || option == "maxFps" || option == "limitFps" || option == "sampleRate" || option == "vsync"))
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -859,4 +865,24 @@ void SettingsDialog::on_vsyncCheckBox_toggled(bool checked)
 void SettingsDialog::on_maxFpsCheckBox_toggled(bool checked)
 {
     ui->fpsSpinBox->setEnabled(!checked);
+}
+
+
+QString SettingsDialog::getOptionValue(QString option)
+{
+    return m_options[option];
+}
+
+
+/*void SettingsDialog::setOptionValue(QString option, QString value)
+{
+    m_options[option] = value;
+}*/
+
+
+void SettingsDialog::onResetShowHelp()
+{
+    m_options["showHelp"] = "no";
+    ui->showHelpCheckBox->setChecked(false);
+    saveConfig();
 }

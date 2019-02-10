@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -280,19 +280,30 @@ void Platform::showDebugger()
     }
 }
 
-/*
+
 bool Platform::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
 
-    if (propertyName == "configTab") {
-        EmuConfigTab* tab = dynamic_cast<EmuConfigTab*>(g_emulation->findObject(values[0].asString()));
-        if (tab) {
-            m_defConfigTabId = tab->getTabId();
-            return true;
-        }
+    if (propertyName == "helpFile") {
+        m_helpFile = values[0].asString();
+        return true;
     }
     return false;
 }
-*/
+
+
+string Platform::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "helpFile")
+        return m_helpFile;
+
+    return "";
+}

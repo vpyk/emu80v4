@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include "qtToolBtn.h"
 #include "qtSettingsDialog.h"
 #include "qtAboutDialog.h"
+#include "qtHelpDialog.h"
 
 #include "qtPal.h"
 #include "../EmuCalls.h"
@@ -116,6 +117,13 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         m_settingsDialog->initConfig();
         updateConfig(); // немного избыточно
 
+        if (m_settingsDialog->getOptionValue("showHelp") == "yes") {
+            std::string helpFile = palMakeFullFileName(emuGetPropertyValue(m_palWindow->getPlatformObjectName(), "helpFile"));
+            HelpDialog* hd = HelpDialog::execute(QString::fromUtf8(helpFile.c_str()), true);
+            if (hd)
+                connect(hd, SIGNAL(resetShowHelp()), m_settingsDialog, SLOT(onResetShowHelp()));
+        }
+
         break;
     case EWT_DEBUG:
         createDebugActions();
@@ -191,6 +199,7 @@ void MainWindow::showWindow()
         setWindowFlags(windowFlags() |= Qt::WindowMaximizeButtonHint);
         show();
         adjustClientSize();
+        HelpDialog::activate();
     }
 }
 
@@ -708,6 +717,13 @@ void MainWindow::createActions()
     m_toolBar->addAction(m_muteAction);
 
     QMenu* helpMenu = m_menuBar->addMenu(tr("Help"));
+
+    m_platformHelpAction = new QAction(tr("Platform help..."), this);
+    m_platformHelpAction->setToolTip(tr("Show help on current platform"));
+    helpMenu->addAction(m_platformHelpAction);
+    connect(m_platformHelpAction, SIGNAL(triggered()), this, SLOT(onPlatformHelp()));
+
+    helpMenu->addSeparator();
 
     m_aboutAction = new QAction(tr("About..."), this);
     m_aboutAction->setToolTip(tr("About"));
@@ -1505,6 +1521,13 @@ void MainWindow::onScreenshot()
 void MainWindow::onCopyImage()
 {
     m_paintWidget->screenshot("");
+}
+
+
+void MainWindow::onPlatformHelp()
+{
+    std::string helpFile = palMakeFullFileName(emuGetPropertyValue(m_palWindow->getPlatformObjectName(), "helpFile"));
+    HelpDialog::execute(QString::fromUtf8(helpFile.c_str()), false);
 }
 
 

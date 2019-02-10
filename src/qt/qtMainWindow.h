@@ -98,6 +98,7 @@ private slots:
     void onScreenshot();
     void onCopyImage();
     void onSettings();
+    void onPlatformHelp();
     void onAbout();
     void onQwerty();
     void onJcuken();
@@ -187,6 +188,7 @@ private:
     QAction* m_preset2xAction;
     QAction* m_preset3xAction;
     QAction* m_presetFitAction;
+    QAction* m_platformHelpAction;
     QAction* m_aboutAction;
     QAction* m_qwertyAction;
     QAction* m_jcukenAction;

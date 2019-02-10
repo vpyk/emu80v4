@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,7 +45,8 @@ class Platform : public ParentObject
         Platform(std::string configFileName, std::string name = "");
         virtual ~Platform();
         void addChild(EmuObject* child) override;
-        //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
         void init() override;
         void reset() override;
 
@@ -87,6 +88,8 @@ class Platform : public ParentObject
         int m_defConfigTabId = 0;
 
         DebugWindow* m_dbgWindow = nullptr;
+
+        std::string m_helpFile = "";
 };
 
 

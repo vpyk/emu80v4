@@ -103,7 +103,8 @@ SOURCES += \
     qt/qtPalWindow.cpp \
     qt/qtRenderHelper.cpp \
     qt/qtSettingsDialog.cpp \
-    qt/qtToolBtn.cpp
+    qt/qtToolBtn.cpp \
+    qt/qtHelpDialog.cpp
 
 HEADERS  += \
     AddrSpace.h \
@@ -184,7 +185,8 @@ HEADERS  += \
     qt/qtPalWindow.h \
     qt/qtRenderHelper.h \
     qt/qtSettingsDialog.h \
-    qt/qtToolBtn.h
+    qt/qtToolBtn.h \
+    qt/qtHelpDialog.h
 
 RESOURCES += \
     qt/icons.qrc \
@@ -197,7 +199,8 @@ CODECFORSRC = UTF-8
 FORMS += \
     qt/qtSettingsDialog.ui \
     qt/qtChoosePlatformDialog.ui \
-    qt/qtAboutDialog.ui
+    qt/qtAboutDialog.ui \
+    qt/qtHelpDialog.ui
 
 win32:RC_FILE = qt/emu80.rc
 
