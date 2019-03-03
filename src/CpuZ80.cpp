@@ -2734,3 +2734,9 @@ void CpuZ80::setIY(uint16_t value)
 {
     iy = value;
 }
+
+
+void CpuZ80::setIFF(bool iff)
+{
+    IFF = iff ? 3 : 0;
+}

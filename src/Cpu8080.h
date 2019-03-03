@@ -110,6 +110,7 @@ class Cpu8080 : public Cpu8080Compatible
         void setHL(uint16_t value) override;
         void setSP(uint16_t value) override;
         void setPC(uint16_t value) override;
+        void setIFF(bool iff) override;
 
         uint8_t getStatusWord() {return m_statusWord;}
 

@@ -25,10 +25,16 @@
 class Keyboard : public EmuObject
 {
     public:
-        void reset() override {resetKeys();}
+        void reset() override {if (m_keysResetAllowed) resetKeys();}
 
         virtual void resetKeys() = 0;
         virtual void processKey(EmuKey key, bool isPressed) = 0;
+
+        void enableKeysReset() {m_keysResetAllowed = true;}
+        void disableKeysReset() {m_keysResetAllowed = false;}
+
+    private:
+        bool m_keysResetAllowed = true;
 };
 
 #endif  // KEYBOARD_H

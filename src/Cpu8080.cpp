@@ -303,7 +303,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 g_emulation->debugRequest(this);
                 break;
             }
-            /* Falls through. */
+        /* Falls through. */
         case 0x00:            /* nop */
             cpu_cycles = 4;
             break;
@@ -1674,7 +1674,7 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0xFB:            /* ei */
             cpu_cycles = 4;
             m_iffPendingCnt = 2;
-            IFF = 0; // check if this is necessary
+            //IFF = 0; // check if this is necessary
             m_core->inte(true);
             break;
 
@@ -1888,6 +1888,12 @@ void Cpu8080::setAF(uint16_t value)
 {
     AF = value;
     i8080_retrieve_flags();
+}
+
+
+void Cpu8080::setIFF(bool iff)
+{
+    IFF = iff ? 1 : 0;
 }
 
 

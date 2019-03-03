@@ -34,6 +34,9 @@ void KbdLayout::resetKeys()
 
 void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey)
 {
+    if (isPressed && processSpecialKeys(keyCode))
+        return;
+
     Keyboard* kbd = m_platform->getKeyboard();
 
     EmuKey emuKey;

@@ -118,6 +118,7 @@ class Cpu8080Compatible : public Cpu
         virtual void setSP(uint16_t value) = 0;
         virtual void setPC(uint16_t value) = 0;
         virtual void setAF(uint16_t value) = 0;
+        virtual void setIFF(bool iff) = 0;
         //virtual void exec(int nCmds) = 0;
 
         virtual bool getInte() = 0;

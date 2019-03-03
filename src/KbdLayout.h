@@ -164,6 +164,7 @@ class KbdLayout : public EmuObject
 
         virtual EmuKey translateKey(PalKeyCode keyCode) {return translateCommonKeys(keyCode);}
         virtual EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
+        virtual bool processSpecialKeys(PalKeyCode) {return false;}
 
         EmuKey translateCommonKeys(PalKeyCode keyCode);
         EmuKey translateCommonUnicodeKeys(unsigned unicodeKey, bool& shift, bool& lang);

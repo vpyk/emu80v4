@@ -91,6 +91,7 @@ SOURCES += \
     Specialist.cpp \
     TapeRedirector.cpp \
     Ut88.cpp \
+    Vector.cpp \
     WavReader.cpp \
     WavWriter.cpp \
     qt/qtAboutDialog.cpp \
@@ -172,6 +173,7 @@ HEADERS  += \
     Specialist.h \
     TapeRedirector.h \
     Ut88.h \
+    Vector.h \
     Version.h \
     WavReader.h \
     WavWriter.h \

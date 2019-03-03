@@ -63,6 +63,7 @@ class CpuZ80 : public Cpu8080Compatible
         void setHL(uint16_t value) override;
         void setSP(uint16_t value) override;
         void setPC(uint16_t value) override;
+        void setIFF(bool iff) override;
         //void exec(int nCmds) override;
 
         bool getInte() override; // у Z80 нет inte, сохранено для эмуляции Z80-Card
