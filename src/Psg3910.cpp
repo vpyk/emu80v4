@@ -56,8 +56,8 @@ void Psg3910::reset()
         m_counters[i].freq = 0;
         m_counters[i].amp = 0;
         m_counters[i].var = false;
-        m_counters[i].toneGate = false;
-        m_counters[i].noiseGate = false;
+        m_counters[i].toneGate = true;
+        m_counters[i].noiseGate = true;
         m_counters[i].counter = 0;
         m_counters[i].toneValue = false;
         m_counters[i].outValue = 0.0;
@@ -100,12 +100,12 @@ void Psg3910::writeByte(int addr, uint8_t value)
             m_noiseFreq = value & 0x1F;
             break;
         case 7:
-            m_counters[0].toneGate = !(value & 0x01);
-            m_counters[1].toneGate = !(value & 0x02);
-            m_counters[2].toneGate = !(value & 0x04);
-            m_counters[0].noiseGate = !(value & 0x08);
-            m_counters[1].noiseGate = !(value & 0x10);
-            m_counters[2].noiseGate = !(value & 0x20);
+            m_counters[0].toneGate = value & 0x01;
+            m_counters[1].toneGate = value & 0x02;
+            m_counters[2].toneGate = value & 0x04;
+            m_counters[0].noiseGate = value & 0x08;
+            m_counters[1].noiseGate = value & 0x10;
+            m_counters[2].noiseGate = value & 0x20;
             break;
         case 8:
             m_counters[0].amp = value & 0x0F;
@@ -178,7 +178,7 @@ void Psg3910::step()
         }
 
         bool tone = m_counters[i].freq ? m_counters[i].toneValue : false; // silent if tone freq = 0
-        bool val = (m_counters[i].toneGate && tone) || (m_counters[i].noiseGate && m_noiseValue);
+        bool val = (m_counters[i].toneGate || tone) && (m_counters[i].noiseGate || m_noiseValue);
 
         m_counters[i].outValue = val ? logAmps[m_counters[i].var ? m_envValue : m_counters[i].amp] : 0.0;
         m_outValue += m_counters[i].outValue;
