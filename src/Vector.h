@@ -33,12 +33,6 @@ class Rom;
 class GeneralSoundSource;
 
 
-struct ScanlineData {
-    uint32_t borderColor;
-    bool mode512px;
-    //uint32_t palette[16];
-};
-
 class VectorRenderer : public CrtRenderer, public IActive
 {
     public:
@@ -76,10 +70,12 @@ class VectorRenderer : public CrtRenderer, public IActive
         int m_offsetY = 0;
 
         uint8_t m_lineOffset = 0xFF;
+        uint8_t m_latchedLineOffset = 0xFF;
+        bool m_lineOffsetIsLatched = false;
         uint8_t m_borderColor = 0;
-        bool m_512pxMode = false;
+        bool m_mode512px = false;
+        bool m_mode512pxLatched = false;
         uint32_t m_palette[16];
-        ScanlineData m_scanlineData[768];
 
         unsigned m_ticksPerPixel;
         int m_pixelsPerOutInstruction = 48;
@@ -87,14 +83,19 @@ class VectorRenderer : public CrtRenderer, public IActive
         uint64_t m_curScanlineClock;
         int m_curScanlinePixel;
 
+        uint64_t m_firstFrameClock;
+        uint64_t m_curFrameClock;
+        int m_curFramePixel;
+
         bool m_yEnabled = false;
         bool m_rEnabled = false;
         bool m_gEnabled = true;
         bool m_bEnabled = false;
 
         void prepareFrame();
-        void renderLine(int nLine);
-        void advance();
+        void renderLine(int nLine, int firstPx, int LastPx);
+        //void advance();
+        void advanceTo(uint64_t clocks);
 };
 
 

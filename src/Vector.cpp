@@ -128,8 +128,10 @@ VectorRenderer::VectorRenderer()
 
     m_ticksPerPixel = g_emulation->getFrequency() / 12000000;
     m_curScanlineClock = m_curClock;
-    memset(m_scanlineData, 0, sizeof(m_scanlineData));
     m_curScanlineClock = m_curClock;
+
+    m_curFramePixel = 0;
+    m_curFrameClock = m_curClock;
 
     m_frameBuf = new uint32_t[maxBufSize];
 
@@ -147,61 +149,65 @@ VectorRenderer::~VectorRenderer()
 
 void VectorRenderer::operate()
 {
-    renderLine(m_curLine);
-    m_curScanlineClock = m_curClock;
-    m_curScanlinePixel = 0;
-    if (++m_curLine == 312) {
-        m_curLine = 0;
-        renderFrame();
-        m_platform->getCore()->vrtc(true);
-    }
-    //uint64_t m_ticksPerScanLine = g_emulation->getFrequency() * 384 / 6000000;
-    m_curClock += m_ticksPerPixel * 768;
+    advanceTo(m_curClock);
+    //m_firstFrameClock = m_curClock;
+    m_curFrameClock = m_curClock;
+    m_curFramePixel = 0;
+    m_curClock += m_ticksPerPixel * 768 * 312;
+    m_lineOffsetIsLatched = false;
+    renderFrame();
+    m_platform->getCore()->vrtc(true);
+    m_mode512pxLatched = m_mode512px;
 }
 
 
-void VectorRenderer::attachMemory(Ram* memory)
+void VectorRenderer::advanceTo(uint64_t clock)
 {
-    m_screenMemory = memory->getDataPtr();
-}
+    const int bias = 145;
 
+    int toPixel = int(clock - m_curFrameClock) / m_ticksPerPixel + bias;
 
-void VectorRenderer::advance()
-{
-    int curPixel = (g_emulation->getCurClock() - m_curScanlineClock) / m_ticksPerPixel;
-    for (int i = m_curScanlinePixel; i < curPixel; i++) {
-        int x = (i + m_pixelsPerOutInstruction + 146) % 768;
-        m_scanlineData[x].borderColor = m_borderColor;
-        m_scanlineData[x].mode512px = m_512pxMode;
-        /*for (int c = 0; c < 16; c++)
-            m_scanlineData[x].palette[c] = m_palette[c];*/
+    if (!m_lineOffsetIsLatched && toPixel > 768 * 40 + 180) {
+        m_lineOffsetIsLatched = true;
+        m_latchedLineOffset = m_lineOffset;
     }
-    m_curScanlinePixel = curPixel;
+
+    int firstLine = m_curFramePixel / 768;
+    int firstPixel = m_curFramePixel % 768;
+    int lastLine = toPixel / 768;
+    int lastPixel = toPixel % 768;
+    m_curFramePixel = toPixel;
+    renderLine(firstLine, firstPixel, firstLine == lastLine ? lastPixel : 768);
+    for (int line = firstLine + 1; line < lastLine + 1; line++)
+        renderLine(line, 0, 768);
+    renderLine(lastLine, firstLine == lastLine ? firstPixel : 0, lastPixel);
 }
 
 
 void VectorRenderer::setBorderColor(uint8_t color)
 {
-    advance();
+    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
     m_borderColor = color;
 }
 
 
 void VectorRenderer::set512pxMode(bool mode512)
 {
-    advance();
-    m_512pxMode = mode512;
+    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
+    m_mode512px = mode512;
 }
 
 
 void VectorRenderer::setLineOffset(uint8_t lineOffset)
 {
+    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
     m_lineOffset = lineOffset;
 }
 
 
 void VectorRenderer::setPaletteColor(uint8_t color)
 {
+    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 27);
     //advance();
     //m_palette[m_borderColor] = ((color & 0x7) << 21) | ((color & 0x38) << 10) | (color & 0xC0);
     m_palette[m_borderColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
@@ -210,83 +216,73 @@ void VectorRenderer::setPaletteColor(uint8_t color)
 }
 
 
-void VectorRenderer::renderLine(int nLine)
+void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
 {
-    // Render scan line #nLine (0-22 - invisible, 23-39 - border, 40-295 - visible, 296-311 - border)
+    // Render scan line #nLine
+    // Vertical: 0-22 - invisible, 23-39 - border, 40-295 - visible, 296-311 - border) from firstPx to lastPx
+    // Horizonlal: 0-123 - invisible, 124-180 - border, 181-692 - active area, 693-749 - border, 750-767 - invisible
 
-    if (nLine < 23)
+    if (nLine < 24)
         return;
 
-    for (int i = m_curScanlinePixel; i < 768; i++) {
-        int x = (i + m_pixelsPerOutInstruction + 146) % 768;
-        m_scanlineData[x].borderColor = m_borderColor;
-        m_scanlineData[x].mode512px = m_512pxMode;
-        /*for (int c = 0; c < 16; c++)
-            m_scanlineData[x].palette[c] = m_palette[c];*/
-    }
+    uint32_t* linePtr = m_frameBuf + (nLine - 24) * 626;
+    uint32_t* ptr;
 
-    uint32_t* linePtr;
-
-    if (m_showBorder) {
-        linePtr = m_frameBuf + m_sizeX * (nLine - 23);
-
-        if (nLine < 40 || nLine >= 296) {
-            //uint32_t* borderPixels = m_bgScanlinePixels + 59 + m_offsetX;
-            for(int i = 0; i < m_sizeX; i++)
-                //*linePtr++ = *borderPixels++;
-                //*linePtr++ = m_scanlineData[i + 124].palette[m_scanlineData[i + 124].borderColor];
-                *linePtr++ = m_palette[m_scanlineData[i + 124].borderColor];
-            return;
-        } else {
-            for(int i = 0; i < 57; i++)
-                //linePtr[i] =  m_scanlineData[i + 124].palette[m_scanlineData[i + 124].borderColor];
-                linePtr[i] =  m_palette[m_scanlineData[i + 124].borderColor];
-            for(int i = 569; i < 626; i++)
-                //linePtr[i] =  m_scanlineData[i + 124].palette[m_scanlineData[i + 124].borderColor];
-                linePtr[i] =  m_palette[m_scanlineData[i + 124].borderColor];
+    if (nLine < 40 || nLine >= 296) {
+        // upper and lower borders
+        if (firstPx < 124) firstPx = 124;
+        ptr = linePtr + firstPx - 124;
+        for (int px = firstPx; px < lastPx && px >= 124 && px < 750; px++)
+            *ptr++ = m_palette[m_borderColor];
+    } else {
+        // left border
+        if (firstPx < 124) firstPx = 124;
+        ptr = linePtr + firstPx - 124;
+        for (int px = firstPx; px < lastPx && px >= 124 && px < 181; px++) {
+            *ptr++ = m_palette[m_borderColor];
         }
 
-        linePtr += 57;
-    } else {
-        if (nLine < 40 || nLine >= 296)
-            return;
-        linePtr = m_frameBuf + m_sizeX * (nLine - 40) + (m_showBorder ? 57 : 0); //replace magic value
-    }
-
-    nLine -= 40;
-    int offset = uint8_t(m_lineOffset - nLine);
-
-    for (int pos = 0; pos < 32 * 256; pos += 256) {
-        uint8_t btY = m_screenMemory[0x8000 + offset + pos];
-        uint8_t btR = m_screenMemory[0xA000 + offset + pos];
-        uint8_t btG = m_screenMemory[0xC000 + offset + pos];
-        uint8_t btB = m_screenMemory[0xE000 + offset + pos];
-        for (int i = 0; i < 8; i++) {
+        // active area
+        if (firstPx < 181) firstPx = 181;
+        ptr = linePtr + firstPx - 124;
+        uint8_t rollOff = uint8_t(m_latchedLineOffset - nLine + 40);
+        for (int px = firstPx - 181; px < lastPx - 181 && px < 693 - 181; px++) {
+            int dot = (px & 0x0E) >> 1;
+            int offset = ((px & 0x1F0) << 4) | rollOff;
+            uint8_t btY = m_screenMemory[0x8000 + offset] << dot;
+            uint8_t btR = m_screenMemory[0xA000 + offset] << dot;
+            uint8_t btG = m_screenMemory[0xC000 + offset] << dot;
+            uint8_t btB = m_screenMemory[0xE000 + offset] << dot;
             int logBGcolor = ((btG & 0x80) >> 6) | ((btB & 0x80) >> 7);
             int logYRcolor = ((btY & 0x80) >> 4) | ((btR & 0x80) >> 5);
-            if (m_scanlineData[i + 124].mode512px) {
-                //*linePtr++ = m_scanlineData[i + 124].palette[logBGcolor];
-                //*linePtr++ = m_scanlineData[i + 124].palette[logYRcolor];
-                *linePtr++ = m_palette[logBGcolor];
-                *linePtr++ = m_palette[logYRcolor];
+            if (m_mode512px) {
+                *ptr++ = px & 1 ? m_palette[logYRcolor] : m_palette[logBGcolor];
             } else {
-                //*linePtr++ = m_scanlineData[i + 124].palette[logBGcolor | logYRcolor];
-                //*linePtr++ = m_scanlineData[i + 124].palette[logBGcolor | logYRcolor];
-                *linePtr++ = m_palette[logBGcolor | logYRcolor];
-                *linePtr++ = m_palette[logBGcolor | logYRcolor];
+                *ptr++ = m_palette[logBGcolor | logYRcolor];
             }
+        }
 
-            btY <<= 1;
-            btR <<= 1;
-            btG <<= 1;
-            btB <<= 1;
+        // right border
+        if (firstPx < 693) firstPx = 693;
+        ptr = linePtr + firstPx - 124;
+        for (int px = firstPx; px < lastPx && px >= 693 && px < 750; px++) {
+            *ptr++ = m_palette[m_borderColor];
         }
     }
 }
 
 void VectorRenderer::renderFrame()
 {
-    memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
+    if (m_showBorder)
+        memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
+    else {
+        uint32_t* ptr = m_frameBuf + 626 * 24 + 57;
+        for (int i = 0; i < 256 * 512; i += 512) {
+            memcpy(m_pixelData + i, ptr, 512 * sizeof(uint32_t));
+            ptr += 626;
+        }
+    }
+
     swapBuffers();
     prepareFrame();
 }
@@ -295,12 +291,10 @@ void VectorRenderer::renderFrame()
 void VectorRenderer::prepareFrame()
 {
     if (!m_showBorder) {
-        m_offsetX = m_offsetY = 0;
         m_sizeX = 512;
         m_sizeY = 256;
         m_aspectRatio = 576.0 * 9 / 704 / 12;
     } else {
-        m_offsetX = 57;
         m_sizeX = 626;
         m_sizeY = 288;
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
@@ -311,6 +305,12 @@ void VectorRenderer::prepareFrame()
 void VectorRenderer::toggleCropping()
 {
     m_showBorder = !m_showBorder;
+}
+
+
+void VectorRenderer::attachMemory(Ram* memory)
+{
+    m_screenMemory = memory->getDataPtr();
 }
 
 
@@ -344,7 +344,7 @@ string VectorRenderer::getPropertyStringValue(const string& propertyName)
     if (propertyName == "visibleArea") {
         return m_showBorder ? "yes" : "no";
     } else if (propertyName == "crtMode") {
-        if (m_512pxMode)
+        if (m_mode512pxLatched)
             return "512\u00D7256@50.08Hz";
         else
             return "256\u00D7256@50.08Hz";
