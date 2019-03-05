@@ -31,6 +31,7 @@ class Ram;
 class Rom;
 //class Fdc1793;
 class GeneralSoundSource;
+class Cpu8080;
 
 
 class VectorRenderer : public CrtRenderer, public IActive
@@ -128,22 +129,31 @@ class VectorAddrSpace : public AddressableDevice
         //~VectorAddrSpace() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        void reset() override {m_romEnabled = true;}
+        void reset() override;
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
 
         void attachRam(AddressableDevice* mem) {m_mainMemory = mem;}
         void attachRom(Rom* rom) {m_rom = rom;}
+        void attachRamDisk(AddressableDevice* ramDisk) {m_ramDisk = ramDisk;}
         void enableRom() {m_romEnabled = true;}
         void disableRom() {m_romEnabled = false;}
+        void ramDiskControl(bool inRamEndbled, bool stackEnabled, int inRamPage, int stackPage);
 
         static EmuObject* create(const EmuValuesList&) {return new VectorAddrSpace();}
 
     private:
-        bool m_romEnabled = true;
         AddressableDevice* m_mainMemory = nullptr;
         Rom* m_rom = nullptr;
+        AddressableDevice* m_ramDisk = nullptr;
+        Cpu8080* m_cpu = nullptr;
+
+        bool m_romEnabled = true;
+        bool m_inRamDiskEnabled = false;
+        bool m_stackDiskEnabled = false;
+        int m_inRamDiskPage = 0;
+        int m_stackDiskPage = 0;
 };
 
 
@@ -291,6 +301,23 @@ class VectorKbdLayout : public RkKbdLayout
 
     protected:
         bool processSpecialKeys(PalKeyCode keyCode) override;
+};
+
+
+class VectorRamDiskSelector : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        void attachVectorAddrSpace(VectorAddrSpace* vectorAddrSpace) {m_vectorAddrSpace = vectorAddrSpace;}
+
+        void writeByte(int, uint8_t value) override;
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new VectorRamDiskSelector();}
+
+    private:
+        VectorAddrSpace* m_vectorAddrSpace = nullptr;
 };
 
 

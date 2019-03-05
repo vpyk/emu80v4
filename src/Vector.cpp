@@ -20,7 +20,7 @@
 
 #include "Vector.h"
 #include "EmuWindow.h"
-#include "Cpu.h"
+#include "Cpu8080.h"
 #include "Platform.h"
 #include "Emulation.h"
 #include "Memory.h"
@@ -29,18 +29,45 @@
 using namespace std;
 
 
+void VectorAddrSpace::reset() {
+    m_romEnabled = true;
+    m_inRamDiskEnabled = false;
+    m_stackDiskEnabled = false;
+    m_inRamDiskPage = 0;
+    m_stackDiskPage = 0;
+}
+
+
 void VectorAddrSpace::writeByte(int addr, uint8_t value)
 {
-    m_mainMemory->writeByte(addr, value);
+    if (m_stackDiskEnabled && (m_cpu->getStatusWord() & 0x04))
+        m_ramDisk->writeByte(m_stackDiskPage * 0x10000 + addr, value);
+    else if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
+        m_ramDisk->writeByte(m_stackDiskPage * 0x4000 + addr - 0xA000, value);
+    else
+        m_mainMemory->writeByte(addr, value);
 }
 
 
 uint8_t VectorAddrSpace::readByte(int addr)
 {
-    if (!m_romEnabled || addr >= 0x8000)
-        return m_mainMemory->readByte(addr);
-    else
+    if (m_stackDiskEnabled && (m_cpu->getStatusWord() & 0x04))
+        return m_ramDisk->readByte(m_stackDiskPage * 0x10000 + addr);
+    if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
+        return m_ramDisk->readByte(m_stackDiskPage * 0x4000 + addr - 0xA000);
+    if (m_romEnabled && addr < 0x8000)
         return m_rom->readByte(addr); // add rom check
+    else
+        return m_mainMemory->readByte(addr);
+}
+
+
+void VectorAddrSpace::ramDiskControl(bool inRamEndbled, bool stackEnabled, int inRamPage, int stackPage)
+{
+    m_inRamDiskEnabled = inRamEndbled;
+    m_stackDiskEnabled = stackEnabled;
+    m_inRamDiskPage = inRamPage;
+    m_stackDiskPage = stackPage;
 }
 
 
@@ -54,6 +81,12 @@ bool VectorAddrSpace::setProperty(const std::string& propertyName, const EmuValu
         return true;
     } else if (propertyName == "rom") {
         attachRom(static_cast<Rom*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "ramDisk") {
+        attachRamDisk(static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else  if (propertyName == "cpu") {
+        m_cpu = static_cast<Cpu8080*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
     return false;
@@ -573,4 +606,25 @@ bool VectorKbdLayout::processSpecialKeys(PalKeyCode keyCode)
         return true;
     }
     return false;
+}
+
+
+bool VectorRamDiskSelector::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "addrSpace") {
+        attachVectorAddrSpace(static_cast<VectorAddrSpace*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
+}
+
+
+void VectorRamDiskSelector::writeByte(int, uint8_t value)
+{
+    if (m_vectorAddrSpace)
+        m_vectorAddrSpace->ramDiskControl(value & 0x20, value & 0x10, value & 0x3, (value >> 2) & 0x3);
 }

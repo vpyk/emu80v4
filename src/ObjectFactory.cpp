@@ -188,6 +188,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(VectorKeyboard);
     REG_EMU_CLASS(VectorCpuWaits);
     REG_EMU_CLASS(VectorKbdLayout);
+    REG_EMU_CLASS(VectorRamDiskSelector);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
