@@ -29,7 +29,7 @@
 
 class Ram;
 class Rom;
-//class Fdc1793;
+class Fdc1793;
 class GeneralSoundSource;
 class Cpu8080;
 
@@ -318,6 +318,23 @@ class VectorRamDiskSelector : public AddressableDevice
 
     private:
         VectorAddrSpace* m_vectorAddrSpace = nullptr;
+};
+
+
+class VectorFddControlRegister : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
+
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new VectorFddControlRegister();}
+
+    private:
+        Fdc1793* m_fdc = nullptr;
 };
 
 

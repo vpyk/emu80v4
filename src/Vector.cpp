@@ -25,6 +25,7 @@
 #include "Emulation.h"
 #include "Memory.h"
 #include "SoundMixer.h"
+#include "Fdc1793.h"
 
 using namespace std;
 
@@ -627,4 +628,25 @@ void VectorRamDiskSelector::writeByte(int, uint8_t value)
 {
     if (m_vectorAddrSpace)
         m_vectorAddrSpace->ramDiskControl(value & 0x20, value & 0x10, value & 0x3, (value >> 2) & 0x3);
+}
+
+
+void VectorFddControlRegister::writeByte(int, uint8_t value)
+{
+    m_fdc->setDrive(value & 1);
+    m_fdc->setHead(((value & 0x4) >> 2) ^ 1);
+}
+
+
+bool VectorFddControlRegister::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "fdc") {
+        attachFdc1793(static_cast<Fdc1793*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
 }
