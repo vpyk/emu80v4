@@ -32,10 +32,10 @@ using namespace std;
 // Cpu8080 types and macroses
 
 #define RD_BYTE(addr) (m_addrSpace->readByte(addr))
-#define RD_WORD(addr) ((RD_BYTE(addr+1) << 8) | RD_BYTE(addr))
+#define RD_WORD(addr) ((RD_BYTE((addr+1) & 0xFFFF) << 8) | RD_BYTE(addr))
 
 #define WR_BYTE(addr, value) m_addrSpace->writeByte(addr, value)
-#define WR_WORD(addr, value) WR_BYTE(addr, value & 0xff);WR_BYTE(addr + 1, (value >> 8) & 0xff);
+#define WR_WORD(addr, value) WR_BYTE(addr, value & 0xff);WR_BYTE((addr + 1) & 0xFFFF, (value >> 8) & 0xff);
 
 #define FLAGS           cpu.f
 #define AF              cpu.af.w

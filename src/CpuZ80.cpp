@@ -28,10 +28,10 @@
 using namespace std;
 
 #define GetBYTE(addr) (m_addrSpace->readByte(addr))
-#define GetWORD(addr) ((GetBYTE(addr+1) << 8) | GetBYTE(addr))
+#define GetWORD(addr) ((GetBYTE((addr+1) & 0xFFFF) << 8) | GetBYTE(addr))
 
 #define PutBYTE(addr, value) m_addrSpace->writeByte(addr, value)
-#define PutWORD(addr, value) PutBYTE(addr, value & 0xff);PutBYTE(addr + 1, (value >> 8) & 0xff);
+#define PutWORD(addr, value) PutBYTE(addr, value & 0xff);PutBYTE((addr + 1) & 0xFFFF, (value >> 8) & 0xff);
 
 #define PC pc
 #define AF af[af_sel]
