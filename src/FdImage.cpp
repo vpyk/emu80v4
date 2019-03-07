@@ -156,6 +156,25 @@ void FdImage::startSectorAccess(int sector)
 }
 
 
+int FdImage::getCurTrack()
+{
+    return m_curTrack;
+}
+
+
+int FdImage::getCurHead()
+{
+    return m_curHead;
+}
+
+
+int FdImage::readSectorAddress()
+{
+    m_curSector = (m_curSector + 1) % m_nSectors;
+    return m_curSector;
+}
+
+
 void FdImage::seek(int offset = 0)
 {
     int ofs = offset + (m_curSector + (m_curHead + m_curTrack * m_nHeads) * m_nSectors) * m_sectorSize;

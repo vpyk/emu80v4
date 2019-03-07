@@ -48,6 +48,10 @@ class FdImage : public EmuObject
         void setCurHead(int head);
         void startSectorAccess(int sector);
 
+        int getCurTrack();
+        int getCurHead();
+        int readSectorAddress();
+
         uint8_t readNextByte();
         uint8_t readByte(int offset);
 

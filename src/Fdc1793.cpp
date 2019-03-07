@@ -37,6 +37,8 @@ Fdc1793::Fdc1793()
     m_status = 0; // регистр статусаs
     m_directionIn = true; // направление движения true=in, false=out
 
+    m_addressIdCnt = 0;
+
     for (int i = 0; i < MAX_DRIVES; i++)
         m_images[i] = nullptr;
 }
@@ -168,6 +170,20 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     m_accessMode = FAM_WRITING;
                     m_status = 0x3;
                     break;
+                case 0xC:
+                    // read address
+                    if (!m_images[m_disk])
+                        break;
+                    m_addressId[0] = m_images[m_disk]->getCurTrack();
+                    m_addressId[1] = m_images[m_disk]->getCurHead();
+                    m_addressId[2] = m_images[m_disk]->readSectorAddress() + 1;
+                    m_addressId[3] = 3;
+                    m_addressId[4] = 0;
+                    m_addressId[5] = 0;
+                    m_addressIdCnt = 6;
+                    m_accessMode = FAM_READING;
+                    m_status = 0x3;
+                    break;
                 case 0xD:
                     // force interrupt
                     m_accessMode = FAM_WAITING;
@@ -268,6 +284,17 @@ uint8_t Fdc1793::readByte(int addr)
                             m_images[m_disk]->writeNextByte(m_data);
                         }
                     }
+                    break;
+                case 0xC:
+                    if (m_dma && m_accessMode == FAM_READING) {
+                        m_status = 0;
+                        m_accessMode = FAM_WAITING;
+                        while (m_addressIdCnt > 0) {
+                            m_data = m_addressId[6 - m_addressIdCnt--];
+                            if (!m_dma->dmaRequest(m_dmaChannel, m_data))
+                                m_status = 0x06;
+                        }
+                    }
             }
             return res;
         }
@@ -281,18 +308,27 @@ uint8_t Fdc1793::readByte(int addr)
             // data register
             if (m_accessMode == FAM_WAITING)
                 m_status &= ~2;
-            if (m_images[m_disk] && m_accessMode == FAM_READING) {
-                m_data = m_images[m_disk]->readNextByte();
-                if (!m_images[m_disk]->getReadyStatus()) {
-                    if (m_lastCommand == 9) {
-                        m_images[m_disk]->startSectorAccess(m_sector++);
-                        m_status = 0x1;
-                    }
-                    else {
+            if (m_accessMode == FAM_READING) {
+                if (m_addressIdCnt > 0) {
+                    m_data = m_addressId[6 - m_addressIdCnt--];
+                    if (m_addressIdCnt == 0) {
                         m_accessMode = FAM_WAITING;
                         m_status = 0x0;
                     }
+                } else if (m_images[m_disk]) {
+                    m_data = m_images[m_disk]->readNextByte();
+                    if (!m_images[m_disk]->getReadyStatus()) {
+                        if (m_lastCommand == 9) {
+                            m_images[m_disk]->startSectorAccess(m_sector++);
+                            m_status = 0x1;
+                        }
+                        else {
+                            m_accessMode = FAM_WAITING;
+                            m_status = 0x0;
+                        }
+                    }
                 }
+
             }
             return m_data;
     }

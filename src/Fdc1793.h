@@ -85,6 +85,9 @@ class Fdc1793 : public AddressableDevice
         int m_lastCommand = 0;
         //bool m_busy = false;
 
+        int m_addressIdCnt = 0;
+        uint8_t m_addressId[6];
+
         void generateInt();
 };
 
