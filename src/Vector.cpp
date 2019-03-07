@@ -42,9 +42,9 @@ void VectorAddrSpace::reset() {
 void VectorAddrSpace::writeByte(int addr, uint8_t value)
 {
     if (m_stackDiskEnabled && (m_cpu->getStatusWord() & 0x04))
-        m_ramDisk->writeByte(m_stackDiskPage * 0x10000 + addr, value);
+        m_ramDisk->writeByte(m_stackDiskPage * 0x4000 + addr, value);
     else if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
-        m_ramDisk->writeByte(m_stackDiskPage * 0x4000 + addr - 0xA000, value);
+        m_ramDisk->writeByte(m_inRamDiskPage * 0x10000 + addr, value);
     else
         m_mainMemory->writeByte(addr, value);
 }
@@ -55,7 +55,7 @@ uint8_t VectorAddrSpace::readByte(int addr)
     if (m_stackDiskEnabled && (m_cpu->getStatusWord() & 0x04))
         return m_ramDisk->readByte(m_stackDiskPage * 0x10000 + addr);
     if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
-        return m_ramDisk->readByte(m_stackDiskPage * 0x4000 + addr - 0xA000);
+        return m_ramDisk->readByte(m_inRamDiskPage * 0x10000 + addr);
     if (m_romEnabled && addr < 0x8000)
         return m_rom->readByte(addr); // add rom check
     else
