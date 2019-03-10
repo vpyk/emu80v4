@@ -227,7 +227,7 @@ void VectorRenderer::setBorderColor(uint8_t color)
 
 void VectorRenderer::set512pxMode(bool mode512)
 {
-    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
+    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 34);
     m_mode512px = mode512;
 }
 
