@@ -75,7 +75,7 @@ void palStart()
 {
     SDL_AudioSpec spec;
     spec.freq = sampleRate;
-    spec.format = AUDIO_S16;
+    spec.format = AUDIO_U16;
     spec.channels = 1;
     spec.samples = 2048;
     spec.callback = audioCallback;
