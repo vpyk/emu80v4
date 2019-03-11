@@ -127,15 +127,15 @@ uint8_t Ppi8255::readByte(int addr)
     switch (addr) {
         case 0:
             if (m_chAMode == PCM_IN)
-                m_portA = m_ppiCircuit ? m_ppiCircuit->getPortA() : 0xFF;
+                m_portA = m_ppiCircuit ? m_ppiCircuit->getPortA() : 0;
             return m_portA;
         case 1:
             if (m_chBMode == PCM_IN)
-                m_portB = m_ppiCircuit ? m_ppiCircuit->getPortB() : 0xFF;
+                m_portB = m_ppiCircuit ? m_ppiCircuit->getPortB() : 0;
             return m_portB;
         case 2:
             if (m_chCLoMode == PCM_IN || m_chCHiMode == PCM_IN) {
-                uint8_t portC = m_ppiCircuit ? m_ppiCircuit->getPortC() : 0xFF;
+                uint8_t portC = m_ppiCircuit ? m_ppiCircuit->getPortC() : 0;
                 if (m_chCLoMode == PCM_IN)
                     m_portC = (m_portC & 0xf0) | (portC & 0x0f);
                 if (m_chCHiMode == PCM_IN)
