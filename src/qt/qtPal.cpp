@@ -195,7 +195,7 @@ void palStart()
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::UnSignedInt);
+    format.setSampleType(QAudioFormat::SignedInt);
 
     audio = new QAudioOutput(format, nullptr /*palGetMainWindow()*/);
     audio->setBufferSize(sampleRate / 5);
