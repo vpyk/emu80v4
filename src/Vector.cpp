@@ -466,8 +466,9 @@ void VectorPpi8255Circuit::setPortC(uint8_t value)
 // Port 02
 void VectorPpi8255Circuit::setPortB(uint8_t value)
 {
-    m_renderer->setBorderColor(value & 0x0f);
+    // order is important!
     m_renderer->set512pxMode(value & 0x10);
+    m_renderer->setBorderColor(value & 0x0f);
 }
 
 
