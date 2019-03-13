@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
 #include <string.h>
 
 #include "Vector.h"
@@ -398,6 +399,24 @@ string VectorRenderer::getPropertyStringValue(const string& propertyName)
         }
 
     return "";
+}
+
+
+string VectorRenderer::getDebugInfo()
+{
+    advanceTo(g_emulation->getCurClock());
+
+    // some magic
+    int pixel = (m_curFramePixel + 768 * 312 - 301) % (768 * 312);
+
+    int line = pixel / 768;
+    int pos = pixel % 768;
+
+    stringstream ss;
+    ss << "CRT:" << "\n";
+    ss << "L:" << line;
+    ss << " P:" << pos << "\n";
+    return ss.str();
 }
 
 

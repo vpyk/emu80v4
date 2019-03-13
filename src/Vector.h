@@ -45,6 +45,7 @@ class VectorRenderer : public CrtRenderer, public IActive
         // derived from EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+        std::string getDebugInfo() override;
 
         // derived from CrtRenderer
         void toggleCropping() override;
