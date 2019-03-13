@@ -71,8 +71,6 @@ bool WavReader::loadFile(const std::string& fileName, TapeRedirector* tapeRedire
     }
 
     bool res = tryWavFormat();
-    if (!res)
-        res = tryCswFormat();
 
     if (res) {
         m_tapeRedirector = tapeRedirector;
