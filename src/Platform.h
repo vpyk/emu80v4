@@ -67,6 +67,7 @@ class Platform : public ParentObject
         Keyboard* getKeyboard() {return m_keyboard;}
 
         void showDebugger();
+        std::string getAllDebugInfo();
 
         int getDefConfigTabId() {return m_defConfigTabId;}
 

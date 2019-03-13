@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <sstream>
 #include "string.h"
 
 #include "Cpu.h"
@@ -129,6 +130,14 @@ std::string Cpu::getPropertyStringValue(const std::string& propertyName)
         return m_debugOnIllegalCmd ? "yes" : "no";
 
     return "";
+}
+
+
+std::string Cpu::getDebugInfo()
+{
+    stringstream ss;
+    ss << "CPU:" << "\n" << m_curClock / m_kDiv;
+    return ss.str();
 }
 
 

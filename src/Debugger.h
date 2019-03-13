@@ -89,7 +89,7 @@ struct BreakpointInfo {
 class DebugWindow : private EmuWindow
 {
     public:
-        DebugWindow(Cpu* cpu);
+        DebugWindow(Platform* platform);
         ~DebugWindow();
 
         void processKey(PalKeyCode keyCode, bool isPressed) override;
@@ -245,6 +245,7 @@ class DebugWindow : private EmuWindow
         void drawHexSeq(int x, int y, uint8_t* seq, uint8_t* old_seq, int len);
         void drawHintBar();
         void displayCpuStatus();
+        void displayObjectDbgInfo();
 
         // cursor related variables
         bool m_cursorVisible;                   // признак видимости курсора
@@ -297,10 +298,10 @@ class DebugWindow : private EmuWindow
         ActiveMode m_inputFromMode;             // предыдущая активная секция
         int m_inputXPos;                        // позиция X поля ввода
         int m_inputYPos;                        // позиция y поля ввода
-        unsigned m_inputNDigits;                     // количество цифр в поле ввода
-        unsigned m_inputCurPos;                      // текущая позиция курсора в поле ввода
+        unsigned m_inputNDigits;                // количество цифр в поле ввода
+        unsigned m_inputCurPos;                 // текущая позиция курсора в поле ввода
         unsigned m_inputReturnValue;            // возвращаемое значение из поля ввода
-        std::string m_inputCurValue;                 // текущее значение в поле ввода
+        std::string m_inputCurValue;            // текущее значение в поле ввода
         void inputInit();                       // инициализация полей отрисовки поля ввода
         // начало ввода
         void inputStart(ActiveMode fromMode, int x, int y, int nDigits, bool useInitialNumber, unsigned initialNumber = 0);

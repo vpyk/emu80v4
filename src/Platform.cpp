@@ -272,7 +272,7 @@ void Platform::showDebugger()
 {
     if (m_cpu->getType() == Cpu::CPU_8080 || m_cpu->getType() == Cpu::CPU_Z80) {
         if (!m_dbgWindow) {
-            m_dbgWindow = new DebugWindow(m_cpu);
+            m_dbgWindow = new DebugWindow(this);
             m_dbgWindow->initDbgWindow();
             m_dbgWindow->setCaption("Debug: " + m_window->getCaption());
         }
@@ -306,4 +306,19 @@ string Platform::getPropertyStringValue(const string& propertyName)
         return m_helpFile;
 
     return "";
+}
+
+
+string Platform::getAllDebugInfo()
+{
+    string res = "";
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
+        string s = (*it)->getDebugInfo();
+        if (s != "") {
+            if (res != "")
+                res += "\n\n";
+            res = res + s;
+        }
+    }
+    return res;
 }

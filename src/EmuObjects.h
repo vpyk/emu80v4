@@ -49,6 +49,8 @@ class EmuObject
         virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
         virtual std::string getPropertyStringValue(const std::string& propertyName);
 
+        virtual std::string getDebugInfo() {return "";}
+
     protected:
         int m_kDiv = 1;
         Platform* m_platform = nullptr;

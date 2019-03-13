@@ -24,6 +24,7 @@
 
 #include "Debugger.h"
 #include "Emulation.h"
+#include "Platform.h"
 #include "Pal.h"
 
 #include "CpuZ80.h"
@@ -32,7 +33,7 @@
 
 using namespace std;
 
-DebugWindow::DebugWindow(Cpu* cpu)
+DebugWindow::DebugWindow(Platform* platform)
 {
     m_windowType = EWT_DEBUG;
 
@@ -122,8 +123,9 @@ DebugWindow::DebugWindow(Cpu* cpu)
     m_stdLayout.aux.width = 13;
     m_stdLayout.aux.height = 26;
 
-    m_cpu = static_cast<Cpu8080Compatible*>(cpu);
-    m_z80cpu = dynamic_cast<CpuZ80*>(cpu);
+    m_platform = platform;
+    m_cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    m_z80cpu = dynamic_cast<CpuZ80*>(m_cpu);
     m_as = m_cpu->getAddrSpace();
 
     m_z80Mode = m_z80cpu != nullptr;
@@ -268,6 +270,7 @@ void DebugWindow::draw()
 
     drawDbgFrame();
     displayCpuStatus();
+    displayObjectDbgInfo();
 
     drawHintBar();
 
@@ -519,6 +522,38 @@ void DebugWindow::drawDbgFrame()
         putString(m_curLayout->regMemHex.left + 12, m_curLayout->regMemHex.top, "-6 -5 -4 -3 -2 -1  0 +1 +2 +3 +4 +5 +6 +7");
 
     putString(m_curLayout->regMemSmb.left + 11, m_curLayout->regMemSmb.top, "-DCBA9876543210123456789ABCDEF+");
+}
+
+
+void DebugWindow::displayObjectDbgInfo()
+{
+    if (m_compactMode)
+        return;
+
+    //const char* s = m_platform->getAllDebugInfo().c_str(); // !! figure out why does this not work?
+    string ss = m_platform->getAllDebugInfo();
+    const char* s = ss.c_str();
+
+    int x = 0;
+    int y = 0;
+    int i = 0;
+
+    while (s[i]) {
+        if (y > m_curLayout->aux.height)
+            break;
+        if (x >= m_curLayout->aux.width) {
+            y++;
+            x = 0;
+        }
+        if (s[i] == '\n') {
+            y++;
+            x = 0;
+        } else {
+            m_screen[m_curLayout->aux.left + x][m_curLayout->aux.top + y].chr = s[i];
+            m_screen[m_curLayout->aux.left + x++][m_curLayout->aux.top + y].fgColor = 11;
+        }
+        i++;
+    }
 }
 
 
