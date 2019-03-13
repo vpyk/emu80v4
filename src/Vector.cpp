@@ -103,6 +103,9 @@ VectorCore::VectorCore()
 
 void VectorCore::draw()
 {
+    if (g_emulation->isDebuggerActive())
+        m_crtRenderer->prepareDebugScreen();
+
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -200,6 +203,9 @@ void VectorRenderer::advanceTo(uint64_t clock)
     const int bias = 145;
 
     int toPixel = int(clock - m_curFrameClock) / m_ticksPerPixel + bias;
+
+    if (toPixel <= m_curFramePixel)
+        return;
 
     if (!m_lineOffsetIsLatched && toPixel > 768 * 40 + 180) {
         m_lineOffsetIsLatched = true;
@@ -333,6 +339,13 @@ void VectorRenderer::prepareFrame()
         m_sizeY = 288;
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
     }
+}
+
+
+void VectorRenderer::prepareDebugScreen()
+{
+    advanceTo(g_emulation->getCurClock());
+    renderFrame();
 }
 
 

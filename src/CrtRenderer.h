@@ -36,6 +36,7 @@ class CrtRenderer : public EmuObject
 
         virtual void renderFrame() = 0;
         virtual EmuPixelData getPixelData();
+        virtual void prepareDebugScreen() {}
 
         virtual void toggleRenderingMethod() {}
         virtual void toggleColorMode() {}

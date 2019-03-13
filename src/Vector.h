@@ -48,6 +48,7 @@ class VectorRenderer : public CrtRenderer, public IActive
 
         // derived from CrtRenderer
         void toggleCropping() override;
+        void prepareDebugScreen() override;
 
         // derived from ActiveDevice
         void operate() override;
