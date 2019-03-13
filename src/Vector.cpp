@@ -25,8 +25,9 @@
 #include "Platform.h"
 #include "Emulation.h"
 #include "Memory.h"
-#include "SoundMixer.h"
 #include "Fdc1793.h"
+#include "SoundMixer.h"
+#include "WavReader.h"
 
 using namespace std;
 
@@ -520,7 +521,7 @@ uint8_t VectorPpi8255Circuit::getPortB()
 
 uint8_t VectorPpi8255Circuit::getPortC()
 {
-    return m_kbd->getCtrlKeys();
+    return (m_kbd->getCtrlKeys() & 0xEF) | (g_emulation->getWavReader()->getCurValue() ? 0x10 : 0x00);
 }
 
 
