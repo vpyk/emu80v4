@@ -241,6 +241,8 @@ void Cpu8080::reset() {
     //PC = 0;
     PC = m_startAddr;
 
+    m_statusWord = 0xA2;
+
     IFF = 0;
     m_iffPendingCnt = 0;
     m_core->inte(false);
@@ -1508,7 +1510,9 @@ int Cpu8080::i8080_execute(int opcode) {
 
         case 0xE3:            /* xthl */
             cpu_cycles = 18;
+            m_statusWord = 0x86;
             work16 = RD_WORD(SP);
+            m_statusWord = 0x84;
             WR_WORD(SP, HL);
             HL = work16;
             break;
@@ -1706,6 +1710,7 @@ int Cpu8080::i8080_execute(int opcode) {
             m_core->inte(true);
         }
 
+    m_statusWord = 0xA2;
 
     return cpu_cycles;
 }
@@ -1735,8 +1740,6 @@ void Cpu8080::operate() {
         if (retFlag)
             return;
     }
-
-    m_statusWord = 0xA2;
 
     if (m_waits) {
         int tag;
