@@ -95,6 +95,7 @@ class Cpu8080 : public Cpu8080Compatible
         //void exec(int nCmds) override;
 
         bool getInte() override;
+        bool checkForStackOperation() override {return m_statusWord & 0x04;}
 
         /*int getA() override;
         int getB() override;

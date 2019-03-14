@@ -141,7 +141,7 @@ bool Ut88Renderer::setProperty(const string& propertyName, const EmuValuesList& 
 
 void Ut88AddrSpaceMapper::writeByte(int addr, uint8_t value)
 {
-    if (m_cpu->getStatusWord() & 0x04)
+    if (m_cpu->checkForStackOperation())
         AddrSpaceMapper::writeByte(addr, value);
     else
         m_pages[0]->writeByte(addr, value);

@@ -86,6 +86,8 @@ class CpuZ80 : public Cpu8080Compatible
         uint8_t  getR();
         uint8_t  getIFF();
 
+        bool checkForStackOperation() override {return m_stackOperation;}
+
         static EmuObject* create(const EmuValuesList&) {return new CpuZ80();}
 
     private:
@@ -105,6 +107,7 @@ class CpuZ80 : public Cpu8080Compatible
         uint16_t IM;
 
         int m_iffPendingCnt = 0;
+        bool m_stackOperation = false;
 
         unsigned cb_prefix(unsigned adr);
         unsigned dfd_prefix(uint16_t& IXY);

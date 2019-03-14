@@ -80,13 +80,17 @@ static const unsigned char partab[256] = {
 #define parity(x)   partab[(x)&0xff]
 
 #define POP(x)  do {                                \
+    m_stackOperation = true;                        \
     unsigned y = GetBYTE(SP); SP++;                 \
     x = y + (GetBYTE(SP) << 8); SP++;               \
+    m_stackOperation = false;                       \
 } while (0)
 
 #define PUSH(x) do {                                \
+    m_stackOperation = true;                        \
     --SP; PutBYTE(SP, (x) >> 8);                    \
     --SP; PutBYTE(SP, x);                           \
+    m_stackOperation = false;                       \
 } while (0)
 
 #define JPC(cond) {                                 \
@@ -796,6 +800,8 @@ unsigned CpuZ80::simz80()
     unsigned temp, acu, sum, cbits;
     unsigned op;
     unsigned cycles;
+
+    m_stackOperation = false;
 
     op = GetBYTE(PC);
     ++PC;

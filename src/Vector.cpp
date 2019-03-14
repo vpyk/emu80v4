@@ -43,7 +43,7 @@ void VectorAddrSpace::reset() {
 
 void VectorAddrSpace::writeByte(int addr, uint8_t value)
 {
-    if (m_stackDiskEnabled && (m_cpu->getStatusWord() & 0x04))
+    if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         m_ramDisk->writeByte(m_stackDiskPage * 0x10000 + addr, value);
     else if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
         m_ramDisk->writeByte(m_inRamDiskPage * 0x10000 + addr, value);
@@ -54,7 +54,7 @@ void VectorAddrSpace::writeByte(int addr, uint8_t value)
 
 uint8_t VectorAddrSpace::readByte(int addr)
 {
-    if (m_stackDiskEnabled && (m_cpu->getStatusWord() & 0x04))
+    if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         return m_ramDisk->readByte(m_stackDiskPage * 0x10000 + addr);
     if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
         return m_ramDisk->readByte(m_inRamDiskPage * 0x10000 + addr);

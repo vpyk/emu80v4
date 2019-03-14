@@ -122,6 +122,7 @@ class Cpu8080Compatible : public Cpu
         //virtual void exec(int nCmds) = 0;
 
         virtual bool getInte() = 0;
+        virtual bool checkForStackOperation() = 0;
 
     protected:
         int io_input(int port);
