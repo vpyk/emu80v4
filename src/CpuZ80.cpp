@@ -2477,8 +2477,9 @@ unsigned CpuZ80::simz80()
         JPC(TSTFLAG(S));
         break;
     case 0xFB:          /* EI */
-        IFF = 3;
-        m_core->inte(true);
+        m_iffPendingCnt = 2;
+        IFF = 0;
+        m_core->inte(true);  // there is no INTE output in Z80 though
         break;
     case 0xFC:          /* CALL M,nnnn */
         CALLC(TSTFLAG(S));
@@ -2501,6 +2502,13 @@ unsigned CpuZ80::simz80()
     case 0xFF:          /* RST 38H */
         PUSH(PC); PC = 0x38;
     }
+
+    if (m_iffPendingCnt)
+        if (!--m_iffPendingCnt) {
+            IFF = 3;
+            m_core->inte(true);
+        }
+
     return cycles;
 }
 
@@ -2558,6 +2566,8 @@ void CpuZ80::reset() {
     IM = 0;
 
     pc = m_startAddr;
+
+    m_iffPendingCnt = 0;
 
     IFF = 0;
     m_core->inte(false);

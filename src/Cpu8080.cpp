@@ -1674,8 +1674,8 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0xFB:            /* ei */
             cpu_cycles = 4;
             m_iffPendingCnt = 2;
-            //IFF = 0; // check if this is necessary
-            m_core->inte(true);
+            IFF = 0;             // interrupts are disabled internally during the EI instruction
+            m_core->inte(true);  // whereas INTE is already active
             break;
 
         case 0xFC:            /* cm addr */

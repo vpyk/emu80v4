@@ -104,6 +104,8 @@ class CpuZ80 : public Cpu8080Compatible
         uint16_t IFF;
         uint16_t IM;
 
+        int m_iffPendingCnt = 0;
+
         unsigned cb_prefix(unsigned adr);
         unsigned dfd_prefix(uint16_t& IXY);
         unsigned simz80();
