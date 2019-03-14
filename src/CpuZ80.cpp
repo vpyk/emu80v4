@@ -767,7 +767,7 @@ unsigned CpuZ80::dfd_prefix(uint16_t& IXY)
             break;
         case 0xCB:          /* CB prefix */
             adr = IXY + (signed char) GetBYTE(PC); ++PC;
-            cb_prefix(adr);
+            cycles = cb_prefix(adr);
             break;
         case 0xE1:          /* POP IXY */
             POP(IXY);
@@ -1960,7 +1960,7 @@ unsigned CpuZ80::simz80()
         CALLC(TSTFLAG(C));
         break;
     case 0xDD:          /* DD prefix */
-        dfd_prefix(ix);
+        cycles = dfd_prefix(ix);
         break;
     case 0xDE:          /* SBC A,nn */
         temp = GetBYTE(PC);
@@ -2485,7 +2485,7 @@ unsigned CpuZ80::simz80()
         CALLC(TSTFLAG(S));
         break;
     case 0xFD:          /* FD prefix */
-        dfd_prefix(iy);
+        cycles = dfd_prefix(iy);
         break;
     case 0xFE:          /* CP nn */
         temp = GetBYTE(PC);
