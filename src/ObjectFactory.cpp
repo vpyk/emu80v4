@@ -187,6 +187,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(VectorColorRegister);
     REG_EMU_CLASS(VectorKeyboard);
     REG_EMU_CLASS(VectorCpuWaits);
+    REG_EMU_CLASS(VectorZ80CpuWaits);
     REG_EMU_CLASS(VectorKbdLayout);
     REG_EMU_CLASS(VectorRamDiskSelector);
     REG_EMU_CLASS(VectorFddControlRegister);

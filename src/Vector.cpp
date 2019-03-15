@@ -21,7 +21,7 @@
 
 #include "Vector.h"
 #include "EmuWindow.h"
-#include "Cpu8080.h"
+#include "Cpu.h"
 #include "Platform.h"
 #include "Emulation.h"
 #include "Memory.h"
@@ -89,8 +89,8 @@ bool VectorAddrSpace::setProperty(const std::string& propertyName, const EmuValu
         attachRamDisk(static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())));
         return true;
     } else  if (propertyName == "cpu") {
-        m_cpu = static_cast<Cpu8080*>(g_emulation->findObject(values[0].asString()));
-        return true;
+        m_cpu = static_cast<Cpu8080Compatible*>(g_emulation->findObject(values[0].asString()));
+        return m_cpu;
     }
     return false;
 
@@ -623,6 +623,13 @@ int VectorCpuWaits::getCpuWaitStates(int, int, int normalClocks)
 {
     static const int waits[19] = {0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 2, 5, 0, 3, 0, 0, 4, 7, 6};
     return waits[normalClocks];
+}
+
+
+int VectorZ80CpuWaits::getCpuWaitStates(int, int opcode, int normalClocks)
+{
+    static const int waits[24] = {0, 0, 0, 0, 0, 3, 2, 1, 4, 3, 2, 5, 4, 3, 2, 5, 4, 3, 6, 5, 4, 3, 6, 5};
+    return (opcode & 0xCF) == 0x09 ? 1 : waits[normalClocks]; // add hl, rp - 11 instead of 16
 }
 
 

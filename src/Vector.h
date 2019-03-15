@@ -31,7 +31,7 @@ class Ram;
 class Rom;
 class Fdc1793;
 class GeneralSoundSource;
-class Cpu8080;
+class Cpu8080Compatible;
 
 
 class VectorRenderer : public CrtRenderer, public IActive
@@ -149,7 +149,7 @@ class VectorAddrSpace : public AddressableDevice
         AddressableDevice* m_mainMemory = nullptr;
         Rom* m_rom = nullptr;
         AddressableDevice* m_ramDisk = nullptr;
-        Cpu8080* m_cpu = nullptr;
+        Cpu8080Compatible* m_cpu = nullptr;
 
         bool m_romEnabled = true;
         bool m_inRamDiskEnabled = false;
@@ -252,47 +252,21 @@ class VectorColorRegister : public AddressableDevice
 };
 
 
-/*class VectorFddControlRegister : public AddressableDevice
-{
-    public:
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-
-        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
-
-        void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int)  override {return 0xff;}
-
-        static EmuObject* create(const EmuValuesList&) {return new VectorFddControlRegister();}
-
-    private:
-        Fdc1793* m_fdc = nullptr;
-};
-
-
-class VectorFdcStatusRegisters : public AddressableDevice
-{
-    public:
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-
-        inline void attachFdc1793(Fdc1793* fdc) {m_fdc = fdc;}
-
-        void writeByte(int addr, uint8_t value)  override {m_bytes[addr & 0x03] = value;}
-        uint8_t readByte(int addr) override;
-
-        static EmuObject* create(const EmuValuesList&) {return new VectorFdcStatusRegisters();}
-
-    private:
-        Fdc1793* m_fdc = nullptr;
-        uint8_t m_bytes[4];
-};*/
-
-
 class VectorCpuWaits : public CpuWaits
 {
 public:
     int getCpuWaitStates(int, int, int normalClocks) override;
 
     static EmuObject* create(const EmuValuesList&) {return new VectorCpuWaits();}
+};
+
+
+class VectorZ80CpuWaits : public CpuWaits
+{
+public:
+    int getCpuWaitStates(int, int opcode, int normalClocks) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new VectorZ80CpuWaits();}
 };
 
 

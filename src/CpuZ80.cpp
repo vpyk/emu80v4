@@ -22,6 +22,7 @@
 
 #include "CpuZ80.h"
 #include "CpuHook.h"
+#include "CpuWaits.h"
 #include "Emulation.h"
 #include "PlatformCore.h"
 
@@ -2545,7 +2546,13 @@ void CpuZ80::operate()
             return;
     }
 
-    m_curClock += m_kDiv * simz80();
+    if (m_waits) {
+        int tag;
+        int opcode = m_addrSpace->readByteEx(PC, tag);
+        int clocks = simz80();
+        m_curClock += m_kDiv * (clocks + m_waits->getCpuWaitStates(tag, opcode, clocks));
+    } else
+        m_curClock += m_kDiv * simz80();
 
     if (m_stepReq) {
         m_stepReq = false;
