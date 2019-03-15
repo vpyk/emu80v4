@@ -197,6 +197,7 @@ void VectorRenderer::operate()
     renderFrame();
     m_platform->getCore()->vrtc(true);
     m_mode512pxLatched = m_mode512px;
+    m_lastColor = 0;
 }
 
 
@@ -252,7 +253,7 @@ void VectorRenderer::setPaletteColor(uint8_t color)
     advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 27);
     //advance();
     //m_palette[m_borderColor] = ((color & 0x7) << 21) | ((color & 0x38) << 10) | (color & 0xC0);
-    m_palette[m_borderColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
+    m_palette[m_lastColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
                                ((color & 0x38) << 10) | ((color & 0x38) << 7) | ((color & 0x30) << 4) |
                                (color & 0xC0) | ((color & 0xC8) >> 2) | ((color & 0xC8) >> 4) | ((color & 0xC8) >> 6);
 }
@@ -263,6 +264,8 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
     // Render scan line #nLine
     // Vertical: 0-22 - invisible, 23-39 - border, 40-295 - visible, 296-311 - border) from firstPx to lastPx
     // Horizonlal: 0-123 - invisible, 124-180 - border, 181-692 - active area, 693-749 - border, 750-767 - invisible
+
+    m_lastColor = m_borderColor;
 
     if (nLine < 24)
         return;
@@ -297,8 +300,9 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
             uint8_t btB = m_screenMemory[0xE000 + offset] << dot;
             int logBGcolor = ((btG & 0x80) >> 6) | ((btB & 0x80) >> 7);
             int logYRcolor = ((btY & 0x80) >> 4) | ((btR & 0x80) >> 5);
+            m_lastColor = px & 1 ? logYRcolor : logBGcolor;
             if (m_mode512px) {
-                *ptr++ = px & 1 ? m_palette[logYRcolor] : m_palette[logBGcolor];
+                *ptr++ = m_palette[m_lastColor];
             } else {
                 *ptr++ = m_palette[logBGcolor | logYRcolor];
             }

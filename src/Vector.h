@@ -79,6 +79,7 @@ class VectorRenderer : public CrtRenderer, public IActive
         bool m_mode512px = false;
         bool m_mode512pxLatched = false;
         uint32_t m_palette[16];
+        int m_lastColor = 0;
 
         unsigned m_ticksPerPixel;
         int m_pixelsPerOutInstruction = 48;
