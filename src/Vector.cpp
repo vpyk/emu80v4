@@ -34,7 +34,7 @@ using namespace std;
 
 void VectorAddrSpace::reset() {
     m_romEnabled = true;
-    m_inRamDiskEnabled = false;
+    m_inRamPagesMask = 0;
     m_stackDiskEnabled = false;
     m_inRamDiskPage = 0;
     m_stackDiskPage = 0;
@@ -45,7 +45,7 @@ void VectorAddrSpace::writeByte(int addr, uint8_t value)
 {
     if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         m_ramDisk->writeByte(m_stackDiskPage * 0x10000 + addr, value);
-    else if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
+    else if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
         m_ramDisk->writeByte(m_inRamDiskPage * 0x10000 + addr, value);
     else
         m_mainMemory->writeByte(addr, value);
@@ -56,7 +56,7 @@ uint8_t VectorAddrSpace::readByte(int addr)
 {
     if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         return m_ramDisk->readByte(m_stackDiskPage * 0x10000 + addr);
-    if (m_inRamDiskEnabled && (addr >= 0xA000) && (addr < 0xE000))
+    if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
         return m_ramDisk->readByte(m_inRamDiskPage * 0x10000 + addr);
     if (m_romEnabled && addr < 0x8000)
         return m_rom->readByte(addr); // add rom check
@@ -65,9 +65,9 @@ uint8_t VectorAddrSpace::readByte(int addr)
 }
 
 
-void VectorAddrSpace::ramDiskControl(bool inRamEndbled, bool stackEnabled, int inRamPage, int stackPage)
+void VectorAddrSpace::ramDiskControl(int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage)
 {
-    m_inRamDiskEnabled = inRamEndbled;
+    m_inRamPagesMask = inRamPagesMask;
     m_stackDiskEnabled = stackEnabled;
     m_inRamDiskPage = inRamPage;
     m_stackDiskPage = stackPage;
@@ -668,7 +668,7 @@ bool VectorRamDiskSelector::setProperty(const string& propertyName, const EmuVal
 void VectorRamDiskSelector::writeByte(int, uint8_t value)
 {
     if (m_vectorAddrSpace)
-        m_vectorAddrSpace->ramDiskControl(value & 0x20, value & 0x10, value & 0x3, (value >> 2) & 0x3);
+        m_vectorAddrSpace->ramDiskControl(((value & 0x40) >> 6) | ((value & 0x20) >> 4) | ((value & 0x20) >> 3) | ((value & 0x80) >> 4), value & 0x10, value & 0x3, (value >> 2) & 0x3);
 }
 
 

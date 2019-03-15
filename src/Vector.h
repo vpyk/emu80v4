@@ -141,7 +141,7 @@ class VectorAddrSpace : public AddressableDevice
         void attachRamDisk(AddressableDevice* ramDisk) {m_ramDisk = ramDisk;}
         void enableRom() {m_romEnabled = true;}
         void disableRom() {m_romEnabled = false;}
-        void ramDiskControl(bool inRamEndbled, bool stackEnabled, int inRamPage, int stackPage);
+        void ramDiskControl(int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage);
 
         static EmuObject* create(const EmuValuesList&) {return new VectorAddrSpace();}
 
@@ -152,7 +152,7 @@ class VectorAddrSpace : public AddressableDevice
         Cpu8080Compatible* m_cpu = nullptr;
 
         bool m_romEnabled = true;
-        bool m_inRamDiskEnabled = false;
+        int m_inRamPagesMask = 0;
         bool m_stackDiskEnabled = false;
         int m_inRamDiskPage = 0;
         int m_stackDiskPage = 0;
