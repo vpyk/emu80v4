@@ -437,6 +437,13 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
 
     uint16_t begAddr = 0x100;
 
+    // check for "r0m"
+    if (fileName.size() >= 4) {
+        string ext = fileName.substr(fileName.size() - 4, 4);
+        if (ext == ".r0m" || ext == ".R0M")
+            begAddr = 0;
+    }
+
     Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
     VectorAddrSpace* as = static_cast<VectorAddrSpace*>(cpu->getAddrSpace());
     m_platform->reset();
