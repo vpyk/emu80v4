@@ -44,6 +44,7 @@ class Fdc1793 : public AddressableDevice
         virtual ~Fdc1793();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getDebugInfo() override;
         void reset() override; // Chip reset
 
         // derived from AddressableDevice

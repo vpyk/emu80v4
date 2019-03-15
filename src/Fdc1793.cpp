@@ -19,6 +19,8 @@
 // Fdc1793.cpp
 // Реализация контроллера НГМД КР580ВГ93 (FDC1793)
 
+#include <sstream>
+
 #include "Fdc1793.h"
 #include "FdImage.h"
 #include "Emulation.h"
@@ -32,7 +34,7 @@ Fdc1793::Fdc1793()
     m_disk = 0; // номер дисковода
     m_head = 0; // номер головки
     m_track = 0; // регистр дорожки
-    m_sector = 0; // регистр сектора
+    m_sector = 1; // регистр сектора
     m_data = 0; // регистр данных
     m_status = 0; // регистр статусаs
     m_directionIn = true; // направление движения true=in, false=out
@@ -366,3 +368,56 @@ bool Fdc1793::setProperty(const string& propertyName, const EmuValuesList& value
 
     return false;
 }
+
+
+string Fdc1793::getDebugInfo()
+{
+    stringstream ss;
+    ss << "FDC:" << "\n";
+    ss << "D:" << m_disk << " ";
+    ss << "H:" << m_head << "\n";
+    ss << "T:" << int(m_track) << " ";
+    ss << "S:" << int(m_sector) << "\n";
+    ss << "CMD:";
+    if (!(m_status & 1))
+        ss << "Ready";
+    else switch (m_lastCommand) {
+    case 0:
+        ss << "Rest";
+        break;
+    case 1:
+        ss << "Seek";
+        break;
+    case 2:
+    case 3:
+        ss << "Step";
+        break;
+    case 4:
+    case 5:
+        ss << "Stp.in";
+        break;
+    case 6:
+    case 7:
+        ss << "Stp.out";
+        break;
+    case 8:
+    case 9:
+        ss << "Read";
+        break;
+    case 0xA:
+    case 0xB:
+        ss << "Write";
+        break;
+    case 0xC:
+        ss << "Rd.addr";
+        break;
+    case 0xD:
+        ss << "Frc.int";
+        break;
+    default:
+        ss << m_lastCommand;
+    }
+
+    return ss.str();
+}
+
