@@ -156,7 +156,7 @@ void FdImage::startSectorAccess(int sector)
 }
 
 
-int FdImage::getCurTrack()
+/*int FdImage::getCurTrack()
 {
     return m_curTrack;
 }
@@ -165,7 +165,7 @@ int FdImage::getCurTrack()
 int FdImage::getCurHead()
 {
     return m_curHead;
-}
+}*/
 
 
 int FdImage::readSectorAddress()

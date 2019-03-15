@@ -176,8 +176,8 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     // read address
                     if (!m_images[m_disk])
                         break;
-                    m_addressId[0] = m_images[m_disk]->getCurTrack();
-                    m_addressId[1] = m_images[m_disk]->getCurHead();
+                    m_addressId[0] = m_track;
+                    m_addressId[1] = m_head;
                     m_addressId[2] = m_images[m_disk]->readSectorAddress() + 1;
                     m_addressId[3] = 3;
                     m_addressId[4] = 0;
