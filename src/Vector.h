@@ -60,6 +60,7 @@ class VectorRenderer : public CrtRenderer, public IActive
         void set512pxMode(bool mode512);
         void setLineOffset(uint8_t lineOffset);
         void setPaletteColor(uint8_t color);
+        void vidMemWriteNotify();
 
         static EmuObject* create(const EmuValuesList&) {return new VectorRenderer();}
 
@@ -140,6 +141,7 @@ class VectorAddrSpace : public AddressableDevice
         void attachRam(AddressableDevice* mem) {m_mainMemory = mem;}
         void attachRom(Rom* rom) {m_rom = rom;}
         void attachRamDisk(AddressableDevice* ramDisk) {m_ramDisk = ramDisk;}
+        void attachCrtRenderer(VectorRenderer* crtRenderer) {m_crtRenderer = crtRenderer;};
         void enableRom() {m_romEnabled = true;}
         void disableRom() {m_romEnabled = false;}
         void ramDiskControl(int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage);
@@ -151,6 +153,7 @@ class VectorAddrSpace : public AddressableDevice
         Rom* m_rom = nullptr;
         AddressableDevice* m_ramDisk = nullptr;
         Cpu8080Compatible* m_cpu = nullptr;
+        VectorRenderer* m_crtRenderer = nullptr;
 
         bool m_romEnabled = true;
         int m_inRamPagesMask = 0;

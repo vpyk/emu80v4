@@ -47,8 +47,11 @@ void VectorAddrSpace::writeByte(int addr, uint8_t value)
         m_ramDisk->writeByte(m_stackDiskPage * 0x10000 + addr, value);
     else if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
         m_ramDisk->writeByte(m_inRamDiskPage * 0x10000 + addr, value);
-    else
+    else {
         m_mainMemory->writeByte(addr, value);
+        if (addr >= 0x8000 && m_crtRenderer)
+            m_crtRenderer->vidMemWriteNotify();
+    }
 }
 
 
@@ -91,6 +94,9 @@ bool VectorAddrSpace::setProperty(const std::string& propertyName, const EmuValu
     } else  if (propertyName == "cpu") {
         m_cpu = static_cast<Cpu8080Compatible*>(g_emulation->findObject(values[0].asString()));
         return m_cpu;
+    } else if (propertyName == "crtRenderer") {
+            attachCrtRenderer(static_cast<VectorRenderer*>(g_emulation->findObject(values[0].asString())));
+            return true;
     }
     return false;
 
@@ -256,6 +262,12 @@ void VectorRenderer::setPaletteColor(uint8_t color)
     m_palette[m_lastColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
                                ((color & 0x38) << 10) | ((color & 0x38) << 7) | ((color & 0x30) << 4) |
                                (color & 0xC0) | ((color & 0xC8) >> 2) | ((color & 0xC8) >> 4) | ((color & 0xC8) >> 6);
+}
+
+
+void VectorRenderer::vidMemWriteNotify()
+{
+    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
 }
 
 
