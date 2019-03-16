@@ -1770,7 +1770,8 @@ void Cpu8080::intRst(int vect) {
             m_curClock = g_emulation->getCurClock();
         }
         RST(vect * 8);
-        m_curClock += m_kDiv * 11; // уточнить!
+        m_statusWord = 0xA2;
+        m_curClock += m_kDiv * 11;
     }
 }
 
