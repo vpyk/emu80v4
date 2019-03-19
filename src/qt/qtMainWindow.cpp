@@ -175,7 +175,7 @@ void MainWindow::adjustClientSize()
         //setFixedSize(width(), height());
         int w = width();
         int h = height();
-        if (w > 200 && h > 100) // some workaround, magic numbers from adjustSize docs
+        if (m_menuBar && (w > 200) && (h > 100)) // some workaround, magic numbers from adjustSize docs
             setFixedSize(w, h);
     }
 
