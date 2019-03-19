@@ -127,6 +127,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         break;
     case EWT_DEBUG:
         createDebugActions();
+        getPaintWidget()->setHideCursor(false);
         //getPaintWidget()->setVsync(false);
         break;
     default:
@@ -906,6 +907,15 @@ void MainWindow::incFrameCount()
 };
 
 
+void MainWindow::mouseClick(int x, int y, PalMouseKey key)
+{
+    if (m_windowType != EWT_DEBUG)
+        return;
+
+    m_palWindow->mouseClick(x, y, key);
+}
+
+
 void MainWindow::onFpsTimer()
 {
     uint64_t delta = m_lastFpsCoutnerFrameTime - m_firstFpsCoutnerFrameTime;
@@ -1580,6 +1590,9 @@ void MainWindow::onSaveRamDisk()
 
 void MainWindow::updateConfig()
 {
+    if (m_palWindow->getWindowType() != EWT_EMULATION)
+        return;
+
     updateActions();
 
     if (m_settingsDialog) {

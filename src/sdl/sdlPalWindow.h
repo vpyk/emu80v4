@@ -25,6 +25,7 @@
 #include <SDL2/SDL.h>
 
 #include "../EmuTypes.h"
+#include "../PalKeys.h"
 
 class PalWindow
 {
@@ -54,6 +55,8 @@ class PalWindow
         void bringToFront();
         void maximize();
         void focusChanged(bool isFocused);
+
+        virtual void mouseClick(int x, int y, PalMouseKey key) {}
 
         virtual std::string getPlatformObjectName() = 0;
         EmuWindowType getWindowType() {return m_windowType;}

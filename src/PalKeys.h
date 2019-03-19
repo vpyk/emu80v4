@@ -143,4 +143,14 @@ enum PalKeyCode
     PK_JOY_RIGHT
 };
 
+
+enum PalMouseKey
+{
+    PM_LEFT_CLICK,
+    PM_LEFT_DBLCLICK,
+    PM_WHEEL_UP,
+    PM_WHEEL_DOWN
+};
+
+
 #endif // PALKEYS_H

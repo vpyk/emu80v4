@@ -46,6 +46,7 @@ public:
 
     void setPalWindow(PalWindow* palWindow);
     void showWindow();
+    void mouseClick(int x, int y, PalMouseKey key);
 
     void setClientSize(int width, int height);
     void adjustClientSize();

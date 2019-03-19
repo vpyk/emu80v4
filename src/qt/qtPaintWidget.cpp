@@ -185,6 +185,9 @@ void PaintWidget::paintEvent(QPaintEvent*)
 
 void PaintWidget::mouseMoveEvent(QMouseEvent*)
 {
+    if (!m_hideCursor)
+        return;
+
     if (m_cursorHidden) {
         setCursor(Qt::ArrowCursor);
         m_cursorHidden = false;
@@ -193,9 +196,42 @@ void PaintWidget::mouseMoveEvent(QMouseEvent*)
 }
 
 
+void PaintWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() & Qt::LeftButton)
+        static_cast<MainWindow*>(parent())->mouseClick(event->x(), event->y(), PM_LEFT_CLICK);
+}
+
+
+void PaintWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() & Qt::LeftButton)
+        static_cast<MainWindow*>(parent())->mouseClick(event->x(), event->y(), PM_LEFT_DBLCLICK);
+}
+
+
+void PaintWidget::wheelEvent(QWheelEvent *event)
+{
+    static_cast<MainWindow*>(parent())->mouseClick(event->x(), event->y(), event->delta() > 0 ? PM_WHEEL_UP : PM_WHEEL_DOWN);
+}
+
+
 void PaintWidget::onHideCursorTimer()
 {
     m_hideCursorTimer.stop();
     setCursor(Qt::BlankCursor);
     m_cursorHidden = true;
+}
+
+
+void PaintWidget::setHideCursor(bool hide)
+{
+    m_hideCursor = hide;
+    if (m_hideCursor) {
+        m_hideCursorTimer.start();
+    } else {
+        m_hideCursorTimer.stop();
+        setCursor(Qt::ArrowCursor);
+        m_cursorHidden = false;
+    }
 }

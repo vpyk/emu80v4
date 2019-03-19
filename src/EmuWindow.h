@@ -89,6 +89,8 @@ class EmuWindow : public EmuObject, public PalWindow
         void drawOverlay(EmuPixelData frame);
         void endDraw();
 
+        bool translateCoords(int& x, int& y);
+
         std::string getCaption();
 
         std::string getPlatformObjectName() override;
@@ -112,6 +114,9 @@ class EmuWindow : public EmuObject, public PalWindow
         FrameScale m_frameScale = FS_BEST_FIT;
         FieldsMixing m_fieldsMixing = FM_NONE;
         WindowStyle m_windowStyle = WS_AUTOSIZE;
+
+        int m_curImgWidth = 0;
+        int m_curImgHeight = 0;
 
         int m_dstX;
         int m_dstY;

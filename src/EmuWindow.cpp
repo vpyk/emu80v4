@@ -183,6 +183,9 @@ void EmuWindow::hide()
 
 void EmuWindow::calcDstRect(EmuPixelData frame)
 {
+    m_curImgWidth = frame.width;
+    m_curImgHeight = frame.height;
+
     double aspectRatio = 1.0;
     if (m_aspectCorrection)
         aspectRatio = m_wideScreen ? frame.aspectRatio * 4.0 / 3.0 : frame.aspectRatio;
@@ -256,6 +259,18 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
             break;
     }
 
+}
+
+
+bool EmuWindow::translateCoords(int& x, int& y)
+{
+    if ((x < m_dstX) || (x >= m_dstX + m_dstWidth) || (y < m_dstY) || (y >= m_dstY + m_dstHeight))
+        return false;
+
+    x = (x - m_dstX) * m_curImgWidth / m_dstWidth;
+    y = (y - m_dstY) * m_curImgHeight / m_dstHeight;
+
+    return true;
 }
 
 
@@ -367,21 +382,24 @@ void EmuWindow::sysReq(SysReq sr)
             setFrameScale(FS_1X);
             setAntialiasing(false);
             m_aspectCorrection = false;
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_2X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_2X);
             setAntialiasing(false);
             m_aspectCorrection = false;
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_3X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_3X);
             setAntialiasing(false);
             m_aspectCorrection = false;
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_FIT:
             if (!m_isFullscreenMode)
@@ -389,26 +407,31 @@ void EmuWindow::sysReq(SysReq sr)
             setFrameScale(FS_FIT_KEEP_AR);
             setAntialiasing(true);
             m_aspectCorrection = true;
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_MAXIMIZE:
             setWindowStyle(WS_SIZABLE);
             setFrameScale(FS_FIT_KEEP_AR);
             setAntialiasing(true);
             maximize();
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_ASPECTCORRECTION:
             m_aspectCorrection = !m_aspectCorrection;
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_WIDESCREEN:
             setWideScreen(!m_wideScreen);
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_ANTIALIASING:
             setAntialiasing(!m_isAntialiased);
-            g_emulation->getConfig()->updateConfig();
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
             break;
         case SR_SCREENSHOT:
             screenshotRequest(palOpenFileDialog("Save screenshot", "BMP files (*.bmp)|*.bmp", true, this));

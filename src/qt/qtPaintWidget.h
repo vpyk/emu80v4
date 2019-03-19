@@ -37,6 +37,7 @@ class PaintWidget : public QOpenGLWidget
         void colorFill(QColor color);
         void draw();
         void screenshot(const QString& ssFileName);
+        void setHideCursor(bool hide);
 
         void setAntialiasing(bool aa) {m_antialiasing = aa;}
         //void setVsync(bool vsync);
@@ -45,8 +46,11 @@ class PaintWidget : public QOpenGLWidget
         int getImageHeight() {return m_dstRect.height();}
 
     protected:
-        void paintEvent(QPaintEvent *);
-        void mouseMoveEvent(QMouseEvent *event);
+        void paintEvent(QPaintEvent *) override;
+        void mouseMoveEvent(QMouseEvent *event) override;
+        void mousePressEvent(QMouseEvent *event) override;
+        void mouseDoubleClickEvent(QMouseEvent *event) override;
+        void wheelEvent(QWheelEvent *event) override;
 
     private slots:
         void onHideCursorTimer();
@@ -66,6 +70,7 @@ class PaintWidget : public QOpenGLWidget
 
         bool m_antialiasing = false;
 
+        bool m_hideCursor = true;
         QTimer m_hideCursorTimer;
         bool m_cursorHidden = false;
 };

@@ -487,6 +487,18 @@ static bool palProcessEvents()
                     }
                     break;
                 }
+            case SDL_MOUSEBUTTONDOWN:
+                    if (!SDL_GetWindowFromID(event.button.windowID))
+                        break; // могут остаться события, относящиеся к уже уделенному окну
+                    if (event.button.button == SDL_BUTTON_LEFT)
+                        PalWindow::windowById(event.button.windowID)->mouseClick(event.button.x, event.button.y,
+                                                                                event.button.clicks < 2 ? PM_LEFT_CLICK : PM_LEFT_DBLCLICK);
+                    break;
+            case SDL_MOUSEWHEEL:
+                    if (!SDL_GetWindowFromID(event.wheel.windowID))
+                        break; // могут остаться события, относящиеся к уже уделенному окну
+                    PalWindow::windowById(event.button.windowID)->mouseClick(0, 0, event.wheel.y > 0 ? PM_WHEEL_UP : PM_WHEEL_DOWN);
+                    break;
             case SDL_TEXTINPUT:
                 {
                     if (unicodeKey)

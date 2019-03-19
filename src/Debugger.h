@@ -92,6 +92,8 @@ class DebugWindow : private EmuWindow
         DebugWindow(Platform* platform);
         ~DebugWindow();
 
+        void mouseClick(int x, int y, PalMouseKey key) override;
+
         void processKey(PalKeyCode keyCode, bool isPressed) override;
         void closeRequest() override;
 
@@ -258,6 +260,8 @@ class DebugWindow : private EmuWindow
 
         void checkForInput();                  // проверка и обработка возможного завершенного ввода
 
+        bool checkRegion(const DbgRegion& rgn, int x, int y);
+
         // debugger operations
         void step();
         void over();
@@ -284,6 +288,7 @@ class DebugWindow : private EmuWindow
         void codeKbdProc(PalKeyCode keyCode);   // клавиатурный обработчик секции кода
         void codeGotoAddr(uint16_t addr);       // переход на указанный адрес
         void codeProcessInput();                // обработка завершения ввода
+        void codeClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
 
         // dump section fields and methods
         uint16_t m_dumpCurStartAddr;            // текущий начальный адрес дампа
@@ -293,6 +298,7 @@ class DebugWindow : private EmuWindow
         void dumpDraw();                        // отрисовка дампа
         void dumpKbdProc(PalKeyCode keyCode);   // клавиатурный обработчик секции дампа
         void dumpProcessInput();                // обработка завершения ввода
+        void dumpClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
 
         // number input fields and methods
         ActiveMode m_inputFromMode;             // предыдущая активная секция
@@ -317,6 +323,7 @@ class DebugWindow : private EmuWindow
         void regsSetCurRegValue(uint16_t value);// устанавливает значение текущего регистра
         void regsKbdProc(PalKeyCode keyCode);   // клавиатурный обработчик секции регистров
         void regsProcessInput();                // обработка завершения ввода
+        void regsClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
 
         // flags section fields and methods
         const int m_flagsBits[6] = {0, 6, 2, 7, 4, 1}; // позиции битов в регистре флагов
@@ -324,11 +331,13 @@ class DebugWindow : private EmuWindow
         void flagsInit();                        // инициализация секции флагов
         void flagsDraw();                        // отрисовка секции флагов
         void flagsKbdProc(PalKeyCode keyCode);   // клавиатурный обработчик секции флагов
+        void flagsClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
 
         // breakpoints section fields and methods
         unsigned m_curBpoint = 0;                    // номер текущей точки останова
         void bpointsDraw();
         void bpointsKbdProc(PalKeyCode keyCode);// клавиатурный обработчик секции точек останова
+        void bpointsClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
 
         // debugger options
         bool m_mnemo8080UpperCase;

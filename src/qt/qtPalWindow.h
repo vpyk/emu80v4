@@ -23,6 +23,7 @@
 #include <map>
 
 #include "../EmuTypes.h"
+#include "../PalKeys.h"
 
 class MainWindow;
 
@@ -54,6 +55,8 @@ class PalWindow
         void bringToFront();
         void maximize();
         void focusChanged(bool isFocused);
+
+        virtual void mouseClick(int x, int y, PalMouseKey key); //{}
 
         virtual std::string getPlatformObjectName() = 0;
         virtual EmuWindowType getWindowType() {return m_windowType;}

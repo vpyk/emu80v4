@@ -935,6 +935,65 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
 }
 
 
+bool DebugWindow::checkRegion(const DbgRegion& rgn, int x, int y)
+{
+    return ((x >= rgn.left) && (x < rgn.left + rgn.width) && (y >= rgn.top) && (y < rgn.top + rgn.height));
+}
+
+void DebugWindow::mouseClick(int x, int y, PalMouseKey key)
+{
+    if (!translateCoords(x, y))
+        return;
+
+    x /= m_chrW;
+    y /= m_chrH;
+
+    if (m_mode == AM_INPUT)
+        return;
+
+    if (key == PM_WHEEL_UP || key == PM_WHEEL_DOWN) {
+        switch (m_mode) {
+        case AM_DUMP:
+            dumpClick(x, y, key);
+            break;
+        case AM_CODE:
+            codeClick(x, y, key);
+            break;
+        case AM_REGS:
+            regsClick(x, y, key);
+            break;
+        case AM_FLAGS:
+            flagsClick(x, y, key);
+            break;
+        case AM_BPOINTS:
+            bpointsClick(x, y, key);
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    if (checkRegion(m_curLayout->code, x, y)) {
+        m_mode = AM_CODE;
+        codeClick(x - m_curLayout->code.left, y - m_curLayout->code.top, key);
+    } else if (checkRegion(m_curLayout->dump, x, y)) {
+        m_mode = AM_DUMP;
+        dumpClick(x - m_curLayout->dump.left, y - m_curLayout->dump.top, key);
+    }
+    else if (checkRegion(m_curLayout->regs, x, y)) {
+        m_mode = AM_REGS;
+        regsClick(x - m_curLayout->regs.left, y - m_curLayout->regs.top, key);
+    } else if (checkRegion(m_curLayout->flags, x, y)) {
+        m_mode = AM_FLAGS;
+        flagsClick(x - m_curLayout->flags.left, y - m_curLayout->flags.top, key);
+    } else if (checkRegion(m_curLayout->bpts, x, y) && (m_bpList.size() > 0)) {
+        m_mode = AM_BPOINTS;
+        bpointsClick(x - m_curLayout->bpts.left, y - m_curLayout->bpts.top, key);
+    }
+}
+
+
 void DebugWindow::checkForInput()
 {
     if (m_mode != AM_INPUT) {
@@ -1305,9 +1364,9 @@ void DebugWindow::codeDraw()
 
     // подсветка текущей строки
     if (m_mode == AM_CODE)
-        highlight(m_curLayout->code.left, m_curLayout->code.top + m_codeHighlightedLine, 3, 34);
-    else
-        highlight(m_curLayout->code.left, m_curLayout->code.top + m_codeHighlightedLine, 0, 34);
+        highlight(m_curLayout->code.left, m_curLayout->code.top + m_codeHighlightedLine, 3, m_compactMode ? 34 : 37);
+    //else
+        //highlight(m_curLayout->code.left, m_curLayout->code.top + m_codeHighlightedLine, 0, 34);
 }
 
 
@@ -1406,6 +1465,27 @@ void DebugWindow::codeKbdProc(PalKeyCode keyCode)
 }
 
 
+// обработчик событий мыши секции кода
+void DebugWindow::codeClick(int x, int y, PalMouseKey key)
+{
+    switch (key) {
+    case PM_LEFT_CLICK:
+        m_codeHighlightedLine = y;
+        break;
+    case PM_LEFT_DBLCLICK:
+        if (x < 3)
+            breakpoint();
+        break;
+    case PM_WHEEL_UP:
+        codeKbdProc(PK_UP);
+        break;
+    case PM_WHEEL_DOWN:
+        codeKbdProc(PK_DOWN);
+        break;
+    }
+}
+
+
 void DebugWindow::codeGotoAddr(uint16_t addr)
 {
     m_codeLayout[m_codeHighlightedLine] = addr;
@@ -1454,6 +1534,7 @@ void DebugWindow::dumpDraw()
 }
 
 
+// клавиатурный обработчик секции дампа
 void DebugWindow::dumpKbdProc(PalKeyCode keyCode)
 {
     switch (keyCode) {
@@ -1479,7 +1560,7 @@ void DebugWindow::dumpKbdProc(PalKeyCode keyCode)
             break;
         case PK_A:
             m_dumpInputAddr = true;
-            inputStart(m_mode, m_curLayout->dump.left + 3, m_curLayout->dump.top + 1, 4, true, m_dumpCurStartAddr);
+            inputStart(m_mode, m_curLayout->dump.left + 3, m_curLayout->dump.top + 1 + uint16_t(m_dumpCurAddr - m_dumpCurStartAddr) / 16, 4, true, m_dumpCurAddr & 0xFFF0);
             break;
         case PK_ENTER:
         case PK_F2: {
@@ -1504,13 +1585,44 @@ void DebugWindow::dumpProcessInput()
 {
     m_inputFromMode = AM_NONE;
     if (m_dumpInputAddr) {
-        m_dumpCurStartAddr = m_inputReturnValue & 0xFFF0;
-        m_dumpCurAddr = m_dumpCurStartAddr;
+        m_dumpCurStartAddr = uint16_t((m_inputReturnValue & 0xFFF0) - uint16_t((m_dumpCurAddr & 0xFFF0) - m_dumpCurStartAddr));
+        m_dumpCurAddr = m_inputReturnValue;
     } else {
         writeByte(m_dumpCurAddr, m_inputReturnValue);
         dumpKbdProc(PK_RIGHT); // переходим к редактированию следующего байта
         m_inputFromMode = AM_DUMP;
         dumpKbdProc(PK_F2);
+    }
+}
+
+
+// обработчик событий мыши секции дампа
+void DebugWindow::dumpClick(int x, int y, PalMouseKey key)
+{
+    switch (key) {
+    case PM_LEFT_CLICK:
+        if (y == 0)
+            return;
+
+        m_dumpCurAddr = m_dumpCurStartAddr + (y - 1) * 16;
+
+        if ((x >= 8) && (x <= 8 + 16 * 3))
+             m_dumpCurAddr += (x - 8) / 3;
+
+        break;
+    case PM_LEFT_DBLCLICK:
+        if ((x >= 8) && (x <= 8 + 16 * 3)) {
+            dumpKbdProc(PK_F2);
+        } else if ((x >= 3) && (x <= 6)) {
+            dumpKbdProc(PK_A);
+        }
+        break;
+    case PM_WHEEL_UP:
+        dumpKbdProc(PK_UP);
+        break;
+    case PM_WHEEL_DOWN:
+        dumpKbdProc(PK_DOWN);
+        break;
     }
 }
 
@@ -1680,6 +1792,32 @@ void DebugWindow::regsKbdProc(PalKeyCode keyCode)
 }
 
 
+// обработчик событий мыши секции регистров
+void DebugWindow::regsClick(int x, int y, PalMouseKey key)
+{
+    if (y > 5)
+        return;
+
+    switch (key) {
+    case PM_LEFT_CLICK:
+        if ((x >= 5) && (x <= 10))
+            m_regsCurReg = y;
+        else if (m_z80Mode && (x >= 17) && (x <= 22))
+            m_regsCurReg = y + 6;
+        break;
+    case PM_LEFT_DBLCLICK:
+        regsKbdProc(PK_F2);
+        break;
+    case PM_WHEEL_UP:
+        regsKbdProc(PK_UP);
+        break;
+    case PM_WHEEL_DOWN:
+        regsKbdProc(PK_DOWN);
+        break;
+    }
+}
+
+
 void DebugWindow::regsProcessInput()
 {
     regsSetCurRegValue(m_inputReturnValue);
@@ -1762,6 +1900,30 @@ void DebugWindow::flagsKbdProc(PalKeyCode keyCode)
 }
 
 
+// обработчик событий мыши секции флагов
+void DebugWindow::flagsClick(int x, int y, PalMouseKey key)
+{
+    if ((y > 5) || ((y == 5) && !m_z80Mode))
+        return;
+
+    switch (key) {
+    case PM_LEFT_CLICK:
+        if ((x >= 5) && (x <= 7) && ((y < 5) || m_z80Mode))
+            m_flagsCurFlag = y;
+        break;
+    case PM_LEFT_DBLCLICK:
+        flagsKbdProc(PK_SPACE);
+        break;
+    case PM_WHEEL_UP:
+        flagsKbdProc(PK_UP);
+        break;
+    case PM_WHEEL_DOWN:
+        flagsKbdProc(PK_DOWN);
+        break;
+    }
+}
+
+
 
 // ######## BREAKPOINTS section methods ########
 
@@ -1811,9 +1973,33 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
             advance(it, m_curBpoint);
             codeGotoAddr((*it).addr);
             codeGotoAddr((*it).addr);
+            m_mode = AM_CODE;
             break; }
         default:
             break;
+    }
+}
+
+
+// обработчик событий мыши секции точек останова
+void DebugWindow::bpointsClick(int x, int y, PalMouseKey key)
+{
+    if (y >= m_bpList.size())
+        return;
+
+    switch (key) {
+    case PM_LEFT_CLICK:
+        m_curBpoint = y;
+        break;
+    case PM_LEFT_DBLCLICK:
+        bpointsKbdProc(PK_ENTER);
+        break;
+    case PM_WHEEL_UP:
+        bpointsKbdProc(PK_UP);
+        break;
+    case PM_WHEEL_DOWN:
+        bpointsKbdProc(PK_DOWN);
+        break;
     }
 }
 
