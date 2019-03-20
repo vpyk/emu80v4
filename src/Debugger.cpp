@@ -1493,6 +1493,8 @@ void DebugWindow::codeClick(int x, int y, PalMouseKey key)
     case PM_LEFT_DBLCLICK:
         if (x < 3)
             breakpoint();
+        else if (x < 8)
+            codeKbdProc(PK_A);
         break;
     case PM_WHEEL_UP:
         codeKbdProc(PK_UP);
