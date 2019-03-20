@@ -189,6 +189,10 @@ class DebugWindow : private EmuWindow
         bool m_z80Mode = false;
         bool m_z80Mnemonics = false;
 
+        uint64_t m_cpuClock = 0;
+        bool m_resetCpuClockFlag = true;
+        void resetCpuClock();
+
         uint32_t m_palette[16] = {
             0x000000, 0x000080, 0x008000, 0x008080,
             0x800000, 0x800080, 0x800000, 0xC0C0C0,

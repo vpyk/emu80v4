@@ -17,7 +17,7 @@
  */
 
 #include <algorithm>
-#include <sstream>
+//#include <sstream>
 #include "string.h"
 
 #include "Cpu.h"
@@ -133,12 +133,12 @@ std::string Cpu::getPropertyStringValue(const std::string& propertyName)
 }
 
 
-std::string Cpu::getDebugInfo()
+/*std::string Cpu::getDebugInfo()
 {
     stringstream ss;
     ss << "CPU:" << "\n" << m_curClock / m_kDiv;
     return ss.str();
-}
+}*/
 
 
 Cpu8080Compatible::Cpu8080Compatible()

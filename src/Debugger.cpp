@@ -203,6 +203,10 @@ void DebugWindow::startDebug()
 {
     if (!m_isRunning)
         return;
+
+    if (m_resetCpuClockFlag || (m_tempBp && m_tempBp->getHookAddr() != m_cpu->getPC()))
+        resetCpuClock();
+
     m_isRunning = false;
 
     if (m_tempBp) {
@@ -525,14 +529,24 @@ void DebugWindow::drawDbgFrame()
 }
 
 
+void DebugWindow::resetCpuClock()
+{
+    m_cpuClock = m_cpu->getClock() / m_cpu->getKDiv();
+}
+
+
 void DebugWindow::displayObjectDbgInfo()
 {
     if (m_compactMode)
         return;
 
+    int clocks = int(m_cpu->getClock() / m_cpu->getKDiv() - m_cpuClock);
+    ostringstream ss;
+    ss << clocks;
+
     //const char* s = m_platform->getAllDebugInfo().c_str(); // !! figure out why does this not work?
-    string ss = m_platform->getAllDebugInfo();
-    const char* s = ss.c_str();
+    string info = "CPU:\n" + ss.str() + "\n\n" + m_platform->getAllDebugInfo();
+    const char* s = info.c_str();
 
     int x = 0;
     int y = 0;
@@ -1025,6 +1039,7 @@ void DebugWindow::step()
     m_cpu->debugStepRequest();
     m_isRunning = true;
     checkForCurBreakpoint();
+    m_resetCpuClockFlag = false;
     g_emulation->debugRun();
 }
 
@@ -1033,6 +1048,7 @@ void DebugWindow::run()
 {
     m_isRunning = true;
     checkForCurBreakpoint();
+    m_resetCpuClockFlag = true;
     g_emulation->debugRun();
     hide();
 }
@@ -1056,6 +1072,7 @@ void DebugWindow::over()
 
         m_isRunning = true;
         checkForCurBreakpoint();
+        m_resetCpuClockFlag = false;
         g_emulation->debugRun();
         hide();
     } else
@@ -1085,6 +1102,7 @@ void DebugWindow::here()
 
     m_isRunning = true;
     checkForCurBreakpoint();
+    m_resetCpuClockFlag = false;
     g_emulation->debugRun();
     hide();
 }
