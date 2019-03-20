@@ -37,8 +37,11 @@ Cpu::Cpu()
 
 Cpu::~Cpu()
 {
-    for (auto it = m_hookVector.begin(); it != m_hookVector.end(); it++)
+    for (auto it = m_hookVector.begin(); it != m_hookVector.end(); it++) {
         (*it)->setCpu(nullptr);
+        if ((*it)->getName() == "") // breakponts
+            delete (*it);
+    }
 }
 
 
@@ -149,7 +152,7 @@ Cpu8080Compatible::Cpu8080Compatible()
 
 void Cpu8080Compatible::addHook(CpuHook* hook)
 {
-    hook->setCpu(this);
+    Cpu::addHook(hook);
     uint16_t addr = hook->getHookAddr();
     if (!m_hookArray[addr])
         m_hookArray[addr] = new list<CpuHook*>;
@@ -159,6 +162,7 @@ void Cpu8080Compatible::addHook(CpuHook* hook)
 
 void Cpu8080Compatible::removeHook(CpuHook* hook)
 {
+    Cpu::removeHook(hook);
     uint16_t addr = hook->getHookAddr();
     list<CpuHook*>* hookList = m_hookArray[addr];
     if (hookList) {
