@@ -24,7 +24,7 @@
 #include "CrtRenderer.h"
 #include "FileLoader.h"
 #include "Keyboard.h"
-#include "Kbdlayout.h"
+#include "KbdLayout.h"
 #include "CpuWaits.h"
 
 class Ram;
