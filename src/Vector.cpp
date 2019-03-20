@@ -48,9 +48,9 @@ void VectorAddrSpace::writeByte(int addr, uint8_t value)
     else if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
         m_ramDisk->writeByte(m_inRamDiskPage * 0x10000 + addr, value);
     else {
-        m_mainMemory->writeByte(addr, value);
         if (addr >= 0x8000 && m_crtRenderer)
             m_crtRenderer->vidMemWriteNotify();
+        m_mainMemory->writeByte(addr, value);
     }
 }
 
@@ -227,9 +227,10 @@ void VectorRenderer::advanceTo(uint64_t clock)
     int lastPixel = toPixel % 768;
     m_curFramePixel = toPixel;
     renderLine(firstLine, firstPixel, firstLine == lastLine ? lastPixel : 768);
-    for (int line = firstLine + 1; line < lastLine + 1; line++)
+    for (int line = firstLine + 1; line < lastLine; line++)
         renderLine(line, 0, 768);
-    renderLine(lastLine, firstLine == lastLine ? firstPixel : 0, lastPixel);
+    if (firstLine != lastLine)
+        renderLine(lastLine, firstLine == lastLine ? firstPixel : 0, lastPixel);
 }
 
 
@@ -267,7 +268,7 @@ void VectorRenderer::setPaletteColor(uint8_t color)
 
 void VectorRenderer::vidMemWriteNotify()
 {
-    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
+    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 40);
 }
 
 
@@ -328,6 +329,7 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
         }
     }
 }
+
 
 void VectorRenderer::renderFrame()
 {
