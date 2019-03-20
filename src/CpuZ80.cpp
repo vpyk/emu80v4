@@ -2310,7 +2310,8 @@ unsigned CpuZ80::simz80()
         case 0xA2:          /* INI */
             PutBYTE(HL, io_input(lreg(BC))); ++HL;
             SETFLAG(N, 1);
-            SETFLAG(P, (--BC & 0xffff) != 0);
+            Sethreg(BC, lreg(BC) - 1);
+            SETFLAG(Z, lreg(BC) == 0);
             break;
         case 0xA3:          /* OUTI */
             io_output(lreg(BC), GetBYTE(HL)); ++HL;
