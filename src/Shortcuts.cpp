@@ -62,6 +62,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_DISKA;
             case PK_B:
                 return SR_DISKB;
+            case PK_E:
+                return SR_LOADRAMDISK;
             case PK_1:
                 return SR_1X;
             case PK_2:
@@ -76,7 +78,7 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_ANTIALIASING;
             case PK_R:
                 return SR_ASPECTCORRECTION;
-            case PK_E:
+            case PK_N:
                 return SR_WIDESCREEN;
             case PK_P:
                 return SR_PAUSE;

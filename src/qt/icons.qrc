@@ -24,5 +24,6 @@
         <file>icons/mute.png</file>
         <file>icons/crop.png</file>
         <file>icons/wide.png</file>
+        <file>icons/edd.png</file>
     </qresource>
 </RCC>

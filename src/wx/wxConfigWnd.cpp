@@ -101,15 +101,17 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-K\t– «Умная» раскладка\n"
         "Alt-A\t– выбор диска A\n"
         "Alt-B\t– выбор диска B\n"
+        "Alt-E\t– выбор электронного диска\n"
         "Alt-1\t– пресет: 1x, автоподстройка размера окна, без сглаживания\n"
         "Alt-2\t– пресет: 2x, автоподстройка размера окна, без сглаживания\n"
         "Alt-3\t– пресет: 3x, автоподстройка размера окна, без сглаживания\n"
-        "Alt-0\t– пресет: изменяемый размер окна, вписать, со сгл, учит. Aspect Ratio\n"
+        "Alt-0\t– пресет: измен. размер окна, вписать, со сгл, учит. Aspect Ratio\n"
         "Alt-M\t– то же, что и Alt-0 + максимизировать окно\n"
         "Alt-F\t– оригинальный/альтернативный шрифт\n"
         "Alt-C\t– переключить режим цвета\n"
         "Alt-R\t– переключить учитывание Aspect Ratio\n"
         "Alt-V\t– переключить отображение только видимой области экрана\n"
+        "Alt-E\t– переключить формат экрана 4:3 / 16:9\n"
         "Alt-H\t– скриншот экрана\n"
         "Alt-U\t– переключение беззвучного режима\n"
         "Alt-Enter\t– полноэкранный режим\n"
@@ -119,9 +121,9 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Вместо клавиши Alt может быть использована Meta (Win)"
         ;
 	wxStaticText* helpText = new wxStaticText(m_helpPanel, wxID_ANY, helpString);
-    //wxFont font = helpText->GetFont();
-    //font.SetPointSize(font.GetPointSize() - font.GetPointSize() / 5);
-    //helpText->SetFont(font);
+    wxFont font = helpText->GetFont();
+    font.SetPointSize(font.GetPointSize() - font.GetPointSize() / 5);
+    helpText->SetFont(font);
 	tabSizer->Add(helpText, 1, wxTOP|wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 12);
 
 	m_mainVSizer->Fit(this);

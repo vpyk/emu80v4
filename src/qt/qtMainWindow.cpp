@@ -315,13 +315,20 @@ void MainWindow::createActions()
     connect(m_diskBAction, SIGNAL(triggered()), this, SLOT(onDiskB()));
 
     m_menuDiskSeparator = fileMenu->addSeparator();
-    m_toolbarDiskSeparator = m_toolBar->addSeparator();
 
     // Load RAM disk
-    m_loadRamDiskAction = new QAction(tr("Load RAM Disk..."), this);
-    //m_loadRamDiskAction->setToolTip(tr("Load RAM Disk image"));
+    m_loadRamDiskAction = new QAction(QIcon(":/icons/edd.png"), tr("Load RAM Disk..."), this);
+    m_loadRamDiskAction->setToolTip(tr("Load RAM Disk image"));
+    QList<QKeySequence> loadRamDiskKeysList;
+    loadRamDiskKeysList.append(QKeySequence(Qt::ALT + Qt::Key_E));
+    loadRamDiskKeysList.append(QKeySequence(Qt::META + Qt::Key_E));
+    m_loadRamDiskAction->setShortcuts(loadRamDiskKeysList);
+    addAction(m_loadRamDiskAction);
     fileMenu->addAction(m_loadRamDiskAction);
+    m_toolBar->addAction(m_loadRamDiskAction);
     connect(m_loadRamDiskAction, SIGNAL(triggered()), this, SLOT(onLoadRamDisk()));
+
+    m_toolbarDiskSeparator = m_toolBar->addSeparator();
 
     // Save RAM disk
     m_saveRamDiskAction = new QAction(tr("Save RAM Disk..."), this);
@@ -583,10 +590,10 @@ void MainWindow::createActions()
     // Wide screen
     m_wideScreenAction = new QAction(QIcon(":/icons/wide.png"), tr("Wide screen (16:9)"), this);
     m_wideScreenAction->setCheckable(true);
-    m_wideScreenAction->setToolTip(tr("Wide screen (16:9) (Alt-E)"));
+    m_wideScreenAction->setToolTip(tr("Wide screen (16:9) (Alt-N)"));
     QList<QKeySequence> wideScreenKeysList;
-    wideScreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_E));
-    wideScreenKeysList.append(QKeySequence(Qt::META + Qt::Key_E));
+    wideScreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_N));
+    wideScreenKeysList.append(QKeySequence(Qt::META + Qt::Key_N));
     m_wideScreenAction->setShortcuts(wideScreenKeysList);
     addAction(m_wideScreenAction);
     //m_toolBar->addAction(m_wideScreenAction);
