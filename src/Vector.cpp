@@ -277,11 +277,12 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
     // Render scan line #nLine
     // Vertical: 0-22 - invisible, 23-39 - border, 40-295 - visible, 296-311 - border) from firstPx to lastPx
     // Horizonlal: 0-123 - invisible, 124-180 - border, 181-692 - active area, 693-749 - border, 750-767 - invisible
+    // (lastPx is non-inclusive)
 
-    m_lastColor = m_borderColor;
-
-    if (nLine < 24)
+    if (nLine < 24) {
+        m_lastColor = m_borderColor;
         return;
+    }
 
     uint32_t* linePtr = m_frameBuf + (nLine - 24) * 626;
     uint32_t* ptr;
@@ -290,15 +291,16 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
         // upper and lower borders
         if (firstPx < 124) firstPx = 124;
         ptr = linePtr + firstPx - 124;
-        for (int px = firstPx; px < lastPx && px >= 124 && px < 750; px++)
+        m_lastColor = m_borderColor;
+        for (int px = firstPx; px < lastPx && px >= 124 && px < 750; px++) {
             *ptr++ = m_palette[m_borderColor];
+        }
     } else {
         // left border
         if (firstPx < 124) firstPx = 124;
         ptr = linePtr + firstPx - 124;
-        for (int px = firstPx; px < lastPx && px >= 124 && px < 181; px++) {
+        for (int px = firstPx; px < lastPx && px >= 124 && px < 181; px++)
             *ptr++ = m_palette[m_borderColor];
-        }
 
         // active area
         if (firstPx < 181) firstPx = 181;
@@ -324,9 +326,11 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
         // right border
         if (firstPx < 693) firstPx = 693;
         ptr = linePtr + firstPx - 124;
-        for (int px = firstPx; px < lastPx && px >= 693 && px < 750; px++) {
+        for (int px = firstPx; px < lastPx && px >= 693 && px < 750; px++)
             *ptr++ = m_palette[m_borderColor];
-        }
+
+        if (lastPx < 182 || lastPx >= 694)
+            m_lastColor = m_borderColor;
     }
 }
 
