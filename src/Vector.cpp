@@ -421,9 +421,9 @@ string VectorRenderer::getPropertyStringValue(const string& propertyName)
         return m_showBorder ? "yes" : "no";
     } else if (propertyName == "crtMode") {
         if (m_mode512pxLatched)
-            return "512\u00D7256@50.08Hz";
+            return u8"512\u00D7256@50.08Hz";
         else
-            return "256\u00D7256@50.08Hz";
+            return u8"256\u00D7256@50.08Hz";
         }
 
     return "";
