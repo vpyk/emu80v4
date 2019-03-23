@@ -756,6 +756,13 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "smart";
     m_options["kbdLayout.layout"] = val;
 
+    val = "";
+    if (ui->kbdOriginalRadioButton->isChecked())
+        val = "original";
+    else if (ui->kbdRamfosRadioButton->isChecked())
+        val = "ramfos";
+    m_options["keyboard.matrix"] = val;
+
     saveRunningConfig();
     saveStoredConfig();
 
