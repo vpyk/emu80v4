@@ -195,7 +195,6 @@ VectorRenderer::~VectorRenderer()
 void VectorRenderer::operate()
 {
     advanceTo(m_curClock);
-    //m_firstFrameClock = m_curClock;
     m_curFrameClock = m_curClock;
     m_curFramePixel = 0;
     m_curClock += m_ticksPerPixel * 768 * 312;
@@ -211,10 +210,16 @@ void VectorRenderer::advanceTo(uint64_t clock)
 {
     const int bias = 145;
 
-    int toPixel = int(clock - m_curFrameClock) / m_ticksPerPixel + bias;
+    if (clock <= m_curFrameClock)
+        return;
+
+    int toPixel = (int64_t(clock) - int64_t(m_curFrameClock)) / m_ticksPerPixel + bias;
 
     if (toPixel <= m_curFramePixel)
         return;
+
+    if (toPixel >= 312 * 768)
+        toPixel = 312 * 768 - 1;
 
     if (!m_lineOffsetIsLatched && toPixel > 768 * 40 + 180) {
         m_lineOffsetIsLatched = true;

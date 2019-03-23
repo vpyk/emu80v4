@@ -71,6 +71,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::setPalWindow(PalWindow* palWindow)
 {
+    if (!palWindow) {
+        m_windowType = EWT_UNDEFINED;
+        return;
+    }
+
     m_windowType = palWindow->getWindowType();
 
     if (!m_palWindow && m_windowType == EWT_EMULATION) {
