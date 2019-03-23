@@ -662,8 +662,35 @@ int VectorCpuWaits::getCpuWaitStates(int, int, int normalClocks)
 
 int VectorZ80CpuWaits::getCpuWaitStates(int, int opcode, int normalClocks)
 {
-    static const int waits[24] = {0, 0, 0, 0, 0, 3, 2, 1, 4, 3, 2, 5, 4, 3, 2, 5, 4, 3, 6, 5, 4, 3, 6, 5};
-    return (opcode & 0xCF) == 0x09 ? 1 : waits[normalClocks]; // add hl, rp - 11 instead of 16
+    static const int waits[24] = {0, 0, 0, 0, 0, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 5, 4, 7, 0, 5};
+    // 8, 11, 12, 13, 15 should be revised
+    switch (normalClocks) {
+    case 8:
+        if ((opcode & 0xFF) == 0x10) // DJNZ, if B==0
+            return 4;
+        break;
+    case 11:
+        if ((opcode & 0xCF) == 0xC5 /* PUSH qq */ ||
+            (opcode & 0xC7) == 0xC0 /* RET cc if cc = true */ ||
+            (opcode & 0xC7) == 0xC7 /* RST p */)
+            return 5;
+        break;
+    case 12:
+        if ((opcode & 0xFF) == 0xCB || (opcode & 0xFF) == 0xEB || (opcode & 0xFF) == 0xED) // BIT b, (HL) or IN r,(C) or OUT (C),r
+            return 0;
+        break;
+    case 13:
+        if ((opcode & 0xFF) == 0x10) // DJNZ, if B<>0
+            return 7;
+        break;
+    case 15:
+        if (opcode == 0xE5DD || opcode == 0xE5FD) // PUSH ix/iy
+            return 5;
+        break;
+    default:
+        break;
+    }
+    return waits[normalClocks];
 }
 
 

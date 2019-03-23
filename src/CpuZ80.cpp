@@ -2549,7 +2549,7 @@ void CpuZ80::operate()
 
     if (m_waits) {
         int tag;
-        int opcode = m_addrSpace->readByteEx(PC, tag);
+        int opcode = m_addrSpace->readByteEx(PC, tag) + (m_addrSpace->readByte(uint16_t(PC + 1)) << 8); // 2 bytes for z80
         int clocks = simz80();
         m_curClock += m_kDiv * (clocks + m_waits->getCpuWaitStates(tag, opcode, clocks));
     } else
