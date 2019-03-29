@@ -2371,39 +2371,43 @@ unsigned CpuZ80::simz80()
             SETFLAG(Z, lreg(BC) == 0);
             break;
         case 0xB0:          /* LDIR */
-            acu = hreg(AF);
-            BC &= 0xffff;
-            do {
-                acu = GetBYTE(HL); ++HL;
-                PutBYTE(DE, acu); ++DE;
-            } while (--BC);
+            acu = GetBYTE(HL++);
+            PutBYTE(DE++, acu);
             acu += hreg(AF);
             AF = (AF & ~0x3e) | (acu & 8) | ((acu & 2) << 4);
+            if (--BC) {
+                cycles += cc_ex[op];
+                PC -= 2;
+            }
             break;
         case 0xB1:          /* CPIR */
+        {
             acu = hreg(AF);
-            BC &= 0xffff;
-            do {
-                temp = GetBYTE(HL); ++HL;
-                op = --BC != 0;
-                sum = acu - temp;
-            } while (op && sum != 0);
+            temp = GetBYTE(HL++);
+            bool cond = --BC != 0;
+            sum = acu - temp;
             cbits = acu ^ temp ^ sum;
             AF = (AF & ~0xfe) | (sum & 0x80) | (!(sum & 0xff) << 6) |
-                (((sum - ((cbits&16)>>4))&2) << 4) |
-                (cbits & 16) | ((sum - ((cbits >> 4) & 1)) & 8) |
-                op << 2 | 2;
+                    (((sum - ((cbits&16)>>4))&2) << 4) |
+                    (cbits & 16) | ((sum - ((cbits >> 4) & 1)) & 8) |
+                    cond << 2 | 2;
             if ((sum & 15) == 8 && (cbits & 16) != 0)
                 AF &= ~8;
+            if (cond && sum) {
+                cycles += cc_ex[op];
+                PC -= 2;
+            }
+        }
             break;
         case 0xB2:          /* INIR */
-            temp = hreg(BC);
-            do {
-                PutBYTE(HL, io_input(lreg(BC))); ++HL;
-            } while (--temp);
-            Sethreg(BC, 0);
+            PutBYTE(HL++, io_input(lreg(BC)));
+            BC -= 0x100;
             SETFLAG(N, 1);
             SETFLAG(Z, 1);
+            if (hreg(BC)) {
+                cycles += cc_ex[op];
+                PC -= 2;
+            }
             break;
         case 0xB3:          /* OTIR */
             temp = hreg(BC);
@@ -2415,38 +2419,43 @@ unsigned CpuZ80::simz80()
             SETFLAG(Z, 1);
             break;
         case 0xB8:          /* LDDR */
-            BC &= 0xffff;
-            do {
-                acu = GetBYTE(HL); --HL;
-                PutBYTE(DE, acu); --DE;
-            } while (--BC);
+            acu = GetBYTE(HL--);
+            PutBYTE(DE--, acu);
             acu += hreg(AF);
             AF = (AF & ~0x3e) | (acu & 8) | ((acu & 2) << 4);
+            if (--BC) {
+                cycles += cc_ex[op];
+                PC -= 2;
+            }
             break;
         case 0xB9:          /* CPDR */
+        {
             acu = hreg(AF);
-            BC &= 0xffff;
-            do {
-                temp = GetBYTE(HL); --HL;
-                op = --BC != 0;
-                sum = acu - temp;
-            } while (op && sum != 0);
+            temp = GetBYTE(HL--);
+            bool cond = --BC != 0;
+            sum = acu - temp;
             cbits = acu ^ temp ^ sum;
             AF = (AF & ~0xfe) | (sum & 0x80) | (!(sum & 0xff) << 6) |
-                (((sum - ((cbits&16)>>4))&2) << 4) |
-                (cbits & 16) | ((sum - ((cbits >> 4) & 1)) & 8) |
-                op << 2 | 2;
+                    (((sum - ((cbits&16)>>4))&2) << 4) |
+                    (cbits & 16) | ((sum - ((cbits >> 4) & 1)) & 8) |
+                    cond << 2 | 2;
             if ((sum & 15) == 8 && (cbits & 16) != 0)
                 AF &= ~8;
+            if (cond && sum) {
+                cycles += cc_ex[op];
+                PC -= 2;
+            }
+        }
             break;
         case 0xBA:          /* INDR */
-            temp = hreg(BC);
-            do {
-                PutBYTE(HL, io_input(lreg(BC))); --HL;
-            } while (--temp);
-            Sethreg(BC, 0);
+            PutBYTE(HL--, io_input(lreg(BC)));
+            BC -= 0x100;
             SETFLAG(N, 1);
             SETFLAG(Z, 1);
+            if (hreg(BC)) {
+                cycles += cc_ex[op];
+                PC -= 2;
+            }
             break;
         case 0xBB:          /* OTDR */
             temp = hreg(BC);
