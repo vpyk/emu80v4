@@ -190,27 +190,6 @@ static const uint8_t cc_xy[0x100] = {
 	5+4,10+4,10+4, 4+4,10+4,11+4, 7+4,11+4, 5+4, 6+4,10+4, 4+4,10+4,   4, 7+4,11+4  /* fd -> cc_xy again */
 };
 
-/*
-static const uint8_t cc_xycb[0x100] = {
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23
-};
-*/
-
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
 static const uint8_t cc_ex[0x100] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -888,8 +867,13 @@ unsigned CpuZ80::simz80()
             (sum & 0x28) | (AF & 0xc4) | (temp & 1);
         break;
     case 0x10:          /* DJNZ dd */
-        PC += ((BC -= 0x100) & 0xff00) ? (signed char) GetBYTE(PC) + 1 : 1;
+        if ((BC -= 0x100) & 0xff00) {
+            PC += (signed char) GetBYTE(PC) + 1;
+            cycles += cc_ex[op];                          \
+        } else
+            PC++;
         break;
+
     case 0x11:          /* LD DE,nnnn */
         DE = GetWORD(PC);
         PC += 2;
@@ -967,12 +951,11 @@ unsigned CpuZ80::simz80()
             (sum & 0x28) | (AF & 0xc4) | (temp & 1);
         break;
     case 0x20:          /* JR NZ,dd */
-        if (!TSTFLAG(Z))
+        if (!TSTFLAG(Z)) {
             PC += (signed char) GetBYTE(PC) + 1;
-        else {
-            PC++;
             cycles += cc_ex[op];                          \
-        }
+        } else
+            PC++;
         break;
     case 0x21:          /* LD HL,nnnn */
         HL = GetWORD(PC);
@@ -1034,12 +1017,11 @@ unsigned CpuZ80::simz80()
             (AF & 0x12) | partab[acu] | cbits;
         break;
     case 0x28:          /* JR Z,dd */
-        if (TSTFLAG(Z))
+        if (TSTFLAG(Z)) {
             PC += (signed char) GetBYTE(PC) + 1;
-        else {
-            PC++;
             cycles += cc_ex[op];                          \
-        }
+        } else
+            PC++;
         break;
     case 0x29:          /* ADD HL,HL */
         HL &= 0xffff;
@@ -1080,12 +1062,11 @@ unsigned CpuZ80::simz80()
         AF = (~AF & ~0xff) | (AF & 0xc5) | ((~AF >> 8) & 0x28) | 0x12;
         break;
     case 0x30:          /* JR NC,dd */
-        if (!TSTFLAG(C))
+        if (!TSTFLAG(C)) {
             PC += (signed char) GetBYTE(PC) + 1;
-        else {
-            PC++;
             cycles += cc_ex[op];                          \
-        }
+        } else
+            PC++;
         break;
     case 0x31:          /* LD SP,nnnn */
         SP = GetWORD(PC);
@@ -1122,12 +1103,11 @@ unsigned CpuZ80::simz80()
         AF = (AF&~0x3b)|((AF>>8)&0x28)|1;
         break;
     case 0x38:          /* JR C,dd */
-        if (TSTFLAG(C))
+        if (TSTFLAG(C)) {
             PC += (signed char) GetBYTE(PC) + 1;
-        else {
-            PC++;
             cycles += cc_ex[op];                          \
-        }
+        } else
+            PC++;
         break;
     case 0x39:          /* ADD HL,SP */
         HL &= 0xffff;
