@@ -967,7 +967,12 @@ unsigned CpuZ80::simz80()
             (sum & 0x28) | (AF & 0xc4) | (temp & 1);
         break;
     case 0x20:          /* JR NZ,dd */
-        PC += (!TSTFLAG(Z)) ? (signed char) GetBYTE(PC) + 1 : 1;
+        if (!TSTFLAG(Z))
+            PC += (signed char) GetBYTE(PC) + 1;
+        else {
+            PC++;
+            cycles += cc_ex[op];                          \
+        }
         break;
     case 0x21:          /* LD HL,nnnn */
         HL = GetWORD(PC);
@@ -1029,7 +1034,12 @@ unsigned CpuZ80::simz80()
             (AF & 0x12) | partab[acu] | cbits;
         break;
     case 0x28:          /* JR Z,dd */
-        PC += (TSTFLAG(Z)) ? (signed char) GetBYTE(PC) + 1 : 1;
+        if (TSTFLAG(Z))
+            PC += (signed char) GetBYTE(PC) + 1;
+        else {
+            PC++;
+            cycles += cc_ex[op];                          \
+        }
         break;
     case 0x29:          /* ADD HL,HL */
         HL &= 0xffff;
@@ -1070,7 +1080,12 @@ unsigned CpuZ80::simz80()
         AF = (~AF & ~0xff) | (AF & 0xc5) | ((~AF >> 8) & 0x28) | 0x12;
         break;
     case 0x30:          /* JR NC,dd */
-        PC += (!TSTFLAG(C)) ? (signed char) GetBYTE(PC) + 1 : 1;
+        if (!TSTFLAG(C))
+            PC += (signed char) GetBYTE(PC) + 1;
+        else {
+            PC++;
+            cycles += cc_ex[op];                          \
+        }
         break;
     case 0x31:          /* LD SP,nnnn */
         SP = GetWORD(PC);
@@ -1107,7 +1122,12 @@ unsigned CpuZ80::simz80()
         AF = (AF&~0x3b)|((AF>>8)&0x28)|1;
         break;
     case 0x38:          /* JR C,dd */
-        PC += (TSTFLAG(C)) ? (signed char) GetBYTE(PC) + 1 : 1;
+        if (TSTFLAG(C))
+            PC += (signed char) GetBYTE(PC) + 1;
+        else {
+            PC++;
+            cycles += cc_ex[op];                          \
+        }
         break;
     case 0x39:          /* ADD HL,SP */
         HL &= 0xffff;
