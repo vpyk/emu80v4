@@ -97,7 +97,7 @@ void Psg3910::writeByte(int addr, uint8_t value)
             m_counters[2].freq = (m_counters[2].freq & 0xFF) | ((value & 0x0F) << 8);
             break;
         case 6:
-            m_noiseFreq = value & 0x1F;
+            m_noiseFreq = (value & 0x1F) << 1; // double freq due to step() called with f/8, not f/16
             break;
         case 7:
             m_counters[0].toneGate = value & 0x01;
@@ -120,10 +120,10 @@ void Psg3910::writeByte(int addr, uint8_t value)
             m_counters[2].var = value & 0x10;
             break;
         case 0xB:
-            m_envFreq = (m_envFreq & 0xFF00) | value;
+            m_envFreq = (m_envFreq & 0x1FE00) | (value << 1);  // double freq due to step() called with f/8, not f/16
             break;
         case 0xC:
-            m_envFreq = (m_envFreq & 0xFF) | (value << 8);
+            m_envFreq = (m_envFreq & 0x1FE) | (value << 9);    // double freq due to step() called with f/8, not f/16
             break;
         case 0xD:
             m_hold = value & 1;
