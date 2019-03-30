@@ -50,7 +50,7 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
         case KLM_SMART:
             bool shift;
             bool lang;
-            emuKey = translateUnicodeKey(unicodeKey, shift, lang);
+            emuKey = translateUnicodeKey(unicodeKey, keyCode, shift, lang);
             if (emuKey == EK_NONE) {
                 emuKey = translateKey(keyCode);
                 if (emuKey == EK_SHIFT)
@@ -860,7 +860,7 @@ EmuKey RkKbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang)
+EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& shift, bool& lang)
 {
     EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
     if (key != EK_NONE) {

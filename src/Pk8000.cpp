@@ -1011,6 +1011,17 @@ bool Pk8000InputRegister::setProperty(const string& propertyName, const EmuValue
 
 EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
 {
+    switch (keyCode) {
+    case PK_INS:
+        return EK_INS;
+    case PK_DEL:
+        return EK_DEL;
+    case PK_PGUP:
+        return EK_LANG;
+    default:
+        break;
+    }
+
     EmuKey key = translateCommonKeys(keyCode);
     if (key != EK_NONE)
         return key;
@@ -1029,6 +1040,7 @@ EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
     case PK_F10:
         return EK_GRAPH;
     case PK_F8:
+    case PK_MENU:
         return EK_FIX;
     case PK_F12:
         return EK_STOP;
@@ -1051,14 +1063,19 @@ EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
     case PK_KP_5:
         return EK_MENU;  // 5
 
+    case PK_KP_MINUS:
+        return EK_CLEAR;  // - СТРН
+
     default:
         return translateCommonKeys(keyCode);
     }
 }
 
 
-EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang)
+EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
 {
+    if (keyCode == PK_KP_MUL || keyCode == PK_KP_DIV || keyCode == PK_KP_MINUS)
+        return EK_NONE;
     EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
     if (key >= EK_0 && key <= EK_9)
         shift = !shift;

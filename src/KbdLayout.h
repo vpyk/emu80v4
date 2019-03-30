@@ -163,7 +163,7 @@ class KbdLayout : public EmuObject
         bool m_numpadJoystick = false;
 
         virtual EmuKey translateKey(PalKeyCode keyCode) {return translateCommonKeys(keyCode);}
-        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
+        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
         virtual bool processSpecialKeys(PalKeyCode) {return false;}
 
         EmuKey translateCommonKeys(PalKeyCode keyCode);
@@ -184,7 +184,7 @@ class RkKbdLayout : public KbdLayout
 {
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, bool& shift, bool& lang) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
 
     public:
         static EmuObject* create(const EmuValuesList&) {return new RkKbdLayout();}

@@ -1104,7 +1104,7 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
     case Qt::Key_8:
         return PK_8;
     case Qt::Key_Asterisk:
-        return PK_8;
+        return keypad ? PK_KP_MUL : PK_8;
     case Qt::Key_9:
         return PK_9;
     case Qt::Key_ParenLeft:
@@ -1221,10 +1221,6 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
 
     case Qt::Key_NumLock:
         return PK_NUMLOCK;
-    /*case Qt::Key_Asterisk:
-        return PK_KP_MUL;
-    case Qt::Key_Plus:
-        return PK_KP_PLUS;*/
     case Qt::Key_Enter:
         return PK_KP_ENTER;
 
@@ -1236,6 +1232,8 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
         return PK_LALT;
     case Qt::Key_Meta:
         return PK_LWIN;
+    case Qt::Key_Menu:
+        return PK_MENU;
 
     /*case SDL_SCANCODE_RCTRL:
         return PK_RCTRL;
