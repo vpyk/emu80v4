@@ -29,7 +29,7 @@ using namespace std;
 
 bool RkTapeOutHook::hookProc()
 {
-    if (!m_isEnabled)
+    if (!m_isEnabled || (m_hasSignature && !checkSignature()))
         return false;
 
     if (m_file->isCancelled())
@@ -73,7 +73,7 @@ void RkTapeInHook::reset()
 
 bool RkTapeInHook::hookProc()
 {
-    if (!m_isEnabled)
+    if (!m_isEnabled || (m_hasSignature && !checkSignature()))
         return false;
 
     if (g_emulation->getWavReader()->isPlaying())
