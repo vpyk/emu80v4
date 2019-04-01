@@ -64,5 +64,17 @@ class CpuHook : public EmuObject
         uint8_t* m_signatureBytes = nullptr;
 };
 
+
+class Ret8080Hook : public CpuHook
+{
+    public:
+        Ret8080Hook(uint16_t addr) : CpuHook(addr) {}
+
+        bool hookProc() override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new Ret8080Hook(parameters[0].asInt()) : nullptr;}
+};
+
+
 #endif //CPUHOOK_H
 

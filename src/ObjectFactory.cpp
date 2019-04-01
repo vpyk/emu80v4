@@ -151,6 +151,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(MsxTapeInHook);
     REG_EMU_CLASS(MsxTapeInHeaderHook);
     REG_EMU_CLASS(CloseFileHook);
+    REG_EMU_CLASS(Ret8080Hook);
     REG_EMU_CLASS(RkRomDisk);
     REG_EMU_CLASS(RkSdController);
     REG_EMU_CLASS(RamDisk);
