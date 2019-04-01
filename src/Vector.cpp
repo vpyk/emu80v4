@@ -460,6 +460,8 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
         return false;
     }*/
 
+    bool basFile = false;
+
     uint8_t* ptr = buf;
 
     uint16_t begAddr = 0x100;
@@ -469,6 +471,8 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
         string ext = fileName.substr(fileName.size() - 4, 4);
         if (ext == ".r0m" || ext == ".R0M")
             begAddr = 0;
+        else if (ext == ".bas" || ext == ".BAS" || ext == ".cas" || ext == ".CAS")
+            basFile = true;
     }
 
     Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
@@ -482,17 +486,66 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
     for (unsigned i = 0; i < 0x100; i++)
         m_as->writeByte(i, 0x00);
 
-    for (int i = 0; i < fileSize; i++) {
-        uint16_t addr = begAddr + i;
-        m_as->writeByte(addr, *ptr++);
-        if (!run && (addr & 0xFF) == 0) {
-            // paint block
-            int block = addr >> 8;
-            uint16_t blockAddr = 0xC018 + (block % 32) * 0x100 + (block / 32) * 0x18;
-            for (int i = 0; i < 8; i++)
-                m_as->writeByte(blockAddr + i, 0x7E);
+    if (!basFile)
+        for (int i = 0; i < fileSize; i++) {
+            uint16_t addr = begAddr + i;
+            m_as->writeByte(addr, *ptr++);
+            if (!run && (addr & 0xFF) == 0) {
+                // paint block
+                int block = addr >> 8;
+                uint16_t blockAddr = 0xC018 + (block % 32) * 0x100 + (block / 32) * 0x18;
+                for (int i = 0; i < 8; i++)
+                    m_as->writeByte(blockAddr + i, 0x7E);
+            }
         }
+    else {
+        // check for CAS
+        if (fileSize >= 0x313 && ptr[0] == 0xD3 && ptr[1] == 0xD3 && ptr[2] == 0xD3 && ptr[3] == 0xD3) {
+            // Cas file
+            ptr += 0x314;
+            fileSize -= 0x314;
+        }
+
+        for (int i = 0; i < 0x39c6; i++)
+            m_as->writeByte(0x0100 + i, as->readByte(0x08C5 + i));
+        as->disableRom();
+        cpu->setPC(begAddr);
+        cpu->setIFF(false);
+        cpu->disableHooks();
+        g_emulation->exec(int64_t(cpu->getKDiv()) * 4000000);
+        cpu->enableHooks();
+        m_as->writeByte(0x4300, 0);
+
+        uint16_t addr, nextAddr;
+        addr = nextAddr = 0x4301;
+        for(;;) {
+            if (addr == nextAddr + 1)
+                nextAddr = (ptr[0] << 8) | ptr[-1];
+            m_as->writeByte(addr++, *ptr++);
+            fileSize--;
+            if (nextAddr == 0 || fileSize == 0 || addr >= 0x7EFF)
+                break;
+        }
+        m_as->writeByte(0x4045, addr & 0xFF);
+        m_as->writeByte(0x4046, addr >> 8);
+        m_as->writeByte(0x4047, addr & 0xFF);
+        m_as->writeByte(0x4048, addr >> 8);
+        m_as->writeByte(0x4049, addr & 0xFF);
+        m_as->writeByte(0x404A, addr >> 8);
+        delete[] buf;
+
+        if (run) {
+            m_as->writeByte(0x3DCA, 'R');
+            m_as->writeByte(0x3DCB, 'U');
+            m_as->writeByte(0x3DCC, 'N');
+            m_as->writeByte(0x3DCD, '\r');
+            m_as->writeByte(0x3DB8, 4);
+            m_as->writeByte(0x3DBA, 11);
+        }
+
+        return true;
     }
+
 
     delete[] buf;
 
