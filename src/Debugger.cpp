@@ -872,6 +872,9 @@ void DebugWindow::drawHintBar()
         default:
             break;
     }
+    if (m_mode != AM_CODE)
+        s += m_swapF5F9 ? " F5-Run" : " F9-Run";
+
     int pos =  (m_curLayout->cols - s.size()) / 2;
     setPos(pos, m_curLayout->menu.top);
     setColors(7, 5);
@@ -924,6 +927,17 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                     if (!m_z80Mode)
                         setLayout(!m_compactMode);
                     break;
+                case PK_F5:
+                    if (m_swapF5F9) {
+                        m_mode = AM_CODE;
+                        run();
+                    }
+                    break;
+                case PK_F9:
+                    if (!m_swapF5F9)
+                        m_mode = AM_CODE;
+                        run();
+                break;
                 default:
                     switch (m_mode) {
                         case AM_CODE:
@@ -1260,6 +1274,7 @@ void DebugWindow::inputKbdProc(PalKeyCode keyCode)
             m_inputFromMode = AM_NONE; // чтобы игнорировалось влзвращаемое значение
             break;
         case PK_ENTER:
+        case PK_KP_ENTER:
             m_cursorVisible = false;
             m_mode = m_inputFromMode;
             m_inputReturnValue = hex2Int(m_inputCurValue);
@@ -1583,6 +1598,7 @@ void DebugWindow::dumpKbdProc(PalKeyCode keyCode)
             inputStart(m_mode, m_curLayout->dump.left + 3, m_curLayout->dump.top + 1 + uint16_t(m_dumpCurAddr - m_dumpCurStartAddr) / 16, 4, true, m_dumpCurAddr & 0xFFF0);
             break;
         case PK_ENTER:
+        case PK_KP_ENTER:
         case PK_F2: {
             m_dumpInputAddr = false;
             int ofs = (m_dumpCurAddr - m_dumpCurStartAddr) & 0xffff;
@@ -1803,6 +1819,7 @@ void DebugWindow::regsKbdProc(PalKeyCode keyCode)
             m_regsCurReg = m_z80Mode ? 11 : 5;
             break;
         case PK_ENTER:
+        case PK_KP_ENTER:
         case PK_F2:
             inputStart(m_mode, m_curLayout->regs.left + (m_z80Mode && m_regsCurReg > 5 ? 17 : 5) + 1, 1 + m_regsCurReg % 6, 4, true, regsGetCurRegValue());
             break;
@@ -1988,7 +2005,8 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
         case PK_PGDN:
             m_curBpoint = m_bpList.size() - 1;
             break;
-        case PK_ENTER: {
+        case PK_ENTER:
+        case PK_KP_ENTER: {
             auto it = m_bpList.begin();
             advance(it, m_curBpoint);
             codeGotoAddr((*it).addr);
