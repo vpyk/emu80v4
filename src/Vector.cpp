@@ -500,7 +500,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
         }
     else {
         // check for CAS
-        if (fileSize >= 0x313 && ptr[0] == 0xD3 && ptr[1] == 0xD3 && ptr[2] == 0xD3 && ptr[3] == 0xD3) {
+        if (fileSize >= 0x317 && ptr[0] == 0xD3 && ptr[1] == 0xD3 && ptr[2] == 0xD3 && ptr[3] == 0xD3) {
             // Cas file
             ptr += 0x314;
             fileSize -= 0x314;
