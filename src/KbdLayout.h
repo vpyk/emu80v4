@@ -163,7 +163,7 @@ class KbdLayout : public EmuObject
         bool m_numpadJoystick = false;
 
         virtual EmuKey translateKey(PalKeyCode keyCode) {return translateCommonKeys(keyCode);}
-        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
+        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode /*key*/, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
         virtual bool processSpecialKeys(PalKeyCode) {return false;}
 
         EmuKey translateCommonKeys(PalKeyCode keyCode);

@@ -119,10 +119,10 @@ void VectorCore::draw()
 }
 
 
-void VectorCore::inte(bool isActive)
+/*void VectorCore::inte(bool isActive)
 {
     // ...
-}
+}*/
 
 
 void VectorCore::vrtc(bool isActive)
@@ -480,7 +480,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
     m_platform->reset();
     as->enableRom();
     cpu->disableHooks();
-    g_emulation->exec(int64_t(cpu->getKDiv() * m_skipTicks));
+    g_emulation->exec(int64_t(cpu->getKDiv()) * m_skipTicks);
     cpu->enableHooks();
 
     for (unsigned i = 0; i < 0x100; i++)

@@ -2020,9 +2020,9 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
 
 
 // обработчик событий мыши секции точек останова
-void DebugWindow::bpointsClick(int x, int y, PalMouseKey key)
+void DebugWindow::bpointsClick(int /*x*/, int y, PalMouseKey key)
 {
-    if (y >= m_bpList.size())
+    if (y >= int(m_bpList.size()))
         return;
 
     switch (key) {
