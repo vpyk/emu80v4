@@ -19,8 +19,8 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VER_STR "4.0.332"
-#define VER_COMMA_SEP 4,0,332,0
+#define VER_STR "4.0.333"
+#define VER_COMMA_SEP 4,0,333,0
 
 #define VI_FILE_DESCR "Emu80 main executable"
 #define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2019"

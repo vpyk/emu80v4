@@ -500,10 +500,20 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
         }
     else {
         // check for CAS
-        if (fileSize >= 0x317 && ptr[0] == 0xD3 && ptr[1] == 0xD3 && ptr[2] == 0xD3 && ptr[3] == 0xD3) {
+        if (fileSize >= 14 && ptr[0] == 0xD3 && ptr[1] == 0xD3 && ptr[2] == 0xD3 && ptr[3] == 0xD3) {
             // Cas file
-            ptr += 0x314;
-            fileSize -= 0x314;
+            while (fileSize && *ptr != 0xE6) {
+                ptr++;
+                fileSize--;
+            }
+
+            if (fileSize < 7) {
+                delete[] buf;
+                return false;
+            }
+
+            ptr += 5;
+            fileSize -= 5;
         }
 
         for (int i = 0; i < 0x39c6; i++)
@@ -535,12 +545,13 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
         delete[] buf;
 
         if (run) {
-            m_as->writeByte(0x3DCA, 'R');
-            m_as->writeByte(0x3DCB, 'U');
-            m_as->writeByte(0x3DCC, 'N');
-            m_as->writeByte(0x3DCD, '\r');
+            m_as->writeByte(0x3DBF, 'R');
+            m_as->writeByte(0x3DC0, 'U');
+            m_as->writeByte(0x3DC1, 'N');
+            m_as->writeByte(0x3DC2, '\r');
             m_as->writeByte(0x3DB8, 4);
-            m_as->writeByte(0x3DBA, 11);
+            m_as->writeByte(0x3DB9, 4);
+            m_as->writeByte(0x3DBA, 0);
         }
 
         return true;
