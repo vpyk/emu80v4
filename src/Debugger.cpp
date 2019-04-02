@@ -934,10 +934,11 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                     }
                     break;
                 case PK_F9:
-                    if (!m_swapF5F9)
+                    if (!m_swapF5F9) {
                         m_mode = AM_CODE;
                         run();
-                break;
+                    }
+                    break;
                 default:
                     switch (m_mode) {
                         case AM_CODE:
