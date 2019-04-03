@@ -37,6 +37,8 @@ window.wideScreen = no
 	
 ######## Platform ########
 
+platform.helpFile = @HELP_FILE
+
 Ram ram0 = 0xF000
 Ram ram1 = 0xF000
 Ram ram2 = 0xF000

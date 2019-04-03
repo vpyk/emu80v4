@@ -1,4 +1,8 @@
-﻿######## Window ########
+﻿# Файл справки
+@HELP_FILE = mikro80/mikro80.html
+
+
+######## Window ########
 
 EmuWindow window
 window.caption = @NAME
@@ -31,6 +35,8 @@ window.wideScreen = no
 
 
 ######## Platform ########
+
+platform.helpFile = @HELP_FILE
 
 Ram ram1 = 0xe000
 Ram videoRam = 0x1000

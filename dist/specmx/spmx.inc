@@ -38,6 +38,8 @@ window.wideScreen = no
 
 ######## Platform ########
 
+platform.helpFile = @HELP_FILE
+
 Ram ram0 = 0x9000
 SpecVideoRam videoRam = 0x3000
 Ram upperRam = 0x3FC0

@@ -1,5 +1,8 @@
 ﻿@NAME = "Радио-86РК"
 
+# Файл справки
+@HELP_FILE = rk86/rk86.html
+
 # Тактовые частоты
 @CPU_FREQUENCY = 1777777   # ВМ80, ВИ53, ВТ57
 @CRT_FREQUENCY = 1333333   # ВГ75
@@ -63,6 +66,8 @@ window.wideScreen = no
 
 
 ######## Platform #####
+
+platform.helpFile = @HELP_FILE
 
 Ram ram = 0x8000
 
