@@ -931,13 +931,15 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                     if (m_swapF5F9) {
                         m_mode = AM_CODE;
                         run();
-                    }
+                    } else if (m_mode == AM_CODE)
+                        codeKbdProc(keyCode);
                     break;
                 case PK_F9:
                     if (!m_swapF5F9) {
                         m_mode = AM_CODE;
                         run();
-                    }
+                    } else if (m_mode == AM_CODE)
+                        codeKbdProc(keyCode);
                     break;
                 default:
                     switch (m_mode) {
@@ -1117,7 +1119,7 @@ void DebugWindow::here()
 
     m_isRunning = true;
     checkForCurBreakpoint();
-    m_resetCpuClockFlag = false;
+    m_resetCpuClockFlag = true;
     g_emulation->debugRun();
     hide();
 }
