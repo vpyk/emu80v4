@@ -28,6 +28,7 @@
 #include <QMimeData>
 #include <QToolButton>
 #include <QMessageBox>
+#include <QLayout>
 
 #include <string>
 
@@ -171,29 +172,21 @@ void MainWindow::setClientSize(int width, int height)
 void MainWindow::adjustClientSize()
 {
     bool sizeable = m_clientWidth == 0 && m_clientHeight == 0;
+
     if (sizeable || m_fullscreenMode) {
+        m_paintWidget->setFixedSize(m_paintWidget->width(), m_paintWidget->height());
+        if (!m_fullscreenMode)
+            adjustSize();
         m_paintWidget->setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+        layout()->setSizeConstraint(QLayout::SetNoConstraint);
         setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
     } else {
         m_paintWidget->setFixedSize(m_clientWidth, m_clientHeight);
-        adjustSize();
-        //setFixedSize(width(), height());
-        int w = width();
-        int h = height();
-        if (m_menuBar && (w > 200) && (h > 100)) // some workaround, magic numbers from adjustSize docs
-            setFixedSize(w, h);
+        layout()->setSizeConstraint(QLayout::SetFixedSize);
     }
 
     if (m_statusBar)
         m_statusBar->setSizeGripEnabled(sizeable);
-
-    /*Qt::WindowFlags flags = windowFlags();
-    if (sizeable)
-        flags |= Qt::WindowMaximizeButtonHint;
-    else
-        flags &= ~Qt::WindowMaximizeButtonHint;
-    setWindowFlags(flags);
-    show();*/
 }
 
 
@@ -220,9 +213,10 @@ void MainWindow::setFullScreen(bool fullscreen)
         m_statusBar->setVisible(visible);
     if (m_toolBar)
         m_toolBar->setVisible(visible);
-    if (fullscreen)
+    if (fullscreen) {
+        layout()->setSizeConstraint(QLayout::SetNoConstraint);
         showFullScreen();
-    else
+    } else
         showNormal();
     m_fullscreenMode = fullscreen;
     adjustClientSize();
