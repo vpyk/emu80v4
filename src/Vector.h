@@ -113,9 +113,9 @@ class VectorCore : public PlatformCore
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void draw() override;
-        //void reset() override;
+        void reset() override;
         void vrtc(bool isActive) override;
-        //void inte(bool isActive) override;
+        void inte(bool isActive) override;
 
         void attachCrtRenderer(VectorRenderer* crtRenderer);
 
@@ -123,6 +123,7 @@ class VectorCore : public PlatformCore
     private:
         VectorRenderer* m_crtRenderer = nullptr;
         bool m_intReq = false;
+        bool m_intsEnabled = false;
 };
 
 

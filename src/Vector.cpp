@@ -109,6 +109,13 @@ VectorCore::VectorCore()
 }
 
 
+void VectorCore::reset()
+{
+    m_intReq = false;
+    m_intsEnabled = false;
+}
+
+
 void VectorCore::draw()
 {
     if (g_emulation->isDebuggerActive())
@@ -119,20 +126,29 @@ void VectorCore::draw()
 }
 
 
-/*void VectorCore::inte(bool isActive)
+void VectorCore::inte(bool isActive)
 {
-    // ...
-}*/
+    m_intsEnabled = isActive;
+    if (!isActive)
+        m_intReq = false;
+    else if (m_intReq) {
+        Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+        if (cpu->getInte()) {
+            cpu->intRst(7);
+            cpu->hrq(cpu->getKDiv() * 16); // add waits to RST
+        }
+    }
+}
 
 
 void VectorCore::vrtc(bool isActive)
 {
-    if (isActive) {
+    if (isActive && m_intsEnabled) {
+        m_intReq = true;
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu->getInte()) {
             cpu->intRst(7);
-            // add waits to RST
-            cpu->hrq(cpu->getKDiv() * 16); // syncronize interrupt with waits
+            cpu->hrq(cpu->getKDiv() * 16); // add waits to RST
         }
     }
 }
