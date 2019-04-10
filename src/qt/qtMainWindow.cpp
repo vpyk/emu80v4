@@ -29,6 +29,8 @@
 #include <QToolButton>
 #include <QMessageBox>
 #include <QLayout>
+#include <QGuiApplication>
+#include <QScreen>
 
 #include <string>
 
@@ -198,6 +200,23 @@ void MainWindow::showWindow()
         setWindowFlags(windowFlags() |= Qt::WindowMaximizeButtonHint);
         show();
         adjustClientSize();
+
+        if (m_windowType == EWT_EMULATION) {
+            // center main window, not debug one
+            QRect rec = QGuiApplication::primaryScreen()->availableGeometry();
+            move((rec.width() - frameGeometry().width()) / 3, (rec.height() - frameGeometry().height()) / 3);
+        }
+        /*else { //if (m_windowType == EWT_DEBUG) {
+            QRect rec = QGuiApplication::primaryScreen()->availableGeometry();
+            int top = frameGeometry().top();
+            int left = frameGeometry().left();
+            if (frameGeometry().bottom() > rec.bottom())
+                top = top + rec.bottom() - frameGeometry().bottom();
+            if (frameGeometry().right() > rec.right())
+                left = left + rec.right() - frameGeometry().right();
+            move(left, top);
+        }*/
+
         HelpDialog::activate();
     }
 }
