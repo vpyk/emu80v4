@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_paintWidget = new PaintWidget(this);
     setCentralWidget(m_paintWidget);
+    m_paintWidget->setFocusPolicy(Qt::StrongFocus);
 
     m_fpsTimer.setInterval(250);
     connect(&m_fpsTimer, SIGNAL(timeout()), this, SLOT(onFpsTimer()));
