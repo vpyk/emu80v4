@@ -140,6 +140,8 @@ private:
     int m_clientWidth = 1;
     int m_clientHeight = 1;
 
+    bool m_showFirstTime = true;
+
     SettingsDialog* m_settingsDialog = nullptr;
 
     QMenu* m_colorModeMenu = nullptr;
