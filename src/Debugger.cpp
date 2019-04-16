@@ -156,6 +156,8 @@ DebugWindow::DebugWindow(Platform* platform)
 
     fillCpuStatus();
 
+    resetCpuClock();
+
     m_mode = AM_CODE;
 
     codeInit();
@@ -204,8 +206,8 @@ void DebugWindow::startDebug()
     if (!m_isRunning)
         return;
 
-    if (m_resetCpuClockFlag || (m_tempBp && m_tempBp->getHookAddr() != m_cpu->getPC()))
-        resetCpuClock();
+    /*if (m_resetCpuClockFlag || (m_tempBp && m_tempBp->getHookAddr() != m_cpu->getPC()))
+        resetCpuClock();*/
 
     m_isRunning = false;
 
@@ -545,7 +547,7 @@ void DebugWindow::displayObjectDbgInfo()
     ss << clocks;
 
     //const char* s = m_platform->getAllDebugInfo().c_str(); // !! figure out why does this not work?
-    string info = "CPU:\n" + ss.str() + "\n\n" + m_platform->getAllDebugInfo();
+    string info = "CPU:\n" + ss.str() + (m_resetCpuClockFlag ? " /0" : "") + "\n\n" + m_platform->getAllDebugInfo();
     const char* s = info.c_str();
 
     int x = 0;
@@ -1049,6 +1051,9 @@ void DebugWindow::checkForInput()
 
 void DebugWindow::step()
 {
+    if (m_resetCpuClockFlag)
+        resetCpuClock();
+
     /*unsigned pc = m_states[m_stateNum].pc;
     unsigned len = getInstructionLength(pc);
     m_states[m_stateNum].pc += len;
@@ -1063,6 +1068,9 @@ void DebugWindow::step()
 
 void DebugWindow::run()
 {
+    if (m_resetCpuClockFlag)
+        resetCpuClock();
+
     m_isRunning = true;
     checkForCurBreakpoint();
     m_resetCpuClockFlag = true;
@@ -1073,6 +1081,9 @@ void DebugWindow::run()
 
 void DebugWindow::over()
 {
+    if (m_resetCpuClockFlag)
+        resetCpuClock();
+
     unsigned pc = m_states[m_stateNum].pc;
     unsigned len = getInstructionLength(pc);
     bool over = getInstructionOverFlag(pc);
@@ -1109,6 +1120,9 @@ void DebugWindow::skip()
 
 void DebugWindow::here()
 {
+    if (m_resetCpuClockFlag)
+        resetCpuClock();
+
     unsigned pc = m_codeLayout[m_codeHighlightedLine];
 
     // если пользователь нажал F4, пока не успела выполниться предудущая F4 или F8, ничего не делаем
