@@ -206,8 +206,10 @@ void DebugWindow::startDebug()
     if (!m_isRunning)
         return;
 
-    /*if (m_resetCpuClockFlag || (m_tempBp && m_tempBp->getHookAddr() != m_cpu->getPC()))
-        resetCpuClock();*/
+    /*if (m_tempBp && m_tempBp->getHookAddr() != m_cpu->getPC()) {
+        resetCpuClock();
+        m_resetCpuClockFlag = false;
+    }*/
 
     m_isRunning = false;
 
@@ -542,7 +544,7 @@ void DebugWindow::displayObjectDbgInfo()
     if (m_compactMode)
         return;
 
-    int clocks = int(m_cpu->getClock() / m_cpu->getKDiv() - m_cpuClock);
+    uint64_t clocks = m_cpu->getClock() / m_cpu->getKDiv() - m_cpuClock;
     ostringstream ss;
     ss << clocks;
 
