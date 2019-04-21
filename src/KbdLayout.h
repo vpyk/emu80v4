@@ -173,6 +173,7 @@ class KbdLayout : public EmuObject
         bool m_shiftPressed = false;
         bool m_langPressed = false;
         EmuKey m_lastNonUnicodeKey = EK_NONE;
+        PalKeyCode m_lastPalKeyPressedCode = PK_NONE;
 
         EmuKey translateCommonKeysQwerty(PalKeyCode keyCode);
         EmuKey translateCommonKeysJcuken(PalKeyCode keyCode);

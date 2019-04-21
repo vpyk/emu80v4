@@ -29,6 +29,7 @@ void KbdLayout::resetKeys()
     m_platform->getKeyboard()->resetKeys();
     m_shiftPressed = false;
     m_lastNonUnicodeKey = EK_NONE;
+    m_lastPalKeyPressedCode = PK_NONE;
 }
 
 
@@ -50,7 +51,7 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
         case KLM_SMART:
             bool shift;
             bool lang;
-            emuKey = translateUnicodeKey(unicodeKey, keyCode, shift, lang);
+            emuKey = translateUnicodeKey(unicodeKey, keyCode != PK_NONE ? keyCode : m_lastPalKeyPressedCode, shift, lang);
             if (emuKey == EK_NONE) {
                 emuKey = translateKey(keyCode);
                 if (emuKey == EK_SHIFT)
@@ -58,13 +59,16 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
                 else if (emuKey == EK_LANG)
                     m_langPressed = isPressed;
                 kbd->processKey(emuKey, isPressed);
-                if (emuKey != EK_SHIFT && emuKey != EK_LANG) // SDL issue, see below
+                if (isPressed && emuKey != EK_SHIFT && emuKey != EK_LANG) {// SDL issue, see below
                     m_lastNonUnicodeKey = emuKey;
+                    m_lastPalKeyPressedCode = keyCode;
+                }
             } else {
                 // Workaround for SDL: unicode and ordinary codes go separately
                 if (keyCode == PK_NONE && m_lastNonUnicodeKey != EK_NONE)
                     kbd->processKey(m_lastNonUnicodeKey, false);
                 m_lastNonUnicodeKey = EK_NONE;
+                m_lastPalKeyPressedCode = PK_NONE;
 
                 if (shift != m_shiftPressed)
                     kbd->processKey(EK_SHIFT, shift == isPressed);
