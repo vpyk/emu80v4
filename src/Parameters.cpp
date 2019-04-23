@@ -31,6 +31,7 @@ EmuValue::EmuValue()
 EmuValue::EmuValue(const string& str)
 {
     m_sValue = str;
+
     m_isInt = true;
     try {
         if (m_sValue.substr(0,2) == "0x") {
@@ -44,6 +45,14 @@ EmuValue::EmuValue(const string& str)
     }
     catch(...) {
         m_isInt = false;
+    }
+
+    m_isFloat = true;
+    try {
+        istringstream iss(m_sValue);
+        iss >> m_fValue;
+    } catch (...) {
+        m_isFloat = false;
     }
 }
 
@@ -68,6 +77,18 @@ int64_t EmuValue::asInt() const
 bool EmuValue::isInt() const
 {
     return m_isInt;
+}
+
+
+double EmuValue::asFloat() const
+{
+    return m_isFloat ? m_fValue : 0.0;
+}
+
+
+bool EmuValue::isFloat() const
+{
+    return m_isFloat;
 }
 
 

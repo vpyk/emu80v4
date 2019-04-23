@@ -17,6 +17,7 @@
  */
 
 #include <sstream>
+#include <iomanip>
 #include <string.h>
 
 #include "EmuWindow.h"
@@ -163,7 +164,20 @@ void EmuWindow::setAspectCorrection(bool aspectCorrection)
 
 void EmuWindow::setWideScreen(bool wideScreen)
 {
-    m_wideScreen = wideScreen;
+    if (!m_useCustomScreenFormat)
+        m_wideScreen = wideScreen;
+}
+
+
+void EmuWindow::setCustomScreenFormat(bool custom)
+{
+    m_useCustomScreenFormat = custom;
+}
+
+
+void EmuWindow::setCustomScreenFormatValue(double format)
+{
+    m_customScreenFormat = format;
 }
 
 
@@ -188,7 +202,7 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
 
     double aspectRatio = 1.0;
     if (m_aspectCorrection)
-        aspectRatio = m_wideScreen ? frame.aspectRatio * 4.0 / 3.0 : frame.aspectRatio;
+        aspectRatio = m_useCustomScreenFormat ? frame.aspectRatio * 0.75 * m_customScreenFormat : m_wideScreen ? frame.aspectRatio / 0.75 : frame.aspectRatio;
 
     FrameScale tempFs = m_frameScale;
 
@@ -537,10 +551,20 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
         }
     } else if (propertyName == "wideScreen") {
         if (values[0].asString() == "no") {
+            setCustomScreenFormat(false);
             setWideScreen(false);
             return true;
         } else if (values[0].asString() == "yes") {
+            setCustomScreenFormat(false);
             setWideScreen(true);
+            return true;
+        } else if (values[0].asString() == "custom") {
+            setCustomScreenFormat(true);
+            return true;
+        }
+    } else if (propertyName == "customScreenFormat") {
+        if (values[0].isFloat()) {
+            setCustomScreenFormatValue(values[0].asFloat());
             return true;
         }
     }
@@ -600,7 +624,7 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
     } else if (propertyName == "aspectCorrection") {
         return m_aspectCorrection ? "yes" : "no";
     } else if (propertyName == "wideScreen") {
-        return m_wideScreen ? "yes" : "no";
+        return m_useCustomScreenFormat ? "custom" : m_wideScreen ? "yes" : "no";
     } else if (propertyName == "defaultWindowWidth") {
         string res;
         stringstream stringStream;
@@ -611,6 +635,12 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
         string res;
         stringstream stringStream;
         stringStream << m_defWindowHeight;
+        stringStream >> res;
+        return res;
+    } else if (propertyName == "customScreenFormat") {
+        string res;
+        stringstream stringStream;
+        stringStream << setprecision(4) << m_customScreenFormat;
         stringStream >> res;
         return res;
     }

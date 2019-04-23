@@ -33,11 +33,15 @@ class EmuValue {
         const std::string& asString() const;
         int64_t asInt() const;
         bool isInt() const;
+        double asFloat() const;
+        bool isFloat() const;
         //bool isString() const;
     private:
         std::string m_sValue;
         int64_t m_nValue;
+        double m_fValue;
         bool m_isInt = false;
+        bool m_isFloat = false;
 };
 
 class EmuValuesList {

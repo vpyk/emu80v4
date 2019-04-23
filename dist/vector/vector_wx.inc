@@ -50,6 +50,7 @@ configTab.addControl = 1, &arSelector
 ConfigRadioSelector wsSelector = &window, wideScreen, "Формат экрана"
 wsSelector.addItem = no, "4:3"
 wsSelector.addItem = yes, "16:9"
+wsSelector.addItem = custom, "Пользовательский"
 configTab.addControl = 2, &wsSelector
 
 #kbdLayout.layout

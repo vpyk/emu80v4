@@ -83,6 +83,8 @@ class EmuWindow : public EmuObject, public PalWindow
         void setFullScreen(bool fullscreen);
         void setAspectCorrection(bool aspectCorrection);
         void setWideScreen(bool wideScreen);
+        void setCustomScreenFormat(bool custom);
+        void setCustomScreenFormatValue(double format);
         void toggleFullScreen();
 
         void drawFrame(EmuPixelData frame);
@@ -108,6 +110,8 @@ class EmuWindow : public EmuObject, public PalWindow
         bool m_isFullscreenMode = false;
         bool m_aspectCorrection = false;
         bool m_wideScreen = false;
+        bool m_useCustomScreenFormat = false;
+        double m_customScreenFormat = 5. / 3.;
 
         std::string m_caption = "";
 

@@ -132,6 +132,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("window.antialiasing");
     loadRunningConfigValue("window.aspectCorrection");
     loadRunningConfigValue("window.wideScreen");
+    loadRunningConfigValue("window.customScreenFormat");
     loadRunningConfigValue("window.fieldsMixing");
     loadRunningConfigValue("window.defaultWindowWidth");
     loadRunningConfigValue("window.defaultWindowHeight");
@@ -291,7 +292,11 @@ void SettingsDialog::fillControlValues()
 
     // Wide screen
     val = m_options["window.wideScreen"];
-    ui->wideComboBox->setCurrentIndex(val == "yes" ? 1 : 0);
+    ui->wideComboBox->setCurrentIndex(val == "yes" ? 1 : val == "custom" ? 2 : 0);
+
+    // Screen format
+    val = m_options["window.customScreenFormat"];
+    ui->customFormatLineEdit->setText(val);
 
     // Debug on HLT
     val = m_options["cpu.debugOnHalt"];
@@ -666,7 +671,9 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     m_options["window.aspectCorrection"] = ui->aspectCheckBox->isChecked() ? "yes" : "no";
 
-    m_options["window.wideScreen"] = ui->wideComboBox->currentIndex() == 1 ? "yes" : "no";
+    m_options["window.wideScreen"] = ui->wideComboBox->currentIndex() == 1 ? "yes" : ui->wideComboBox->currentIndex() == 2 ? "custom" : "no";
+
+    m_options["window.customScreenFormat"] = ui->customFormatLineEdit->text();
 
     m_options["crtRenderer.visibleArea"] = ui->cropCheckBox->isChecked() ? "yes" : "no";
 
