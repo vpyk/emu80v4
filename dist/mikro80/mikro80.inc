@@ -41,6 +41,9 @@ window.customScreenFormat = 1.667
 
 platform.helpFile = @HELP_FILE
 
+# Code page: rk, koi8 (default = rk)
+platform.codePage = rk
+
 Ram ram1 = 0xe000
 Ram videoRam = 0x1000
 Ram ram2 = 0x800
@@ -202,3 +205,9 @@ ConfigRadioSelector tapeSelector = &tapeGrp, enabled, "Перехват магн
 tapeSelector.addItem = yes, "Вкл."
 tapeSelector.addItem = no, "Выкл."
 configTab.addControl = 3, &tapeSelector
+
+#platform.codePage
+ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
+codePageSelector.addItem = rk, "РК-86"
+codePageSelector.addItem = koi8, "КОИ-8"
+configTab.addControl = 3, &codePageSelector

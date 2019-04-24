@@ -43,6 +43,9 @@ window.customScreenFormat = 1.667
 
 platform.helpFile = @HELP_FILE
 
+# Code page: rk, koi8 (default = rk)
+platform.codePage = koi8
+
 Ram ram0 = 0x9000
 SpecVideoRam videoRam = 0x3000
 Ram upperRam = 0x3FC0
@@ -231,17 +234,23 @@ configTab.addControl = 2, &wsSelector
 ConfigRadioSelector cropSelector = &crtRenderer, visibleArea, "Отображать реальный бордюр"
 cropSelector.addItem = no, "Нет"
 cropSelector.addItem = yes, "Да"
-configTab.addControl = 1, &cropSelector
+configTab.addControl = 2, &cropSelector
 
 #kayboard.matrix
 ConfigRadioSelector kbdSelector = &keyboard, matrix, "Тип клавиатуры"
 kbdSelector.addItem = original, "Оригинальная"
 kbdSelector.addItem = ramfos, "RAMFOS"
-configTab.addControl = 2, &kbdSelector
+configTab.addControl = 3, &kbdSelector
 
 #kbdLayout.layout
 ConfigRadioSelector laSelector = &kbdLayout, layout, "Раскладка клавиатуры"
 laSelector.addItem = qwerty, "Qwerty"
 laSelector.addItem = jcuken, "Йцукен"
 laSelector.addItem = smart, "«Умная» раскладка"
-configTab.addControl = 2, &laSelector
+configTab.addControl = 3, &laSelector
+
+#platform.codePage
+ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
+codePageSelector.addItem = rk, "РК-86"
+codePageSelector.addItem = koi8, "КОИ-8"
+configTab.addControl = 3, &codePageSelector

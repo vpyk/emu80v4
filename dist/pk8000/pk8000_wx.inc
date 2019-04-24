@@ -32,7 +32,7 @@ configTab.addControl = 1, &styleSelector
 ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
 mixSelector.addItem = none, "Выкл."
 mixSelector.addItem = scanline, "Имитация линий растра"
-configTab.addControl = 2, &mixSelector
+configTab.addControl = 1, &mixSelector
 
 #window.antialiasing
 ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
@@ -44,7 +44,7 @@ configTab.addControl = 1, &aaSelector
 ConfigRadioSelector arSelector = &window, aspectCorrection, "Учитывать Aspect Ratio"
 arSelector.addItem = no, "Нет (1:1)"
 arSelector.addItem = yes, "Оригинальный AR"
-configTab.addControl = 1, &arSelector
+configTab.addControl = 2, &arSelector
 
 #window.wideScreen
 ConfigRadioSelector wsSelector = &window, wideScreen, "Формат экрана"
@@ -52,6 +52,12 @@ wsSelector.addItem = no, "4:3"
 wsSelector.addItem = yes, "16:9"
 wsSelector.addItem = custom, "Пользовательский"
 configTab.addControl = 2, &wsSelector
+
+#crtRenderer.visibleArea
+ConfigRadioSelector cropSelector = &crtRenderer, visibleArea, "Отображать реальный бордюр"
+cropSelector.addItem = no, "Нет"
+cropSelector.addItem = yes, "Да"
+configTab.addControl = 2, &cropSelector
 
 #kbdLayout.layout
 ConfigRadioSelector laSelector = &kbdLayout, layout, "Раскладка клавиатуры"
@@ -64,14 +70,20 @@ configTab.addControl = 2, &laSelector
 ConfigRadioSelector njSelector = &kbdLayout, numpadJoystick, "Клавиши джойстика"
 njSelector.addItem = no, "Совмещены с клавиатурой (стрелки, пробел, Enter)"
 njSelector.addItem = yes, "Доп. цифр. клавиатура (стрелки, 5, Ins)"
-configTab.addControl = 2, &njSelector
+configTab.addControl = 3, &njSelector
 
 ConfigRadioSelector tapeSelector = &tapeGrp, enabled, "Перехват магнитофона"
 tapeSelector.addItem = yes, "Вкл."
 tapeSelector.addItem = no, "Выкл."
-configTab.addControl = 2, &tapeSelector
+configTab.addControl = 3, &tapeSelector
 
 ConfigRadioSelector multiblockSelector = &loader, allowMultiblock, "Мультиблочная загрузка"
 multiblockSelector.addItem = yes, "Вкл."
 multiblockSelector.addItem = no, "Выкл."
-configTab.addControl = 2, &multiblockSelector
+configTab.addControl = 3, &multiblockSelector
+
+#platform.codePage
+ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
+codePageSelector.addItem = rk, "РК-86"
+codePageSelector.addItem = koi8, "КОИ-8"
+configTab.addControl = 3, &codePageSelector

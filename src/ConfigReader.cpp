@@ -194,7 +194,10 @@ void ConfigReader::fillValuesList(string s, EmuValuesList* values)
         }
         if (token != "") {
             if (token.substr(0, 1) == "&")
-                token = m_prefix + token.substr(1);
+                if (token == "&platform")
+                    token = m_prefix.substr(0, m_prefix.size() - 1); // убираем "."
+                else
+                    token = m_prefix + token.substr(1);
             values->addValue(token);
         }
 
@@ -443,7 +446,7 @@ void ConfigReader::processConfigFile(ParentObject* parent)
         }
         else if (t == "" && o != "" && p != "") {
             EmuObject* obj = nullptr;
-            if (m_prefix != "" && o == "platform") // подставляем вместо "platform" конкретное име текущей платформы
+            if (m_prefix != "" && o == "platform") // подставляем вместо "platform" конкретное имя текущей платформы
                 o = m_prefix.substr(0, m_prefix.size() - 1); // убираем "."
             else
                 o = m_prefix + o;

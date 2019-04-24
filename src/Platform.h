@@ -68,6 +68,7 @@ class Platform : public ParentObject
 
         void showDebugger();
         std::string getAllDebugInfo();
+        CodePage getCodePage() {return m_codePage;}
 
         int getDefConfigTabId() {return m_defConfigTabId;}
 
@@ -91,6 +92,7 @@ class Platform : public ParentObject
         DebugWindow* m_dbgWindow = nullptr;
 
         std::string m_helpFile = "";
+        CodePage m_codePage = CP_RK;
 };
 
 

@@ -111,4 +111,10 @@ enum TabIds
     TABID_HELP = -2
 };
 
+enum CodePage {
+    CP_RK,
+    CP_KOI8
+};
+
+
 #endif // EMUTYPES_H

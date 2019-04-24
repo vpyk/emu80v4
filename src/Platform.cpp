@@ -289,6 +289,14 @@ bool Platform::setProperty(const string& propertyName, const EmuValuesList& valu
     if (propertyName == "helpFile") {
         m_helpFile = values[0].asString();
         return true;
+    } else if (propertyName == "codePage") {
+        if (values[0].asString() == "rk") {
+            m_codePage = CP_RK;
+            return true;
+        } else if (values[0].asString() == "koi8") {
+            m_codePage = CP_KOI8;
+            return true;
+        }
     }
     return false;
 }
@@ -304,6 +312,8 @@ string Platform::getPropertyStringValue(const string& propertyName)
 
     if (propertyName == "helpFile")
         return m_helpFile;
+    else if (propertyName == "codePage")
+        return m_codePage == CP_RK ? "rk" : "koi8";
 
     return "";
 }

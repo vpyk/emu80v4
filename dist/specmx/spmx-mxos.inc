@@ -47,6 +47,9 @@ window.customScreenFormat = 1.667
 
 ######## Platform ########
 
+# Code page: rk, koi8 (default = rk)
+platform.codePage = rk
+
 Ram ram0 = 0x9000
 SpecVideoRam videoRam = 0x3000
 Ram upperRam = 0x3FC0
@@ -268,3 +271,9 @@ laSelector.addItem = qwerty, "Qwerty"
 laSelector.addItem = jcuken, "Йцукен"
 laSelector.addItem = smart, "«Умная» раскладка"
 configTab.addControl = 2, &laSelector
+
+#platform.codePage
+ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
+codePageSelector.addItem = rk, "РК-86"
+codePageSelector.addItem = koi8, "КОИ-8"
+configTab.addControl = 3, &codePageSelector

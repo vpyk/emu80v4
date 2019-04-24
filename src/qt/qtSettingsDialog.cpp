@@ -81,10 +81,13 @@ QString SettingsDialog::getRunningConfigValue(QString option)
     std::string obj = option.mid(0, dotPos).toUtf8().constData();
     std::string prop = option.mid(dotPos + 1).toUtf8().constData();
 
-    if (obj != "emulation" && obj != "wavReader")
-        return QString::fromUtf8(emuGetPropertyValue(m_platform + "." + obj, prop).c_str());
-    else
-        return QString::fromUtf8(emuGetPropertyValue(obj, prop).c_str());
+    if (obj != "platform") {
+        if (obj != "emulation" && obj != "wavReader")
+            obj = m_platform + "." + obj;
+    } else
+        obj = m_platform;
+
+    return QString::fromUtf8(emuGetPropertyValue(obj, prop).c_str());
 }
 
 
@@ -95,10 +98,13 @@ void SettingsDialog::setRunningConfigValue(QString option, QString value)
     std::string prop = option.mid(dotPos + 1).toUtf8().constData();
     std::string val = value.toUtf8().constData();
 
-    if (obj != "emulation" && obj != "wavReader")
-        emuSetPropertyValue(m_platform + "." + obj, prop, val);
-    else
-        emuSetPropertyValue(obj, prop, val);
+    if (obj != "platform") {
+        if (obj != "emulation" && obj != "wavReader")
+            obj = m_platform + "." + obj;
+    } else
+        obj = m_platform;
+
+    emuSetPropertyValue(obj, prop, val);
 }
 
 
@@ -150,6 +156,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("kbdLayout.layout");
     loadRunningConfigValue("kbdLayout.numpadJoystick");
     loadRunningConfigValue("keyboard.matrix");
+    loadRunningConfigValue("platform.codePage");
 }
 
 
@@ -245,7 +252,12 @@ void SettingsDialog::fillControlValues()
     ui->upperZ80checkBox->setChecked(m_options["emulation.debugZ80MnemoUpperCase"] == "yes");
     ui->swapF5F9checkBox->setChecked(m_options["emulation.debugSwapF5F9"] == "yes");
 
-    // Volume
+    // Debugger code page
+    val = m_options["platform.codePage"];
+    ui->rkCodePageRadioButton->setChecked(val == "rk");
+    ui->koi8CodePageRadioButton->setChecked(val == "koi8");
+
+            // Volume
     val = m_options["emulation.volume"];
     int volume = val.toInt();
     ui->muteCheckBox->setVisible(false); //временно!
@@ -639,6 +651,13 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["emulation.debug8080MnemoUpperCase"] = ui->upper8080checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugZ80MnemoUpperCase"] = ui->upperZ80checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugSwapF5F9"] = ui->swapF5F9checkBox->isChecked() ? "yes" : "no";
+
+    val = "";
+    if (ui->rkCodePageRadioButton->isChecked())
+        val = "rk";
+    else if (ui->koi8CodePageRadioButton->isChecked())
+        val = "koi8";
+    m_options["platform.codePage"] = val;
 
     val = QString::number(ui->volumeSlider->value());
     m_options["emulation.volume"] = val;

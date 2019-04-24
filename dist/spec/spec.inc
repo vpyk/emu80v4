@@ -38,6 +38,9 @@ window.customScreenFormat = 1.667
 
 platform.helpFile = @HELP_FILE
 
+# Code page: rk, koi8 (default = rk)
+platform.codePage = rk
+
 Ram ram = 0x9000
 SpecVideoRam videoRam = 0x3000
 
@@ -148,7 +151,7 @@ configTab.addControl = 1, &styleSelector
 ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
 mixSelector.addItem = none, "Выкл."
 mixSelector.addItem = scanline, "Имитация линий растра"
-configTab.addControl = 2, &mixSelector
+configTab.addControl = 1, &mixSelector
 
 #window.antialiasing
 ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
@@ -173,7 +176,7 @@ configTab.addControl = 2, &wsSelector
 ConfigRadioSelector cropSelector = &crtRenderer, visibleArea, "Отображать реальный бордюр"
 cropSelector.addItem = no, "Нет"
 cropSelector.addItem = yes, "Да"
-configTab.addControl = 3, &cropSelector
+configTab.addControl = 2, &cropSelector
 
 #crtRenderer.colorMode
 ConfigRadioSelector colorSelector = &crtRenderer, colorMode, "Цветовой режим"
@@ -198,3 +201,9 @@ ConfigRadioSelector tapeSuspendSelector = &tapeInHook, suspendAfterResetForMs, "
 tapeSuspendSelector.addItem = 200, "Вкл."
 tapeSuspendSelector.addItem = 0, "Выкл."
 configTab.addControl = 3, &tapeSuspendSelector
+
+#platform.codePage
+ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
+codePageSelector.addItem = rk, "РК-86"
+codePageSelector.addItem = koi8, "КОИ-8"
+configTab.addControl = 3, &codePageSelector

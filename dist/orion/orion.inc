@@ -42,6 +42,9 @@ window.customScreenFormat = 1.667
 
 platform.helpFile = @HELP_FILE
 
+# Code page: rk, koi8 (default = rk)
+platform.codePage = rk
+
 Ram ram0 = 0xF000
 Ram ram1 = 0xF000
 Ram ram2 = 0xF000
@@ -264,3 +267,9 @@ ifdef USE_TAPE
   tapeSelector.addItem = no, "Выкл."
   configTab.addControl = 3, &tapeSelector
 endif
+
+#platform.codePage
+ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
+codePageSelector.addItem = rk, "РК-86"
+codePageSelector.addItem = koi8, "КОИ-8"
+configTab.addControl = 3, &codePageSelector
