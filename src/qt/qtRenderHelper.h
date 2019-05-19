@@ -37,8 +37,8 @@ public:
     virtual ~RenderHelper();
     void setPaintWidget(PaintWidget* widget);
     void start();
-    void pause() {m_paused = true;}
-    void resume() {m_paused = false;}
+    void pause();
+    void resume();
     void drawAll();
     void addWindow(MainWindow* window);
     void removeWindow(MainWindow* window);

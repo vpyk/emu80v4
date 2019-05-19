@@ -59,12 +59,26 @@ void RenderHelper::onTimer()
     if (!m_paused)
         emuEmulationCycle();
     else
-        palDelay(30);
+        palDelay(30); // to be on the safe side
 }
 
 
 void RenderHelper::start()
 {
+    m_timer->start();
+}
+
+
+void RenderHelper::pause()
+{
+    m_paused = true;
+    m_timer->stop();
+}
+
+
+void RenderHelper::resume()
+{
+    m_paused = false;
     m_timer->start();
 }
 
