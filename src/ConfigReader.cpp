@@ -193,11 +193,12 @@ void ConfigReader::fillValuesList(string s, EmuValuesList* values)
             getToken(s, DELIM_QUOT);
         }
         if (token != "") {
-            if (token.substr(0, 1) == "&")
+            if (token.substr(0, 1) == "&") {
                 if (token == "&platform")
                     token = m_prefix.substr(0, m_prefix.size() - 1); // убираем "."
                 else
                     token = m_prefix + token.substr(1);
+            }
             values->addValue(token);
         }
 
