@@ -193,8 +193,12 @@ void ConfigWnd::Save()
             for (auto it = m_selectorList.begin(); it != m_selectorList.end(); it++) {
                 if ((*it)->m_tabId == tabId) {
                     wxString obj = (*it)->m_object;
+
                     if (obj.Find('.') != wxNOT_FOUND)
                         obj = obj.AfterLast('.');
+                    else if (obj != "emulation" && obj != "wavReader") // workaround for global opt-file
+                        obj = "platform";
+
                     wxString line = obj + "." + (*it)->m_property + " = " + (*it)->m_values[(*it)->m_selectedItem] + "\n";
                     file.Write(line);
                 }
