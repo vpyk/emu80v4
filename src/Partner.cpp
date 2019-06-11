@@ -321,7 +321,7 @@ bool PartnerModuleSelector::setProperty(const string& propertyName, const EmuVal
 
 void PartnerMcpgSelector::writeByte(int, uint8_t value)
 {
-    m_isMcpgEnabled = !(value & 1);
+    m_isMcpgEnabled = !(value & 0x80);
 }
 
 
