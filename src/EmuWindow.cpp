@@ -448,7 +448,12 @@ void EmuWindow::sysReq(SysReq sr)
                 g_emulation->getConfig()->updateConfig();
             break;
         case SR_SCREENSHOT:
-            screenshotRequest(palOpenFileDialog("Save screenshot", "BMP files (*.bmp)|*.bmp", true, this));
+            screenshotRequest(palOpenFileDialog("Save screenshot",
+                "BMP files (*.bmp)|*.bmp"
+#ifdef PAL_QT
+                "|PNG files (*.png)|*.png"
+#endif
+                , true, this));
             break;
         default:
             break;
