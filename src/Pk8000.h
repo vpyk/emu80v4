@@ -54,12 +54,13 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         void attachScreenMemoryBank(int bankN, Ram* screenMemoryBank);
         void setScreenBank(unsigned bank);
         void setMode(unsigned mode);
+        void advance();
         void setFgBgColors(unsigned fgColor, unsigned bgColor);
         void setTextBufferBase(uint16_t base) {m_txtBase = base;}
         void setSymGenBufferBase(uint16_t base);
         void setGraphicsBufferBase(uint16_t base) {m_grBase = base;}
         void setColorBufferBase(uint16_t base) {m_colBase = base;}
-        void setBlanking(bool blanking) {m_blanking = blanking;}
+        void setBlanking(bool blanking);
         void setColorReg(unsigned addr, uint8_t value);
         uint8_t getColorReg(unsigned addr);
         bool isBorderWide() {return m_wideBorder;}
@@ -72,6 +73,12 @@ class Pk8000Renderer : public CrtRenderer, public IActive
             0x0000A8, 0x0000FF, 0x00A8A8, 0x00FFFF,
             0xA80000, 0xFF0000, 0xA8A800, 0xFFFF00,
             0xA800A8, 0xFF00FF, 0xA8A8A8, 0xFFFFFF
+        };
+
+        enum BlankingState {
+            BS_NORMAL,
+            BS_BLANK,
+            BS_WRITE
         };
 
         const uint8_t* m_screenMemoryBanks[4];
@@ -105,9 +112,11 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         void renderLine(int nLine);
 
         uint64_t m_curScanlineClock;
-        int m_curScanlinePixel;
+        int m_curScanlinePixel = 0;
+        int m_curBlankingPixel = 0;
         uint32_t m_bgScanlinePixels[320];
         uint32_t m_fgScanlinePixels[320];
+        BlankingState m_blankingPixels[320];
 };
 
 
