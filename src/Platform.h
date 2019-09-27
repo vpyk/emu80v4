@@ -21,6 +21,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+#include <map>
 
 #include "PalKeys.h"
 #include "EmuTypes.h"
@@ -70,11 +71,13 @@ class Platform : public ParentObject
         std::string getAllDebugInfo();
         CodePage getCodePage() {return m_codePage;}
 
+        const std::string& getBaseName() {return m_baseName;}
         int getDefConfigTabId() {return m_defConfigTabId;}
 
     private:
         std::string m_baseDir;
         std::list<EmuObject* >m_objList;
+        std::string m_baseName;
 
         PlatformCore* m_core = nullptr;
         Cpu* m_cpu = nullptr;

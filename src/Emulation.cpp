@@ -358,9 +358,9 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
                 if (!platform)
                     platform = m_lastActivePlatform;
                 if (platform)
-                    curPlatformName = platform->getName();
+                    curPlatformName = platform->getBaseName();
                 bool newWnd;
-                if (m_config->choosePlatform(pi, curPlatformName, newWnd, false, wnd)) { // если имя платформы было изменено (2 экземпляра), найдено не будет
+                if (m_config->choosePlatform(pi, curPlatformName, newWnd, false, wnd)) {
                     // Удяляем активную платформу (как опция можно все - закомментировано)
                     if (!newWnd) {
                         m_platformList.remove(platform);
@@ -373,6 +373,27 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
                     m_platformList.push_back(newPlatform);
                     //m_activePlatform = platform;
                     checkPlatforms();
+                }
+            }
+            break;
+        case SR_CHCONFIG:
+            {
+                if (!platform)
+                break;
+
+                string curPlatformName = platform->getBaseName();
+                if (palChooseConfiguration(curPlatformName, wnd)) {
+                    m_platformList.remove(platform);
+                    delete platform;
+
+                    const std::vector<PlatformInfo>* platformVector = m_config->getPlatformInfos();
+                    for (unsigned i = 0; i < platformVector->size(); i++)
+                        if ((*platformVector)[i].objName == curPlatformName) {
+                            Platform* newPlatform = new Platform((*platformVector)[i].configFileName, curPlatformName);
+                            m_platformList.push_back(newPlatform);
+                            checkPlatforms();
+                            break;
+                        }
                 }
             }
             break;

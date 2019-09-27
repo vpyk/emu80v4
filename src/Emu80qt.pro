@@ -97,11 +97,13 @@ SOURCES += \
     qt/qtAboutDialog.cpp \
     qt/qtAudioDevice.cpp \
     qt/qtChoosePlatformDialog.cpp \
+    qt/qtConfigWidget.cpp \
     qt/qtMainWindow.cpp \
     qt/qtPaintWidget.cpp \
     qt/qtPal.cpp \
     qt/qtPalFile.cpp \
     qt/qtPalWindow.cpp \
+    qt/qtPlatformConfig.cpp \
     qt/qtRenderHelper.cpp \
     qt/qtSettingsDialog.cpp \
     qt/qtToolBtn.cpp \
@@ -180,11 +182,13 @@ HEADERS  += \
     qt/qtAboutDialog.h \
     qt/qtAudioDevice.h \
     qt/qtChoosePlatformDialog.h \
+    qt/qtConfigWidget.h \
     qt/qtMainWindow.h \
     qt/qtPaintWidget.h \
     qt/qtPal.h \
     qt/qtPalFile.h \
     qt/qtPalWindow.h \
+    qt/qtPlatformConfig.h \
     qt/qtRenderHelper.h \
     qt/qtSettingsDialog.h \
     qt/qtToolBtn.h \
@@ -199,6 +203,7 @@ TRANSLATIONS += qt/emu80_ru.ts
 CODECFORSRC = UTF-8
 
 FORMS += \
+    qt/qtPlatformConfig.ui \
     qt/qtSettingsDialog.ui \
     qt/qtChoosePlatformDialog.ui \
     qt/qtAboutDialog.ui \

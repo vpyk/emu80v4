@@ -192,9 +192,20 @@ bool palChoosePlatform(std::vector<PlatformInfo>&, int&, bool&, bool, PalWindow*
 }
 
 
+bool palChooseConfiguration(std::string platformName, PalWindow* wnd) {
+    return false;
+}
+
+
 void palGetPalDefines(std::list<std::string>& defineList)
 {
     defineList.push_back("SDL");
+}
+
+
+void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
+{
+
 }
 
 

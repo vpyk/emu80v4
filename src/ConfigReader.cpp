@@ -51,6 +51,11 @@ ConfigReader::ConfigReader(string configFileName, string platformName)
     for (auto it = palDefines.begin(); it != palDefines.end(); it++)
         m_varMap[*it] = "";
 
+    map<string, string> platformDefines;
+    palGetPlatformDefines(platformName, platformDefines);
+    for (auto it = platformDefines.begin(); it != platformDefines.end(); it++)
+        m_varMap[it->first] = it->second;
+
     openFile();
 }
 

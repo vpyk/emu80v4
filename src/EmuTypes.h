@@ -51,6 +51,7 @@ enum SysReq
     SR_ABOUT,
     SR_FULLSCREEN,
     SR_CHPLATFORM,
+    SR_CHCONFIG,
     SR_CONFIG,
     SR_DEBUG,
     SR_QUERTY,

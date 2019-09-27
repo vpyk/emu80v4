@@ -42,6 +42,8 @@ Platform::Platform(string configFileName, string name)
     if (slashPos != string::npos)
         m_baseDir = configFileName.substr(0, slashPos) + "/";
 
+    m_baseName = name;
+
     // Если платформа с таким именем уже есть, добавляем в конец "$" и номер, начиная от 1
     if (g_emulation->findObject(name)) {
         ostringstream oss;

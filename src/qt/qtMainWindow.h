@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -94,6 +94,7 @@ private slots:
     void onFont();
     void onSmoothing();
     void onPlatform();
+    void onPlatformConfig();
     void onPlatformSelect();
     void onTapeHook();
     void onScreenshot();
@@ -166,6 +167,7 @@ private:
     QAction* m_ramDiskSeparator;
     QAction* m_exitAction;
     QAction* m_platformSelectAction;
+    QAction* m_platformConfigAction;
     QAction* m_resetAction;
     QAction* m_pauseAction;
     QAction* m_forwardAction;

@@ -36,6 +36,7 @@
 #include "qtPal.h"
 #include "qtPalWindow.h"
 #include "qtChoosePlatformDialog.h"
+#include "qtPlatformConfig.h"
 #include "qtAudioDevice.h"
 
 #include "../Pal.h"
@@ -490,11 +491,30 @@ bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bo
 }
 
 
+bool palChooseConfiguration(std::string platformName, PalWindow* wnd)
+{
+    QWidget* parent = nullptr;
+    if (wnd)
+        parent = wnd->getQtWindow();
+    PlatformConfigDialog* dialog = new PlatformConfigDialog(parent);
+    g_renderHelper->pause();
+    bool res = dialog->configure(QString::fromUtf8(platformName.c_str()));
+    g_renderHelper->resume();
+    return res;
+}
+
+
+void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
+{
+    return;
+}
+
+
 std::string palGetDefaultPlatform()
 {
     QSettings settings;
     settings.beginGroup("system");
-    return settings.value("platform", "").toString().toUtf8().constData();;
+    return settings.value("platform", "").toString().toUtf8().constData();
 }
 
 

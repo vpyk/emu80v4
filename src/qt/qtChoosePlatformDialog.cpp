@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,12 +37,18 @@ ChoosePlatformDialog::~ChoosePlatformDialog()
 
 bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, QString runFileName, bool setDef)
 {
-    Q_UNUSED(runFileName);
-    Q_UNUSED(setDef);
+    Q_UNUSED(runFileName)
+    Q_UNUSED(setDef)
     //ui->defaultCheckBox->setChecked(setDef);
     for (auto it = pi.begin(); it != pi.end(); it++) {
         QString s = QString::fromUtf8((*it).platformName.c_str());
-        ui->platformListWidget->addItem(s);
+        QListWidgetItem* item = new QListWidgetItem(s);
+        ui->platformListWidget->addItem(item);
+        /*if ((*it).objName.find(".") == std::string::npos) {
+            QFont font = item->font();
+            font.setBold(true);
+            item->setFont(font);
+        }*/
     }
     ui->platformListWidget->setCurrentRow(pos);
     if (exec() == QDialog::Accepted) {
@@ -62,6 +68,6 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
 
 void ChoosePlatformDialog::on_platformListWidget_doubleClicked(const QModelIndex &index)
 {
-    Q_UNUSED(index);
+    Q_UNUSED(index)
     accept();
 }

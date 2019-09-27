@@ -145,6 +145,12 @@ bool palChoosePlatform(vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool se
 }
 
 
+bool palChooseConfiguration(std::string platformName, PalWindow* wnd)
+{
+    return false;
+}
+
+
 void palSetRunFileName(std::string runFileName) {
     ::runFileName = wxString::FromUTF8(runFileName.c_str());
 }
@@ -202,6 +208,12 @@ void palGetPalDefines(std::list<std::string>& defineList)
 {
     defineList.push_back("SDL");
     defineList.push_back("WX");
+}
+
+
+void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
+{
+
 }
 
 

@@ -30,6 +30,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_FULLSCREEN;
             case PK_F10:
                 return SR_CLOSE;
+            case PK_F8:
+                return SR_CHCONFIG;
             case PK_F9:
                 return SR_CHPLATFORM;
             case PK_F12:

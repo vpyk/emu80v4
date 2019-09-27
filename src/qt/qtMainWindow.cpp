@@ -41,6 +41,7 @@
 #include "qtRenderHelper.h"
 #include "qtToolBtn.h"
 #include "qtSettingsDialog.h"
+#include "qtPlatformConfig.h"
 #include "qtAboutDialog.h"
 #include "qtHelpDialog.h"
 
@@ -396,8 +397,19 @@ void MainWindow::createActions()
 
     platformMenu->addMenu(m_platformListMenu);
     // platformMenu->addAction(m_platformSelectAction);
-    platformMenu->addSeparator();
 
+    // Platform configuration
+    m_platformConfigAction = new QAction(QIcon(":/icons/config.png"), tr("Platform configuration..."), this);
+    m_platformConfigAction->setToolTip(tr("Configure current platform (Alt-F8)"));
+    QList<QKeySequence> platformConfigKeysList;
+    platformConfigKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F8));
+    platformConfigKeysList.append(QKeySequence(Qt::META + Qt::Key_F8));
+    m_platformConfigAction->setShortcuts(platformConfigKeysList);
+    addAction(m_platformConfigAction);
+    m_toolBar->addAction(m_platformConfigAction);
+    platformMenu->addAction(m_platformConfigAction);
+    connect(m_platformConfigAction, SIGNAL(triggered()), this, SLOT(onPlatformConfig()));
+    platformMenu->addSeparator();
 
     // Reset
     m_resetAction = new QAction(QIcon(":/icons/reset.png"), tr("Reset"), this);
@@ -847,6 +859,8 @@ void MainWindow::tuneMenu()
     m_colorLabel->setVisible(hasColor);
     m_colorMenuAction->setVisible(hasColor);
     m_colorMenuAction->setEnabled(hasColor);
+
+    m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 }
 
 
@@ -1537,6 +1551,12 @@ void MainWindow::onPlatformSelect()
 void MainWindow::onPlatform()
 {
     emuSysReq(m_palWindow, SR_CHPLATFORM);
+}
+
+
+void MainWindow::onPlatformConfig()
+{
+    emuSysReq(m_palWindow, SR_CHCONFIG);
 }
 
 
