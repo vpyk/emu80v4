@@ -130,6 +130,7 @@ static void trim(string& s)
 static const char* DELIM_DOTSPACE = " \t.=";
 static const char* DELIM_COMMA = ",\"";
 static const char* DELIM_QUOT = "\"";
+static const char* DELIM_SPACE = " \t";
 
 static string getToken(string &s, string delimeters)
 {
@@ -284,6 +285,41 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
             continue;
         }
 
+        if (first == "if") {
+            if (!m_ifCondition) {
+                m_condLevel++;
+                continue;
+            }
+            second = getToken(s, DELIM_DOTSPACE);
+            auto it = m_varMap.find(second);
+            if (it == m_varMap.end()) {
+                logPrefix();
+                emuLog << "variable @" << second << " not found" << "\n";
+                stop();
+                return false;
+            }
+            string val = it->second;
+
+            token = getToken(s, DELIM_SPACE);
+            if (token != "==" && token != "!=") {
+                logPrefix();
+                emuLog << "error: invalid if syntax" << "\n";
+                stop();
+                return false;
+            }
+            bool cond = (token == "==");
+
+            string::size_type sharpPos = s.find("#",0);
+            if (sharpPos != string::npos)
+                s = s.substr(0, sharpPos);
+
+            m_condStack.push(m_ifCondition);
+            m_ifCondition = s == val;
+            if (!cond)
+                m_ifCondition = !m_ifCondition;
+            continue;
+        }
+
         if (first == "else") {
             // else implementation
             if (m_condLevel)
@@ -311,7 +347,7 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
                 stop();
             }
 
-            m_ifCondition = m_condStack.top();;
+            m_ifCondition = m_condStack.top();
             m_condStack.pop();
             continue;
         }
