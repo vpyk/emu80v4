@@ -33,6 +33,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += PAL_QT
 
 SOURCES += \
+    Covox.cpp \
     Main.cpp \
     AddrSpace.cpp \
     Apogey.cpp \
@@ -115,6 +116,7 @@ HEADERS  += \
     AtaDrive.h \
     CloseFileHook.h \
     ConfigReader.h \
+    Covox.h \
     Cpu.h \
     Cpu8080.h \
     Cpu8080dasm.h \

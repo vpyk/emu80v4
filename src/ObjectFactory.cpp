@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@
 #include "PpiAtaAdapter.h"
 #include "AtaDrive.h"
 #include "Vector.h"
+#include "Covox.h"
 
 #include "EmuConfig.h"
 
@@ -185,6 +186,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(VectorRenderer);
     REG_EMU_CLASS(VectorFileLoader);
     REG_EMU_CLASS(VectorPpi8255Circuit);
+    REG_EMU_CLASS(VectorPpi8255Circuit2);
     REG_EMU_CLASS(VectorColorRegister);
     REG_EMU_CLASS(VectorKeyboard);
     REG_EMU_CLASS(VectorCpuWaits);
@@ -192,6 +194,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(VectorKbdLayout);
     REG_EMU_CLASS(VectorRamDiskSelector);
     REG_EMU_CLASS(VectorFddControlRegister);
+    REG_EMU_CLASS(Covox);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
