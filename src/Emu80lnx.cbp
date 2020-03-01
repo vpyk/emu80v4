@@ -86,6 +86,8 @@
 		<Unit filename="CloseFileHook.h" />
 		<Unit filename="ConfigReader.cpp" />
 		<Unit filename="ConfigReader.h" />
+		<Unit filename="Covox.cpp" />
+		<Unit filename="Covox.h" />
 		<Unit filename="Cpu.cpp" />
 		<Unit filename="Cpu.h" />
 		<Unit filename="Cpu8080.cpp" />
