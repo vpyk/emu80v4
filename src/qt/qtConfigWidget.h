@@ -20,38 +20,63 @@
 #define CONFIGWIDGET_H
 
 #include <QWidget>
-
+#include <QSettings>
+#include <QDir>
+#include <QLabel>
 
 class ConfigWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    //ConfigWidget();
+    explicit ConfigWidget(QWidget* parent = nullptr);
 
-    virtual void setConfig() = 0;
-    virtual void getConfig() = 0;
+    virtual void loadConfig() = 0;
+    virtual void saveConfig() = 0;
+    virtual void setDefaults() = 0;
 
     static ConfigWidget* create(QString platformName);
+
+protected:
+    QSettings m_settings;
+    QString m_platform;
+    QDir m_baseDir;
+
+    QMap<QString, QString> m_defValues;
+
+    void optBegin();
+    void optSave(QString option, QString value);
+    QVariant optLoad(QString option);
+    void optEnd();
+
+    QString selectFile(QString fileName, bool dirMode, QString title = "Select file", QString filter = "*.*");
+    void selectFile(QLabel* label, bool dirMode, QString title = "Select file", QString filter = "*.*");
 };
 
 
-class SampleConfigWidget : public ConfigWidget
+namespace Ui {
+    class ApogeyConfigWidget;
+}
+
+class ApogeyConfigWidget : public ConfigWidget
 {
     Q_OBJECT
 
 public:
-    //explicit SampleConfigWidget(QWidget *parent = nullptr);
-    //~SampleConfigWidget();
+    explicit ApogeyConfigWidget(QWidget *parent = nullptr);
+    //~ApogeyConfigWidget();
 
-    void setConfig() override;
-    void getConfig() override;
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private slots:
+    void onSelectRomDisk();
+    void onSelectSd();
 
 private:
-    //Ui::SampleConfigWidget *ui;
+    Ui::ApogeyConfigWidget *ui;
 };
-
-
 
 
 #endif // CONFIGWIDGET_H

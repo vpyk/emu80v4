@@ -26,10 +26,14 @@
 @OPT_FILE = "rk86/rk86.opt"
 
 # Файл ROM-диска (если не подключен таймер)
-@ROMDISK_FILE = "rk86/romdisk.bin"
+ifndef CFG_ROMDISK_FILE
+  @CFG_ROMDISK_FILE = "rk86/romdisk.bin"
+endif
 
 # Директория SD-карты
-@SD_DIR = "rk86/sdcard"
+ifndef CFG_SD_DIR
+  @CFG_SD_DIR = "rk86/sdcard"
+endif
 
 
 
@@ -160,12 +164,12 @@ ppiCircuit.rkKeyboard = &keyboard
 ppi1.circuit = &ppiCircuit
 
 ifdef ROM_DISK
-  RkRomDisk romDisk = @ROM_DISK_FILE
+  RkRomDisk romDisk = @CFG_ROMDISK_FILE
   ppi2.circuit = &romDisk
 endif
 
 ifdef SD_CARD
-  RkSdController sdCard = @SD_DIR
+  RkSdController sdCard = @CFG_SD_DIR
   ppi2.circuit = &sdCard
 endif
 

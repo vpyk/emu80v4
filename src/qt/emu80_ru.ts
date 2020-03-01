@@ -15,6 +15,56 @@
     </message>
 </context>
 <context>
+    <name>ApogeyConfigWidget</name>
+    <message>
+        <source>External Storage (second PPI)</source>
+        <translation type="vanished">Внешнее хранилище (второй ППА)</translation>
+    </message>
+    <message>
+        <location filename="qtApogeyConfig.ui" line="32"/>
+        <source>ROM Disk</source>
+        <translation>ROM-диск</translation>
+    </message>
+    <message>
+        <location filename="qtApogeyConfig.ui" line="54"/>
+        <source>Select file</source>
+        <translation>Выбрать файл</translation>
+    </message>
+    <message>
+        <location filename="qtApogeyConfig.ui" line="67"/>
+        <source>SD Adapter (vinxru)</source>
+        <translation>SD-адаптер (схема vinxru)</translation>
+    </message>
+    <message>
+        <location filename="qtApogeyConfig.ui" line="86"/>
+        <source>Select folder</source>
+        <translation>Выюрать папку</translation>
+    </message>
+    <message>
+        <source>SD adapter (vinxru):</source>
+        <translation type="vanished">SD-адаптер (схема vinxru):</translation>
+    </message>
+    <message>
+        <source>ROM disk:</source>
+        <translation type="vanished">ROM-диск:</translation>
+    </message>
+    <message>
+        <location filename="qtConfigWidget.cpp" line="160"/>
+        <source>Select ROM Disk File</source>
+        <translation>Выберите файл ROM-диска</translation>
+    </message>
+    <message>
+        <location filename="qtConfigWidget.cpp" line="160"/>
+        <source>ROM Disk Files</source>
+        <translation>Файлы ROM-диска</translation>
+    </message>
+    <message>
+        <location filename="qtConfigWidget.cpp" line="166"/>
+        <source>Select SD Card Folder</source>
+        <translation>Выберите папку SD-карты</translation>
+    </message>
+</context>
+<context>
     <name>ChoosePlatformDialog</name>
     <message>
         <location filename="qtChoosePlatformDialog.ui" line="17"/>
@@ -35,6 +85,14 @@
         <location filename="qtChoosePlatformDialog.ui" line="78"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigWidget</name>
+    <message>
+        <location filename="qtConfigWidget.cpp" line="75"/>
+        <source>All Files (*.*)</source>
+        <translation>Все файлы (*.*)</translation>
     </message>
 </context>
 <context>

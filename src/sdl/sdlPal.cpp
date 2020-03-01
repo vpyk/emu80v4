@@ -120,6 +120,12 @@ void palSdlQuit()
 }
 
 
+const string& palGetBasePath()
+{
+    return basePath;
+}
+
+
 bool palSetSampleRate(int sampleRate)
 {
     if (isRunning)

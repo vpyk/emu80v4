@@ -180,6 +180,13 @@ void palQtQuit()
     delete application;
 }
 
+
+const string& palGetBasePath()
+{
+    return basePath;
+}
+
+
 static QAudioOutput* audio;
 
 static EmuAudioIoDevice* audioDevice = 0;
@@ -506,7 +513,14 @@ bool palChooseConfiguration(std::string platformName, PalWindow* wnd)
 
 void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
 {
-    return;
+    QSettings settings;
+    settings.beginGroup(QString::fromUtf8(platformName.c_str()) + "-config");
+    QStringList keys = settings.allKeys();
+    for (const auto& key: keys) {
+        QString value = settings.value(key).toString();
+        definesMap.insert(std::make_pair(key.toUtf8().constData(), value.toUtf8().constData()));
+    }
+    settings.endGroup();
 }
 
 

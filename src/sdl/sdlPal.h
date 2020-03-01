@@ -32,6 +32,8 @@ class PalWindow;
 bool palSdlInit();
 void palSdlQuit();
 
+const std::string& palGetBasePath();
+
 void palStart();
 void palPause();
 void palResume();

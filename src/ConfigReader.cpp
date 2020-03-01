@@ -51,10 +51,12 @@ ConfigReader::ConfigReader(string configFileName, string platformName)
     for (auto it = palDefines.begin(); it != palDefines.end(); it++)
         m_varMap[*it] = "";
 
-    map<string, string> platformDefines;
-    palGetPlatformDefines(platformName, platformDefines);
-    for (auto it = platformDefines.begin(); it != platformDefines.end(); it++)
-        m_varMap[it->first] = it->second;
+    if (platformName != "") {
+        map<string, string> platformDefines;
+        palGetPlatformDefines(platformName, platformDefines);
+        for (auto it = platformDefines.begin(); it != platformDefines.end(); it++)
+            m_varMap[it->first] = it->second;
+    }
 
     openFile();
 }
@@ -125,6 +127,15 @@ static void trim(string& s)
         s.erase(0, 1);
     while (s != "" && isspc(s[s.size() - 1]))
         s.erase(s.size() - 1, 1);
+}
+
+static string deQuote(string s)
+{
+    trim(s);
+    if (s.length() >= 2 && s[0] == '\"' && s[s.length() - 1] == '\"')
+        return s.substr(1, s.length() - 2);
+    else
+        return s;
 }
 
 static const char* DELIM_DOTSPACE = " \t.=";
@@ -292,13 +303,15 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
             }
             second = getToken(s, DELIM_DOTSPACE);
             auto it = m_varMap.find(second);
-            if (it == m_varMap.end()) {
+            /*if (it == m_varMap.end()) {
                 logPrefix();
                 emuLog << "variable @" << second << " not found" << "\n";
                 stop();
                 return false;
             }
-            string val = it->second;
+            string val = it->second;*/
+
+            string val = it != m_varMap.end() ? it->second : "";
 
             token = getToken(s, DELIM_SPACE);
             if (token != "==" && token != "!=") {
@@ -314,7 +327,7 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
                 s = s.substr(0, sharpPos);
 
             m_condStack.push(m_ifCondition);
-            m_ifCondition = s == val;
+            m_ifCondition = deQuote(s) == deQuote(val);
             if (!cond)
                 m_ifCondition = !m_ifCondition;
             continue;

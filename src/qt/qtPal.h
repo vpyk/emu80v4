@@ -33,6 +33,8 @@ class PalWindow;
 bool palQtInit(int& argc, char** argv);
 void palQtQuit();
 
+const std::string& palGetBasePath();
+
 void palStart();
 void palPause();
 void palResume();
