@@ -2731,8 +2731,8 @@ uint8_t CpuZ80::getIM() {
 }
 
 
-uint8_t CpuZ80::getR() {
-    return ir;
+uint8_t CpuZ80::getI() {
+    return ir >> 8;
 }
 
 

@@ -456,7 +456,7 @@ void DebugWindow::drawDbgFrame()
         putString(m_curLayout->regs.left + 12, m_curLayout->regs.top + 4, "IX  = ");
         putString(m_curLayout->regs.left + 12, m_curLayout->regs.top + 5, "IY  = ");
 
-        putString(m_curLayout->regs.left + 1, m_curLayout->regs.top + 7, "R  = ");
+        putString(m_curLayout->regs.left + 1, m_curLayout->regs.top + 7, "I  = ");
         putString(m_curLayout->regs.left + 12, m_curLayout->regs.top + 7, "IM  = ");
     }
     // else if (!m_compactMode)
@@ -638,7 +638,7 @@ void DebugWindow::fillCpuStatus()
         m_states[m_stateNum].h2 = (m_states[m_stateNum].hl2 & 0xff00) >> 8;
         m_states[m_stateNum].l2 = m_states[m_stateNum].hl2 & 0xff;
         m_states[m_stateNum].fl_n = m_states[m_stateNum].af & 0b00000010 ? 1 : 0;
-        m_states[m_stateNum].r = m_z80cpu->getR();
+        m_states[m_stateNum].i = m_z80cpu->getI();
         m_states[m_stateNum].im = m_z80cpu->getIM();
     }
 }
@@ -1728,7 +1728,7 @@ void DebugWindow::regsDraw()
 
         baseY = m_curLayout->regs.top + 7;
         baseX = m_curLayout->regs.left + 6;
-        drawHexByte(baseX,     baseY,   m_states[m_stateNum].r, m_states[m_stateNum].r != m_states[1-m_stateNum].r);
+        drawHexByte(baseX,     baseY,   m_states[m_stateNum].i, m_states[m_stateNum].i != m_states[1-m_stateNum].i);
         baseX += 12;
         drawHexByte(baseX,     baseY,   m_states[m_stateNum].im, m_states[m_stateNum].im != m_states[1-m_stateNum].im);
     }

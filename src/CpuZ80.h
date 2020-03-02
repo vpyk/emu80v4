@@ -83,7 +83,7 @@ class CpuZ80 : public Cpu8080Compatible
         void setIY(uint16_t value);
 
         uint8_t  getIM();
-        uint8_t  getR();
+        uint8_t  getI();
         uint8_t  getIFF();
 
         bool checkForStackOperation() override {return m_stackOperation;}
