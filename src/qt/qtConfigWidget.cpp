@@ -40,6 +40,7 @@ ConfigWidget* ConfigWidget::create(QString platformName)
     ConfigWidget* widget;
     widget = new ApogeyConfigWidget();
     widget->m_platform = platformName;
+    widget->tune();
     return widget;
 }
 
@@ -116,8 +117,17 @@ ApogeyConfigWidget::ApogeyConfigWidget(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->romDiskToolButton, SIGNAL(clicked()), this, SLOT(onSelectRomDisk()));
-    connect(ui->sdToolButton, SIGNAL(clicked()), this, SLOT(onSelectSd()));
+    connect(ui->sdToolButton, SIGNAL(clicked()), this, SLOT(onSelectSdDir()));
+    connect(ui->sdosToolButton, SIGNAL(clicked()), this, SLOT(onSelectSdImg()));
 }
+
+
+void ApogeyConfigWidget::tune()
+{
+    if (m_platform == "apogey")
+        ui->sdosGroupBox->hide();
+}
+
 
 void ApogeyConfigWidget::loadConfig()
 {
@@ -127,6 +137,7 @@ void ApogeyConfigWidget::loadConfig()
     } else { // if (m_platform == "rk86") {
         m_defValues["CFG_ROMDISK_FILE"] = "rk86/romdisk.bin";
         m_defValues["CFG_SD_DIR"] = "rk86/sdcard";
+        m_defValues["CFG_SD_IMG"] = "rk86/sd_rk86.img";
     }
 
     optBegin();
@@ -135,6 +146,7 @@ void ApogeyConfigWidget::loadConfig()
     ui->romDiskRadioButton->setChecked(extStorage == "ROMDISK");*/
     ui->romDiskLabel->setText(optLoad("CFG_ROMDISK_FILE").toString());
     ui->sdLabel->setText(optLoad("CFG_SD_DIR").toString());
+    ui->sdosLabel->setText(optLoad("CFG_SD_IMG").toString());
     optEnd();
 }
 
@@ -145,6 +157,8 @@ void ApogeyConfigWidget::saveConfig()
     //optSave("CFG_EXT_STORAGE", extStorage);
     optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
     optSave("CFG_SD_DIR", ui->sdLabel->text());
+    if (m_platform != "apogey")
+        optSave("CFG_SD_IMG", ui->sdosLabel->text());
     optEnd();
 }
 
@@ -153,6 +167,7 @@ void ApogeyConfigWidget::setDefaults()
     //ui->romDiskRadioButton->setChecked(true);
     ui->romDiskLabel->setText(m_defValues["CFG_ROMDISK_FILE"]);
     ui->sdLabel->setText(m_defValues["CFG_SD_DIR"]);
+    ui->sdosLabel->setText(m_defValues["CFG_SD_IMG"]);
 }
 
 
@@ -162,7 +177,13 @@ void ApogeyConfigWidget::onSelectRomDisk()
 }
 
 
-void ApogeyConfigWidget::onSelectSd()
+void ApogeyConfigWidget::onSelectSdDir()
 {
     selectFile(ui->sdLabel, true, tr("Select SD Card Folder"));
+}
+
+
+void ApogeyConfigWidget::onSelectSdImg()
+{
+    selectFile(ui->sdLabel, true, tr("Select SD Card Image File"));
 }

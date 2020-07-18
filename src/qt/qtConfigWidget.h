@@ -35,6 +35,8 @@ public:
     virtual void saveConfig() = 0;
     virtual void setDefaults() = 0;
 
+    virtual void tune() {}
+
     static ConfigWidget* create(QString platformName);
 
 protected:
@@ -70,9 +72,12 @@ public:
     void saveConfig() override;
     void setDefaults() override;
 
+    void tune() override;
+
 private slots:
     void onSelectRomDisk();
-    void onSelectSd();
+    void onSelectSdDir();
+    void onSelectSdImg();
 
 private:
     Ui::ApogeyConfigWidget *ui;

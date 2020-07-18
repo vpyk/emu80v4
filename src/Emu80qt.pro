@@ -87,6 +87,8 @@ SOURCES += \
     RkRomDisk.cpp \
     RkSdController.cpp \
     RkTapeHooks.cpp \
+    SdAdapters.cpp \
+    SdCard.cpp \
     Shortcuts.cpp \
     SoundMixer.cpp \
     Specialist.cpp \
@@ -172,6 +174,8 @@ HEADERS  += \
     RkRomDisk.h \
     RkSdController.h \
     RkTapeHooks.h \
+    SdAdapters.h \
+    SdCard.h \
     Shortcuts.h \
     SoundMixer.h \
     Specialist.h \

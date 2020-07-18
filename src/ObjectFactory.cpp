@@ -59,6 +59,8 @@
 #include "AtaDrive.h"
 #include "Vector.h"
 #include "Covox.h"
+#include "SdCard.h"
+#include "SdAdapters.h"
 
 #include "EmuConfig.h"
 
@@ -195,6 +197,9 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(VectorRamDiskSelector);
     REG_EMU_CLASS(VectorFddControlRegister);
     REG_EMU_CLASS(Covox);
+    REG_EMU_CLASS(SdCard);
+    REG_EMU_CLASS(SdAdapter);
+    REG_EMU_CLASS(PpiSdAdapter);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

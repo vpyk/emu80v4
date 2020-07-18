@@ -62,7 +62,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="sdGroupBox">
      <property name="title">
       <string>SD Adapter (vinxru)</string>
      </property>
@@ -82,6 +82,38 @@
       </item>
       <item>
        <widget class="QToolButton" name="sdToolButton">
+        <property name="toolTip">
+         <string>Select folder</string>
+        </property>
+        <property name="text">
+         <string notr="true">...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="sdosGroupBox">
+     <property name="title">
+      <string>SD Adapter (SDOS)</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QLabel" name="sdosLabel">
+        <property name="maximumSize">
+         <size>
+          <width>600</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string notr="true">rk86/sd_rk86.img</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="sdosToolButton">
         <property name="toolTip">
          <string>Select folder</string>
         </property>
