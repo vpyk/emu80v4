@@ -101,6 +101,8 @@
 		<Unit filename="CloseFileHook.h" />
 		<Unit filename="ConfigReader.cpp" />
 		<Unit filename="ConfigReader.h" />
+		<Unit filename="Covox.cpp" />
+		<Unit filename="Covox.h" />
 		<Unit filename="Cpu.cpp" />
 		<Unit filename="Cpu.h" />
 		<Unit filename="Cpu8080.cpp" />
@@ -204,6 +206,10 @@
 		<Unit filename="RkSdController.h" />
 		<Unit filename="RkTapeHooks.cpp" />
 		<Unit filename="RkTapeHooks.h" />
+		<Unit filename="SdAdapters.cpp" />
+		<Unit filename="SdAdapters.h" />
+		<Unit filename="SdCard.cpp" />
+		<Unit filename="SdCard.h" />
 		<Unit filename="Shortcuts.cpp" />
 		<Unit filename="Shortcuts.h" />
 		<Unit filename="SoundMixer.cpp" />

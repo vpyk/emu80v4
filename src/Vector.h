@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ class Rom;
 class Fdc1793;
 class GeneralSoundSource;
 class Cpu8080Compatible;
+class Covox;
 
 
 class VectorRenderer : public CrtRenderer, public IActive
@@ -237,6 +238,24 @@ class VectorPpi8255Circuit : public Ppi8255Circuit
 
         VectorKeyboard* m_kbd = nullptr;
         VectorRenderer* m_renderer = nullptr;
+};
+
+
+class VectorPpi8255Circuit2 : public Ppi8255Circuit
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        // derived from Ppi8255Circuit
+        void setPortA(uint8_t value) override; // port 03
+
+        void attachCovox(Covox* covox) {m_covox = covox;}
+
+        static EmuObject* create(const EmuValuesList&) {return new VectorPpi8255Circuit2();}
+
+    private:
+        // Источник звука - ковокс
+        Covox* m_covox;
 };
 
 

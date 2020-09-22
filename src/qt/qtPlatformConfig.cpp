@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,29 +34,43 @@ PlatformConfigDialog::~PlatformConfigDialog()
     delete ui;
 }
 
-
-bool PlatformConfigDialog::hasConfig(QString platform)
+QString PlatformConfigDialog::getGroupName(QString name)
 {
-    return false; //platform == "apogey";
+    return name.section('.', 0, 0);
 }
 
 
-void PlatformConfigDialog::getConfig(QString platform, std::map<std::string, std::string>& defines)
+bool PlatformConfigDialog::hasConfig(QString platform)
 {
-    return;
+    //return platform == "apogey";
+    QString groupName = getGroupName(platform);
+    return groupName == "apogey" || groupName == "rk86";
 }
 
 
 bool PlatformConfigDialog::configure(QString platform)
 {
-    ConfigWidget* cw = ConfigWidget::create(platform);
+    m_configWidget = ConfigWidget::create(getGroupName(platform));
+    connect(ui->defaultsButton, SIGNAL(clicked()), this, SLOT(onDefaults()));
     QSizePolicy sp;
     sp.setVerticalPolicy(QSizePolicy::Expanding);
     sp.setVerticalStretch(1);
     sp.setHorizontalPolicy(QSizePolicy::Expanding);
     sp.setHorizontalStretch(1);
-    cw->setSizePolicy(sp);
-    static_cast<QBoxLayout*>(layout())->insertWidget(0, cw);
-    cw->setConfig();
-    return exec() == QDialog::Accepted;
+    m_configWidget->setSizePolicy(sp);
+    static_cast<QBoxLayout*>(layout())->insertWidget(0, m_configWidget);
+    m_configWidget->loadConfig();
+    bool res = exec() == QDialog::Accepted;
+    if (res)
+        m_configWidget->saveConfig();
+    delete m_configWidget;
+    m_configWidget = nullptr;
+    return res;
+}
+
+
+void PlatformConfigDialog::onDefaults()
+{
+    if (m_configWidget)
+        m_configWidget->setDefaults();
 }

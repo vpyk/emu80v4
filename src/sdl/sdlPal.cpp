@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -117,6 +117,12 @@ void palSdlQuit()
     SDL_CloseAudioDevice(audioDevId);
 
     SDL_Quit();
+}
+
+
+const string& palGetBasePath()
+{
+    return basePath;
 }
 
 

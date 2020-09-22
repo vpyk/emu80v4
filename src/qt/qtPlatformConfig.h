@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ namespace Ui {
 class PlatformConfigDialog;
 }
 
+class ConfigWidget;
+
 class PlatformConfigDialog : public QDialog
 {
     Q_OBJECT
@@ -35,10 +37,16 @@ public:
 
     static bool hasConfig(QString platform);
     bool configure(QString platform);
-    void getConfig(QString platform, std::map<std::string, std::string>& defines);
 
 private:
     Ui::PlatformConfigDialog *ui;
+
+    ConfigWidget* m_configWidget = nullptr;
+
+    static QString getGroupName(QString name);
+
+private slots:
+    void onDefaults();
 };
 
 #endif // QTPLATFORMCONFIG_H

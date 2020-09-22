@@ -2606,9 +2606,16 @@ void CpuZ80::intRst(int vect)
             PC++;
             m_curClock = g_emulation->getCurClock();
         }
-        PUSH(PC); PC = vect * 8;
-        m_stackOperation = false;
-        m_curClock += m_kDiv * 11; // уточнить!
+        PUSH(PC);
+        if (IM != 2)
+            PC = vect * 8;
+        else {
+            PC = GetWORD(ir | 0xFF); // r is ignored
+            m_curClock += m_kDiv * 19;
+            if (m_waits)
+                m_curClock += m_waits->getCpuWaitStates(0, 0xE3, 19); // similar to xthl
+        }
+        m_curClock += m_kDiv * 11; // revise!
     }
 }
 
@@ -2724,8 +2731,8 @@ uint8_t CpuZ80::getIM() {
 }
 
 
-uint8_t CpuZ80::getR() {
-    return ir;
+uint8_t CpuZ80::getI() {
+    return ir >> 8;
 }
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>PlatformConfigDialog</class>
- <widget class="QWidget" name="PlatformConfigDialog">
+ <widget class="QDialog" name="PlatformConfigDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -87,5 +87,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>okButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlatformConfigDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>394</x>
+     <y>386</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>261</x>
+     <y>203</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlatformConfigDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>475</x>
+     <y>386</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>261</x>
+     <y>203</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -27,8 +27,6 @@
 #include "PalFile.h"
 #include "EmuObjects.h"
 
-class FdImage;
-
 
 class AtaDrive : public EmuObject
 {

@@ -33,6 +33,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += PAL_QT
 
 SOURCES += \
+    Covox.cpp \
     Main.cpp \
     AddrSpace.cpp \
     Apogey.cpp \
@@ -86,6 +87,8 @@ SOURCES += \
     RkRomDisk.cpp \
     RkSdController.cpp \
     RkTapeHooks.cpp \
+    SdAdapters.cpp \
+    SdCard.cpp \
     Shortcuts.cpp \
     SoundMixer.cpp \
     Specialist.cpp \
@@ -115,6 +118,7 @@ HEADERS  += \
     AtaDrive.h \
     CloseFileHook.h \
     ConfigReader.h \
+    Covox.h \
     Cpu.h \
     Cpu8080.h \
     Cpu8080dasm.h \
@@ -170,6 +174,8 @@ HEADERS  += \
     RkRomDisk.h \
     RkSdController.h \
     RkTapeHooks.h \
+    SdAdapters.h \
+    SdCard.h \
     Shortcuts.h \
     SoundMixer.h \
     Specialist.h \
@@ -207,7 +213,8 @@ FORMS += \
     qt/qtSettingsDialog.ui \
     qt/qtChoosePlatformDialog.ui \
     qt/qtAboutDialog.ui \
-    qt/qtHelpDialog.ui
+    qt/qtHelpDialog.ui \
+    qt/qtApogeyConfig.ui
 
 win32:RC_FILE = qt/emu80.rc
 

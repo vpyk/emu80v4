@@ -162,7 +162,7 @@ class DebugWindow : private EmuWindow
 
             int fl_n;
 
-            uint8_t r;
+            uint8_t i;
             uint8_t im;
             int iff;
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "Fdc1793.h"
 #include "SoundMixer.h"
 #include "WavReader.h"
+#include "Covox.h"
 
 using namespace std;
 
@@ -831,4 +832,25 @@ bool VectorFddControlRegister::setProperty(const string& propertyName, const Emu
     }
 
     return false;
+}
+
+
+bool VectorPpi8255Circuit2::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (Ppi8255Circuit::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "covox") {
+        attachCovox(static_cast<Covox*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+    return false;
+}
+
+
+void VectorPpi8255Circuit2::setPortA(uint8_t value)
+{
+    if (m_covox) {
+        m_covox->setValue(value >> 1);
+    }
 }
