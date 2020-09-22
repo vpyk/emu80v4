@@ -9,3 +9,5 @@
 /build
 .qmake.stash
 Makefile
+build-*-Debug
+/dist/Emu80qt

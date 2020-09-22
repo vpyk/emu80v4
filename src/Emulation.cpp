@@ -18,6 +18,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <iostream>
 
 #include "Pal.h"
 
@@ -113,7 +114,11 @@ void Emulation::checkPlatforms()
             it++;
 
     if (m_platformList.empty())
+    {
+        std::cout << "Missing config files with platforms description." << endl;
+        std::cout << "Executable binary file Emu80qt must placing to directory with file emu80.conf and platforms subdirectories." << endl;
         palRequestForQuit();
+    }
 }
 
 
