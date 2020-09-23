@@ -391,7 +391,7 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
             int extItem = 0;
             QString ext;
             do {
-                ext = itemFilter.section("[;,]", extItem, extItem);
+                ext = itemFilter.section(QRegExp("[;,]"), extItem, extItem);
                 if (ext != "") {
                     if (extItem != 0)
                         newFilter += " ";

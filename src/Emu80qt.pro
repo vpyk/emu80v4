@@ -224,6 +224,8 @@ MOC_DIR = $${BUILDDIR}/moc
 RCC_DIR = $${BUILDDIR}/qrc
 UI_DIR = $${BUILDDIR}/ui
 
+DESTDIR = ../dist
+
 INSTALLDIR = ~/emu80
 QMAKE_EXTRA_TARGETS += install
 install.commands = mkdir -p $$INSTALLDIR && mkdir -p $$INSTALLDIR/_settings && cp Emu80qt $$INSTALLDIR && cp -r dist/* $$INSTALLDIR && cp COPYING.txt $$INSTALLDIR && cp whatsnew.txt $$INSTALLDIR && cp doc/* $$INSTALLDIR
