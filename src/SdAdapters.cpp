@@ -150,6 +150,7 @@ uint8_t SdAdapter::readDataPort()
     case SDA_MSX:
         return m_readValue;
     default:
+        return 0;
         break;
     }
 }

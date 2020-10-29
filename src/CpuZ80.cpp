@@ -2610,7 +2610,7 @@ void CpuZ80::intRst(int vect)
         if (IM != 2)
             PC = vect * 8;
         else {
-            PC = GetWORD(ir | 0xFF); // r is ignored
+            PC = GetWORD((ir | 0xFF)); // r is ignored
             m_curClock += m_kDiv * 19;
             if (m_waits)
                 m_curClock += m_waits->getCpuWaitStates(0, 0xE3, 19); // similar to xthl
