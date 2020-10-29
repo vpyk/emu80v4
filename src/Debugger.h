@@ -359,6 +359,7 @@ class DebugWindow : private EmuWindow
         // debugger options
         bool m_mnemo8080UpperCase;
         bool m_mnemoZ80UpperCase;
+        bool m_forceZ80Mnemonics;
         bool m_swapF5F9;
 
         CodePage m_codePage = CP_RK;

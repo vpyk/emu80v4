@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>585</width>
-    <height>508</height>
+    <height>516</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -847,6 +847,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="forceZ80checkBox">
+            <property name="text">
+             <string>Use Z80 mnemonics for 8080</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1329,6 +1336,7 @@
   <tabstop>debugIllegalCheckBox</tabstop>
   <tabstop>upper8080checkBox</tabstop>
   <tabstop>upperZ80checkBox</tabstop>
+  <tabstop>forceZ80checkBox</tabstop>
   <tabstop>swapF5F9checkBox</tabstop>
   <tabstop>bwRadioButton</tabstop>
   <tabstop>color1RadioButton</tabstop>
@@ -1351,6 +1359,8 @@
   <tabstop>kbdRamfosRadioButton</tabstop>
   <tabstop>numpadJoystickCheckBox</tabstop>
   <tabstop>langComboBox</tabstop>
+  <tabstop>rkCodePageRadioButton</tabstop>
+  <tabstop>koi8CodePageRadioButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

@@ -791,7 +791,7 @@ void MainWindow::createActions()
 
     // Reset settings
     QMenu* resetMenu = new QMenu(tr("Reset settings"), this);
-    QAction* resetPlatformAction = new QAction(tr("Current platform settings..."), this);
+    QAction* resetPlatformAction = new QAction(tr("Current platform and common settings..."), this);
     QAction* resetAllAction = new QAction(tr("All settings..."), this);
     resetMenu->addAction(resetPlatformAction);
     resetMenu->addAction(resetAllAction);
@@ -1605,7 +1605,7 @@ void MainWindow::onResetPlatform()
 {
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(tr("Emu80: warning"));
-    msgBox.setText(tr("Reset current platform settings?"));
+    msgBox.setText(tr("Reset current platform and common settings?"));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.addButton(QMessageBox::Yes);
     msgBox.addButton(QMessageBox::No);

@@ -132,6 +132,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("emulation.volume");
     loadRunningConfigValue("emulation.debug8080MnemoUpperCase");
     loadRunningConfigValue("emulation.debugZ80MnemoUpperCase");
+    loadRunningConfigValue("emulation.debugForceZ80Mnemonics");
     loadRunningConfigValue("emulation.debugSwapF5F9");
     loadRunningConfigValue("window.windowStyle");
     loadRunningConfigValue("window.frameScale");
@@ -144,7 +145,6 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("window.defaultWindowHeight");
     loadRunningConfigValue("cpu.debugOnHalt");
     loadRunningConfigValue("cpu.debugOnIllegalCmd");
-    // add mnemonics case options here
     loadRunningConfigValue("crtRenderer.colorMode");
     loadRunningConfigValue("crtRenderer.altRenderer");
     loadRunningConfigValue("crtRenderer.visibleArea");
@@ -170,7 +170,7 @@ void SettingsDialog::writeInitialSavedConfig()
     settings.beginGroup(m_platformGroup);
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (value != "" && option != "locale" && option != "showHelp" &&
+        if (value != "" && option.left(10) != "emulation." && option != "locale" && option != "showHelp" &&
                 option != "maxFps" && option != "sampleRate" && option != "vsync" && option != "limitFps" &&
                 !settings.contains(option))
             settings.setValue(option, value);
@@ -250,6 +250,7 @@ void SettingsDialog::fillControlValues()
     // Debugger options
     ui->upper8080checkBox->setChecked(m_options["emulation.debug8080MnemoUpperCase"] == "yes");
     ui->upperZ80checkBox->setChecked(m_options["emulation.debugZ80MnemoUpperCase"] == "yes");
+    ui->forceZ80checkBox->setChecked(m_options["emulation.debugForceZ80Mnemonics"] == "yes");
     ui->swapF5F9checkBox->setChecked(m_options["emulation.debugSwapF5F9"] == "yes");
 
     // Debugger code page
@@ -650,6 +651,7 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     m_options["emulation.debug8080MnemoUpperCase"] = ui->upper8080checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugZ80MnemoUpperCase"] = ui->upperZ80checkBox->isChecked() ? "yes" : "no";
+    m_options["emulation.debugForceZ80Mnemonics"] = ui->forceZ80checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugSwapF5F9"] = ui->swapF5F9checkBox->isChecked() ? "yes" : "no";
 
     val = "";

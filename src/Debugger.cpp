@@ -272,6 +272,7 @@ void DebugWindow::draw()
     const DebuggerOptions& debOpt = g_emulation->getDebuggerOptions();
     m_mnemo8080UpperCase = debOpt.mnemo8080UpperCase;
     m_mnemoZ80UpperCase = debOpt.mnemoZ80UpperCase;
+    m_forceZ80Mnemonics = debOpt.forceZ80Mnemonics;
     m_swapF5F9 = debOpt.swapF5F9;
 
     m_codePage = m_platform->getCodePage();
@@ -654,7 +655,7 @@ string DebugWindow::getInstructionMnemonic(uint16_t addr)
     buf[2] = memByte(addr + 2);
     buf[3] = memByte(addr + 3); // Z80
 
-    if (!m_z80Mode && !m_z80Mnemonics) {
+    if (!m_z80Mode && !m_z80Mnemonics && !m_forceZ80Mnemonics) {
         mnemo = i8080GetInstructionMnemonic(buf);
         if (!m_mnemo8080UpperCase)
             transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::tolower);

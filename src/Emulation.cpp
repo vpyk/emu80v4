@@ -567,6 +567,11 @@ bool Emulation::setProperty(const string& propertyName, const EmuValuesList& val
             m_debuggerOptions.mnemoZ80UpperCase = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "debugForceZ80Mnemonics") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_debuggerOptions.forceZ80Mnemonics = values[0].asString() == "yes";
+            return true;
+        }
     } else if (propertyName == "debugSwapF5F9") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
             m_debuggerOptions.swapF5F9 = values[0].asString() == "yes";
@@ -594,6 +599,8 @@ string Emulation::getPropertyStringValue(const string& propertyName)
         res = m_debuggerOptions.mnemo8080UpperCase ? "yes" : "no";
     else if (propertyName == "debugZ80MnemoUpperCase")
         res = m_debuggerOptions.mnemoZ80UpperCase ? "yes" : "no";
+    else if (propertyName == "debugForceZ80Mnemonics")
+        res = m_debuggerOptions.forceZ80Mnemonics ? "yes" : "no";
     else if (propertyName == "debugSwapF5F9")
         res = m_debuggerOptions.swapF5F9 ? "yes" : "no";
     /* else if (propertyName == "frameRate") {
