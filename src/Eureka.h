@@ -28,10 +28,9 @@ class GeneralSoundSource;
 class EurekaCore : public SpecCore
 {
     public:
-        EurekaCore();
-        virtual ~EurekaCore();
-
         void inte(bool isActive) override;
+
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         static EmuObject* create(const EmuValuesList&) {return new EurekaCore();}
 

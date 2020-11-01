@@ -299,6 +299,11 @@ bool Platform::setProperty(const string& propertyName, const EmuValuesList& valu
             m_codePage = CP_KOI8;
             return true;
         }
+    } else if (propertyName == "muteTape") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_muteTape = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
 }
@@ -316,6 +321,8 @@ string Platform::getPropertyStringValue(const string& propertyName)
         return m_helpFile;
     else if (propertyName == "codePage")
         return m_codePage == CP_RK ? "rk" : "koi8";
+    else if (propertyName == "muteTape")
+        return m_muteTape ? "yes" : "no";
 
     return "";
 }

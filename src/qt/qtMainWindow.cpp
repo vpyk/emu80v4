@@ -561,6 +561,13 @@ void MainWindow::createActions()
     m_toolBar->addAction(m_tapeHookAction);
     connect(m_tapeHookAction, SIGNAL(triggered()), this, SLOT(onTapeHook()));
 
+    // Tape mute on/off
+    m_muteTapeAction = new QAction(QIcon(":/icons/mute_tape.png"), tr("Mute tape output"), this);
+    m_muteTapeAction->setCheckable(true);
+    m_muteTapeAction->setToolTip(tr("Mute tape output"));
+    settingsMenu->addAction(m_muteTapeAction);
+    connect(m_muteTapeAction, SIGNAL(triggered()), this, SLOT(onMuteTape()));
+
     // Color mode
     m_colorModeMenu = new QMenu(tr("Color mode"), this);
     QActionGroup* colorModeGroup = new QActionGroup(m_colorModeMenu);
@@ -666,6 +673,9 @@ void MainWindow::createActions()
     m_toolBar->addAction(m_fontAction);
     settingsMenu->addAction(m_fontAction);
     connect(m_fontAction, SIGNAL(triggered()), this, SLOT(onFont()));
+
+    // Mute tape output toolbar button
+    //m_toolBar->addAction(m_muteTapeAction);
 
     // Mute
     m_muteAction = new QAction(QIcon(":/icons/mute.png"), tr("Mute"), this);
@@ -1568,6 +1578,14 @@ void MainWindow::onTapeHook()
 }
 
 
+void MainWindow::onMuteTape()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".tapeSoundSource", "muted", m_muteTapeAction->isChecked() ? "yes" : "no");
+    m_settingsDialog->updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onSettings()
 {
     if (m_settingsDialog)
@@ -1733,6 +1751,14 @@ void MainWindow::updateActions()
     else {
         m_tapeHookAction->setVisible(true);
         m_tapeHookAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "tapeSoundSource", "muted");
+    if (val == "")
+        m_muteTapeAction->setVisible(false);
+    else {
+        m_muteTapeAction->setVisible(true);
+        m_muteTapeAction->setChecked(val == "yes");
     }
 
     val = emuGetPropertyValue(platform + "kbdLayout", "layout");

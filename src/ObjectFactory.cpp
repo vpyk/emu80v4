@@ -88,6 +88,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Crt8275);
     REG_EMU_CLASS(Pit8253);
     REG_EMU_CLASS(Fdc1793);
+    REG_EMU_CLASS(GeneralSoundSource);
     REG_EMU_CLASS(Pit8253SoundSource);
     REG_EMU_CLASS(RkPit8253SoundSource);
     //REG_EMU_CLASS(MikroshaPit8253SoundSource);

@@ -32,19 +32,6 @@
 using namespace std;
 
 
-OrionCore::OrionCore()
-{
-    m_beepSoundSource = new GeneralSoundSource;
-}
-
-
-
-OrionCore::~OrionCore()
-{
-    delete m_beepSoundSource;
-}
-
-
 void OrionCore::draw()
 {
     m_crtRenderer->renderFrame();
@@ -72,6 +59,9 @@ bool OrionCore::setProperty(const string& propertyName, const EmuValuesList& val
 
     if (propertyName == "crtRenderer") {
         attachCrtRenderer(static_cast<OrionRenderer*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "beepSoundSource") {
+        m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
     return false;

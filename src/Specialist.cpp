@@ -334,18 +334,6 @@ void SpecMxFddControlRegisters::writeByte(int addr, uint8_t value)
 }
 
 
-SpecPpi8255Circuit::SpecPpi8255Circuit()
-{
-    m_tapeSoundSource = new GeneralSoundSource;
-    g_emulation->getSoundMixer()->addSoundSource(m_tapeSoundSource);
-}
-
-SpecPpi8255Circuit::~SpecPpi8255Circuit()
-{
-    delete m_tapeSoundSource;
-}
-
-
 uint8_t SpecPpi8255Circuit::getPortA()
 {
     return m_kbd->getHMatrixData() & 0xFF;
@@ -448,6 +436,9 @@ bool SpecPpi8255Circuit::setProperty(const string& propertyName, const EmuValues
         return true;
     } else if (propertyName == "videoRam") {
         attachVideoRam(static_cast<SpecVideoRam*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "tapeSoundSource") {
+        m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 

@@ -148,12 +148,17 @@ cpu.startAddr = 0x0000
 cpu.addrSpace = &addrSpace
 cpu.core = &core
 
+GeneralSoundSource tapeSoundSource
+#tapeSoundSource.muted = yes
+
 RkKbdLayout kbdLayout
 SpecKeyboard keyboard
 keyboard.matrix = @KBD
 
 SpecPpi8255Circuit ppiCircuit
 ppiCircuit.specKeyboard = &keyboard
+ppiCircuit.tapeSoundSource = &tapeSoundSource
+
 ppi1.circuit = &ppiCircuit
 
 RkRomDisk romDisk = @EXT_ROM

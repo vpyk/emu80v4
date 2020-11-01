@@ -31,21 +31,6 @@
 using namespace std;
 
 
-RkPpi8255Circuit::RkPpi8255Circuit()
-{
-    m_tapeSoundSource = new GeneralSoundSource;
-    //g_emulation->getSoundMixer()->addSoundSource(m_tapeSoundSource);
-}
-
-
-
-RkPpi8255Circuit::~RkPpi8255Circuit()
-{
-    delete m_tapeSoundSource;
-}
-
-
-
 uint8_t RkPpi8255Circuit::getPortA()
 {
     return 0xFF;
@@ -76,7 +61,8 @@ void RkPpi8255Circuit::setPortA(uint8_t value)
 
 void RkPpi8255Circuit::setPortC(uint8_t value)
 {
-    m_tapeSoundSource->setValue(value & 1);
+    if (m_tapeSoundSource)
+        m_tapeSoundSource->setValue(value & 1);
     m_platform->getCore()->tapeOut(value & 1);
 }
 
@@ -95,6 +81,9 @@ bool RkPpi8255Circuit::setProperty(const string& propertyName, const EmuValuesLi
 
     if (propertyName == "rkKeyboard") {
         attachRkKeyboard(static_cast<RkKeyboard*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "tapeSoundSource") {
+        m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 

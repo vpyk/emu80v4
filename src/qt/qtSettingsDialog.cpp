@@ -151,6 +151,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("wavReader.channel");
     loadRunningConfigValue("wavReader.speedUpFactor");
     loadRunningConfigValue("tapeGrp.enabled");
+    loadRunningConfigValue("tapeSoundSource.muted");
     loadRunningConfigValue("tapeInHook.suspendAfterResetForMs");
     loadRunningConfigValue("loader.allowMultiblock");
     loadRunningConfigValue("kbdLayout.layout");
@@ -258,7 +259,7 @@ void SettingsDialog::fillControlValues()
     ui->rkCodePageRadioButton->setChecked(val == "rk");
     ui->koi8CodePageRadioButton->setChecked(val == "koi8");
 
-            // Volume
+    // Volume
     val = m_options["emulation.volume"];
     int volume = val.toInt();
     ui->muteCheckBox->setVisible(false); //временно!
@@ -379,6 +380,11 @@ void SettingsDialog::fillControlValues()
     val = m_options["tapeGrp.enabled"];
     ui->tapeRedirectCheckBox->setVisible(val != "");
     ui->tapeRedirectCheckBox->setChecked(val == "yes");
+
+    // Mute tape
+    val = m_options["tapeSoundSource.muted"];
+    ui->muteTapeCheckBox->setVisible(val != "");
+    ui->muteTapeCheckBox->setChecked(val == "yes");
 
     // Suppress file opening on reset
     val = m_options["tapeInHook.suspendAfterResetForMs"];
@@ -765,6 +771,9 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     if (ui->tapeRedirectCheckBox->isVisible())
         m_options["tapeGrp.enabled"] = ui->tapeRedirectCheckBox->isChecked() ? "yes" : "no";
+
+    if (ui->muteTapeCheckBox->isVisible())
+        m_options["tapeSoundSource.muted"] = ui->muteTapeCheckBox->isChecked() ? "yes" : "no";
 
     if (ui->tapeSuppressOpeningCheckBox->isVisible())
         m_options["tapeInHook.suspendAfterResetForMs"] = ui->tapeSuppressOpeningCheckBox->isChecked() ? "200" : "0"; // !!! добавить поле ms

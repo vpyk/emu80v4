@@ -65,8 +65,7 @@ private:
 class Mikro80TapeRegister : public AddressableDevice
 {
     public:
-        Mikro80TapeRegister();
-        virtual ~Mikro80TapeRegister();
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // derived from AddressableDevice
         void writeByte(int nAddr, uint8_t value) override;

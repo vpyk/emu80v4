@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -1107,6 +1107,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="muteTapeCheckBox">
+         <property name="text">
+          <string>Mute tape output</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="tapeSuppressOpeningCheckBox">
          <property name="text">
           <string>Suppress file opening on reset</string>
@@ -1350,6 +1357,7 @@
   <tabstop>speedUpCheckBox</tabstop>
   <tabstop>speedUpSpinBox</tabstop>
   <tabstop>tapeRedirectCheckBox</tabstop>
+  <tabstop>muteTapeCheckBox</tabstop>
   <tabstop>tapeSuppressOpeningCheckBox</tabstop>
   <tabstop>tapeMultiblockCheckBox</tabstop>
   <tabstop>qwertyRadioButton</tabstop>

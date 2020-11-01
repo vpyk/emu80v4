@@ -240,9 +240,6 @@ class SpecKeyboard : public Keyboard
 class SpecPpi8255Circuit : public Ppi8255Circuit
 {
     public:
-        SpecPpi8255Circuit();
-        virtual ~SpecPpi8255Circuit();
-
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // derived from Ppi8255Circuit

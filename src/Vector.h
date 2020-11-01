@@ -215,9 +215,6 @@ class VectorKeyboard : public Keyboard
 class VectorPpi8255Circuit : public Ppi8255Circuit
 {
     public:
-        VectorPpi8255Circuit();
-        ~VectorPpi8255Circuit() override;
-
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // derived from Ppi8255Circuit

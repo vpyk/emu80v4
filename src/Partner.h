@@ -140,9 +140,6 @@ private:
 class PartnerCore : public PlatformCore
 {
     public:
-        PartnerCore();
-        virtual ~PartnerCore();
-
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         void reset() override;
 

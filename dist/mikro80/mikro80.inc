@@ -64,7 +64,11 @@ addrSpace.poke = 0xF75D, 0x32
 Ppi8255 ppi
 AddrSpaceInverter invertedPpi = &ppi
 
+GeneralSoundSource tapeSoundSource
+#tapeSoundSource.muted = yes
+
 Mikro80TapeRegister tapeReg
+tapeReg.tapeSoundSource = &tapeSoundSource
 
 AddrSpace ioAddrSpace
 ioAddrSpace.range = &tapeReg, 0x01, 0x01

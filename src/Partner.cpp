@@ -35,18 +35,6 @@ using namespace std;
 
 // Partner implementation
 
-PartnerCore::PartnerCore()
-{
-    m_beepSoundSource = new GeneralSoundSource;
-}
-
-
-PartnerCore::~PartnerCore()
-{
-    delete m_beepSoundSource;
-}
-
-
 void PartnerCore::attachCpu(Cpu8080Compatible* cpu)
 {
     m_cpu = cpu;
@@ -148,6 +136,9 @@ bool PartnerCore::setProperty(const string& propertyName, const EmuValuesList& v
         return true;
     } else if (propertyName == "cpu") {
         attachCpu(static_cast<Cpu8080Compatible*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "beepSoundSource") {
+        m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
     return false;

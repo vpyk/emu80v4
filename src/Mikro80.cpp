@@ -143,18 +143,6 @@ bool Mikro80Renderer::setProperty(const string& propertyName, const EmuValuesLis
 }
 
 
-Mikro80TapeRegister::Mikro80TapeRegister()
-{
-    m_tapeSoundSource = new GeneralSoundSource;
-}
-
-
-Mikro80TapeRegister::~Mikro80TapeRegister()
-{
-    delete m_tapeSoundSource;
-}
-
-
 void Mikro80TapeRegister::writeByte(int, uint8_t value)
 {
     m_tapeSoundSource->setValue(value & 1);
@@ -165,4 +153,18 @@ void Mikro80TapeRegister::writeByte(int, uint8_t value)
 uint8_t Mikro80TapeRegister::readByte(int)
 {
     return g_emulation->getWavReader()->getCurValue() ? 0x01 : 0x00;
+}
+
+
+bool Mikro80TapeRegister::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "tapeSoundSource") {
+        m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+
+    return false;
 }

@@ -70,6 +70,7 @@ class Platform : public ParentObject
         void showDebugger();
         std::string getAllDebugInfo();
         CodePage getCodePage() {return m_codePage;}
+        bool getMuteTapeFlag() {return m_muteTape;}
 
         const std::string& getBaseName() {return m_baseName;}
         int getDefConfigTabId() {return m_defConfigTabId;}
@@ -96,6 +97,7 @@ class Platform : public ParentObject
 
         std::string m_helpFile = "";
         CodePage m_codePage = CP_RK;
+        bool m_muteTape = false;
 };
 
 

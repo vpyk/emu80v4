@@ -27,14 +27,14 @@ using namespace std;
 
 ApogeyCore::ApogeyCore()
 {
-    m_beepSoundSource = new GeneralSoundSource;
+    //
 }
 
 
 
 ApogeyCore::~ApogeyCore()
 {
-   delete m_beepSoundSource;
+   //
 }
 
 

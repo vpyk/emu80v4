@@ -305,7 +305,6 @@ class Pk8000Ppi8255Circuit1 : public Ppi8255Circuit
 {
     public:
         Pk8000Ppi8255Circuit1();
-        virtual ~Pk8000Ppi8255Circuit1();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 

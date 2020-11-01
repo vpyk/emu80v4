@@ -46,8 +46,6 @@ class ApogeyCore : public PlatformCore
 
     private:
         Crt8275Renderer* m_crtRenderer = nullptr;
-        SoundSource* m_beepSoundSource;
-        //Pit8253SoundSource* m_pitSoundSource;
 };
 
 

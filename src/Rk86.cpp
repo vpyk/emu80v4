@@ -25,19 +25,6 @@
 using namespace std;
 
 
-Rk86Core::Rk86Core()
-{
-    m_beepSoundSource = new GeneralSoundSource;
-}
-
-
-
-Rk86Core::~Rk86Core()
-{
-    delete m_beepSoundSource;
-}
-
-
 void Rk86Core::vrtc(bool isActive)
 {
     if (isActive) {
@@ -72,6 +59,9 @@ bool Rk86Core::setProperty(const string& propertyName, const EmuValuesList& valu
 
     if (propertyName == "crtRenderer") {
         attachCrtRenderer(static_cast<Crt8275Renderer*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "beepSoundSource") {
+        m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
     return false;

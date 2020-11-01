@@ -62,5 +62,6 @@ int Covox::calcValue()
         res = int64_t(m_sumVal) * MAX_SIGNAL_AMP / ticks >> (m_bits - 1);
     m_sumVal = 0;
     m_initClock = g_emulation->getCurClock();
-    return res;
+
+    return m_muted ? 0 : res;
 }

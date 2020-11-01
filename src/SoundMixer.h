@@ -39,6 +39,12 @@ class SoundSource : public EmuObject
 
         // Получение текущего сэмпла
         virtual int calcValue() = 0;
+
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
+    protected:
+        bool m_muted = false;
 };
 
 
@@ -51,6 +57,8 @@ class GeneralSoundSource : public SoundSource
 
         // Установка текущего значения источника звука
         void setValue(int value);
+
+        static EmuObject* create(const EmuValuesList&) {return new GeneralSoundSource();}
 
     private:
         int m_curValue = 0;

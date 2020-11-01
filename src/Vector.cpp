@@ -591,18 +591,6 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
 }
 
 
-VectorPpi8255Circuit::VectorPpi8255Circuit()
-{
-    m_tapeSoundSource = new GeneralSoundSource;
-}
-
-
-VectorPpi8255Circuit::~VectorPpi8255Circuit()
-{
-    delete m_tapeSoundSource;
-}
-
-
 // Port 01
 void VectorPpi8255Circuit::setPortC(uint8_t value)
 {
@@ -650,6 +638,9 @@ bool VectorPpi8255Circuit::setProperty(const std::string& propertyName, const Em
         return true;
     } else if (propertyName == "keyboard") {
         attachKeyboard(static_cast<VectorKeyboard*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "tapeSoundSource") {
+        m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
     return false;

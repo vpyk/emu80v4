@@ -28,9 +28,6 @@ class GeneralSoundSource;
 class Rk86Core : public PlatformCore
 {
     public:
-        Rk86Core();
-        virtual ~Rk86Core();
-
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void draw() override;

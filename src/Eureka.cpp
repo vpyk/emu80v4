@@ -25,22 +25,22 @@
 using namespace std;
 
 
-EurekaCore::EurekaCore()
-{
-    m_inteSoundSource = new GeneralSoundSource;
-}
-
-
-
-EurekaCore::~EurekaCore()
-{
-    delete m_inteSoundSource;
-}
-
-
 void EurekaCore::inte(bool isActive)
 {
     m_inteSoundSource->setValue(isActive ? 1 : 0);
+}
+
+
+bool EurekaCore::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (SpecCore::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "beepSoundSource") {
+        m_inteSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+    return false;
 }
 
 

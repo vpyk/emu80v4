@@ -175,9 +175,6 @@ class OrionFddQueryRegister : public AddressableDevice
 class OrionCore : public PlatformCore
 {
     public:
-        OrionCore();
-        virtual ~OrionCore();
-
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void draw() override;

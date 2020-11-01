@@ -45,7 +45,7 @@ int Pit8253SoundSource::calcValue()
         }
     }
 
-    return res;
+    return m_muted ? 0 : res;
 }
 
 
@@ -84,5 +84,5 @@ int RkPit8253SoundSource::calcValue()
         m_pit->getCounter(2)->resetStats();
     }
 
-    return res;
+    return m_muted ? 0 : res;
 }

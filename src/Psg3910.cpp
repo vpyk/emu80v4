@@ -230,7 +230,7 @@ uint16_t Psg3910::getOutput()
 
 int Psg3910SoundSource::calcValue()
 {
-    return m_psg ? m_psg->getOutput() : 0;
+    return m_psg && !m_muted ? m_psg->getOutput() : 0;
 }
 
 

@@ -470,18 +470,8 @@ string Pk8000Renderer::getPropertyStringValue(const string& propertyName)
 
 Pk8000Ppi8255Circuit1::Pk8000Ppi8255Circuit1()
 {
-    m_beepSoundSource = new GeneralSoundSource;
-    m_tapeSoundSource = new GeneralSoundSource;
-
     for (int i = 0; i < 4; i++)
         m_addrSpaceMappers[i] = nullptr;
-}
-
-
-Pk8000Ppi8255Circuit1::~Pk8000Ppi8255Circuit1()
-{
-    delete m_beepSoundSource;
-    delete m_tapeSoundSource;
 }
 
 
@@ -535,6 +525,12 @@ bool Pk8000Ppi8255Circuit1::setProperty(const string& propertyName, const EmuVal
         return true;
     } else if (propertyName == "keyboard") {
         attachKeyboard(static_cast<Pk8000Keyboard*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "tapeSoundSource") {
+        m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "beepSoundSource") {
+        m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 

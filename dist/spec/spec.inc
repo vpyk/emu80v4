@@ -70,6 +70,9 @@ cpu.startAddr = 0xC000
 cpu.addrSpace = &addrSpace
 cpu.core = &core
 
+GeneralSoundSource tapeSoundSource
+#tapeSoundSource.muted = yes
+
 RkKbdLayout kbdLayout
 SpecKeyboard keyboard
 #keyboard.matrix = "original"
@@ -77,6 +80,8 @@ SpecKeyboard keyboard
 SpecPpi8255Circuit ppiCircuit
 ppiCircuit.specKeyboard = &keyboard
 ppiCircuit.videoRam = &videoRam
+ppiCircuit.tapeSoundSource = &tapeSoundSource
+
 ppi2.circuit = &ppiCircuit
 
 

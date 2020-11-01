@@ -106,9 +106,12 @@ crtRenderer.colorMemory = &ram1
 screenSelector.crtRenderer = &crtRenderer
 colorModeSelector.crtRenderer = &crtRenderer
 
+GeneralSoundSource beepSoundSource
+
 OrionCore core
 core.window = &window
 core.crtRenderer = &crtRenderer
+core.beepSoundSource = &beepSoundSource
 
 ifdef Z80
   CpuZ80 cpu
@@ -121,11 +124,16 @@ cpu.startAddr = 0xF800
 cpu.addrSpace = &addrSpace
 cpu.core = &core
 
+GeneralSoundSource tapeSoundSource
+#tapeSoundSource.muted = yes
+
 RkKbdLayout kbdLayout
 RkKeyboard keyboard
 
 RkPpi8255Circuit ppiCircuit
 ppiCircuit.rkKeyboard = &keyboard
+ppiCircuit.tapeSoundSource = &tapeSoundSource
+
 ppi1.circuit = &ppiCircuit
 
 RkRomDisk romDisk = @ROM_DISK

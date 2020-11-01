@@ -21,6 +21,7 @@
 
 #include "Globals.h"
 #include "Emulation.h"
+#include "Platform.h"
 
 #include "Pal.h"
 #include "SoundMixer.h"
@@ -101,6 +102,36 @@ SoundSource::~SoundSource()
 }
 
 
+bool SoundSource::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "muted") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_muted = values[0].asString() == "yes";
+            return true;
+        }
+    }
+    return false;
+}
+
+
+std::string SoundSource::getPropertyStringValue(const std::string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "muted")
+        return m_muted ? "yes" : "no";
+
+    return "";
+}
+
+
 void GeneralSoundSource::setValue(int value)
 {
     updateStats();
@@ -132,5 +163,6 @@ int GeneralSoundSource::calcValue()
             res = sumVal * MAX_SIGNAL_AMP / ticks;
     sumVal = 0;
     initClock = g_emulation->getCurClock();
-    return res;
+
+    return m_muted ? 0 : res;
 }

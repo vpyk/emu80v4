@@ -31,9 +31,6 @@ class RkKeyboard;
 class RkPpi8255Circuit : public Ppi8255Circuit
 {
     public:
-        RkPpi8255Circuit();
-        virtual ~RkPpi8255Circuit();
-
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // derived from Ppi8255Circuit
