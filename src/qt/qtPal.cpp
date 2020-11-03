@@ -30,6 +30,7 @@
 #include <QDirIterator>
 #include <QDateTime>
 #include <QDebug>
+#include <QMessageBox>
 
 #include "qtMainWindow.h"
 #include "qtRenderHelper.h"
@@ -575,6 +576,13 @@ EmuLog& EmuLog::operator<<(int n)
     string s = oss.str();
     palLog(s);
     return *this;
+}
+
+
+void palMsgBox(std::string msg)
+{
+    QMessageBox msgBox(QMessageBox::Critical, "Emu80", QString::fromUtf8(msg.c_str()));
+    msgBox.exec();
 }
 
 

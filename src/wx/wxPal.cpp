@@ -18,6 +18,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include <wx/app.h>
 #include <wx/filedlg.h>
@@ -254,5 +255,14 @@ EmuLog& EmuLog::operator<<(int n)
     palLog(s);
     return *this;
 }
+
+
+void palMsgBox(string msg)
+{
+    wxMessageBox(wxString::FromUTF8(msg.c_str()),
+                 wxT("Emu80"),
+                 wxOK | wxICON_ERROR);
+}
+
 
 EmuLog emuLog;

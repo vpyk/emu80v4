@@ -17,6 +17,7 @@
  */
 
 #include <sstream>
+#include <iostream>
 
 #ifdef __WIN32__
     #include <mem.h>
@@ -233,7 +234,8 @@ void palSetTabOptFileName(int, string) {
 void palWxProcessMessages() {
 }
 
-void palLog(std::string) {
+void palLog(std::string s) {
+    cout << s << endl;
 }
 
 EmuLog& EmuLog::operator<<(string s)
@@ -259,5 +261,12 @@ EmuLog& EmuLog::operator<<(int n)
     palLog(s);
     return *this;
 }
+
+
+void palMsgBox(string msg)
+{
+    cout << msg << endl;
+}
+
 
 EmuLog emuLog;

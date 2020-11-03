@@ -112,8 +112,10 @@ void Emulation::checkPlatforms()
         else
             it++;
 
-    if (m_platformList.empty())
+    if (m_platformList.empty()) {
+        palMsgBox("Error: platform configuration files not found!\nFiles emu80.conf etc. should be placed in the excecutable file directory.");
         palRequestForQuit();
+    }
 }
 
 
