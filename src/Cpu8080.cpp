@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
  *
  *  Based on i8080 core object model code by:
  *  Alexander Demin <alexander@demin.ws> (https://github.com/begoon/i8080-core)
