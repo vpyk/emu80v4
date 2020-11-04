@@ -83,6 +83,9 @@ uint8_t EurekaPpi8255Circuit::getPortB()
 
 bool EurekaPpi8255Circuit::setProperty(const string& propertyName, const EmuValuesList& values)
 {
+    if (SpecPpi8255Circuit::setProperty(propertyName, values))
+        return true;
+
     if (propertyName == "videoRam")
         return false;
     if (SpecPpi8255Circuit::setProperty(propertyName, values))
