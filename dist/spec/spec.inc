@@ -72,6 +72,7 @@ cpu.core = &core
 
 GeneralSoundSource tapeSoundSource
 #tapeSoundSource.muted = yes
+GeneralSoundSource beepSoundSource
 
 RkKbdLayout kbdLayout
 SpecKeyboard keyboard
@@ -81,6 +82,7 @@ SpecPpi8255Circuit ppiCircuit
 ppiCircuit.specKeyboard = &keyboard
 ppiCircuit.videoRam = &videoRam
 ppiCircuit.tapeSoundSource = &tapeSoundSource
+ppiCircuit.beepSoundSource = &beepSoundSource
 
 ppi2.circuit = &ppiCircuit
 

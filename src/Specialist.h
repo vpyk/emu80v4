@@ -263,7 +263,10 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
 
     protected:
         // Источник звука - вывод на магнитофон
-        GeneralSoundSource* m_tapeSoundSource;
+        GeneralSoundSource* m_tapeSoundSource = nullptr;
+
+        // Источник звука - встроенный динамик
+        GeneralSoundSource* m_beepSoundSource = nullptr;
 
     private:
         // Клавиатура типа РК86

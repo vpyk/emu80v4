@@ -383,7 +383,9 @@ void SpecPpi8255Circuit::setPortC(uint8_t value)
     m_kbdMask &= ~0xF00;
     m_kbdMask |= (value & 0xf) << 8;;
     m_kbd->setVMatrixMask(m_kbdMask);
-    m_tapeSoundSource->setValue(((value & 0x20) >> 5) + ((value & 0x80) >> 7));
+    if (m_beepSoundSource)
+        m_beepSoundSource->setValue((value & 0x20) >> 5);
+    m_tapeSoundSource->setValue((value & 0x80) >> 7);
     m_platform->getCore()->tapeOut(value & 0x80);
     if (m_videoRam)
         m_videoRam->setCurColor(value & 0xD0);
@@ -439,6 +441,9 @@ bool SpecPpi8255Circuit::setProperty(const string& propertyName, const EmuValues
         return true;
     } else if (propertyName == "tapeSoundSource") {
         m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "beepSoundSource") {
+        m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 
