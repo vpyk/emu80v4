@@ -218,6 +218,8 @@ FORMS += \
 
 win32:RC_FILE = qt/emu80.rc
 
+macx:ICON = qt/icons/emu80.icns
+
 BUILDDIR = build
 OBJECTS_DIR = $${BUILDDIR}/obj
 MOC_DIR = $${BUILDDIR}/moc
