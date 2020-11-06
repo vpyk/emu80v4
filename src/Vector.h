@@ -66,13 +66,10 @@ class VectorRenderer : public CrtRenderer, public IActive
         static EmuObject* create(const EmuValuesList&) {return new VectorRenderer();}
 
     private:
-        int m_curLine = 0;
         uint32_t* m_frameBuf;
         const uint8_t* m_screenMemory;
 
         bool m_showBorder = false;
-        int m_offsetX = 0;
-        int m_offsetY = 0;
 
         uint8_t m_lineOffset = 0xFF;
         uint8_t m_latchedLineOffset = 0xFF;
@@ -84,19 +81,11 @@ class VectorRenderer : public CrtRenderer, public IActive
         int m_lastColor = 0;
 
         unsigned m_ticksPerPixel;
-        int m_pixelsPerOutInstruction = 48;
 
         uint64_t m_curScanlineClock;
-        int m_curScanlinePixel;
 
-        uint64_t m_firstFrameClock;
         uint64_t m_curFrameClock;
         int m_curFramePixel;
-
-        bool m_yEnabled = false;
-        bool m_rEnabled = false;
-        bool m_gEnabled = true;
-        bool m_bEnabled = false;
 
         void prepareFrame();
         void renderLine(int nLine, int firstPx, int LastPx);

@@ -73,7 +73,6 @@ class Psg3910 : public AddressableDevice
         uint64_t m_discreteClock = 0;
         double m_accum = 0.0;
         double m_outValue = 0;
-        unsigned m_stepNo = 0;
 
         Psg3910Counter m_counters[3];
         unsigned m_noiseFreq;
