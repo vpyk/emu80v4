@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  Based on i8080 core object model code by:
  *  Alexander Demin <alexander@demin.ws> (https://github.com/begoon/i8080-core)
@@ -31,10 +31,10 @@ using namespace std;
 
 // Cpu8080 types and macroses
 
-#define RD_BYTE(addr) (m_addrSpace->readByte(addr))
+#define RD_BYTE(addr) (as_input(addr))
 #define RD_WORD(addr) ((RD_BYTE((addr+1) & 0xFFFF) << 8) | RD_BYTE(addr))
 
-#define WR_BYTE(addr, value) m_addrSpace->writeByte(addr, value)
+#define WR_BYTE(addr, value) as_output(addr, value)
 #define WR_WORD(addr, value) WR_BYTE(addr, value & 0xff);WR_BYTE((addr + 1) & 0xFFFF, (value >> 8) & 0xff);
 
 #define FLAGS           cpu.f
@@ -1743,8 +1743,10 @@ void Cpu8080::operate() {
 
     if (m_waits) {
         int tag;
-        int opcode = m_addrSpace->readByteEx(PC++, tag);
-        int clocks = i8080_execute(opcode);
+        //int opcode = m_addrSpace->readByteEx(PC++, tag);
+        //int clocks = i8080_execute(opcode);
+        int opcode = m_addrSpace->readByteEx(PC, tag);
+        int clocks = i8080_execute(RD_BYTE(PC++));
         m_curClock += m_kDiv * (clocks + m_waits->getCpuWaitStates(tag, opcode, clocks));
     } else
         m_curClock += m_kDiv * i8080_execute(RD_BYTE(PC++));

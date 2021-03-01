@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VER_STR "4.0.346"
-#define VER_COMMA_SEP 4,0,346,0
+#define VER_STR "4.0.348"
+#define VER_COMMA_SEP 4,0,348,0
 
 #define VI_FILE_DESCR "Emu80 main executable"
-#define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2020"
+#define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2021"
 #define VI_FILE_NAME "Emu80qt.exe"
 #define VI_PRODUCT "Emu80"
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ class AddressableDevice : public EmuObject
         virtual uint8_t readByte(int) {return 0xFF;}
 
         uint8_t readByteEx(int addr, int& tag);
+        void writeByteEx(int addr, uint8_t value, int& tag);
 
         void setAddrMask(int mask) {m_addrMask = mask;}
 

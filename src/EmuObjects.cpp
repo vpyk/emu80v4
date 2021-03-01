@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -115,6 +115,14 @@ uint8_t AddressableDevice::readByteEx(int addr, int& tag)
     uint8_t read = readByte(addr);
     tag = AddressableDevice::m_lastTag;
     return read;
+}
+
+
+void AddressableDevice::writeByteEx(int addr, uint8_t value, int& tag)
+{
+    AddressableDevice::m_lastTag = 0;
+    writeByte(addr, value);
+    tag = AddressableDevice::m_lastTag;
 }
 
 

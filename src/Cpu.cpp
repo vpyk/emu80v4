@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -80,6 +80,31 @@ void Cpu::removeHook(CpuHook* hook)
 }
 
 
+int Cpu::as_input(int addr)
+{
+    if (!m_cycleWaits)
+        return m_addrSpace->readByte(addr);
+    else {
+        int tag;
+        int read = m_addrSpace->readByteEx(addr, tag);
+        m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag);
+        return read;
+    }
+}
+
+
+void Cpu::as_output(int addr, int value)
+{
+    if (!m_cycleWaits)
+        m_addrSpace->writeByte(addr, value);
+    else {
+        int tag;
+        m_addrSpace->writeByteEx(addr, value, tag);
+        m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag);
+    }
+}
+
+
 bool Cpu::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
@@ -112,6 +137,9 @@ bool Cpu::setProperty(const string& propertyName, const EmuValuesList& values)
         }
     } else if (propertyName == "cpuWaits") {
         m_waits = (static_cast<CpuWaits*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "cpuCycleWaits") {
+        m_cycleWaits = (static_cast<CpuCycleWaits*>(g_emulation->findObject(values[0].asString())));
         return true;
     }
 

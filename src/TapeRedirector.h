@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,11 +45,13 @@ class TapeRedirector : public EmuObject
         uint8_t peekByte();
         void writeByte(uint8_t bt);
         bool waitForSequence(const uint8_t* seq, int len);
+        void skipSeq(const uint8_t* seq, int len);
         uint8_t readByteSkipSeq(const uint8_t* seq, int len);
         int getPos();
         bool isEof();
         bool isOpen();
         bool isCancelled();
+        bool isLvt();
 
         static EmuObject* create(const EmuValuesList&) {return new TapeRedirector();}
 
@@ -62,6 +64,7 @@ class TapeRedirector : public EmuObject
         PalFile m_file;
         bool m_isOpen = false;
         bool m_cancelled = false;
+        bool m_lvt = false;
         //bool m_read = false;
 
         WavWriter* m_wavWriter = nullptr;
@@ -69,6 +72,8 @@ class TapeRedirector : public EmuObject
         int m_timeout = 0;
         ElapsedTimer* m_timer = nullptr;
         void updateTimer();
+
+        void switchToNextLvt();
 };
 
 

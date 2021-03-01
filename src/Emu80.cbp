@@ -151,6 +151,8 @@
 		<Unit filename="KbdLayout.cpp" />
 		<Unit filename="KbdLayout.h" />
 		<Unit filename="Keyboard.h" />
+		<Unit filename="Lvov.cpp" />
+		<Unit filename="Lvov.h" />
 		<Unit filename="Main.cpp" />
 		<Unit filename="Memory.cpp" />
 		<Unit filename="Memory.h" />

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ class MsxTapeOutHook : public CpuHook
     private:
         bool m_regC = false;
 
+        int m_curPos = 0;
 };
 
 
@@ -64,6 +65,9 @@ class MsxTapeInHook : public CpuHook
     private:
         bool m_ignoreHeaders = false;
         bool m_apogeyFix = false;
+
+        int m_typeRptCount = 0;
+        uint8_t m_type;
 };
 
 

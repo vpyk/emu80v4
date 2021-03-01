@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,21 @@
 #ifndef CPUWAITS_H
 #define CPUWAITS_H
 
+#include "EmuObjects.h"
 
-// Базовый класс тактов ожидания процессора
+// Базовый класс тактов ожидания процессора (на команду)
 class CpuWaits : public EmuObject
 {
     public:
         virtual int getCpuWaitStates(int memTag, int opcode, int normalClocks) = 0;
+};
+
+
+// Базовый класс тактов ожидания процессора (на обращение к шине)
+class CpuCycleWaits : public EmuObject
+{
+    public:
+        virtual int getCpuCycleWaitStates(int memTag) = 0;
 };
 
 #endif //CPUWAITS_H

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -126,6 +126,20 @@ enum EmuKey
     EK_PHOME, // .
     EK_PEND,  // 0
     EK_MENU,  // 5
+
+    // Added in Lvov
+    EK_FG,  // functional G
+    EK_FB,  // functional B
+    EK_FR,  // functional R
+    EK_SPK, // functional Speaker
+    EK_CD,
+    EK_PRN, // ПЧ
+    EK_SCR, // П/Д
+    EK_F0,
+    EK_GT,  // ГТ
+    EK_VR,  // ВР
+    EK_LAT, // ЛАТ
+    EK_RUS, // РУС
 
     // Joystick
     EK_JS_UP,

@@ -62,6 +62,7 @@ SOURCES += \
     FileLoader.cpp \
     GenericModules.cpp \
     KbdLayout.cpp \
+    Lvov.cpp \
     Memory.cpp \
     Mikro80.cpp \
     Mikrosha.cpp \
@@ -145,6 +146,7 @@ HEADERS  += \
     Globals.h \
     KbdLayout.h \
     Keyboard.h \
+    Lvov.h \
     Memory.h \
     Mikro80.h \
     Mikrosha.h \

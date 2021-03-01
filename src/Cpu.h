@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 
 class CpuHook;
 class CpuWaits;
+class CpuCycleWaits;
 class PlatformCore;
 
 
@@ -66,6 +67,9 @@ class Cpu : public ActiveDevice
         AddressableDevice* getAddrSpace() {return m_addrSpace;}
 
     protected:
+        int as_input(int addr);
+        void as_output(int addr, int value);
+
         AddressableDevice* m_addrSpace = nullptr;
         AddressableDevice* m_ioAddrSpace = nullptr;
         PlatformCore* m_core = nullptr;
@@ -81,6 +85,7 @@ class Cpu : public ActiveDevice
         bool m_debugOnIllegalCmd = false;
 
         CpuWaits* m_waits = nullptr;
+        CpuCycleWaits* m_cycleWaits = nullptr;
 };
 
 

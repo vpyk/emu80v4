@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ Ram::~Ram()
 
 void Ram::writeByte(int addr, uint8_t value)
 {
-    //m_lastTag = m_tag;
+    m_lastTag = m_tag;
     if (m_addrMask)
         addr &= m_addrMask;
     if (m_buf && addr < m_size)

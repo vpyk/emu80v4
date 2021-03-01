@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@
 #include "Covox.h"
 #include "SdCard.h"
 #include "SdAdapters.h"
+#include "Lvov.h"
 
 #include "EmuConfig.h"
 
@@ -201,6 +202,15 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(SdCard);
     REG_EMU_CLASS(SdAdapter);
     REG_EMU_CLASS(PpiSdAdapter);
+    REG_EMU_CLASS(LvovCore);
+    REG_EMU_CLASS(LvovRenderer);
+    REG_EMU_CLASS(LvovPpi8255Circuit1);
+    REG_EMU_CLASS(LvovPpi8255Circuit2);
+    REG_EMU_CLASS(LvovKeyboard);
+    REG_EMU_CLASS(LvovKbdLayout);
+    REG_EMU_CLASS(LvovCpuWaits);
+    REG_EMU_CLASS(LvovCpuCycleWaits);
+    REG_EMU_CLASS(LvovFileLoader);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

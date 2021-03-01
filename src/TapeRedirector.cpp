@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -80,6 +80,9 @@ void TapeRedirector::openFile()
         return;
     }
 
+    ext = ext.substr(0, 3);
+    m_lvt = (ext == ".lv" || ext == ".LV");
+
     if (m_fileName == "") {
         m_cancelled = true;
         return;
@@ -132,7 +135,9 @@ uint8_t TapeRedirector::readByte()
     uint8_t buf = m_file.read8();
     if (isEof()) {
         closeFile();
-        //m_read = true;
+        if (m_lvt) {
+            switchToNextLvt();
+        }
     }
 
     updateTimer();
@@ -159,6 +164,19 @@ uint8_t TapeRedirector::readByteSkipSeq(const uint8_t* seq, int len)
           firstByte = readByte();
     }
     return firstByte;
+}
+
+
+void TapeRedirector::skipSeq(const uint8_t* seq, int len)
+{
+    uint8_t curByte;
+    for (int i = 0; i < len; i++) {
+        curByte = readByte();
+        if (curByte != *(seq++)) {
+            closeFile();
+            break;
+        }
+    }
 }
 
 
@@ -300,4 +318,29 @@ void TapeRedirector::updateTimer()
         m_timer = new CloseFileTimer(this);
 
     m_timer->start(m_timeout);
+}
+
+
+bool TapeRedirector::isLvt()
+{
+    return m_lvt;
+}
+
+
+void TapeRedirector::switchToNextLvt()
+{
+    if (m_fileName.size() >= 4) {
+        string ext = m_fileName.substr(m_fileName.size() - 4, 4);
+        if (ext.substr(0, 3) == ".lv" || ext.substr(0, 3) == ".LV") {
+            char letter = ext[3];
+            if (letter == 't' || letter == 'T')
+                letter = '0';
+            else
+                letter += 1;
+            m_fileName[m_fileName.size() - 1] = letter;
+            m_file.open(m_fileName, m_rwMode);
+            m_isOpen = m_file.isOpen();
+            //m_cancelled = false;
+        }
+    }
 }

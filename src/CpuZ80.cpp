@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
  *
  *  Based on original code by:
  *  Frank D. Cringle (YAZE project, GPL v.2 licence)
@@ -28,10 +28,10 @@
 
 using namespace std;
 
-#define GetBYTE(addr) (m_addrSpace->readByte(addr))
+#define GetBYTE(addr) (as_input(addr))
 #define GetWORD(addr) ((GetBYTE((addr+1) & 0xFFFF) << 8) | GetBYTE(addr))
 
-#define PutBYTE(addr, value) m_addrSpace->writeByte(addr, value)
+#define PutBYTE(addr, value) as_output(addr, value)
 #define PutWORD(addr, value) PutBYTE(addr, value & 0xff);PutBYTE((addr + 1) & 0xFFFF, (value >> 8) & 0xff);
 
 #define PC pc
