@@ -82,6 +82,11 @@ private slots:
     void on1x();
     void on2x();
     void on3x();
+    void on4x();
+    void on5x();
+    void on2x3();
+    void on3x5();
+    void onStretch();
     void onFit();
     void onFullscreen();
     void onFullwindow();
@@ -194,6 +199,11 @@ private:
     QAction* m_preset1xAction;
     QAction* m_preset2xAction;
     QAction* m_preset3xAction;
+    QAction* m_preset4xAction;
+    QAction* m_preset5xAction;
+    QAction* m_preset2x3Action;
+    QAction* m_preset3x5Action;
+    QAction* m_presetStretchAction;
     QAction* m_presetFitAction;
     QAction* m_platformHelpAction;
     QAction* m_aboutAction;

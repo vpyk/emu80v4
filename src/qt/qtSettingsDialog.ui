@@ -398,7 +398,32 @@
            </item>
            <item>
             <property name="text">
+             <string>4x, auto size, no smoothing</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>5x, auto size, no smoothing</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>2x3, auto size, no smoothing</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>3x5, auto size, no smoothing</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>2x, fixed size</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Stretch, user-changeable, smoothing</string>
             </property>
            </item>
            <item>
@@ -570,25 +595,45 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="fixedScaleSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <widget class="QComboBox" name="fixedScaleComboBox">
+              <property name="editable">
+               <bool>false</bool>
               </property>
-              <property name="suffix">
-               <string notr="true">x</string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>3</number>
-              </property>
-              <property name="value">
-               <number>2</number>
-              </property>
+              <item>
+               <property name="text">
+                <string notr="true">1x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string notr="true">2x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string notr="true">3x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string notr="true">4x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string notr="true">5x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string notr="true">2x3</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string notr="true">3x5</string>
+               </property>
+              </item>
              </widget>
             </item>
             <item>
@@ -1348,7 +1393,7 @@
   <tabstop>widthLineEdit</tabstop>
   <tabstop>heightLineEdit</tabstop>
   <tabstop>fixedScaleRadioButton</tabstop>
-  <tabstop>fixedScaleSpinBox</tabstop>
+  <tabstop>fixedScaleComboBox</tabstop>
   <tabstop>stretchRadioButton</tabstop>
   <tabstop>stretchPropRadioButton</tabstop>
   <tabstop>stretchPropIntRadioButton</tabstop>

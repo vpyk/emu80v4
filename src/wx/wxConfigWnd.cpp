@@ -82,10 +82,10 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
 	m_helpPanel = new wxPanel(m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	m_notebook->AddPage(m_helpPanel, _("Help"), false);
 
-	wxBoxSizer* tabSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* tabSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_helpPanel->SetSizer(tabSizer);
 
-	wxString helpString =
+	wxString helpString1 =
         L"Управление:\n\n"
         "Alt-F12\t– окно конфигурации\n"
         "Alt-F11\t– reset\n"
@@ -101,10 +101,14 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-K\t– «Умная» раскладка\n"
         "Alt-A\t– выбор диска A\n"
         "Alt-B\t– выбор диска B\n"
-        "Alt-E\t– выбор электронного диска\n"
-        "Alt-1\t– пресет: 1x, автоподстройка размера окна, без сглаживания\n"
-        "Alt-2\t– пресет: 2x, автоподстройка размера окна, без сглаживания\n"
-        "Alt-3\t– пресет: 3x, автоподстройка размера окна, без сглаживания\n"
+        "Alt-E\t– выбор электронного диска"
+        ;
+
+	wxString helpString2 =
+        L"Alt-1..5\t– пресет: 1x-5x, автоподстройка размера окна, без сглаживания\n"
+        "Alt-6t– пресет: 2x3, автоподстройка размера окна, без сглаживания\n"
+        "Alt-7\t– пресет: 3x5, автоподстройка размера окна, без сглаживания\n"
+        "Alt-9\t– пресет: измен. размер окна, растянуть, со сгл\n"
         "Alt-0\t– пресет: измен. размер окна, вписать, со сгл, учит. Aspect Ratio\n"
         "Alt-M\t– то же, что и Alt-0 + максимизировать окно\n"
         "Alt-F\t– оригинальный/альтернативный шрифт\n"
@@ -120,11 +124,18 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-F1\t– эта подсказка\n\n"
         "Вместо клавиши Alt может быть использована Meta (Win)"
         ;
-	wxStaticText* helpText = new wxStaticText(m_helpPanel, wxID_ANY, helpString);
-    wxFont font = helpText->GetFont();
-    font.SetPointSize(font.GetPointSize() - font.GetPointSize() / 5);
-    helpText->SetFont(font);
-	tabSizer->Add(helpText, 1, wxTOP|wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 12);
+
+	wxStaticText* helpText1 = new wxStaticText(m_helpPanel, wxID_ANY, helpString1);
+    wxFont font1 = helpText1->GetFont();
+    font1.SetPointSize(font1.GetPointSize() - font1.GetPointSize() / 5);
+    helpText1->SetFont(font1);
+	tabSizer->Add(helpText1, 1, wxTOP|wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 12);
+
+	wxStaticText* helpText2 = new wxStaticText(m_helpPanel, wxID_ANY, helpString2);
+    wxFont font2 = helpText2->GetFont();
+    font2.SetPointSize(font2.GetPointSize() - font2.GetPointSize() / 5);
+    helpText2->SetFont(font2);
+	tabSizer->Add(helpText2, 2, wxTOP|wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 12);
 
 	m_mainVSizer->Fit(this);
 	m_mainVSizer->SetSizeHints(this);

@@ -38,6 +38,10 @@ enum FrameScale {
     FS_1X,
     FS_2X,
     FS_3X,
+    FS_4X,
+    FS_5X,
+    FS_2X3,
+    FS_3X5,
     FS_FIT,
     FS_FIT_KEEP_AR
 };

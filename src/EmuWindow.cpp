@@ -216,19 +216,43 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
             m_dstWidth = frame.width * aspectRatio + .5;
             m_dstHeight = frame.height;
             m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) /2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
             break;
         case FS_2X:
             m_dstWidth = frame.width * 2 * aspectRatio + .5;
             m_dstHeight = frame.height * 2;
             m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) /2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
             break;
         case FS_3X:
             m_dstWidth = frame.width * 3 * aspectRatio + .5;
             m_dstHeight = frame.height * 3;
             m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) /2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            break;
+        case FS_4X:
+            m_dstWidth = frame.width * 4 * aspectRatio + .5;
+            m_dstHeight = frame.height * 4;
+            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            break;
+        case FS_5X:
+            m_dstWidth = frame.width * 5 * aspectRatio + .5;
+            m_dstHeight = frame.height * 5;
+            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            break;
+        case FS_2X3:
+            m_dstWidth = frame.width * (m_aspectCorrection ? 2 : 3) * aspectRatio + .5;
+            m_dstHeight = frame.height * 2;
+            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            break;
+        case FS_3X5:
+            m_dstWidth = frame.width * (m_aspectCorrection ? 3 : 5) * aspectRatio + .5;
+            m_dstHeight = frame.height * 3;
+            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
             break;
         case FS_BEST_FIT: {
             int timesX = m_curWindowWidth / (frame.width * aspectRatio + .5);
@@ -337,7 +361,8 @@ void EmuWindow::drawFrame(EmuPixelData frame)
 
     calcDstRect(frame);
 
-    if ((m_windowStyle == WS_AUTOSIZE) && !m_isFullscreenMode && (m_frameScale == FS_1X || m_frameScale == FS_2X || m_frameScale == FS_3X)
+    if ((m_windowStyle == WS_AUTOSIZE) && !m_isFullscreenMode
+          && (m_frameScale == FS_1X || m_frameScale == FS_2X || m_frameScale == FS_3X || m_frameScale == FS_4X || m_frameScale == FS_5X || m_frameScale == FS_2X3 || m_frameScale == FS_3X5)
           && (m_curWindowWidth != m_dstWidth || m_curWindowHeight != m_dstHeight)) {
         m_curWindowHeight = m_dstHeight;
         m_curWindowWidth = m_dstWidth;
@@ -415,10 +440,51 @@ void EmuWindow::sysReq(SysReq sr)
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             break;
+        case SR_4X:
+            setWindowStyle(WS_AUTOSIZE);
+            setFrameScale(FS_4X);
+            setAntialiasing(false);
+            m_aspectCorrection = false;
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            break;
+        case SR_5X:
+            setWindowStyle(WS_AUTOSIZE);
+            setFrameScale(FS_5X);
+            setAntialiasing(false);
+            m_aspectCorrection = false;
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            break;
+        case SR_2X3:
+            setWindowStyle(WS_AUTOSIZE);
+            setFrameScale(FS_2X3);
+            setAntialiasing(false);
+            m_aspectCorrection = false;
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            break;
+        case SR_3X5:
+            setWindowStyle(WS_AUTOSIZE);
+            setFrameScale(FS_3X5);
+            setAntialiasing(false);
+            m_aspectCorrection = false;
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            break;
         case SR_FIT:
             if (!m_isFullscreenMode)
                 setWindowStyle(WS_SIZABLE);
             setFrameScale(FS_FIT_KEEP_AR);
+            setAntialiasing(true);
+            m_aspectCorrection = true;
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            break;
+        case SR_STRETCH:
+            if (!m_isFullscreenMode)
+                setWindowStyle(WS_SIZABLE);
+            setFrameScale(FS_FIT);
             setAntialiasing(true);
             m_aspectCorrection = true;
             if (m_windowType == EWT_EMULATION)
@@ -493,6 +559,18 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             return true;
         } else if (values[0].asString() == "3x") {
             setFrameScale(FS_3X);
+            return true;
+        } else if (values[0].asString() == "4x") {
+            setFrameScale(FS_4X);
+            return true;
+        } else if (values[0].asString() == "5x") {
+            setFrameScale(FS_5X);
+            return true;
+        } else if (values[0].asString() == "2x3") {
+            setFrameScale(FS_2X3);
+            return true;
+        } else if (values[0].asString() == "3x5") {
+            setFrameScale(FS_3X5);
             return true;
         } else if (values[0].asString() == "fit") {
             setFrameScale(FS_FIT);
@@ -607,6 +685,14 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
                 return "2x";
             case FS_3X:
                 return "3x";
+            case FS_4X:
+                return "4x";
+            case FS_5X:
+                return "5x";
+            case FS_2X3:
+                return "2x3";
+            case FS_3X5:
+                return "3x5";
             case FS_FIT:
                 return "fit";
             case FS_FIT_KEEP_AR:

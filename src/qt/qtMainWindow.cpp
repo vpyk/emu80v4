@@ -726,6 +726,65 @@ void MainWindow::createActions()
     presetMenu->addAction(m_preset3xAction);
     connect(m_preset3xAction, SIGNAL(triggered()), this, SLOT(on3x()));
 
+    // 4x preset
+    m_preset4xAction = new QAction(tr("Preset: 4x"), this);
+    //m_preset4xAction->setToolTip(tr("Preset: 4x (Alt-4)"));
+    QList<QKeySequence> preset4xKeysList;
+    preset4xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_4));
+    preset4xKeysList.append(QKeySequence(Qt::META + Qt::Key_4));
+    m_preset4xAction->setShortcuts(preset4xKeysList);
+    addAction(m_preset4xAction);
+    presetMenu->addAction(m_preset4xAction);
+    connect(m_preset4xAction, SIGNAL(triggered()), this, SLOT(on4x()));
+
+    // 5x preset
+    m_preset5xAction = new QAction(tr("Preset: 5x"), this);
+    //m_preset5xAction->setToolTip(tr("Preset: 5x (Alt-5)"));
+    QList<QKeySequence> preset5xKeysList;
+    preset5xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_5));
+    preset5xKeysList.append(QKeySequence(Qt::META + Qt::Key_5));
+    m_preset5xAction->setShortcuts(preset5xKeysList);
+    addAction(m_preset5xAction);
+    presetMenu->addAction(m_preset5xAction);
+    connect(m_preset5xAction, SIGNAL(triggered()), this, SLOT(on5x()));
+
+    presetMenu->addSeparator();
+
+    // 2x3 preset
+    m_preset2x3Action = new QAction(tr("Preset: 2x3"), this);
+    //m_preset2x3Action->setToolTip(tr("Preset: 2x3 (Alt-6)"));
+    QList<QKeySequence> preset2x3KeysList;
+    preset2x3KeysList.append(QKeySequence(Qt::ALT + Qt::Key_6));
+    preset2x3KeysList.append(QKeySequence(Qt::META + Qt::Key_6));
+    m_preset2x3Action->setShortcuts(preset2x3KeysList);
+    addAction(m_preset2x3Action);
+    presetMenu->addAction(m_preset2x3Action);
+    connect(m_preset2x3Action, SIGNAL(triggered()), this, SLOT(on2x3()));
+
+    // 2x3 preset
+    m_preset3x5Action = new QAction(tr("Preset: 3x5"), this);
+    //m_preset3x5Action->setToolTip(tr("Preset: 3x5 (Alt-7)"));
+    QList<QKeySequence> preset3x5KeysList;
+    preset3x5KeysList.append(QKeySequence(Qt::ALT + Qt::Key_7));
+    preset3x5KeysList.append(QKeySequence(Qt::META + Qt::Key_7));
+    m_preset3x5Action->setShortcuts(preset3x5KeysList);
+    addAction(m_preset3x5Action);
+    presetMenu->addAction(m_preset3x5Action);
+    connect(m_preset3x5Action, SIGNAL(triggered()), this, SLOT(on3x5()));
+
+    presetMenu->addSeparator();
+
+    // Stretch preset
+    m_presetStretchAction = new QAction(tr("Preset: Stretch"), this);
+    //m_presetStretcgAction->setToolTip(tr("Preset: Stretch (Alt-9)"));
+    QList<QKeySequence> presetStretchKeysList;
+    presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
+    presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
+    m_presetStretchAction->setShortcuts(presetStretchKeysList);
+    addAction(m_presetStretchAction);
+    presetMenu->addAction(m_presetStretchAction);
+    connect(m_presetStretchAction, SIGNAL(triggered()), this, SLOT(onStretch()));
+
     // Fit preset
     m_presetFitAction = new QAction(tr("Preset: Fit"), this);
     //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
@@ -1446,6 +1505,41 @@ void MainWindow::on2x()
 void MainWindow::on3x()
 {
     emuSysReq(m_palWindow, SR_3X);
+    saveConfig();
+}
+
+
+void MainWindow::on4x()
+{
+    emuSysReq(m_palWindow, SR_4X);
+    saveConfig();
+}
+
+
+void MainWindow::on5x()
+{
+    emuSysReq(m_palWindow, SR_5X);
+    saveConfig();
+}
+
+
+void MainWindow::on2x3()
+{
+    emuSysReq(m_palWindow, SR_2X3);
+    saveConfig();
+}
+
+
+void MainWindow::on3x5()
+{
+    emuSysReq(m_palWindow, SR_3X5);
+    saveConfig();
+}
+
+
+void MainWindow::onStretch()
+{
+    emuSysReq(m_palWindow, SR_STRETCH);
     saveConfig();
 }
 

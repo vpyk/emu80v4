@@ -11,7 +11,7 @@ window.defaultWindowSize = 800, 600
 window.windowStyle = autosize
 #window.windowStyle = sizable
 
-# Window scaling option: 1x, 2x, 3x, fit, bestFit, fitKeepAR (default = bestFit)
+# Window scaling option: 1x, 2x, 3x, 4x, 5x, 2x3, 3x5, fit, bestFit, fitKeepAR (default = bestFit)
 window.frameScale = 2x
 #window.frameScale = fitKeepAR
 #window.frameScale = bestFit
@@ -142,6 +142,10 @@ ConfigRadioSelector scaleSelector = &window, frameScale, "Масштабиров
 scaleSelector.addItem = 1x, "1x"
 scaleSelector.addItem = 2x, "2x"
 scaleSelector.addItem = 3x, "3x"
+scaleSelector.addItem = 4x, "4x"
+scaleSelector.addItem = 5x, "5x"
+scaleSelector.addItem = 2x3, "2x3"
+scaleSelector.addItem = 3x5, "3x5"
 scaleSelector.addItem = fit, "Растянуть во все окно"
 scaleSelector.addItem = fitKeepAR, "Растянуть с сохранением пропорций"
 scaleSelector.addItem = bestFit, "Растянуть с целым коэффициентом"
@@ -164,7 +168,7 @@ configTab.addControl = 1, &mixSelector
 ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
 aaSelector.addItem = no, "Выкл."
 aaSelector.addItem = yes, "Вкл."
-configTab.addControl = 1, &aaSelector
+configTab.addControl = 2, &aaSelector
 
 #window.aspectCorrection
 ConfigRadioSelector arSelector = &window, aspectCorrection, "Учитывать Aspect Ratio"

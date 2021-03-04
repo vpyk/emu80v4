@@ -76,8 +76,6 @@ private slots:
 
     void on_aspectCheckBox_toggled(bool checked);
 
-    void on_fixedScaleSpinBox_valueChanged(const QString &arg1);
-
     void on_applyPushButton_clicked();
 
     void on_speedUpCheckBox_toggled(bool checked);
@@ -89,6 +87,8 @@ private slots:
     void on_maxFpsCheckBox_toggled(bool checked);
 
     void on_volumeSlider_valueChanged(int value);
+
+    void on_fixedScaleComboBox_currentIndexChanged(int index);
 
 private:
     Ui::SettingsDialog *ui;

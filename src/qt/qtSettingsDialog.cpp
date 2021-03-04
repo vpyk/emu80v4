@@ -282,13 +282,25 @@ void SettingsDialog::fillControlValues()
     val = m_options["window.frameScale"];
     if (val == "1x") {
         ui->fixedScaleRadioButton->setChecked(true);
-        ui->fixedScaleSpinBox->setValue(1);
+        ui->fixedScaleComboBox->setCurrentIndex(0);
     } else if (val == "2x") {
         ui->fixedScaleRadioButton->setChecked(true);
-        ui->fixedScaleSpinBox->setValue(2);
+        ui->fixedScaleComboBox->setCurrentIndex(1);
     } else if (val == "3x") {
         ui->fixedScaleRadioButton->setChecked(true);
-        ui->fixedScaleSpinBox->setValue(3);
+        ui->fixedScaleComboBox->setCurrentIndex(2);
+    } else if (val == "4x") {
+        ui->fixedScaleRadioButton->setChecked(true);
+        ui->fixedScaleComboBox->setCurrentIndex(3);
+    } else if (val == "5x") {
+        ui->fixedScaleRadioButton->setChecked(true);
+        ui->fixedScaleComboBox->setCurrentIndex(4);
+    } else if (val == "2x3") {
+        ui->fixedScaleRadioButton->setChecked(true);
+        ui->fixedScaleComboBox->setCurrentIndex(5);
+    } else if (val == "3x5") {
+        ui->fixedScaleRadioButton->setChecked(true);
+        ui->fixedScaleComboBox->setCurrentIndex(6);
     } else {
         ui->fixedScaleRadioButton->setChecked(false);
         ui->stretchRadioButton->setChecked(val == "fit");
@@ -436,20 +448,30 @@ void SettingsDialog::on_presetComboBox_currentIndexChanged(int index)
     case 1:
     case 2:
     case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
         ui->autoSizeRadioButton->setChecked(true);
         ui->fixedScaleRadioButton->setChecked(true);
-        ui->fixedScaleSpinBox->setValue(index);
+        ui->fixedScaleComboBox->setCurrentIndex(index - 1);
         ui->smoothCheckBox->setChecked(false);
         ui->aspectCheckBox->setChecked(false);
         break;
-    case 4:
+    case 8:
         ui->fixedSizeRadioButton->setChecked(true);
         ui->fixedScaleRadioButton->setChecked(true);
-        ui->fixedScaleSpinBox->setValue(2);
+        ui->fixedScaleComboBox->setCurrentIndex(1);
         ui->smoothCheckBox->setChecked(false);
         ui->aspectCheckBox->setChecked(false);
         break;
-    case 5:
+    case 9:
+        ui->userSizeRadioButton->setChecked(true);
+        ui->stretchRadioButton->setChecked(true);
+        ui->smoothCheckBox->setChecked(true);
+        ui->aspectCheckBox->setChecked(true);
+        break;
+    case 10:
         ui->userSizeRadioButton->setChecked(true);
         ui->stretchPropRadioButton->setChecked(true);
         ui->smoothCheckBox->setChecked(true);
@@ -477,33 +499,62 @@ void SettingsDialog::adjustPresetComboBoxState()
     m_presetComboBoxEventsAllowed = false;
     if (ui->autoSizeRadioButton->isChecked() &&
             ui->fixedScaleRadioButton->isChecked() &&
-            ui->fixedScaleSpinBox->value() == 1 &&
+            ui->fixedScaleComboBox->currentIndex() == 0 &&
             !ui->smoothCheckBox->isChecked() &&
             !ui->aspectCheckBox->isChecked())
         ui->presetComboBox->setCurrentIndex(1);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
-             ui->fixedScaleSpinBox->value() == 2 &&
+             ui->fixedScaleComboBox->currentIndex() == 1 &&
              !ui->smoothCheckBox->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(2);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
-             ui->fixedScaleSpinBox->value() == 3 &&
+             ui->fixedScaleComboBox->currentIndex() == 2 &&
              !ui->smoothCheckBox->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(3);
-    else if (ui->fixedSizeRadioButton->isChecked() &&
+    else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
-             ui->fixedScaleSpinBox->value() == 2 &&
+             ui->fixedScaleComboBox->currentIndex() == 3 &&
              !ui->smoothCheckBox->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(4);
+    else if (ui->autoSizeRadioButton->isChecked() &&
+             ui->fixedScaleRadioButton->isChecked() &&
+             ui->fixedScaleComboBox->currentIndex() == 4 &&
+             !ui->smoothCheckBox->isChecked() &&
+             !ui->aspectCheckBox->isChecked())
+         ui->presetComboBox->setCurrentIndex(5);
+    else if (ui->autoSizeRadioButton->isChecked() &&
+             ui->fixedScaleRadioButton->isChecked() &&
+             ui->fixedScaleComboBox->currentIndex() == 5 &&
+             !ui->smoothCheckBox->isChecked() &&
+             !ui->aspectCheckBox->isChecked())
+         ui->presetComboBox->setCurrentIndex(6);
+    else if (ui->autoSizeRadioButton->isChecked() &&
+             ui->fixedScaleRadioButton->isChecked() &&
+             ui->fixedScaleComboBox->currentIndex() == 6 &&
+             !ui->smoothCheckBox->isChecked() &&
+             !ui->aspectCheckBox->isChecked())
+         ui->presetComboBox->setCurrentIndex(7);
+    else if (ui->fixedSizeRadioButton->isChecked() &&
+             ui->fixedScaleRadioButton->isChecked() &&
+             ui->fixedScaleComboBox->currentIndex() == 1 &&
+             !ui->smoothCheckBox->isChecked() &&
+             !ui->aspectCheckBox->isChecked())
+         ui->presetComboBox->setCurrentIndex(8);
+    else if (ui->userSizeRadioButton->isChecked() &&
+             ui->stretchRadioButton->isChecked() &&
+             ui->smoothCheckBox->isChecked() &&
+             ui->aspectCheckBox->isChecked())
+         ui->presetComboBox->setCurrentIndex(9);
     else if (ui->userSizeRadioButton->isChecked() &&
              ui->stretchPropRadioButton->isChecked() &&
              ui->smoothCheckBox->isChecked() &&
              ui->aspectCheckBox->isChecked())
-         ui->presetComboBox->setCurrentIndex(5);
+         ui->presetComboBox->setCurrentIndex(10);
     else
         ui->presetComboBox->setCurrentIndex(0);
     m_presetComboBoxEventsAllowed = true;
@@ -535,7 +586,7 @@ void SettingsDialog::on_userSizeRadioButton_toggled(bool checked)
 
 void SettingsDialog::on_fixedScaleRadioButton_toggled(bool checked)
 {
-    ui->fixedScaleSpinBox->setEnabled(checked);
+    ui->fixedScaleComboBox->setEnabled(checked);
     if (checked)
         adjustPresetComboBoxState();
 }
@@ -576,9 +627,9 @@ void SettingsDialog::on_aspectCheckBox_toggled(bool checked)
 }
 
 
-void SettingsDialog::on_fixedScaleSpinBox_valueChanged(const QString &arg1)
+void SettingsDialog::on_fixedScaleComboBox_currentIndexChanged(int index)
 {
-    Q_UNUSED(arg1);
+    Q_UNUSED(index);
     adjustPresetComboBoxState();
 }
 
@@ -684,7 +735,23 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     val = "";
     if (ui->fixedScaleRadioButton->isChecked())
-        val = QString::number(ui->fixedScaleSpinBox->value()) + "x";
+        switch (ui->fixedScaleComboBox->currentIndex()) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            val = QString::number(ui->fixedScaleComboBox->currentIndex() + 1) + "x";
+            break;
+        case 5:
+            val = "2x3";
+            break;
+        case 6:
+            val = "3x5";
+            break;
+        default:
+            break;
+        }
     else if (ui->stretchRadioButton->isChecked())
         val = "fit";
     else if (ui->stretchPropRadioButton->isChecked())

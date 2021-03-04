@@ -72,6 +72,16 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_2X;
             case PK_3:
                 return SR_3X;
+            case PK_4:
+                return SR_4X;
+            case PK_5:
+                return SR_5X;
+            case PK_6:
+                return SR_2X3;
+            case PK_7:
+                return SR_3X5;
+            case PK_9:
+                return SR_STRETCH;
             case PK_0:
                 return SR_FIT;
             case PK_M:
