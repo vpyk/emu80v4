@@ -357,14 +357,18 @@ EmuKey LvovKbdLayout::translateKey(PalKeyCode keyCode)
         return EK_CLEAR;
     case PK_PGUP:
         return EK_RUS;
+    case PK_PGDN:
+        return EK_LAT;
     case PK_KP_PLUS:
-        return EK_F0;
+        return EK_LF;
+    case PK_KP_DIV:
+        return EK_VR;
     case PK_KP_MUL:
-        return EK_GT;
+        return EK_F0;
     case PK_KP_MINUS:
         return EK_UNDSCR;
     case PK_INS:
-        return EK_LAT;
+        return EK_GT;
     default:
         break;
     }
@@ -389,7 +393,7 @@ EmuKey LvovKbdLayout::translateKey(PalKeyCode keyCode)
     case PK_F12:
         return EK_SCR;
     case PK_DEL:
-        return EK_VR;
+        return EK_BSP;
 
     default:
         return EK_NONE;
@@ -399,7 +403,7 @@ EmuKey LvovKbdLayout::translateKey(PalKeyCode keyCode)
 
 EmuKey LvovKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
 {
-    if (keyCode == PK_KP_MUL || keyCode == PK_KP_PLUS || keyCode == PK_KP_MINUS)
+    if (keyCode == PK_KP_MUL || keyCode == PK_KP_PLUS || keyCode == PK_KP_MINUS || keyCode == PK_KP_DIV)
         return EK_NONE;
 
     if (unicodeKey == L'_')
