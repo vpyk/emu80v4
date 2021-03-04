@@ -26,6 +26,7 @@
 #include "SoundMixer.h"
 #include "Cpu.h"
 #include "TapeRedirector.h"
+#include "WavReader.h"
 
 using namespace std;
 
@@ -201,6 +202,12 @@ void LvovPpi8255Circuit1::setPortC(uint8_t value)
     m_platform->getCore()->tapeOut(value & 1);
 
     m_addrSpaceMapper->setCurPage(value >> 1 & 1);
+}
+
+
+uint8_t LvovPpi8255Circuit1::getPortC()
+{
+    return g_emulation->getWavReader()->getCurValue() ? 0x10 : 0x00;
 }
 
 

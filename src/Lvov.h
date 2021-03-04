@@ -127,7 +127,7 @@ class LvovPpi8255Circuit1 : public Ppi8255Circuit
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // derived from Ppi8255Circuit
-        //uint8_t getPortC() override;
+        uint8_t getPortC() override;
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
 
