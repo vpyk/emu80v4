@@ -1,4 +1,4 @@
-table {
+/*table {
   border-width: 1px;
   border-style: solid;
   margin-top: 8px;
@@ -8,4 +8,41 @@ td {
   border-width: 1px;
   padding: 4px;
   border-style: solid;
+}*/
+
+
+table.kbd {
+  color:black;
+  border:solid #808080 2px;
+  background:#D8D8D8;
+  font-size: small;
+}
+
+table.kbd td {
+    text-align:center;
+    vertical-align:middle;
+    border: solid #101010 1px;
+    background:#FFFFFF;
+}
+
+table.kbd td.blank {
+  background:#D8D8D8;
+  border: none;
+}
+
+table.kbd td.unused {
+  background:#C0C0C0;
+  color: #707070;
+}
+    
+table.kbd td.special {
+  background:#C0C0C0;
+  color: #4040B0;
+}
+
+table.kbd td.title {
+  text-align:right;
+  background:#D8D8D8;
+  color: black;
+  border:none;
 }
