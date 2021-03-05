@@ -81,6 +81,7 @@ SOURCES += \
     PpiAtaAdapter.cpp \
     Psg3910.cpp \
     RamDisk.cpp \
+    RfsTapeHooks.cpp \
     Rk86.cpp \
     RkFdd.cpp \
     RkKeyboard.cpp \
@@ -169,6 +170,7 @@ HEADERS  += \
     PpiAtaAdapter.h \
     Psg3910.h \
     RamDisk.h \
+    RfsTapeHooks.h \
     Rk86.h \
     RkFdd.h \
     RkKeyboard.h \

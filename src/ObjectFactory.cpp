@@ -48,6 +48,7 @@
 #include "FdImage.h"
 #include "RkTapeHooks.h"
 #include "MsxTapeHooks.h"
+#include "RfsTapeHooks.h"
 #include "CloseFileHook.h"
 #include "RkRomDisk.h"
 #include "RkSdController.h"
@@ -155,6 +156,10 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(MsxTapeOutHeaderHook);
     REG_EMU_CLASS(MsxTapeInHook);
     REG_EMU_CLASS(MsxTapeInHeaderHook);
+    REG_EMU_CLASS(RfsTapeOutHook);
+    REG_EMU_CLASS(RfsTapeOutHeaderHook);
+    REG_EMU_CLASS(RfsTapeInHook);
+    REG_EMU_CLASS(RfsTapeInHeaderHook);
     REG_EMU_CLASS(CloseFileHook);
     REG_EMU_CLASS(Ret8080Hook);
     REG_EMU_CLASS(RkRomDisk);

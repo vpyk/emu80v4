@@ -183,6 +183,50 @@ ramDisk.page = 6, &ramDisk7
 ramDisk.page = 7, &ramDisk8
 
 
+TapeRedirector rfsTapeOutFile
+rfsTapeOutFile.mode = "w"
+rfsTapeOutFile.filter = "Файлы RAMFOS (*.rfs)|*.rfs|Все файлы (*.*)|*"
+rfsTapeOutFile.timeout = 1500
+
+TapeRedirector rfsTapeInFile
+rfsTapeInFile.mode = "r"
+rfsTapeInFile.filter = "Файлы RAMFOS (*.rfs)|*.rfs;*.RFS|Все файлы (*.*)|*"
+rfsTapeInFile.timeout = 3000
+
+RfsTapeOutHook tapeOutHook = 0xC728
+tapeOutHook.signature = E5C52A60C6C6
+tapeOutHook.tapeRedirector = &rfsTapeOutFile
+cpu.addHook = &tapeOutHook
+
+RfsTapeOutHeaderHook tapeOutHeaderHook = 0xC70F
+tapeOutHeaderHook.signature = E5C52A62C63E
+tapeOutHeaderHook.tapeRedirector = &rfsTapeOutFile
+cpu.addHook = &tapeOutHeaderHook
+
+RfsTapeInHook tapeInHook = 0xC6BE
+tapeInHook.signature = E5D5C52189CBE5
+tapeInHook.tapeRedirector = &rfsTapeInFile
+cpu.addHook = &tapeInHook
+
+RfsTapeInHeaderHook tapeInHeaderHook = 0xC66C
+tapeInHeaderHook.signature = E5D5C52189CBE5
+tapeInHeaderHook.tapeRedirector = &rfsTapeInFile
+cpu.addHook = &tapeInHeaderHook
+
+CloseFileHook closeFileHook = 0xCE78
+closeFileHook.signature = E5D5C5CDC4CECC
+closeFileHook.addTapeRedirector = &rfsTapeInFile
+closeFileHook.addTapeRedirector = &rfsTapeOutFile
+cpu.addHook = &closeFileHook
+
+EmuObjectGroup tapeGrp
+tapeGrp.addItem = &tapeOutHook
+tapeGrp.addItem = &tapeInHook
+tapeGrp.addItem = &tapeOutHeaderHook
+tapeGrp.addItem = &tapeInHeaderHook
+tapeGrp.addItem = &closeFileHook
+
+
 
 ######## Include Saved Options ########
 

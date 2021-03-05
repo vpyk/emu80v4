@@ -194,6 +194,8 @@
 		<Unit filename="Psg3910.h" />
 		<Unit filename="RamDisk.cpp" />
 		<Unit filename="RamDisk.h" />
+		<Unit filename="RfsTapeHooks.cpp" />
+		<Unit filename="RfsTapeHooks.h" />
 		<Unit filename="Rk86.cpp" />
 		<Unit filename="Rk86.h" />
 		<Unit filename="RkFdd.cpp" />

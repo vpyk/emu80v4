@@ -1086,6 +1086,16 @@ void MainWindow::onFpsTimer()
                 fileName = emuGetPropertyValue(platform + "msxTapeOutFile", "currentFile");
                 if (fileName != "")
                     labelText = tr("Writing MSX file:");
+                else {
+                    fileName = emuGetPropertyValue(platform + "rfsTapeOutFile", "currentFile");
+                    if (fileName != "")
+                        labelText = tr("Writing RFS file:");
+                    else {
+                        fileName = emuGetPropertyValue(platform + "rfsTapeInFile", "currentFile");
+                        if (fileName != "")
+                            labelText = tr("Reading RFS file:");
+                    }
+                }
             }
         }
     }
