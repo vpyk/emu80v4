@@ -56,7 +56,6 @@ bool MsxTapeOutHook::hookProc()
     else
         outByte = (cpu->getAF() & 0xFF00) >> 8;
 
-    int aaa = m_file->getPos();
     if (m_curPos != 0 && m_file->getPos() == 9) // LVT signature length
         m_curPos = 0;
 
