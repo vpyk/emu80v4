@@ -21,6 +21,7 @@
 
 #include "PalFile.h"
 
+#include "EmuObjects.h"
 #include "WavWriter.h"
 
 class ElapsedTimer;
@@ -52,6 +53,7 @@ class TapeRedirector : public EmuObject
         bool isOpen();
         bool isCancelled();
         bool isLvt();
+        void switchToNextLvt();
 
         static EmuObject* create(const EmuValuesList&) {return new TapeRedirector();}
 
@@ -72,8 +74,6 @@ class TapeRedirector : public EmuObject
         int m_timeout = 0;
         ElapsedTimer* m_timer = nullptr;
         void updateTimer();
-
-        void switchToNextLvt();
 };
 
 

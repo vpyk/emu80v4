@@ -329,6 +329,9 @@ bool TapeRedirector::isLvt()
 
 void TapeRedirector::switchToNextLvt()
 {
+    if (m_isOpen)
+        closeFile();
+
     if (m_fileName.size() >= 4) {
         string ext = m_fileName.substr(m_fileName.size() - 4, 4);
         if (ext.substr(0, 3) == ".lv" || ext.substr(0, 3) == ".LV") {

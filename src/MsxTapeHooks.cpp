@@ -56,10 +56,11 @@ bool MsxTapeOutHook::hookProc()
     else
         outByte = (cpu->getAF() & 0xFF00) >> 8;
 
-    if (m_curPos != 0 && m_file->getPos() == 8) // LVT signature length
+    int aaa = m_file->getPos();
+    if (m_curPos != 0 && m_file->getPos() == 9) // LVT signature length
         m_curPos = 0;
 
-    if (!m_file->isLvt() || m_curPos >= 9)
+    if (!m_file->isLvt() || m_curPos == 0 || m_curPos >= 10)
         m_file->writeByte(outByte);
     ++m_curPos;
 
@@ -113,8 +114,8 @@ bool MsxTapeOutHeaderHook::hookProc()
         // LVT
         bool longHeader = (static_cast<Cpu8080Compatible*>(m_cpu)->getAF() & 0xFF00) != 0;
 
-        // if (longHeader)
-        // m_file->switchToNextFile()
+        if (longHeader && m_file->getPos() != 0)
+            m_file->switchToNextLvt();
 
         if (longHeader)
             for (int i = 0; i < 9; i++)
