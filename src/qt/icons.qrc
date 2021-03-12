@@ -27,5 +27,6 @@
         <file>icons/edd.png</file>
         <file>icons/config.png</file>
         <file>icons/mute_tape.png</file>
+        <file>icons/emu80.png</file>
     </qresource>
 </RCC>
