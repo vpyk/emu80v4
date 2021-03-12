@@ -836,6 +836,10 @@ void MainWindow::createActions()
     QMenu* helpMenu = m_menuBar->addMenu(tr("Help"));
 
     m_platformHelpAction = new QAction(tr("Platform help..."), this);
+    QList<QKeySequence> platformHelpKeysList;
+    platformHelpKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F1));
+    platformHelpKeysList.append(QKeySequence(Qt::META + Qt::Key_F1));
+    m_platformHelpAction->setShortcuts(platformHelpKeysList);
     m_platformHelpAction->setToolTip(tr("Show help on current platform"));
     helpMenu->addAction(m_platformHelpAction);
     connect(m_platformHelpAction, SIGNAL(triggered()), this, SLOT(onPlatformHelp()));
