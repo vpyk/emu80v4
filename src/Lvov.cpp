@@ -385,6 +385,11 @@ EmuKey LvovKbdLayout::translateKey(PalKeyCode keyCode)
         return key;
 
     switch (keyCode) {
+    case PK_LCTRL:
+        return EK_CTRL;
+    case PK_HOME:
+        return EK_HOME;
+
     case PK_F6:
         return EK_FG;
     case PK_F7:
