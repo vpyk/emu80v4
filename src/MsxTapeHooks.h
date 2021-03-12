@@ -65,6 +65,7 @@ class MsxTapeInHook : public CpuHook
     private:
         bool m_ignoreHeaders = false;
         bool m_apogeyFix = false;
+        bool m_lvovFix = false;
 
         int m_typeRptCount = 0;
         uint8_t m_type;

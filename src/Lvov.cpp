@@ -582,6 +582,8 @@ bool LvovFileLoader::loadBinary(bool run)
             g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
             cpu->enableHooks();
 
+            m_io->writeByte(0xD3, 0x8A);
+
             uint16_t sp = 0xAFBB;
             cpu->setSP(sp);
             m_as->writeByte(sp, 0x2F);

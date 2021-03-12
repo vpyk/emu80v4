@@ -65,6 +65,7 @@ class Cpu : public ActiveDevice
         void debugStepRequest() {m_stepReq = true;}
 
         AddressableDevice* getAddrSpace() {return m_addrSpace;}
+        AddressableDevice* getIoAddrSpace() {return m_ioAddrSpace;}
 
     protected:
         int as_input(int addr);

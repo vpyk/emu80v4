@@ -176,7 +176,10 @@ bool MsxTapeInHook::hookProc()
 
     cpu->setAF((af & 0xFF) | (inByte << 8));
 
-    static_cast<Cpu8080Compatible*>(m_cpu)->ret();
+    if (m_lvovFix)
+        m_cpu->getIoAddrSpace()->writeByte(0xD2, 0);
+
+        static_cast<Cpu8080Compatible*>(m_cpu)->ret();
 
     return true;
 }
@@ -195,6 +198,11 @@ bool MsxTapeInHook::setProperty(const string& propertyName, const EmuValuesList&
     } else if (propertyName == "apogeyFix") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
             m_apogeyFix = values[0].asString() == "yes";
+            return true;
+        }
+    } else if (propertyName == "lvovFix") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_lvovFix = values[0].asString() == "yes";
             return true;
         }
     }
