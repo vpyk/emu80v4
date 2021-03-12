@@ -581,6 +581,13 @@ bool LvovFileLoader::loadBinary(bool run)
             cpu->disableHooks();
             g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
             cpu->enableHooks();
+
+            uint16_t sp = 0xAFBB;
+            cpu->setSP(sp);
+            m_as->writeByte(sp, 0x2F);
+            m_as->writeByte(sp + 1, 0xDD);
+            m_as->writeByte(sp + 4, 0x89);
+            m_as->writeByte(sp + 5, 0x05);
             cpu->setPC(startAddr);
         }
     }
@@ -705,6 +712,10 @@ void LvovFileLoader::loadDump(bool run)
 
 void LvovFileLoader::setupMultiblock()
 {
+    // empty file name for reading
+    for (uint16_t addr = 0xBE8C; addr <= 0xBE91; addr++)
+        m_as->writeByte(addr, 0x20);
+
     string ext = m_fileName.substr(m_fileName.size() - 4, 4);
     if (ext.substr(0, 3) != ".lv" && ext.substr(0, 3) != ".LV") {
         // CAS
