@@ -993,6 +993,17 @@ void MainWindow::createDebugActions()
     //presetMenu->addAction(m_presetFitAction);
     connect(m_presetFitAction, SIGNAL(triggered()), this, SLOT(onFit()));
 
+    // Stretch preset
+    m_presetStretchAction = new QAction(tr("Preset: Stretch"), this /*m_menuBar*/);
+    //m_presetStretchAction->setToolTip(tr("Preset: Stretch (Alt-9)"));
+    QList<QKeySequence> presetStretchKeysList;
+    presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
+    presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
+    m_presetStretchAction->setShortcuts(presetStretchKeysList);
+    addAction(m_presetStretchAction);
+    //presetMenu->addAction(m_presetStretchAction);
+    connect(m_presetStretchAction, SIGNAL(triggered()), this, SLOT(onStretch()));
+
     //viewMenu->addSeparator();
 
     m_fullscreenAction = new QAction(tr("Fullscreen mode"), this /*m_menuBar*/);
