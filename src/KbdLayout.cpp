@@ -72,8 +72,18 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
 
                 if (shift != m_shiftPressed)
                     kbd->processKey(EK_SHIFT, shift == isPressed);
-                if (lang != m_langPressed)
-                    kbd->processKey(EK_LANG, lang == isPressed);
+                if (m_separateRusLat) {
+                    // Lvov etc.
+                    kbd->processKey(EK_RUS, lang && isPressed);
+                    if (m_prevLang && !lang)
+                        kbd->processKey(EK_LAT, lang != isPressed);
+                    if (!isPressed)
+                        m_prevLang = lang;
+                } else {
+                    // Pk8000 etc.
+                    if (lang != m_langPressed)
+                        kbd->processKey(EK_LANG, lang == isPressed);
+                }
                 kbd->processKey(emuKey, isPressed);
             }
 
@@ -381,6 +391,7 @@ EmuKey KbdLayout::translateCommonUnicodeKeys(unsigned unicodeKey, bool& shift, b
 {
     EmuKey key;
     shift = false;
+    lang = false;
 
     if (unicodeKey >= L'A' && unicodeKey <= L'Z') {
         key = (EmuKey)((int)EK_A + (unicodeKey - L'A'));

@@ -175,6 +175,7 @@ class KbdLayout : public EmuObject
 
         KbdLayoutMode m_mode = KLM_QWERTY;
         bool m_numpadJoystick = false;
+        bool m_separateRusLat = false;
 
         virtual EmuKey translateKey(PalKeyCode keyCode) {return translateCommonKeys(keyCode);}
         virtual EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode /*key*/, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
@@ -186,6 +187,7 @@ class KbdLayout : public EmuObject
     private:
         bool m_shiftPressed = false;
         bool m_langPressed = false;
+        bool m_prevLang = false;
         EmuKey m_lastNonUnicodeKey = EK_NONE;
         PalKeyCode m_lastPalKeyPressedCode = PK_NONE;
 

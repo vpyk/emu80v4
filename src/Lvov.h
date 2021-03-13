@@ -178,8 +178,7 @@ class LvovPpi8255Circuit2 : public Ppi8255Circuit
 class LvovKbdLayout : public KbdLayout
 {
     public:
-        //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        //std::string getPropertyStringValue(const std::string& propertyName) override;
+        LvovKbdLayout() {m_separateRusLat = true;}
 
         static EmuObject* create(const EmuValuesList&) {return new LvovKbdLayout();}
 
