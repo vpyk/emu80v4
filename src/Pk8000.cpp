@@ -344,9 +344,8 @@ void Pk8000Renderer::renderLine(int nLine)
                     color = c_pk8000ColorPalette[15];
                     break;
                 case BS_WRITE:
-                    color = bgColor;
-                    break;
                 default:
+                    color = bgColor;
                     break;
                 }
 

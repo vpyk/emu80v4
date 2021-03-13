@@ -179,7 +179,7 @@ bool MsxTapeInHook::hookProc()
     if (m_lvovFix)
         m_cpu->getIoAddrSpace()->writeByte(0xD2, 0);
 
-        static_cast<Cpu8080Compatible*>(m_cpu)->ret();
+    static_cast<Cpu8080Compatible*>(m_cpu)->ret();
 
     return true;
 }
