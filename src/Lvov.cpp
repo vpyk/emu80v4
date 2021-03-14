@@ -427,14 +427,7 @@ EmuKey LvovKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCod
 
 int LvovCpuWaits::getCpuWaitStates(int /*memTag*/, int opcode, int /*normalClocks*/)
 {
-    if (opcode == 0xD3 || opcode == 0xDB) {
-        m_curWaits++;
-        if (m_curWaits == 2)
-            m_curWaits = 0;
-        return m_curWaits ? 1 : 0;
-    }
-
-    return 0;
+    return (opcode == 0xD3 || opcode == 0xDB) ? 1 : 0;
 }
 
 

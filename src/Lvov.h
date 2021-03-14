@@ -194,9 +194,6 @@ public:
     int getCpuWaitStates(int memTag, int opcode, int normalClocks) override;
 
     static EmuObject* create(const EmuValuesList&) {return new LvovCpuWaits();}
-
-private:
-    int m_curWaits = 0;
 };
 
 
