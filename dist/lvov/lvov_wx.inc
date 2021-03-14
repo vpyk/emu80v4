@@ -76,3 +76,9 @@ ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица си
 codePageSelector.addItem = rk, "РК-86"
 codePageSelector.addItem = koi8, "КОИ-8"
 configTab.addControl = 3, &codePageSelector
+
+loader.allowMultiblock = yes
+ConfigRadioSelector multiblockSelector = &loader, allowMultiblock, "Мультиблочная загрузка"
+multiblockSelector.addItem = yes, "Вкл."
+multiblockSelector.addItem = no, "Выкл."
+configTab.addControl = 3, &multiblockSelector

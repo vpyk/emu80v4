@@ -212,6 +212,8 @@ private:
 class LvovFileLoader : public FileLoader
 {
     public:
+        LvovFileLoader() {m_multiblockAvailable = true;}
+
         bool loadFile(const std::string& fileName, bool run = false) override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
