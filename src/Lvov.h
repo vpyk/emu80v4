@@ -145,8 +145,15 @@ class LvovPpi8255Circuit1 : public Ppi8255Circuit
         // Lvov renderer for palette setting
         LvovRenderer* m_renderer = nullptr;
 
-        // sound source - tape output (+ beep)
+        // sound source - tape output
         GeneralSoundSource* m_tapeSoundSource = nullptr;
+
+        // sound source - internal beeper
+        GeneralSoundSource* m_beepSoundSource = nullptr;
+
+        // sound related bits
+        bool m_pb7 = false;
+        bool m_pc0 = false;
 
         // address space mapper to switch memory pages
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;

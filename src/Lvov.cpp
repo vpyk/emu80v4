@@ -186,6 +186,9 @@ bool LvovPpi8255Circuit1::setProperty(const string& propertyName, const EmuValue
     } else if (propertyName == "tapeSoundSource") {
         m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
+    } else if (propertyName == "beepSoundSource") {
+        m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
+        return true;
     } else if (propertyName == "mapper") {
         attachAddrSpaceMapper(static_cast<AddrSpaceMapper*>(g_emulation->findObject(values[0].asString())));
         return true;
@@ -197,9 +200,13 @@ bool LvovPpi8255Circuit1::setProperty(const string& propertyName, const EmuValue
 
 void LvovPpi8255Circuit1::setPortC(uint8_t value)
 {
+    m_pc0 = value & 1;
     if (m_tapeSoundSource)
-        m_tapeSoundSource->setValue(value & 1);
-    m_platform->getCore()->tapeOut(value & 1);
+        m_tapeSoundSource->setValue(m_pc0);
+    m_platform->getCore()->tapeOut(m_pc0);
+
+    if (m_beepSoundSource)
+        m_beepSoundSource->setValue(m_pc0 || !m_pb7);
 
     m_addrSpaceMapper->setCurPage(value >> 1 & 1);
 }
@@ -214,6 +221,10 @@ uint8_t LvovPpi8255Circuit1::getPortC()
 void LvovPpi8255Circuit1::setPortB(uint8_t value)
 {
     m_renderer->setPaletteByte(value & 0x7F);
+
+    m_pb7 = value & 0x80;
+    if (m_beepSoundSource)
+        m_beepSoundSource->setValue(m_pc0 || !m_pb7);
 }
 
 
