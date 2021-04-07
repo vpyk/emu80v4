@@ -35,8 +35,10 @@ configTab.addControl = 1, &styleSelector
 #window.fieldsMixing
 ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
 mixSelector.addItem = none, "Выкл."
+mixSelector.addItem = mix, "Вкл."
+mixSelector.addItem = interlace, "Чередование"
 mixSelector.addItem = scanline, "Имитация линий растра"
-configTab.addControl = 1, &mixSelector
+configTab.addControl = 3, &mixSelector
 
 #window.antialiasing
 ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
