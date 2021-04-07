@@ -442,13 +442,21 @@ int LvovCpuWaits::getCpuWaitStates(int /*memTag*/, int opcode, int /*normalClock
 }
 
 
-int LvovCpuCycleWaits::getCpuCycleWaitStates(int memTag)
+int LvovCpuCycleWaits::getCpuCycleWaitStates(int memTag, bool write)
 {
     if (memTag == 1) {
         m_curWaits++;
-        if (m_curWaits == 2/*4*/)
+        if (m_curWaits == 7)
             m_curWaits = 0;
-        return 2 + (m_curWaits ? 0 : 1);
+        int waits = m_curWaits & 3 ? 2 : 3; // 2 2/7
+        if (write) {
+            // write
+            m_curWriteWaits++;
+            if (m_curWriteWaits == 4)
+                m_curWriteWaits = 0;
+            waits += m_curWriteWaits == 0 ? 0 : 1; // add 0.75
+        }
+        return waits;
     }
 
     return 0;

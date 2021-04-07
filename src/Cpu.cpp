@@ -87,7 +87,7 @@ int Cpu::as_input(int addr)
     else {
         int tag;
         int read = m_addrSpace->readByteEx(addr, tag);
-        m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag);
+        m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag, false);
         return read;
     }
 }
@@ -100,7 +100,7 @@ void Cpu::as_output(int addr, int value)
     else {
         int tag;
         m_addrSpace->writeByteEx(addr, value, tag);
-        m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag);
+        m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag, true);
     }
 }
 

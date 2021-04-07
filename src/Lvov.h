@@ -207,12 +207,13 @@ public:
 class LvovCpuCycleWaits : public CpuCycleWaits
 {
 public:
-    int getCpuCycleWaitStates(int memTag) override;
+    int getCpuCycleWaitStates(int memTag, bool write) override;
 
     static EmuObject* create(const EmuValuesList&) {return new LvovCpuCycleWaits();}
 
 private:
     int m_curWaits = 0;
+    int m_curWriteWaits = 0;
 };
 
 

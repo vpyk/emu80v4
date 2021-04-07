@@ -33,7 +33,7 @@ class CpuWaits : public EmuObject
 class CpuCycleWaits : public EmuObject
 {
     public:
-        virtual int getCpuCycleWaitStates(int memTag) = 0;
+        virtual int getCpuCycleWaitStates(int memTag, bool write) = 0;
 };
 
 #endif //CPUWAITS_H
