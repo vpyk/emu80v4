@@ -118,6 +118,8 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, i
         m_imageData2 = new uchar[imageWidth * imageHeight * 4];
         memcpy(m_imageData2, pixels, imageWidth * imageHeight * 4);
         m_image2 = new QImage(m_imageData2, imageWidth, imageHeight, useAlpha ? QImage::Format_ARGB32 : QImage::Format_RGB32);
+        if (!useAlpha)
+            *m_image2 = m_image2->convertToFormat(QImage::Format_ARGB32); // add alpha channel
         m_useAlpha = useAlpha;
         return;
     }
@@ -145,10 +147,11 @@ void PaintWidget::paintScreen(QPainter* painter, QRect dstRect)
         QRectF srcRect2(0, 0, m_image2->width(), m_image2->height());
         painter->drawImage(dstRect, *m_image2, srcRect2);
     } else {
+        painter->setOpacity(1);
         painter->fillRect(dstRect, Qt::black);
-        painter->setOpacity(0.5);
         painter->drawImage(dstRect, *m_image, srcRect);
         QRectF srcRect2(0, 0, m_image2->width(), m_image2->height());
+        painter->setOpacity(0.5);
         painter->drawImage(dstRect, *m_image2, srcRect2);
     }
 }
