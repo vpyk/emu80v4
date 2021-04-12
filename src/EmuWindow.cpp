@@ -254,6 +254,12 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
             m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
             m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
             break;
+        case FS_4X6:
+            m_dstWidth = frame.width * (m_aspectCorrection ? 4 : 6) * aspectRatio + .5;
+            m_dstHeight = frame.height * 4;
+            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
+            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            break;
         case FS_BEST_FIT: {
             int timesX = m_curWindowWidth / (frame.width * aspectRatio + .5);
             int timesY = m_curWindowHeight / frame.height;
@@ -362,7 +368,7 @@ void EmuWindow::drawFrame(EmuPixelData frame)
     calcDstRect(frame);
 
     if ((m_windowStyle == WS_AUTOSIZE) && !m_isFullscreenMode
-          && (m_frameScale == FS_1X || m_frameScale == FS_2X || m_frameScale == FS_3X || m_frameScale == FS_4X || m_frameScale == FS_5X || m_frameScale == FS_2X3 || m_frameScale == FS_3X5)
+          && (m_frameScale == FS_1X || m_frameScale == FS_2X || m_frameScale == FS_3X || m_frameScale == FS_4X || m_frameScale == FS_5X || m_frameScale == FS_2X3 || m_frameScale == FS_3X5 || m_frameScale == FS_4X6)
           && (m_curWindowWidth != m_dstWidth || m_curWindowHeight != m_dstHeight)) {
         m_curWindowHeight = m_dstHeight;
         m_curWindowWidth = m_dstWidth;
@@ -472,6 +478,14 @@ void EmuWindow::sysReq(SysReq sr)
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             break;
+        case SR_4X6:
+            setWindowStyle(WS_AUTOSIZE);
+            setFrameScale(FS_4X6);
+            setAntialiasing(false);
+            m_aspectCorrection = false;
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            break;
         case SR_FIT:
             if (!m_isFullscreenMode)
                 setWindowStyle(WS_SIZABLE);
@@ -571,6 +585,9 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             return true;
         } else if (values[0].asString() == "3x5") {
             setFrameScale(FS_3X5);
+            return true;
+        } else if (values[0].asString() == "4x6") {
+            setFrameScale(FS_4X6);
             return true;
         } else if (values[0].asString() == "fit") {
             setFrameScale(FS_FIT);
@@ -693,6 +710,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
                 return "2x3";
             case FS_3X5:
                 return "3x5";
+            case FS_4X6:
+                return "4x6";
             case FS_FIT:
                 return "fit";
             case FS_FIT_KEEP_AR:

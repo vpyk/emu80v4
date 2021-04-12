@@ -418,6 +418,11 @@
            </item>
            <item>
             <property name="text">
+             <string>4x6, auto size, no smoothing</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>2x, fixed size</string>
             </property>
            </item>
@@ -632,6 +637,11 @@
               <item>
                <property name="text">
                 <string notr="true">3x5</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string notr="true">4x6</string>
                </property>
               </item>
              </widget>

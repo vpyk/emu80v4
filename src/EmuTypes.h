@@ -68,6 +68,7 @@ enum SysReq
     SR_5X,
     SR_2X3,
     SR_3X5,
+    SR_4X6,
     SR_FIT,
     SR_STRETCH,
     SR_MAXIMIZE,

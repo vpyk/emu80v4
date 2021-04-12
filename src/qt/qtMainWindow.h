@@ -86,6 +86,7 @@ private slots:
     void on5x();
     void on2x3();
     void on3x5();
+    void on4x6();
     void onStretch();
     void onFit();
     void onFullscreen();
@@ -203,6 +204,7 @@ private:
     QAction* m_preset5xAction;
     QAction* m_preset2x3Action;
     QAction* m_preset3x5Action;
+    QAction* m_preset4x6Action;
     QAction* m_presetStretchAction;
     QAction* m_presetFitAction;
     QAction* m_platformHelpAction;
