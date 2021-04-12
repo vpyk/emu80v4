@@ -570,12 +570,12 @@
     <message>
         <location filename="qtMainWindow.cpp" line="1118"/>
         <source>Writing RFS file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись RFS-файла:</translation>
     </message>
     <message>
         <location filename="qtMainWindow.cpp" line="1122"/>
         <source>Reading RFS file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтение RFS-файла:</translation>
     </message>
     <message>
         <location filename="qtMainWindow.cpp" line="1138"/>
