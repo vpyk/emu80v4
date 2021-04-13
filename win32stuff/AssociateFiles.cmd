@@ -71,6 +71,11 @@ REG ADD HKCU\Software\Classes\Emu80.rke /t REG_SZ /d "Eureka tape file" /f
 REG ADD HKCU\Software\Classes\Emu80.rke\shell\open\command /t REG_SZ /d "\"%EXE%\" \"%%1"\" /f 
 REG ADD HKCU\Software\Classes\Emu80.rke\DefaultIcon /t REG_SZ /d %EXE%,14 /f
 
+REG ADD HKCU\Software\Classes\.lvt /t REG_SZ /d Emu80.lvt /f
+REG ADD HKCU\Software\Classes\Emu80.lvt /t REG_SZ /d "Lvov tape file" /f
+REG ADD HKCU\Software\Classes\Emu80.lvt\shell\open\command /t REG_SZ /d "\"%EXE%\" \"%%1"\" /f 
+REG ADD HKCU\Software\Classes\Emu80.lvt\DefaultIcon /t REG_SZ /d %EXE%,15 /f
+
 
 set IE4UINIT=%SYSTEMROOT%\SYSTEM32\ie4uinit.exe
 if exist %IE4UINIT% goto proceed
