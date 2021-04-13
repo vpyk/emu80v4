@@ -910,7 +910,7 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("Color (Akimenko)"));
         m_colorColor2Action->setData("color2");
-    } else if (platformGroup == "apogey" || platformGroup == "orion") {
+    } else if (platformGroup == "apogey" || platformGroup == "orion" || platformGroup == "lvov") {
         hasColor = true;
 
         m_colorMonoAction->setVisible(true);

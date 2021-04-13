@@ -41,10 +41,15 @@ class LvovRenderer : public CrtRenderer
         0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF
     };
 
+    const uint32_t lvovBwPalette[4] = {
+        0x000000, 0x555555, 0xAAAAAA, 0xFFFFFF
+    };
+
 public:
         LvovRenderer();
         void renderFrame() override;
 
+        void toggleColorMode() override;
         void toggleCropping() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -59,6 +64,8 @@ public:
         const uint8_t* m_screenMemory = nullptr;
         bool m_showBorder = false;
         uint8_t m_paletteByte = 0;
+        bool m_colorMode = true;
+
 };
 
 

@@ -64,6 +64,12 @@ cropSelector.addItem = no, "Нет"
 cropSelector.addItem = yes, "Да"
 configTab.addControl = 2, &cropSelector
 
+#crtRenderer.colorMode
+ConfigRadioSelector colorSelector = &crtRenderer, colorMode, "Режим цвета"
+colorSelector.addItem = color, "Цветной"
+colorSelector.addItem = mono, "Ч/б"
+configTab.addControl = 2, &colorSelector
+
 #kbdLayout.layout
 ConfigRadioSelector laSelector = &kbdLayout, layout, "Раскладка клавиатуры"
 laSelector.addItem = qwerty, "Qwerty"

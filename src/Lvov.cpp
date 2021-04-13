@@ -101,35 +101,44 @@ void LvovRenderer::renderFrame()
             uint8_t bt = m_screenMemory[addr];
             for (int p = 0; p < 4; p++) {
                 int colorBits = ((bt & 0x80) >> 6) | ((bt & 0x08) >> 3);
-                int r, g, b;
-                switch (colorBits) {
-                case 0:
-                    r = (m_paletteByte & 8) == (m_paletteByte >> 1 & 8);
-                    g = (m_paletteByte >> 5 & 1);
-                    b = (m_paletteByte & 4) == (m_paletteByte >> 4 & 4);
-                    break;
-                case 1:
-                    r = (m_paletteByte & 1) == (m_paletteByte >> 4 & 1);
-                    g = (m_paletteByte >> 5 & 1);
-                    b = ~(m_paletteByte >> 6) & 1;
-                    break;
-                case 2:
-                    r = m_paletteByte >> 4 & 1;
-                    g = ~(m_paletteByte >> 5) & 1;
-                    b = m_paletteByte >> 6 & 1;
-                    break;
-                default: //case 3:
-                    r = ~(m_paletteByte >> 4) & 1;
-                    g = (m_paletteByte & 2) == (m_paletteByte >> 4 & 2);
-                    b = (m_paletteByte >> 6 & 1);
-                    break;
-                }
-                uint32_t color = lvovPalette[r << 2 | g << 1 | b ];
-                //uint32_t color = lvovPalette[((bt & 0x80) >> 6) | ((bt & 0x08) >> 3)];
+                uint32_t color;
+                if (m_colorMode) {
+                    int r, g, b;
+                    switch (colorBits) {
+                    case 0:
+                        r = (m_paletteByte & 8) == (m_paletteByte >> 1 & 8);
+                        g = (m_paletteByte >> 5 & 1);
+                        b = (m_paletteByte & 4) == (m_paletteByte >> 4 & 4);
+                        break;
+                    case 1:
+                        r = (m_paletteByte & 1) == (m_paletteByte >> 4 & 1);
+                        g = (m_paletteByte >> 5 & 1);
+                        b = ~(m_paletteByte >> 6) & 1;
+                        break;
+                    case 2:
+                        r = m_paletteByte >> 4 & 1;
+                        g = ~(m_paletteByte >> 5) & 1;
+                        b = m_paletteByte >> 6 & 1;
+                        break;
+                    default: //case 3:
+                        r = ~(m_paletteByte >> 4) & 1;
+                        g = (m_paletteByte & 2) == (m_paletteByte >> 4 & 2);
+                        b = (m_paletteByte >> 6 & 1);
+                        break;
+                    }
+                    color = lvovPalette[r << 2 | g << 1 | b ];
+                } else
+                    color = lvovBwPalette[colorBits];
                 bt <<= 1;
                 m_pixelData[(row + offsetY) * m_sizeX + col * 4 + p + offsetX] = color;
             }
         }
+}
+
+
+void LvovRenderer::toggleColorMode()
+{
+    m_colorMode = !m_colorMode;
 }
 
 
@@ -152,6 +161,14 @@ bool LvovRenderer::setProperty(const string& propertyName, const EmuValuesList& 
             m_showBorder = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "colorMode") {
+        if (values[0].asString() == "mono")
+            m_colorMode = false;
+        else if (values[0].asString() == "color")
+            m_colorMode = true;
+        else
+            return false;
+        return true;
     }
     return false;
 }
@@ -168,7 +185,9 @@ string LvovRenderer::getPropertyStringValue(const string& propertyName)
     if (propertyName == "visibleArea") {
         return m_showBorder ? "yes" : "no";
     } else if (propertyName == "crtMode") {
-            return u8"256\u00D7256@48.83Hz" ;
+        return u8"256\u00D7256@48.83Hz" ;
+    } else if (propertyName == "colorMode") {
+        return m_colorMode ? "color" : "mono";
     }
 
     return "";
