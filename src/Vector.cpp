@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -197,7 +197,9 @@ VectorRenderer::VectorRenderer()
 
     m_frameBuf = new uint32_t[maxBufSize];
 
-    memset(m_palette, 0, sizeof(uint32_t) * 16);
+    memset(m_colorPalette, 0, sizeof(uint32_t) * 16);
+    memset(m_bwPalette, 0, sizeof(uint32_t) * 16);
+    m_palette = m_colorPalette;
 
     prepareFrame(); // prepare 1st frame dimensions
 }
@@ -282,9 +284,11 @@ void VectorRenderer::setPaletteColor(uint8_t color)
     advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 27);
     //advance();
     //m_palette[m_borderColor] = ((color & 0x7) << 21) | ((color & 0x38) << 10) | (color & 0xC0);
-    m_palette[m_lastColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
-                               ((color & 0x38) << 10) | ((color & 0x38) << 7) | ((color & 0x30) << 4) |
-                               (color & 0xC0) | ((color & 0xC0) >> 2) | ((color & 0xC0) >> 4) | ((color & 0xC0) >> 6);
+    m_colorPalette[m_lastColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
+                                  ((color & 0x38) << 10) | ((color & 0x38) << 7) | ((color & 0x30) << 4) |
+                                  (color & 0xC0) | ((color & 0xC0) >> 2) | ((color & 0xC0) >> 4) | ((color & 0xC0) >> 6);
+    uint8_t bw = c_bwMap[color];
+    m_bwPalette[m_lastColor] = (bw << 16) | (bw << 8) | bw;
 }
 
 
@@ -395,6 +399,19 @@ void VectorRenderer::prepareDebugScreen()
 }
 
 
+void VectorRenderer::setColorMode(bool colorMode)
+{
+    m_colorMode = colorMode;
+    m_palette = m_colorMode ? m_colorPalette : m_bwPalette;
+}
+
+
+void VectorRenderer::toggleColorMode()
+{
+    setColorMode(!m_colorMode);
+}
+
+
 void VectorRenderer::toggleCropping()
 {
     m_showBorder = !m_showBorder;
@@ -420,6 +437,14 @@ bool VectorRenderer::setProperty(const string& propertyName, const EmuValuesList
             m_showBorder = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "colorMode") {
+        if (values[0].asString() == "mono")
+            setColorMode(false);
+        else if (values[0].asString() == "color")
+            setColorMode(true);
+        else
+            return false;
+        return true;
     }
 
     return false;
@@ -436,6 +461,8 @@ string VectorRenderer::getPropertyStringValue(const string& propertyName)
 
     if (propertyName == "visibleArea") {
         return m_showBorder ? "yes" : "no";
+    } else if (propertyName == "colorMode") {
+        return m_colorMode ? "color" : "mono";
     } else if (propertyName == "crtMode") {
         if (m_mode512pxLatched)
             return u8"512\u00D7256@50.08Hz";

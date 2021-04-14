@@ -32,14 +32,6 @@ styleSelector.addItem = sizable, "Изменяемый пользователе�
 styleSelector.addItem = fixed, "Фиксированный"
 configTab.addControl = 1, &styleSelector
 
-#window.fieldsMixing
-ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
-mixSelector.addItem = none, "Выкл."
-mixSelector.addItem = mix, "Вкл."
-mixSelector.addItem = interlace, "Чередование"
-mixSelector.addItem = scanline, "Имитация линий растра"
-configTab.addControl = 3, &mixSelector
-
 #window.antialiasing
 ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
 aaSelector.addItem = no, "Выкл."
@@ -64,6 +56,20 @@ ConfigRadioSelector cropSelector = &crtRenderer, visibleArea, "Отобража�
 cropSelector.addItem = no, "Нет"
 cropSelector.addItem = yes, "Да"
 configTab.addControl = 2, &cropSelector
+
+#crtRenderer.colorMode
+ConfigRadioSelector colorSelector = &crtRenderer, colorMode, "Режим цвета"
+colorSelector.addItem = color, "Цветной"
+colorSelector.addItem = mono, "Ч/б"
+configTab.addControl = 3, &colorSelector
+
+#window.fieldsMixing
+ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
+mixSelector.addItem = none, "Выкл."
+mixSelector.addItem = mix, "Вкл."
+mixSelector.addItem = interlace, "Чередование"
+mixSelector.addItem = scanline, "Имитация линий растра"
+configTab.addControl = 3, &mixSelector
 
 #kbdLayout.layout
 ConfigRadioSelector laSelector = &kbdLayout, layout, "Раскладка клавиатуры"
