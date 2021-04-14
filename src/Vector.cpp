@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -284,7 +284,7 @@ void VectorRenderer::setPaletteColor(uint8_t color)
     //m_palette[m_borderColor] = ((color & 0x7) << 21) | ((color & 0x38) << 10) | (color & 0xC0);
     m_palette[m_lastColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
                                ((color & 0x38) << 10) | ((color & 0x38) << 7) | ((color & 0x30) << 4) |
-                               (color & 0xC0) | ((color & 0xC8) >> 2) | ((color & 0xC8) >> 4) | ((color & 0xC8) >> 6);
+                               (color & 0xC0) | ((color & 0xC0) >> 2) | ((color & 0xC0) >> 4) | ((color & 0xC0) >> 6);
 }
 
 
