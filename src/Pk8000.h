@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
         // derived from CrtRenderer
+        void toggleColorMode() override;
         void toggleCropping() override;
 
         // derived from ActiveDevice
@@ -75,6 +76,13 @@ class Pk8000Renderer : public CrtRenderer, public IActive
             0xA800A8, 0xFF00FF, 0xA8A8A8, 0xFFFFFF
         };
 
+        const uint32_t c_pk8000BwPalette[16] = {
+            0x000000, 0x1E1E1E, 0x3C3C3C, 0x5A5A5A,
+            0x787878, 0x969696, 0xB4B4B4, 0xD2D2D2,
+            0x000000, 0x202020, 0x404040, 0x606060,
+            0x808080, 0xA0A0A0, 0xE0E0E0, 0xFFFFFF
+        };
+
         enum BlankingState {
             BS_NORMAL,
             BS_BLANK,
@@ -95,10 +103,12 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         uint32_t m_bgColor = 0x000000;
         uint8_t m_colorRegs[32];
         bool m_showBorder = false;
+        bool m_colorMode = true;
         bool m_blanking = false;
         bool m_activeArea = false;
         unsigned m_ticksPerPixel;
         uint16_t m_nextLineSgBase = 0;
+        const uint32_t* m_palette = c_pk8000ColorPalette;
 
         uint64_t m_ticksPerScanLineActiveArea;   // тактов на активную часть скан-линии
         uint64_t m_ticksPerScanLineSideBorder;   // тактов на боковой бордюр скан-линии
@@ -110,6 +120,8 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         uint32_t* m_frameBuf;
         void prepareFrame();
         void renderLine(int nLine);
+
+        void setColorMode(bool colorMode);
 
         uint64_t m_curScanlineClock;
         int m_curScanlinePixel = 0;

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -131,6 +131,8 @@ Pk8000Renderer::Pk8000Renderer()
     m_ticksPerPixel = g_emulation->getFrequency() / 5000000;
     setMode(0);
 
+    m_palette = c_pk8000ColorPalette;
+
     m_curScanlineClock = m_curClock;
     memset(m_bgScanlinePixels, 0, 320 * sizeof(uint32_t));
     memset(m_fgScanlinePixels, 0, 320 * sizeof(uint32_t));
@@ -228,8 +230,8 @@ void Pk8000Renderer::setFgBgColors(unsigned fgColor, unsigned bgColor)
     }
     m_curScanlinePixel = curPixel;
 
-    m_fgColor = c_pk8000ColorPalette[fgColor];
-    m_bgColor = c_pk8000ColorPalette[bgColor];
+    m_fgColor = m_palette[fgColor];
+    m_bgColor = m_palette[bgColor];
 }
 
 
@@ -330,8 +332,8 @@ void Pk8000Renderer::renderLine(int nLine)
         for (int pos = 0; pos < 32; pos++) {
             uint8_t chr = m_screenMemoryBanks[m_bank][m_txtBase + row * 32 + pos];
             unsigned colorCode = m_colorRegs[chr >> 3];
-            uint32_t fgColor = c_pk8000ColorPalette[colorCode & 0x0F];
-            uint32_t bgColor = c_pk8000ColorPalette[colorCode >> 4];
+            uint32_t fgColor = m_palette[colorCode & 0x0F];
+            uint32_t bgColor = m_palette[colorCode >> 4];
             uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
             for (int i = 0; i < 8; i++) {
                 BlankingState bs = m_blankingPixels[54 + m_offsetX + pos * 8 + i];
@@ -341,7 +343,7 @@ void Pk8000Renderer::renderLine(int nLine)
                     color = bt & 0x80 ? fgColor : bgColor;
                     break;
                 case BS_BLANK:
-                    color = c_pk8000ColorPalette[15];
+                    color = m_palette[15];
                     break;
                 case BS_WRITE:
                 default:
@@ -360,8 +362,8 @@ void Pk8000Renderer::renderLine(int nLine)
         for (int pos = 0; pos < 32; pos++) {
             uint8_t chr = m_screenMemoryBanks[m_bank][m_sgBase + part * 256 + row * 32 + pos];
             unsigned colorCode = m_screenMemoryBanks[m_bank][m_colBase + part * 0x800 + chr * 8 + line];
-            uint32_t fgColor = c_pk8000ColorPalette[colorCode & 0x0F];
-            uint32_t bgColor = c_pk8000ColorPalette[colorCode >> 4];
+            uint32_t fgColor = m_palette[colorCode & 0x0F];
+            uint32_t bgColor = m_palette[colorCode >> 4];
             uint8_t bt = m_screenMemoryBanks[m_bank][m_grBase + part * 0x800 + chr * 8 + line];
             for (int i = 0; i < 8; i++) {
                 uint32_t color = bt & 0x80 ? fgColor : bgColor;
@@ -409,6 +411,19 @@ void Pk8000Renderer::prepareFrame()
 }
 
 
+void Pk8000Renderer::setColorMode(bool colorMode)
+{
+    m_colorMode = colorMode;
+    m_palette = m_colorMode ? c_pk8000ColorPalette : c_pk8000BwPalette;
+}
+
+
+void Pk8000Renderer::toggleColorMode()
+{
+    setColorMode(!m_colorMode);
+}
+
+
 void Pk8000Renderer::toggleCropping()
 {
     m_showBorder = !m_showBorder;
@@ -428,6 +443,14 @@ bool Pk8000Renderer::setProperty(const string& propertyName, const EmuValuesList
             m_showBorder = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "colorMode") {
+        if (values[0].asString() == "mono")
+            setColorMode(false);
+        else if (values[0].asString() == "color")
+            setColorMode(true);
+        else
+            return false;
+        return true;
     } else if (propertyName == "cpuWaits") {
         m_waits = (static_cast<Pk8000CpuWaits*>(g_emulation->findObject(values[0].asString())));
         return true;
@@ -447,6 +470,8 @@ string Pk8000Renderer::getPropertyStringValue(const string& propertyName)
 
     if (propertyName == "visibleArea") {
         return m_showBorder ? "yes" : "no";
+    } else if (propertyName == "colorMode") {
+        return m_colorMode ? "color" : "mono";
     } else if (propertyName == "crtMode") {
         switch (m_mode) {
         case 0:

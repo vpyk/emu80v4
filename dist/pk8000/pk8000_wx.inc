@@ -72,6 +72,12 @@ laSelector.addItem = jcuken, "Йцукен"
 laSelector.addItem = smart, "«Умная» раскладка"
 configTab.addControl = 2, &laSelector
 
+#crtRenderer.colorMode
+ConfigRadioSelector colorRadioSelector = &crtRenderer, colorMode, "Режим цвета"
+colorRadioSelector.addItem = color, "Цветной"
+colorRadioSelector.addItem = mono, "Ч/б"
+configTab.addControl = 2, &colorRadioSelector
+
 #kbdLayout.numpadJoystick
 ConfigRadioSelector njSelector = &kbdLayout, numpadJoystick, "Клавиши джойстика"
 njSelector.addItem = no, "Совмещены с клавиатурой (стрелки, пробел, Enter)"
