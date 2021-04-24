@@ -26,8 +26,6 @@
 #include "EmuObjects.h"
 
 
-const int MAX_SIGNAL_AMP = 4095;
-
 class SoundMixer;
 
 // Базовый класс источника звука
@@ -114,10 +112,13 @@ class SoundMixer : public ActiveDevice
         bool m_muted = false;
 
         // Уровень громкости (1-5)
-        int m_volume = 4;
+        int m_volume = 5;
 
         // сдвиг отсчета вправо для уменьшения громкости
         int m_sampleShift = 0;
+
+        // уровень тишины (0 для гроскости 0-5)
+        int m_silenceLevel = 0;
 };
 
 #endif // SOUNDMIXER_H

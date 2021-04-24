@@ -158,7 +158,7 @@ void Pit8253Counter::updateState()
 
 //    m_avgOut = 0;
 //    if (curClock != m_prevClock)
-//        m_avgOut = m_tempSumOut * 9 * SND_AMP / (curClock - m_prevClock + addClock);
+//        m_avgOut = m_tempSumOut * 9 * MAX_SND_AMP / (curClock - m_prevClock + addClock);
 
     m_prevClock = curClock;
 #ifdef LESS_64BIT_DIVS
@@ -173,13 +173,13 @@ int Pit8253Counter::getAvgOut()
     m_avgOut = 0;
     if (curClock != m_sampleClock) {
 #ifndef LESS_64BIT_DIVS
-        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * SND_AMP / (curClock - m_sampleClock);
+        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * MAX_SND_AMP / (curClock - m_sampleClock);
 #else
         uint32_t dt = curClock - m_sampleClock;
         m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * 4096 / dt;
 #endif
     }
-        //m_avgOut = m_tempSumOut * SND_AMP / (curClock / 9 - m_sampleClock / 9);
+        //m_avgOut = m_tempSumOut * MAX_SND_AMP / (curClock / 9 - m_sampleClock / 9);
     return m_avgOut;
 }
 

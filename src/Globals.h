@@ -32,7 +32,7 @@
 #define VERSION VER_STR TARGET
 
 
-#define SND_AMP 4096
+#define MAX_SND_AMP 16383
 
 class Emulation;
 extern Emulation* g_emulation;

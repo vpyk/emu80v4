@@ -265,6 +265,7 @@ void SettingsDialog::fillControlValues()
     ui->muteCheckBox->setVisible(false); //временно!
     ui->volumeSpinBox->setValue(volume);
     ui->volumeSlider->setValue(volume);
+    ui->warnLabel->setVisible(volume > 5);
 
     // Window style
     val = m_options["window.windowStyle"];
@@ -434,6 +435,7 @@ void SettingsDialog::fillControlValues()
 void SettingsDialog::on_volumeSlider_valueChanged(int value)
 {
     ui->volumeSpinBox->setValue(value);
+    ui->warnLabel->setVisible(value > 5);
 }
 
 

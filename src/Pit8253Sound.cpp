@@ -39,9 +39,9 @@ int Pit8253SoundSource::calcValue()
     if (m_pit) {
         m_pit->updateState();
         for (int i = 0; i < 3; i++) {
-            res += SND_AMP - (m_pit->getCounter(i)->getAvgOut());
+            res += MAX_SND_AMP - (m_pit->getCounter(i)->getAvgOut());
             m_pit->getCounter(i)->resetStats();
-            //res += m_pit->getOut(i) ? SND_AMP : 0;
+            //res += m_pit->getOut(i) ? MAX_SND_AMP : 0;
         }
     }
 
@@ -77,7 +77,7 @@ int RkPit8253SoundSource::calcValue()
         cnt->operateForTicks(t);
 
         if (!m_pit->getCounter(2)->getOut())
-            res += (SND_AMP - m_pit->getCounter(0)->getAvgOut());
+            res += (MAX_SND_AMP - m_pit->getCounter(0)->getAvgOut());
 
         m_pit->getCounter(0)->resetStats();
         m_pit->getCounter(1)->resetStats();

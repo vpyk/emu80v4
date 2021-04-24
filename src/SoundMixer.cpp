@@ -31,14 +31,14 @@ using namespace std;
 // Вызывается 48000 (SAMPLE_RATE) раз в секунду для получения текущего сэмпла и его проигрывания
 void SoundMixer::operate()
 {
-    int16_t sample = 0;
+    int sample = 0;
     for(auto it = m_soundSources.begin(); it != m_soundSources.end(); it++)
         sample += (*it)->calcValue();
 
     if (!m_muted)
-        palPlaySample(sample >> m_sampleShift);
+        palPlaySample((sample >> m_sampleShift) + m_silenceLevel);
     else
-        palPlaySample(0);
+        palPlaySample(m_silenceLevel);
 
     m_curClock += m_ticksPerSample;
 
@@ -77,10 +77,16 @@ void SoundMixer::toggleMute()
 
 void SoundMixer::setVolume(int volume)
 {
-    if (volume >= 1 && volume <= 5) {
-        m_volume = volume;
-        m_sampleShift = 5 - volume;
-    }
+    if (volume < 1 || volume > 7)
+        return;
+
+    m_volume = volume;
+    m_sampleShift = 7 - volume;
+
+    if (volume <= 5)
+        m_silenceLevel = 0;
+    else
+        m_silenceLevel = -32768;
 }
 
 
@@ -160,7 +166,7 @@ int GeneralSoundSource::calcValue()
 
     uint64_t ticks = g_emulation->getCurClock() - initClock;
     if (ticks)
-            res = sumVal * MAX_SIGNAL_AMP / ticks;
+            res = sumVal * MAX_SND_AMP / ticks;
     sumVal = 0;
     initClock = g_emulation->getCurClock();
 

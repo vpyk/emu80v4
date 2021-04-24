@@ -220,7 +220,7 @@ uint16_t Psg3910::getOutput()
     uint64_t curClock = g_emulation->getCurClock();
 
     double delta = m_outValue * (m_discreteClock - curClock);
-    uint16_t res = (m_accum - delta) / (curClock - m_prevClock) * SND_AMP;
+    uint16_t res = (m_accum - delta) / (curClock - m_prevClock) * MAX_SND_AMP;
     m_accum = delta;
     m_prevClock = curClock;
 
