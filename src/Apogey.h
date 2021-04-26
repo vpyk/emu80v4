@@ -73,7 +73,7 @@ class ApogeyRenderer : public Crt8275Renderer
 
         const char16_t* c_apogeySymbols =
             u" ▘▝▀▗▚▐▜ ★⬯↑⬮ ↣↓▖▌▞▛▄▙▟█∼≈╋┃━↢✿▕"
-            u" !\"#$%&'()*+,-./0123456789:;<=>?"
+            u" !\"#¤%&'()*+,-./0123456789:;<=>?"
             u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
             u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▒";
 
