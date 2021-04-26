@@ -19,7 +19,7 @@ before_install:
   - sudo apt-get -qy update                # Update repo
 
 install:
-  - sudo apt-get -qy install qt${QT}base qt${QT}multimedia    # install specific Qt version
+  - sudo apt-get -qy install qt${QT}base qt${QT}multimedia libgl1-mesa-dev   # install specific Qt version
 
 before_script:
   - '"$CXX" != clang++ || export QMAKESPEC=linux-clang'
