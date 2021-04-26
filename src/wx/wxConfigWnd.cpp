@@ -334,11 +334,8 @@ wxRadioBox* ConfigWndTab::addRadioSelector(int column, wxString caption, wxStrin
 	wxRadioBox* radioBox = new wxRadioBox(m_tabPanel, wxID_ANY, caption, wxDefaultPosition, wxDefaultSize, nItems, items, 1, wxRA_SPECIFY_COLS, wxDefaultValidator, _T("ID_RADIOBOX2"));
 	radioBox->SetSelection(selectedItem);
 	m_tabVSizers[column - 1]->Add(radioBox, 0, wxTOP|wxLEFT|wxRIGHT|wxEXPAND, 5);
+    m_tabVSizers[column - 1]->Layout();
 	//m_radioBoxList.push_back(radioBox);
-
-	// некорректное позиционирование последнего RadioBox - workaround
-	for (int i = 0; i < 3; i++)
-        m_tabVSizers[i]->RecalcSizes();
 
 	m_tabHSizer->Fit(m_tabPanel);
 	m_tabHSizer->SetSizeHints(m_tabPanel);
