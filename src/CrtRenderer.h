@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,6 +42,8 @@ class CrtRenderer : public EmuObject
         virtual void toggleColorMode() {}
         virtual void toggleCropping() {}
         virtual void setCropping(bool) {}
+
+        virtual const char* getTextScreen() {return nullptr;}
 
         void attachSecondaryRenderer(CrtRenderer* renderer);
 
@@ -92,6 +94,23 @@ class TextCrtRenderer : public CrtRenderer
 
         virtual void primaryRenderFrame() = 0;
         virtual void altRenderFrame() = 0;
+
+        const char* generateTextScreen(char16_t* wTextArray, int w, int h);
+
+        const char16_t* c_rkSymbols =
+            u" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢✿ "
+            u" !\"#¤%&'()*+,-./0123456789:;<=>?"
+            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
+
+        const char16_t* c_mikroSymbols =
+            u" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢· "
+            u" !\"#$%&'()*+,-./0123456789:;<=>?"
+            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
+
+    private:
+        std::string m_textScreen;
 };
 
 #endif // CRTRENDERER_H

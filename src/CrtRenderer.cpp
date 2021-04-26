@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,6 +15,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <locale>
+#include <codecvt>
 
 #include "Pal.h"
 
@@ -147,6 +150,63 @@ void TextCrtRenderer::renderFrame()
     else
         primaryRenderFrame();
 }
+
+
+const char* TextCrtRenderer::generateTextScreen(char16_t* wTextArray, int w, int h)
+{
+    // calculate row lengths for every row without trailing spaces
+    int* rowLengths = new int[h];
+    for (int y = 0; y < h; y++) {
+        int x;
+        for (x = w - 1; x >= 0; x--)
+            if (wTextArray[y * w + x] != u' ')
+                break;
+        rowLengths[y] = x + 1;
+    }
+
+    // Calculate first and last non-empty rows
+    int y;
+    for (y = 0; y < h; y++)
+        if (rowLengths[y] > 0)
+            break;
+    int firstRow = y;
+    for (y = h - 1; y >= 0; y--)
+        if (rowLengths[y] > 0)
+            break;
+    int lastRow = y;
+    if(firstRow > lastRow)
+        firstRow = lastRow = 0;
+
+
+    // Calculate left offset
+    int firstPos = w;
+    for (int y = firstRow; y <= lastRow; y++)
+        for (int x = 0; x < rowLengths[y]; x++)
+            if (wTextArray[y * w + x] != u' ') {
+                if (firstPos > x)
+                    firstPos = x;
+                break;
+            }
+    if (firstPos >= w)
+        firstPos = 0;
+
+    u16string wTextScreen;
+    for (int y = firstRow; y <= lastRow; y++) {
+        for (int x = firstPos; x < rowLengths[y]; x++) {
+            char16_t wchr = wTextArray[y * w + x];
+            wTextScreen.append(1, wchr);
+        }
+        wTextScreen.append(u"\n");
+    }
+
+    delete[] wTextArray;
+
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> conversion;
+    m_textScreen = conversion.to_bytes(wTextScreen.c_str());
+
+    return m_textScreen.c_str();
+}
+
 
 
 bool TextCrtRenderer::setProperty(const string& propertyName, const EmuValuesList& values)

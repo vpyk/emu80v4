@@ -481,7 +481,7 @@ static bool palProcessEvents()
                     if (!SDL_GetWindowFromID(event.key.windowID))
                         break; // могут остаться события, относящиеся к уже уделенному окну
                     PalKeyCode key = TranslateScanCode(event.key.keysym.scancode);
-                    SysReq sr = TranslateKeyToSysReq(key, event.type == SDL_KEYDOWN, SDL_GetModState() & (KMOD_ALT | KMOD_GUI));
+                    SysReq sr = TranslateKeyToSysReq(key, event.type == SDL_KEYDOWN, SDL_GetModState() & (KMOD_ALT | KMOD_GUI), SDL_GetModState() & KMOD_SHIFT);
                     if (sr)
                         emuSysReq(PalWindow::windowById(event.key.windowID), sr);
                     else {
@@ -584,6 +584,12 @@ uint64_t palGetCounterFreq()
 void palDelay(uint64_t time)
 {
     SDL_Delay(time * 1000 / SDL_GetPerformanceFrequency());
+}
+
+
+void palCopyTextToClipboard(const char* text)
+{
+    SDL_SetClipboardText(text);
 }
 
 

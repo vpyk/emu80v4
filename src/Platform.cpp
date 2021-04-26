@@ -200,6 +200,13 @@ void Platform::sysReq(SysReq sr)
                 g_emulation->getConfig()->updateConfig();
             }
             break;
+        case SR_COPYTXT:
+            if (m_renderer) {
+                const char* text = m_renderer->getTextScreen();
+                if (text)
+                    palCopyTextToClipboard(text);
+            }
+            break;
         case SR_DISKA:
             // open disk A image
             if (m_diskA)

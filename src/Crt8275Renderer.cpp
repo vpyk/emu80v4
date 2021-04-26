@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 // Crt8275Renderer.cpp
 
 #include <sstream>
-#include <string.h>
+#include <cstring>
 
 #include "Crt8275Renderer.h"
 #include "Emulation.h"
@@ -340,6 +340,42 @@ void Crt8275Renderer::altRenderFrame()
     }
 
     trimImage(8, nLines);
+}
+
+
+char16_t Crt8275Renderer::getUnicodeSymbol(uint8_t, bool, bool, bool)
+{
+    return 0;
+}
+
+
+const char* Crt8275Renderer::getTextScreen()
+{
+    const Frame* frame = m_crt->getFrame();
+
+    int h = frame->nRows;
+    int w = frame->nCharsPerRow;
+
+    char16_t* wTextArray = new char16_t[h * w];
+
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            Symbol symbol = frame->symbols[y][x];
+            uint8_t chr = symbol.chr;
+            bool gpa0 = symbol.symbolAttributes.gpa0;
+            bool gpa1 = symbol.symbolAttributes.gpa1;
+            bool hglt = symbol.symbolAttributes.hglt;
+            bool vsp = symbol.symbolLineAttributes[1].vsp;
+
+            char16_t wchr = getUnicodeSymbol(chr, gpa0, gpa1, hglt);
+            if (wchr == 0)
+                wchr = u' ';
+
+            wTextArray[y * w + x] = wchr && !vsp ? wchr : u' ';
+        }
+    }
+
+    return generateTextScreen(wTextArray, w, h);
 }
 
 

@@ -22,6 +22,6 @@
 #include "PalKeys.h"
 #include "EmuTypes.h"
 
-SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed);
+SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, bool isShiftPressed);
 
 #endif // SHORTCUTS_H

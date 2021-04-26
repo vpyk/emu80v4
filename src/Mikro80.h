@@ -34,6 +34,8 @@ class Mikro80Renderer : public TextCrtRenderer
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
+        const char* getTextScreen() override;
+
         void attachScreenMemory(Ram* screenMemory);
 
         static EmuObject* create(const EmuValuesList&) {return new Mikro80Renderer();}

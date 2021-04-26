@@ -209,6 +209,20 @@ class PartnerRenderer : public Crt8275Renderer
         const uint8_t* getAltFontPtr(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt) override;
+        virtual char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt);
+
+    private:
+        const char16_t* c_partnerSymbols =
+            u" ☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§■↨↑↓→←∟↔▲▼"
+            u" !\"#$%&'()*+,-./0123456789:;<=>?"
+            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            u"`abcdefghijklmnopqrstuvwxyz{|}~"
+            u"╧╨╤╡╢╖╕╥╙╘╒╜╛╞╟╓"
+            u"╔╗╝╚═║╦╣╩╠╬░▒▓╫╪"
+            u"┌┐┘└─│┬┤┴├┼█▄▌▐▀"
+            u"АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+            u"абвгдежзийклмнопрстуфхцчшщъыьэюя"
+            u"Ёё╭╮╯╰→←↑↓÷±№¤■ ";
 };
 
 

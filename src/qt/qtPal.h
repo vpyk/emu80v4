@@ -63,6 +63,9 @@ void palPlaySample(int16_t sample);
 
 std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
 
+void palCopyTextToClipboard(const char* text);
+
+
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false, PalWindow* wnd = nullptr);
 bool palChooseConfiguration(std::string platformName, PalWindow* wnd);
 void palSetRunFileName(std::string runFileName);

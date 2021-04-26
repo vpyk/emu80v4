@@ -197,6 +197,12 @@ const uint8_t* MikroshaRenderer::getAltFontPtr(bool, bool, bool)
 }
 
 
+char16_t MikroshaRenderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
+{
+    return c_mikroshaSymbols[m_fontNumber * 128 + chr];
+}
+
+
 void MikroshaPit8253SoundSource::updateStats()
 {
     if (m_pit) {

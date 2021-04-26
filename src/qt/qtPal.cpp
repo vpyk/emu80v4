@@ -31,6 +31,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QMessageBox>
+#include <QClipboard>
 
 #include "qtMainWindow.h"
 #include "qtRenderHelper.h"
@@ -537,6 +538,15 @@ void palGetPalDefines(std::list<std::string>& defineList)
 {
     defineList.push_back("QT");
 }
+
+
+void palCopyTextToClipboard(const char* text)
+{
+    QClipboard* clipboard = QGuiApplication::clipboard();
+    QString str = QString::fromUtf8(text);
+    clipboard->setText(str);
+}
+
 
 static string logStr = "";
 

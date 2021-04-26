@@ -60,4 +60,6 @@ void palPlaySample(int16_t sample);
 
 std::string palGetDefaultPlatform();
 
+void palCopyTextToClipboard(const char* text);
+
 #endif // SDLPAL_H

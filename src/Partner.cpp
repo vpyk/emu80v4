@@ -393,6 +393,19 @@ const uint8_t* PartnerRenderer::getAltFontPtr(bool gpa0, bool gpa1, bool hglt)
 }
 
 
+char16_t PartnerRenderer::getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt)
+{
+    int font = (gpa0 ? 1 : 0) + (gpa1 ? 2 : 0) + (hglt ? 4 : 0);
+
+    if (font == 3)
+        return c_rkSymbols[chr];
+    else if (font < 2)
+        return c_partnerSymbols[font * 128 + chr];
+    else
+        return (chr || font == 7) ? u'·' : u' ';
+}
+
+
 bool PartnerRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (Crt8275Renderer::setProperty(propertyName, values))

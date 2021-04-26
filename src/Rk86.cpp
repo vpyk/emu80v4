@@ -123,6 +123,12 @@ const uint8_t* Rk86Renderer::getAltFontPtr(bool, bool, bool)
 }
 
 
+char16_t Rk86Renderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
+{
+    return c_rkSymbols[chr];
+}
+
+
 void Rk86Renderer::toggleColorMode()
 {
     /*if (m_colorMode == RCM_MONO_SIMPLE)

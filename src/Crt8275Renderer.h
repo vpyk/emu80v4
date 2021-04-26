@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ class Crt8275Renderer : public TextCrtRenderer
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
+        const char* getTextScreen() override;
+
         void attachCrt(Crt8275* crt);
 
         void setFontSetNum(int fontNum) {m_fontNumber = fontNum;}
@@ -46,6 +48,7 @@ class Crt8275Renderer : public TextCrtRenderer
         virtual uint32_t getCurFgColor(bool, bool, bool) = 0;
         virtual uint32_t getCurBgColor(bool, bool, bool) {return 0x000000;}
         virtual void customDrawSymbolLine(uint32_t*, uint8_t, int, bool, bool, bool, bool, bool, bool) {}
+        virtual char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt);
 
         Crt8275* m_crt = nullptr;
 

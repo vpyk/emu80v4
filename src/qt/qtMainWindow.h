@@ -106,6 +106,7 @@ private slots:
     void onMuteTape();
     void onScreenshot();
     void onCopyImage();
+    void onCopyText();
     void onSettings();
     void onPlatformHelp();
     void onAbout();
@@ -181,6 +182,7 @@ private:
     QAction* m_debugAction;
     QAction* m_screenshotAction;
     QAction* m_copyImageAction;
+    QAction* m_copyTextAction;
     QAction* m_settingsAction;
     QAction* m_tapeHookAction;
     QAction* m_muteTapeAction;

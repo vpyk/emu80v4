@@ -20,7 +20,7 @@
 #include "PalKeys.h"
 #include "Shortcuts.h"
 
-SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
+SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, bool isShiftPressed)
 {
     if (isKeyDown && isAltPressed)
         switch (key) {
@@ -100,6 +100,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed)
                 return SR_SCREENSHOT;
             case PK_U:
                 return SR_MUTE;
+            case PK_INS:
+                return isShiftPressed ? SR_COPYTXT : SR_NONE;
             default:
                 return SR_NONE;
         } else {

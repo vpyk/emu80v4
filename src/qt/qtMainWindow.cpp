@@ -498,6 +498,16 @@ void MainWindow::createActions()
     addAction(m_copyImageAction);
     connect(m_copyImageAction, SIGNAL(triggered()), this, SLOT(onCopyImage()));
 
+    // Copy text screen to clipboard
+    m_copyTextAction = new QAction(tr("Copy text screen"), this);
+    //m_copyTextAction->setToolTip(tr("Copy text screen to clipboard (Alt-Shift-Ins)"));
+    QList<QKeySequence> copyTextKeysList;
+    copyTextKeysList.append(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Insert));
+    copyTextKeysList.append(QKeySequence(Qt::META + Qt::SHIFT + Qt::Key_Insert));
+    m_copyTextAction->setShortcuts(copyTextKeysList);
+    addAction(m_copyTextAction);
+    connect(m_copyTextAction, SIGNAL(triggered()), this, SLOT(onCopyText()));
+
     m_toolBar->addSeparator();
 
     settingsMenu->addSeparator();
@@ -810,6 +820,7 @@ void MainWindow::createActions()
     viewMenu->addSeparator();
     viewMenu->addAction(m_screenshotAction);
     viewMenu->addAction(m_copyImageAction);
+    viewMenu->addAction(m_copyTextAction);
     viewMenu->addSeparator();
 
     m_fullscreenAction = new QAction(tr("Fullscreen mode"), this);
@@ -943,6 +954,10 @@ void MainWindow::tuneMenu()
     m_colorLabel->setVisible(hasColor);
     m_colorMenuAction->setVisible(hasColor);
     m_colorMenuAction->setEnabled(hasColor);
+
+    m_copyTextAction->setVisible(platformGroup == "apogey" || platformGroup == "rk86" ||
+                                 platformGroup == "partner" || platformGroup == "mikrosha" ||
+                                 platformGroup == "mikro80" || platformGroup == "ut88");
 
     m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 }
@@ -1739,6 +1754,12 @@ void MainWindow::onScreenshot()
 void MainWindow::onCopyImage()
 {
     m_paintWidget->screenshot("");
+}
+
+
+void MainWindow::onCopyText()
+{
+    emuSysReq(m_palWindow, SR_COPYTXT);
 }
 
 
