@@ -69,7 +69,7 @@ class Rk86Renderer : public Crt8275Renderer
         const uint8_t* getAltFontPtr(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt) override;
-        virtual char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt);
+        char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt) override;
 
     private:
         Rk86ColorMode m_colorMode = RCM_COLOR1;

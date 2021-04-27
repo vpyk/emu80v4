@@ -164,8 +164,6 @@ class LvovPpi8255Circuit1 : public Ppi8255Circuit
 
         // address space mapper to switch memory pages
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
-
-        uint16_t m_kbdMask;
 };
 
 
