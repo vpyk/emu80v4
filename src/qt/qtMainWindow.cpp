@@ -265,6 +265,16 @@ void MainWindow::fillPlatformListMenu()
 }
 
 
+#ifndef __APPLE__
+    #define ADD_HOTKEY(keyList, key) \
+    keyList.append(QKeySequence(Qt::ALT + key)); \
+    keyList.append(QKeySequence(Qt::META + key))
+#else
+    #define ADD_HOTKEY(keyList, key) \
+    keyList.append(QKeySequence(Qt::ALT + key))
+#endif
+
+
 void MainWindow::createActions()
 {
     m_menuBar = menuBar();
@@ -284,8 +294,9 @@ void MainWindow::createActions()
     m_loadRunAction = new QAction(QIcon(":/icons/open_run.png"), tr("Load && Run..."), this);
     m_loadRunAction->setToolTip(tr("Load file and run (Alt-F3)"));
     QList<QKeySequence> loadRunKeysList;
-    loadRunKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F3));
-    loadRunKeysList.append(QKeySequence(Qt::META + Qt::Key_F3));
+    ADD_HOTKEY(loadRunKeysList, Qt::Key_F3);
+    //loadRunKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F3));
+    //loadRunKeysList.append(QKeySequence(Qt::META + Qt::Key_F3));
     m_loadRunAction->setShortcuts(loadRunKeysList);
     addAction(m_loadRunAction);
     fileMenu->addAction(m_loadRunAction);
@@ -296,8 +307,9 @@ void MainWindow::createActions()
     m_loadAction = new QAction(QIcon(":/icons/open.png"), tr("Load..."), this);
     m_loadAction->setToolTip(tr("Load file (Alt-L)"));
     QList<QKeySequence> loadKeysList;
-    loadKeysList.append(QKeySequence(Qt::ALT + Qt::Key_L));
-    loadKeysList.append(QKeySequence(Qt::META + Qt::Key_L));
+    ADD_HOTKEY(loadKeysList, Qt::Key_L);
+    //loadKeysList.append(QKeySequence(Qt::ALT + Qt::Key_L));
+    //loadKeysList.append(QKeySequence(Qt::META + Qt::Key_L));
     m_loadAction->setShortcuts(loadKeysList);
     addAction(m_loadAction);
     fileMenu->addAction(m_loadAction);
@@ -308,8 +320,9 @@ void MainWindow::createActions()
     m_loadWavAction = new QAction(QIcon(":/icons/open_wav.png"), tr("Load WAV..."), this);
     m_loadWavAction->setToolTip(tr("Load and play (or stop playing) WAV file (Alt-W)"));
     QList<QKeySequence> loadWavKeysList;
-    loadWavKeysList.append(QKeySequence(Qt::ALT + Qt::Key_W));
-    loadWavKeysList.append(QKeySequence(Qt::META + Qt::Key_W));
+    ADD_HOTKEY(loadWavKeysList, Qt::Key_W);
+    //loadWavKeysList.append(QKeySequence(Qt::ALT + Qt::Key_W));
+    //loadWavKeysList.append(QKeySequence(Qt::META + Qt::Key_W));
     m_loadWavAction->setShortcuts(loadWavKeysList);
     addAction(m_loadWavAction);
     fileMenu->addAction(m_loadWavAction);
@@ -323,8 +336,9 @@ void MainWindow::createActions()
     m_diskAAction = new QAction(QIcon(":/icons/disk_a.png"), tr("Disk A..."), this);
     m_diskAAction->setToolTip(tr("Load disk A image (Alt-A)"));
     QList<QKeySequence> diskAKeysList;
-    diskAKeysList.append(QKeySequence(Qt::ALT + Qt::Key_A));
-    diskAKeysList.append(QKeySequence(Qt::META + Qt::Key_A));
+    ADD_HOTKEY(diskAKeysList, Qt::Key_A);
+    //diskAKeysList.append(QKeySequence(Qt::ALT + Qt::Key_A));
+    //diskAKeysList.append(QKeySequence(Qt::META + Qt::Key_A));
     m_diskAAction->setShortcuts(diskAKeysList);
     addAction(m_diskAAction);
     fileMenu->addAction(m_diskAAction);
@@ -335,8 +349,9 @@ void MainWindow::createActions()
     m_diskBAction = new QAction(QIcon(":/icons/disk_b.png"), tr("Disk B..."), this);
     m_diskBAction->setToolTip(tr("Load disk B image (Alt-B)"));
     QList<QKeySequence> diskBKeysList;
-    diskBKeysList.append(QKeySequence(Qt::ALT + Qt::Key_B));
-    diskBKeysList.append(QKeySequence(Qt::META + Qt::Key_B));
+    ADD_HOTKEY(diskBKeysList, Qt::Key_B);
+    //diskBKeysList.append(QKeySequence(Qt::ALT + Qt::Key_B));
+    //diskBKeysList.append(QKeySequence(Qt::META + Qt::Key_B));
     m_diskBAction->setShortcuts(diskBKeysList);
     addAction(m_diskBAction);
     fileMenu->addAction(m_diskBAction);
@@ -349,8 +364,9 @@ void MainWindow::createActions()
     m_loadRamDiskAction = new QAction(QIcon(":/icons/edd.png"), tr("Load RAM Disk..."), this);
     m_loadRamDiskAction->setToolTip(tr("Load RAM Disk image"));
     QList<QKeySequence> loadRamDiskKeysList;
-    loadRamDiskKeysList.append(QKeySequence(Qt::ALT + Qt::Key_E));
-    loadRamDiskKeysList.append(QKeySequence(Qt::META + Qt::Key_E));
+    ADD_HOTKEY(loadRamDiskKeysList, Qt::Key_E);
+    //loadRamDiskKeysList.append(QKeySequence(Qt::ALT + Qt::Key_E));
+    //loadRamDiskKeysList.append(QKeySequence(Qt::META + Qt::Key_E));
     m_loadRamDiskAction->setShortcuts(loadRamDiskKeysList);
     addAction(m_loadRamDiskAction);
     fileMenu->addAction(m_loadRamDiskAction);
@@ -371,8 +387,9 @@ void MainWindow::createActions()
     m_exitAction = new QAction(tr("Exit"), this);
     m_exitAction->setToolTip(tr("Exit (Alt-X)"));
     QList<QKeySequence> exitKeysList;
-    exitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_X));
-    exitKeysList.append(QKeySequence(Qt::META + Qt::Key_X));
+    ADD_HOTKEY(exitKeysList, Qt::Key_X);
+    //exitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_X));
+    //exitKeysList.append(QKeySequence(Qt::META + Qt::Key_X));
     m_exitAction->setShortcuts(exitKeysList);
     addAction(m_exitAction);
     fileMenu->addAction(m_exitAction);
@@ -387,8 +404,9 @@ void MainWindow::createActions()
     m_platformSelectAction = m_platformListMenu->menuAction();
     m_platformSelectAction->setToolTip(tr("Select platform (Alt-F9)"));
     QList<QKeySequence> platformKeyList;
-    platformKeyList.append(QKeySequence(Qt::ALT + Qt::Key_F9));
-    platformKeyList.append(QKeySequence(Qt::META + Qt::Key_F9));
+    ADD_HOTKEY(platformKeyList, Qt::Key_F9);
+    //platformKeyList.append(QKeySequence(Qt::ALT + Qt::Key_F9));
+    //platformKeyList.append(QKeySequence(Qt::META + Qt::Key_F9));
     m_platformSelectAction->setShortcuts(platformKeyList);
     addAction(m_platformSelectAction);
     connect(m_platformSelectAction, SIGNAL(triggered()), this, SLOT(onPlatform()));
@@ -402,8 +420,9 @@ void MainWindow::createActions()
     m_platformConfigAction = new QAction(QIcon(":/icons/config.png"), tr("Platform configuration..."), this);
     m_platformConfigAction->setToolTip(tr("Configure current platform (Alt-F8)"));
     QList<QKeySequence> platformConfigKeysList;
-    platformConfigKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F8));
-    platformConfigKeysList.append(QKeySequence(Qt::META + Qt::Key_F8));
+    ADD_HOTKEY(platformConfigKeysList, Qt::Key_F8);
+    //platformConfigKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F8));
+    //platformConfigKeysList.append(QKeySequence(Qt::META + Qt::Key_F8));
     m_platformConfigAction->setShortcuts(platformConfigKeysList);
     addAction(m_platformConfigAction);
     m_toolBar->addAction(m_platformConfigAction);
@@ -415,8 +434,9 @@ void MainWindow::createActions()
     m_resetAction = new QAction(QIcon(":/icons/reset.png"), tr("Reset"), this);
     m_resetAction->setToolTip(tr("Reset (Alt-F11)"));
     QList<QKeySequence> resetKeysList;
-    resetKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F11));
-    resetKeysList.append(QKeySequence(Qt::META + Qt::Key_F11));
+    ADD_HOTKEY(resetKeysList, Qt::Key_F11);
+    //resetKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F11));
+    //resetKeysList.append(QKeySequence(Qt::META + Qt::Key_F11));
     m_resetAction->setShortcuts(resetKeysList);
     addAction(m_resetAction);
     platformMenu->addAction(m_resetAction);
@@ -429,8 +449,9 @@ void MainWindow::createActions()
     m_pauseAction->setToolTip(tr("Pause (Pause, Alt-P)"));
     QList<QKeySequence> pauseKeysList;
     pauseKeysList.append(QKeySequence(Qt::Key_Pause));
-    pauseKeysList.append(QKeySequence(Qt::ALT + Qt::Key_P));
-    pauseKeysList.append(QKeySequence(Qt::META + Qt::Key_P));
+    ADD_HOTKEY(pauseKeysList, Qt::Key_P);
+    //pauseKeysList.append(QKeySequence(Qt::ALT + Qt::Key_P));
+    //pauseKeysList.append(QKeySequence(Qt::META + Qt::Key_P));
     m_pauseAction->setShortcuts(pauseKeysList);
     addAction(m_pauseAction);
     platformMenu->addAction(m_pauseAction);
@@ -452,8 +473,9 @@ void MainWindow::createActions()
     m_debugAction = new QAction(QIcon(":/icons/debug.png"), tr("Debug..."), this);
     m_debugAction->setToolTip(tr("Debug (Alt-D)"));
     QList<QKeySequence> debugKeysList;
-    debugKeysList.append(QKeySequence(Qt::ALT + Qt::Key_D));
-    debugKeysList.append(QKeySequence(Qt::META + Qt::Key_D));
+    ADD_HOTKEY(debugKeysList, Qt::Key_D);
+    //debugKeysList.append(QKeySequence(Qt::ALT + Qt::Key_D));
+    //debugKeysList.append(QKeySequence(Qt::META + Qt::Key_D));
     m_debugAction->setShortcuts(debugKeysList);
     addAction(m_debugAction);
     platformMenu->addAction(m_debugAction);
@@ -469,8 +491,9 @@ void MainWindow::createActions()
     m_settingsAction = new QAction(QIcon(":/icons/settings.png"), tr("Emulator settings..."), this);
     m_settingsAction->setToolTip(tr("Emulator settings (Alt-F12)"));
     QList<QKeySequence> settingsKeysList;
-    settingsKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F12));
-    settingsKeysList.append(QKeySequence(Qt::META + Qt::Key_F12));
+    ADD_HOTKEY(settingsKeysList, Qt::Key_F12);
+    //settingsKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F12));
+    //settingsKeysList.append(QKeySequence(Qt::META + Qt::Key_F12));
     m_settingsAction->setShortcuts(settingsKeysList);
     addAction(m_settingsAction);
     settingsMenu->addAction(m_settingsAction);
@@ -481,8 +504,9 @@ void MainWindow::createActions()
     m_screenshotAction = new QAction(QIcon(":/icons/screenshot.png"), tr("Take screenshot..."), this);
     m_screenshotAction->setToolTip(tr("Take screenshot (Alt-H)"));
     QList<QKeySequence> screenshotKeysList;
-    screenshotKeysList.append(QKeySequence(Qt::ALT + Qt::Key_H));
-    screenshotKeysList.append(QKeySequence(Qt::META + Qt::Key_H));
+    ADD_HOTKEY(screenshotKeysList, Qt::Key_H);
+    //screenshotKeysList.append(QKeySequence(Qt::ALT + Qt::Key_H));
+    //screenshotKeysList.append(QKeySequence(Qt::META + Qt::Key_H));
     m_screenshotAction->setShortcuts(screenshotKeysList);
     addAction(m_screenshotAction);
     m_toolBar->addAction(m_screenshotAction);
@@ -492,8 +516,9 @@ void MainWindow::createActions()
     m_copyImageAction = new QAction(tr("Copy screenshot"), this);
     m_copyImageAction->setToolTip(tr("Copy screenshot to clipboard (Alt-Ins)"));
     QList<QKeySequence> copyImageKeysList;
-    copyImageKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Insert));
-    copyImageKeysList.append(QKeySequence(Qt::META + Qt::Key_Insert));
+    ADD_HOTKEY(copyImageKeysList, Qt::Key_Insert);
+    //copyImageKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Insert));
+    //copyImageKeysList.append(QKeySequence(Qt::META + Qt::Key_Insert));
     m_copyImageAction->setShortcuts(copyImageKeysList);
     addAction(m_copyImageAction);
     connect(m_copyImageAction, SIGNAL(triggered()), this, SLOT(onCopyImage()));
@@ -502,8 +527,9 @@ void MainWindow::createActions()
     m_copyTextAction = new QAction(tr("Copy text screen"), this);
     //m_copyTextAction->setToolTip(tr("Copy text screen to clipboard (Alt-Shift-Ins)"));
     QList<QKeySequence> copyTextKeysList;
-    copyTextKeysList.append(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Insert));
-    copyTextKeysList.append(QKeySequence(Qt::META + Qt::SHIFT + Qt::Key_Insert));
+    ADD_HOTKEY(copyTextKeysList, Qt::SHIFT + Qt::Key_Insert);
+    //copyTextKeysList.append(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Insert));
+    //copyTextKeysList.append(QKeySequence(Qt::META + Qt::SHIFT + Qt::Key_Insert));
     m_copyTextAction->setShortcuts(copyTextKeysList);
     addAction(m_copyTextAction);
     connect(m_copyTextAction, SIGNAL(triggered()), this, SLOT(onCopyText()));
@@ -520,8 +546,9 @@ void MainWindow::createActions()
     m_qwertyAction->setCheckable(true);
     m_qwertyAction->setToolTip("Qwerty (Alt-Q)");
     QList<QKeySequence> qwertyKeyList;
-    qwertyKeyList.append(QKeySequence(Qt::ALT + Qt::Key_Q));
-    qwertyKeyList.append(QKeySequence(Qt::META + Qt::Key_Q));
+    ADD_HOTKEY(qwertyKeyList, Qt::Key_Q);
+    //qwertyKeyList.append(QKeySequence(Qt::ALT + Qt::Key_Q));
+    //qwertyKeyList.append(QKeySequence(Qt::META + Qt::Key_Q));
     m_qwertyAction->setShortcuts(qwertyKeyList);
     addAction(m_qwertyAction);
     layoutMenu->addAction(m_qwertyAction);
@@ -531,8 +558,9 @@ void MainWindow::createActions()
     m_jcukenAction->setCheckable(true);
     m_jcukenAction->setToolTip(tr("Jcuken (Alt-J)"));
     QList<QKeySequence> jcukenKeyList;
-    jcukenKeyList.append(QKeySequence(Qt::ALT + Qt::Key_J));
-    jcukenKeyList.append(QKeySequence(Qt::META + Qt::Key_J));
+    ADD_HOTKEY(jcukenKeyList, Qt::Key_J);
+    //jcukenKeyList.append(QKeySequence(Qt::ALT + Qt::Key_J));
+    //jcukenKeyList.append(QKeySequence(Qt::META + Qt::Key_J));
     m_jcukenAction->setShortcuts(jcukenKeyList);
     addAction(m_jcukenAction);
     layoutMenu->addAction(m_jcukenAction);
@@ -542,8 +570,9 @@ void MainWindow::createActions()
     m_smartAction->setCheckable(true);
     m_smartAction->setToolTip(tr("Smart (Alt-K)"));
     QList<QKeySequence> smartKeyList;
-    smartKeyList.append(QKeySequence(Qt::ALT + Qt::Key_K));
-    smartKeyList.append(QKeySequence(Qt::META + Qt::Key_K));
+    ADD_HOTKEY(smartKeyList, Qt::Key_K);
+    //smartKeyList.append(QKeySequence(Qt::ALT + Qt::Key_K));
+    //smartKeyList.append(QKeySequence(Qt::META + Qt::Key_K));
     m_smartAction->setShortcuts(smartKeyList);
     addAction(m_smartAction);
     layoutMenu->addAction(m_smartAction);
@@ -611,8 +640,9 @@ void MainWindow::createActions()
     settingsMenu->addAction(m_colorMenuAction);
 
     QList<QKeySequence> colorKeysList;
-    colorKeysList.append(QKeySequence(Qt::ALT + Qt::Key_C));
-    colorKeysList.append(QKeySequence(Qt::META + Qt::Key_C));
+    ADD_HOTKEY(colorKeysList, Qt::Key_C);
+    //colorKeysList.append(QKeySequence(Qt::ALT + Qt::Key_C));
+    //colorKeysList.append(QKeySequence(Qt::META + Qt::Key_C));
     m_colorMenuAction->setShortcuts(colorKeysList);
 
     settingsMenu->addAction(m_colorMenuAction);
@@ -623,8 +653,9 @@ void MainWindow::createActions()
     m_cropAction->setCheckable(true);
     m_cropAction->setToolTip(tr("Show only visible area (Alt-V)"));
     QList<QKeySequence> cropKeysList;
-    cropKeysList.append(QKeySequence(Qt::ALT + Qt::Key_V));
-    cropKeysList.append(QKeySequence(Qt::META + Qt::Key_V));
+    ADD_HOTKEY(cropKeysList, Qt::Key_V);
+    //cropKeysList.append(QKeySequence(Qt::ALT + Qt::Key_V));
+    //cropKeysList.append(QKeySequence(Qt::META + Qt::Key_V));
     m_cropAction->setShortcuts(cropKeysList);
     addAction(m_cropAction);
     m_toolBar->addAction(m_cropAction);
@@ -636,8 +667,9 @@ void MainWindow::createActions()
     m_aspectAction->setCheckable(true);
     m_aspectAction->setToolTip(tr("Original aspect ratio (Alt-R)"));
     QList<QKeySequence> aspectKeysList;
-    aspectKeysList.append(QKeySequence(Qt::ALT + Qt::Key_R));
-    aspectKeysList.append(QKeySequence(Qt::META + Qt::Key_R));
+    ADD_HOTKEY(aspectKeysList, Qt::Key_R);
+    //aspectKeysList.append(QKeySequence(Qt::ALT + Qt::Key_R));
+    //aspectKeysList.append(QKeySequence(Qt::META + Qt::Key_R));
     m_aspectAction->setShortcuts(aspectKeysList);
     addAction(m_aspectAction);
     m_toolBar->addAction(m_aspectAction);
@@ -649,8 +681,9 @@ void MainWindow::createActions()
     m_wideScreenAction->setCheckable(true);
     m_wideScreenAction->setToolTip(tr("Wide screen (16:9) (Alt-N)"));
     QList<QKeySequence> wideScreenKeysList;
-    wideScreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_N));
-    wideScreenKeysList.append(QKeySequence(Qt::META + Qt::Key_N));
+    ADD_HOTKEY(wideScreenKeysList, Qt::Key_N);
+    //wideScreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_N));
+    //wideScreenKeysList.append(QKeySequence(Qt::META + Qt::Key_N));
     m_wideScreenAction->setShortcuts(wideScreenKeysList);
     addAction(m_wideScreenAction);
     //m_toolBar->addAction(m_wideScreenAction);
@@ -662,8 +695,9 @@ void MainWindow::createActions()
     m_smoothingAction->setCheckable(true);
     m_smoothingAction->setToolTip(tr("Smoothing (Alt-S)"));
     QList<QKeySequence> smoothingKeysList;
-    smoothingKeysList.append(QKeySequence(Qt::ALT + Qt::Key_S));
-    smoothingKeysList.append(QKeySequence(Qt::META + Qt::Key_S));
+    ADD_HOTKEY(smoothingKeysList, Qt::Key_S);
+    //smoothingKeysList.append(QKeySequence(Qt::ALT + Qt::Key_S));
+    //smoothingKeysList.append(QKeySequence(Qt::META + Qt::Key_S));
     m_smoothingAction->setShortcuts(smoothingKeysList);
     addAction(m_smoothingAction);
     m_toolBar->addAction(m_smoothingAction);
@@ -675,8 +709,9 @@ void MainWindow::createActions()
     m_fontAction->setCheckable(true);
     m_fontAction->setToolTip(tr("Advanced font (Alt-F)"));
     QList<QKeySequence> fontKeysList;
-    fontKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F));
-    fontKeysList.append(QKeySequence(Qt::META + Qt::Key_F));
+    ADD_HOTKEY(fontKeysList, Qt::Key_F);
+    //fontKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F));
+    //fontKeysList.append(QKeySequence(Qt::META + Qt::Key_F));
     m_fontAction->setShortcuts(fontKeysList);
     //platformMenu->addAction(m_fontAction);
     addAction(m_fontAction);
@@ -692,8 +727,9 @@ void MainWindow::createActions()
     m_muteAction->setCheckable(true);
     m_muteAction->setToolTip(tr("Mute (Alt-M)"));
     QList<QKeySequence> muteKeysList;
-    muteKeysList.append(QKeySequence(Qt::ALT + Qt::Key_M));
-    muteKeysList.append(QKeySequence(Qt::META + Qt::Key_M));
+    ADD_HOTKEY(muteKeysList, Qt::Key_M);
+    //muteKeysList.append(QKeySequence(Qt::ALT + Qt::Key_M));
+    //muteKeysList.append(QKeySequence(Qt::META + Qt::Key_M));
     m_muteAction->setShortcuts(muteKeysList);
     addAction(m_muteAction);
     settingsMenu->addAction(m_muteAction);
@@ -707,8 +743,9 @@ void MainWindow::createActions()
     m_preset1xAction = new QAction(tr("Preset: 1x"), this);
     //m_preset1xAction->setToolTip(tr("Preset: 1x (Alt-1)"));
     QList<QKeySequence> preset1xKeysList;
-    preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
-    preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
+    ADD_HOTKEY(preset1xKeysList, Qt::Key_1);
+    //preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
+    //preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
     m_preset1xAction->setShortcuts(preset1xKeysList);
     addAction(m_preset1xAction);
     presetMenu->addAction(m_preset1xAction);
@@ -718,8 +755,9 @@ void MainWindow::createActions()
     m_preset2xAction = new QAction(tr("Preset: 2x"), this);
     //m_preset2xAction->setToolTip(tr("Preset: 2x (Alt-2)"));
     QList<QKeySequence> preset2xKeysList;
-    preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
-    preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
+    ADD_HOTKEY(preset2xKeysList, Qt::Key_2);
+    //preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
+    //preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
     m_preset2xAction->setShortcuts(preset2xKeysList);
     addAction(m_preset2xAction);
     presetMenu->addAction(m_preset2xAction);
@@ -729,8 +767,9 @@ void MainWindow::createActions()
     m_preset3xAction = new QAction(tr("Preset: 3x"), this);
     //m_preset3xAction->setToolTip(tr("Preset: 3x (Alt-3)"));
     QList<QKeySequence> preset3xKeysList;
-    preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
-    preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
+    ADD_HOTKEY(preset3xKeysList, Qt::Key_3);
+    //preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
+    //preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
     m_preset3xAction->setShortcuts(preset3xKeysList);
     addAction(m_preset3xAction);
     presetMenu->addAction(m_preset3xAction);
@@ -740,8 +779,9 @@ void MainWindow::createActions()
     m_preset4xAction = new QAction(tr("Preset: 4x"), this);
     //m_preset4xAction->setToolTip(tr("Preset: 4x (Alt-4)"));
     QList<QKeySequence> preset4xKeysList;
-    preset4xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_4));
-    preset4xKeysList.append(QKeySequence(Qt::META + Qt::Key_4));
+    ADD_HOTKEY(preset4xKeysList, Qt::Key_4);
+    //preset4xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_4));
+    //preset4xKeysList.append(QKeySequence(Qt::META + Qt::Key_4));
     m_preset4xAction->setShortcuts(preset4xKeysList);
     addAction(m_preset4xAction);
     presetMenu->addAction(m_preset4xAction);
@@ -751,8 +791,9 @@ void MainWindow::createActions()
     m_preset5xAction = new QAction(tr("Preset: 5x"), this);
     //m_preset5xAction->setToolTip(tr("Preset: 5x (Alt-5)"));
     QList<QKeySequence> preset5xKeysList;
-    preset5xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_5));
-    preset5xKeysList.append(QKeySequence(Qt::META + Qt::Key_5));
+    ADD_HOTKEY(preset5xKeysList, Qt::Key_5);
+    //preset5xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_5));
+    //preset5xKeysList.append(QKeySequence(Qt::META + Qt::Key_5));
     m_preset5xAction->setShortcuts(preset5xKeysList);
     addAction(m_preset5xAction);
     presetMenu->addAction(m_preset5xAction);
@@ -764,8 +805,9 @@ void MainWindow::createActions()
     m_preset2x3Action = new QAction(tr("Preset: 2x3"), this);
     //m_preset2x3Action->setToolTip(tr("Preset: 2x3 (Alt-6)"));
     QList<QKeySequence> preset2x3KeysList;
-    preset2x3KeysList.append(QKeySequence(Qt::ALT + Qt::Key_6));
-    preset2x3KeysList.append(QKeySequence(Qt::META + Qt::Key_6));
+    ADD_HOTKEY(preset2x3KeysList, Qt::Key_6);
+    //preset2x3KeysList.append(QKeySequence(Qt::ALT + Qt::Key_6));
+    //preset2x3KeysList.append(QKeySequence(Qt::META + Qt::Key_6));
     m_preset2x3Action->setShortcuts(preset2x3KeysList);
     addAction(m_preset2x3Action);
     presetMenu->addAction(m_preset2x3Action);
@@ -775,8 +817,9 @@ void MainWindow::createActions()
     m_preset3x5Action = new QAction(tr("Preset: 3x5"), this);
     //m_preset3x5Action->setToolTip(tr("Preset: 3x5 (Alt-7)"));
     QList<QKeySequence> preset3x5KeysList;
-    preset3x5KeysList.append(QKeySequence(Qt::ALT + Qt::Key_7));
-    preset3x5KeysList.append(QKeySequence(Qt::META + Qt::Key_7));
+    ADD_HOTKEY(preset3x5KeysList, Qt::Key_7);
+    //preset3x5KeysList.append(QKeySequence(Qt::ALT + Qt::Key_7));
+    //preset3x5KeysList.append(QKeySequence(Qt::META + Qt::Key_7));
     m_preset3x5Action->setShortcuts(preset3x5KeysList);
     addAction(m_preset3x5Action);
     presetMenu->addAction(m_preset3x5Action);
@@ -786,8 +829,9 @@ void MainWindow::createActions()
     m_preset4x6Action = new QAction(tr("Preset: 4x6"), this);
     //m_preset4x6Action->setToolTip(tr("Preset: 4x6 (Alt-8)"));
     QList<QKeySequence> preset4x6KeysList;
-    preset4x6KeysList.append(QKeySequence(Qt::ALT + Qt::Key_8));
-    preset4x6KeysList.append(QKeySequence(Qt::META + Qt::Key_8));
+    ADD_HOTKEY(preset4x6KeysList, Qt::Key_8);
+    //preset4x6KeysList.append(QKeySequence(Qt::ALT + Qt::Key_8));
+    //preset4x6KeysList.append(QKeySequence(Qt::META + Qt::Key_8));
     m_preset4x6Action->setShortcuts(preset4x6KeysList);
     addAction(m_preset4x6Action);
     presetMenu->addAction(m_preset4x6Action);
@@ -799,8 +843,9 @@ void MainWindow::createActions()
     m_presetStretchAction = new QAction(tr("Preset: Stretch"), this);
     //m_presetStretcgAction->setToolTip(tr("Preset: Stretch (Alt-9)"));
     QList<QKeySequence> presetStretchKeysList;
-    presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
-    presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
+    ADD_HOTKEY(presetStretchKeysList, Qt::Key_9);
+    //presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
+    //presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
     m_presetStretchAction->setShortcuts(presetStretchKeysList);
     addAction(m_presetStretchAction);
     presetMenu->addAction(m_presetStretchAction);
@@ -810,8 +855,9 @@ void MainWindow::createActions()
     m_presetFitAction = new QAction(tr("Preset: Fit"), this);
     //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
     QList<QKeySequence> presetFitKeysList;
-    presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
-    presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
+    ADD_HOTKEY(presetFitKeysList, Qt::Key_0);
+    //presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
+    //presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
     m_presetFitAction->setShortcuts(presetFitKeysList);
     addAction(m_presetFitAction);
     presetMenu->addAction(m_presetFitAction);
@@ -827,8 +873,9 @@ void MainWindow::createActions()
     m_fullscreenAction->setCheckable(true);
     //setToolTip(tr("Fullscreen mode (Alt-Enter)"));
     QList<QKeySequence> fullscreenKeysList;
-    fullscreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Return));
-    fullscreenKeysList.append(QKeySequence(Qt::META + Qt::Key_Return));
+    ADD_HOTKEY(fullscreenKeysList, Qt::Key_Return);
+    //fullscreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Return));
+    //fullscreenKeysList.append(QKeySequence(Qt::META + Qt::Key_Return));
     m_fullscreenAction->setShortcuts(fullscreenKeysList);
     connect(m_fullscreenAction, SIGNAL(triggered()), this, SLOT(onFullscreen()));
     addAction(m_fullscreenAction);
@@ -838,8 +885,9 @@ void MainWindow::createActions()
     m_fullwindowAction->setCheckable(true);
     //setToolTip(tr("Hide menu and buttons (Alt-\\)"));
     QList<QKeySequence> fullwindowKeysList;
-    fullwindowKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Backslash));
-    fullwindowKeysList.append(QKeySequence(Qt::META + Qt::Key_Backslash));
+    ADD_HOTKEY(fullwindowKeysList, Qt::Key_Backslash);
+    //fullwindowKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Backslash));
+    //fullwindowKeysList.append(QKeySequence(Qt::META + Qt::Key_Backslash));
     m_fullwindowAction->setShortcuts(fullwindowKeysList);
     connect(m_fullwindowAction, SIGNAL(triggered()), this, SLOT(onFullwindow()));
     addAction(m_fullwindowAction);
@@ -859,8 +907,9 @@ void MainWindow::createActions()
 
     m_platformHelpAction = new QAction(tr("Platform help..."), this);
     QList<QKeySequence> platformHelpKeysList;
-    platformHelpKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F1));
-    platformHelpKeysList.append(QKeySequence(Qt::META + Qt::Key_F1));
+    ADD_HOTKEY(platformHelpKeysList, Qt::Key_F1);
+    //platformHelpKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F1));
+    //platformHelpKeysList.append(QKeySequence(Qt::META + Qt::Key_F1));
     m_platformHelpAction->setShortcuts(platformHelpKeysList);
     m_platformHelpAction->setToolTip(tr("Show help on current platform"));
     helpMenu->addAction(m_platformHelpAction);
@@ -979,8 +1028,9 @@ void MainWindow::createDebugActions()
     m_preset1xAction = new QAction(tr("Preset: 1x"), this /*m_menuBar*/);
     //m_preset1xAction->setToolTip(tr("Preset: 1x (Alt-1)"));
     QList<QKeySequence> preset1xKeysList;
-    preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
-    preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
+    ADD_HOTKEY(preset1xKeysList, Qt::Key_1);
+    //preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
+    //preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
     m_preset1xAction->setShortcuts(preset1xKeysList);
     addAction(m_preset1xAction);
     //presetMenu->addAction(m_preset1xAction);
@@ -990,8 +1040,9 @@ void MainWindow::createDebugActions()
     m_preset2xAction = new QAction(tr("Preset: 2x"), this /*m_menuBar*/);
     //m_preset2xAction->setToolTip(tr("Preset: 2x (Alt-2)"));
     QList<QKeySequence> preset2xKeysList;
-    preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
-    preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
+    ADD_HOTKEY(preset2xKeysList, Qt::Key_2);
+    //preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
+    //preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
     m_preset2xAction->setShortcuts(preset2xKeysList);
     addAction(m_preset2xAction);
     //presetMenu->addAction(m_preset2xAction);
@@ -1001,8 +1052,9 @@ void MainWindow::createDebugActions()
     m_preset3xAction = new QAction(tr("Preset: 3x"), this /*m_menuBar*/);
     //m_preset3xAction->setToolTip(tr("Preset: 3x (Alt-3)"));
     QList<QKeySequence> preset3xKeysList;
-    preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
-    preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
+    ADD_HOTKEY(preset3xKeysList, Qt::Key_3);
+    //preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
+    //preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
     m_preset3xAction->setShortcuts(preset3xKeysList);
     addAction(m_preset3xAction);
     //presetMenu->addAction(m_preset3xAction);
@@ -1012,8 +1064,9 @@ void MainWindow::createDebugActions()
     m_presetFitAction = new QAction(tr("Preset: Fit"), this /*m_menuBar*/);
     //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
     QList<QKeySequence> presetFitKeysList;
-    presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
-    presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
+    ADD_HOTKEY(presetFitKeysList, Qt::Key_0);
+    //presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
+    //presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
     m_presetFitAction->setShortcuts(presetFitKeysList);
     addAction(m_presetFitAction);
     //presetMenu->addAction(m_presetFitAction);
@@ -1023,8 +1076,9 @@ void MainWindow::createDebugActions()
     m_presetStretchAction = new QAction(tr("Preset: Stretch"), this /*m_menuBar*/);
     //m_presetStretchAction->setToolTip(tr("Preset: Stretch (Alt-9)"));
     QList<QKeySequence> presetStretchKeysList;
-    presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
-    presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
+    ADD_HOTKEY(presetStretchKeysList, Qt::Key_9);
+    //presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
+    //presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
     m_presetStretchAction->setShortcuts(presetStretchKeysList);
     addAction(m_presetStretchAction);
     //presetMenu->addAction(m_presetStretchAction);
@@ -1036,8 +1090,9 @@ void MainWindow::createDebugActions()
     //m_fullscreenAction->setCheckable(true);
     //setToolTip(tr("Fullscreen mode (Alt-Enter)"));
     QList<QKeySequence> fullscreenKeysList;
-    fullscreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Return));
-    fullscreenKeysList.append(QKeySequence(Qt::META + Qt::Key_Return));
+    ADD_HOTKEY(fullscreenKeysList, Qt::Key_Return);
+    //fullscreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Return));
+    //fullscreenKeysList.append(QKeySequence(Qt::META + Qt::Key_Return));
     m_fullscreenAction->setShortcuts(fullscreenKeysList);
     connect(m_fullscreenAction, SIGNAL(triggered()), this, SLOT(onFullscreen()));
     addAction(m_fullscreenAction);
@@ -1047,8 +1102,9 @@ void MainWindow::createDebugActions()
     //m_fullwindowAction->setCheckable(true);
     //setToolTip(tr("Hide menu and buttons (Alt-\)"));
     QList<QKeySequence> fullwindowKeysList;
-    fullwindowKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Backslash));
-    fullwindowKeysList.append(QKeySequence(Qt::META + Qt::Key_Backslash));
+    ADD_HOTKEY(fullwindowKeysList, Qt::Key_Backslash);
+    //fullwindowKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Backslash));
+    //fullwindowKeysList.append(QKeySequence(Qt::META + Qt::Key_Backslash));
     m_fullwindowAction->setShortcuts(fullwindowKeysList);
     connect(m_fullwindowAction, SIGNAL(triggered()), this, SLOT(onFullwindow()));
     addAction(m_fullwindowAction);
@@ -1388,7 +1444,11 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
     case Qt::Key_Alt:
         return PK_LALT;
     case Qt::Key_Meta:
+#ifndef __APPLE__
         return PK_LWIN;
+#else
+        return PK_LCTRL;
+#endif
     case Qt::Key_Menu:
         return PK_MENU;
 
