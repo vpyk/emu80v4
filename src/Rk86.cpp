@@ -129,16 +129,23 @@ char16_t Rk86Renderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
 }
 
 
+void Rk86Renderer::setColorMode(Rk86ColorMode mode) {
+    m_colorMode = mode;
+    m_dashedLten = mode == RCM_MONO_ORIG;
+    m_useRvv = mode != RCM_MONO_ORIG;
+}
+
+
 void Rk86Renderer::toggleColorMode()
 {
-    /*if (m_colorMode == RCM_MONO_SIMPLE)
-        m_colorMode = RCM_MONO;
-    else */if (m_colorMode == RCM_MONO)
-        m_colorMode = RCM_COLOR1;
+    if (m_colorMode == RCM_MONO_ORIG)
+        setColorMode(RCM_MONO);
+    else if (m_colorMode == RCM_MONO)
+        setColorMode(RCM_COLOR1);
     else if (m_colorMode == RCM_COLOR1)
-        m_colorMode = RCM_COLOR2;
+        setColorMode(RCM_COLOR2);
     else if (m_colorMode == RCM_COLOR2)
-        m_colorMode = RCM_MONO/*_SIMPLE*/;
+        setColorMode(RCM_MONO_ORIG);
 }
 
 
@@ -148,14 +155,14 @@ bool Rk86Renderer::setProperty(const string& propertyName, const EmuValuesList& 
         return true;
 
     if (propertyName == "colorMode") {
-        /*if (values[0].asString() == "original")
-            m_colorMode = RCM_MONO_SIMPLE;
-        else */if (values[0].asString() == "mono")
-            m_colorMode = RCM_MONO;
+        if (values[0].asString() == "original")
+            setColorMode(RCM_MONO_ORIG);
+        else if (values[0].asString() == "mono")
+            setColorMode(RCM_MONO);
         else if (values[0].asString() == "color1")
-            m_colorMode = RCM_COLOR1;
+            setColorMode(RCM_COLOR1);
         else if (values[0].asString() == "color2")
-            m_colorMode = RCM_COLOR2;
+            setColorMode(RCM_COLOR2);
         else
             return false;
         return true;
@@ -175,8 +182,8 @@ string Rk86Renderer::getPropertyStringValue(const string& propertyName)
 
     if (propertyName == "colorMode") {
         switch (m_colorMode) {
-            /*case RCM_MONO_SIMPLE:
-                return "original";*/
+            case RCM_MONO_ORIG:
+                return "original";
             case RCM_MONO:
                 return "mono";
             case RCM_COLOR1:

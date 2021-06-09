@@ -168,6 +168,8 @@ void Crt8275Renderer::primaryRenderFrame()
 
     for (int row = 0; row < nRows; row++) {
         uint32_t* chrPtr = rowPtr;
+        bool curLten[16];
+        memset(curLten, 0, sizeof(curLten));
         for (int chr = 0; chr < nChars; chr++) {
             Symbol symbol = frame->symbols[row][chr];
             uint32_t* linePtr = chrPtr;
@@ -198,7 +200,6 @@ void Crt8275Renderer::primaryRenderFrame()
             uint32_t fgColor = getCurFgColor(gpa0, gpa1, hglt);
             uint32_t bgColor = getCurBgColor(gpa0, gpa1, hglt);
 
-
             for (int ln = 0; ln < nLines; ln++) {
                 int lc;
                 if (!frame->isOffsetLineMode)
@@ -214,17 +215,20 @@ void Crt8275Renderer::primaryRenderFrame()
                 else
                     lten = frame->symbols[row][chr+1].symbolLineAttributes[ln].lten;
 
+                curLten[ln] = m_dashedLten ? lten && !curLten[ln] : lten;
+
                 if (!m_customDraw) {
-                    uint8_t fntLine = fntPtr[symbol.chr * m_fntCharHeight + (lc & m_fntLcMask)] << (8 - m_fntCharWidth);
+                    uint16_t fntLine = fntPtr[symbol.chr * m_fntCharHeight + (lc & m_fntLcMask)] << (8 - m_fntCharWidth);
 
                     for (int pt = 0; pt < m_fntCharWidth; pt++) {
-                        //bool v = lten || !vsp && (fntLine & 0x80);
-                        bool v = lten || !(vsp || (fntLine & 0x80));
+                        bool v = curLten[ln] || !(vsp || (fntLine & 0x80));
                         if (rvv && m_useRvv)
                             v = !v;
                         linePtr[pt] = v ? fgColor : bgColor;
                         fntLine <<= 1;
                     }
+                    if (m_dashedLten && (curLten[ln] || !(vsp || (fntLine & 0x400))))
+                        curLten[ln] = true;
                 } else
                     customDrawSymbolLine(linePtr, symbol.chr, lc, lten, vsp, rvv, gpa0, gpa1, hglt);
                 linePtr += nChars * m_fntCharWidth;

@@ -66,6 +66,7 @@ class Crt8275Renderer : public TextCrtRenderer
         bool m_gpaOffset;
 
         bool m_useRvv;
+        bool m_dashedLten = false;
 
         int m_dataSize = 0;
 

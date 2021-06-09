@@ -168,6 +168,7 @@ MikroshaRenderer::MikroshaRenderer()
     m_gpaOffset  = true;
 
     m_useRvv     = false;
+    m_dashedLten = true;
 
     m_customDraw = false;
 }

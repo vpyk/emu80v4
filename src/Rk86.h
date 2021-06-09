@@ -48,7 +48,7 @@ class Rk86Core : public PlatformCore
 class Rk86Renderer : public Crt8275Renderer
 {
     enum Rk86ColorMode {
-        //RCM_MONO_SIMPLE,
+        RCM_MONO_ORIG,
         RCM_MONO,
         RCM_COLOR1,
         RCM_COLOR2
@@ -73,6 +73,8 @@ class Rk86Renderer : public Crt8275Renderer
 
     private:
         Rk86ColorMode m_colorMode = RCM_COLOR1;
+
+        void setColorMode(Rk86ColorMode mode);
 };
 
 

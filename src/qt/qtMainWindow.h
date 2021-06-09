@@ -188,6 +188,7 @@ private:
     QAction* m_muteTapeAction;
     QAction* m_colorMenuAction;
     QAction* m_colorAction;
+    QAction* m_colorMonoOrigAction;
     QAction* m_colorMonoAction;
     QAction* m_colorColor1Action;
     QAction* m_colorColor2Action;

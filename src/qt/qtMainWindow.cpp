@@ -611,6 +611,13 @@ void MainWindow::createActions()
     m_colorModeMenu = new QMenu(tr("Color mode"), this);
     QActionGroup* colorModeGroup = new QActionGroup(m_colorModeMenu);
 
+    m_colorMonoOrigAction = new QAction(QIcon(":/icons/bw.png"), tr("Black && white original"), this);
+    m_colorMonoOrigAction->setCheckable(true);
+    m_colorMonoOrigAction->setData("original");
+    m_colorModeMenu->addAction(m_colorMonoOrigAction);
+    colorModeGroup->addAction(m_colorMonoOrigAction);
+    connect(m_colorMonoOrigAction, SIGNAL(triggered()), this, SLOT(onColorSelect()));
+
     m_colorMonoAction = new QAction(QIcon(":/icons/bw.png"), tr("Black && white"), this);
     m_colorMonoAction->setCheckable(true);
     m_colorMonoAction->setData("mono");
@@ -958,6 +965,9 @@ void MainWindow::tuneMenu()
         hasColor = true;
         m_colorLabel->setVisible(false);
 
+        m_colorMonoOrigAction->setVisible(true);
+        m_colorMonoOrigAction->setEnabled(true);
+
         m_colorMonoAction->setVisible(true);
         m_colorMonoAction->setEnabled(true);
 
@@ -973,6 +983,9 @@ void MainWindow::tuneMenu()
     } else if (platformGroup == "apogey" || platformGroup == "orion" || platformGroup == "lvov" || platformGroup == "vector" || platformGroup == "pk8000") {
         hasColor = true;
 
+        m_colorMonoOrigAction->setVisible(false);
+        m_colorMonoOrigAction->setEnabled(false);
+
         m_colorMonoAction->setVisible(true);
         m_colorMonoAction->setEnabled(true);
 
@@ -985,6 +998,9 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setEnabled(false);
     } else if (platformGroup == "spec") {
         hasColor = true;
+
+        m_colorMonoOrigAction->setVisible(false);
+        m_colorMonoOrigAction->setEnabled(false);
 
         m_colorMonoAction->setVisible(true);
         m_colorMonoAction->setEnabled(true);
@@ -1997,7 +2013,7 @@ void MainWindow::updateActions()
         for (auto it = list.begin(); it != list.end(); it++) {
             if ((*it)->data().toString().toUtf8().constData() == val) {
                 (*it)->setChecked(true);
-                m_colorLabel->setText((*it)->text());
+                m_colorLabel->setText((*it)->text().replace("&&", "&"));
                 break;
             }
         }
