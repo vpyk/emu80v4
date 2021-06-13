@@ -98,8 +98,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
                 return SR_PAUSE;
             case PK_H:
                 return SR_SCREENSHOT;
-            /*case PK_U:
-                return SR_MUTE;*/
+            case PK_U:
+                return SR_FASTRESET;
             case PK_INS:
                 return isShiftPressed ? SR_COPYTXT : SR_NONE;
             default:

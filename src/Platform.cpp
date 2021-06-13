@@ -246,6 +246,10 @@ void Platform::sysReq(SysReq sr)
             if (m_ramDisk)
             m_ramDisk->saveToFile();
             break;
+        case SR_FASTRESET:
+            if (m_fastResetCpuTicks)
+                m_fastReset = !m_fastReset;
+            break;
         default:
             break;
     }
