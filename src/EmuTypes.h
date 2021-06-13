@@ -85,6 +85,7 @@ enum SysReq
     SR_SCREENSHOT,
     SR_COPYTXT,
     SR_MUTE,
+    SR_FASTRESET,
     SR_LOADRAMDISK,
     SR_SAVERAMDISK
 };

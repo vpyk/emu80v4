@@ -158,6 +158,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("kbdLayout.numpadJoystick");
     loadRunningConfigValue("keyboard.matrix");
     loadRunningConfigValue("platform.codePage");
+    loadRunningConfigValue("platform.fastReset");
 }
 
 
@@ -429,6 +430,11 @@ void SettingsDialog::fillControlValues()
     ui->kbdTypeGroupBox->setVisible(val != "");
     ui->kbdOriginalRadioButton->setChecked(val == "original");
     ui->kbdRamfosRadioButton->setChecked(val == "ramfos");
+
+    // Fast reset
+    val = m_options["platform.fastReset"];
+    ui->fastResetCheckBox->setVisible(val != "");
+    ui->fastResetCheckBox->setChecked(val == "yes");
 }
 
 
@@ -865,6 +871,9 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     if (ui->numpadJoystickCheckBox->isVisible())
         m_options["kbdLayout.numpadJoystick"] = ui->numpadJoystickCheckBox->isChecked() ? "yes" : "no";
+
+    if (ui->fastResetCheckBox->isVisible())
+        m_options["platform.fastReset"] = ui->fastResetCheckBox->isChecked() ? "yes" : "no";
 
     val = "";
     if (ui->qwertyRadioButton->isChecked())

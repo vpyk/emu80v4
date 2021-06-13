@@ -163,6 +163,12 @@ void Platform::sysReq(SysReq sr)
     switch (sr) {
         case SR_RESET:
             reset();
+            if (m_fastReset && m_fastResetCpuTicks) {
+                Cpu* cpu = getCpu();
+                cpu->disableHooks();
+                g_emulation->exec((int64_t)cpu->getKDiv() * m_fastResetCpuTicks);
+                cpu->enableHooks();
+            }
             break;
         case SR_QUERTY:
             if (m_kbdLayout) {
@@ -311,6 +317,14 @@ bool Platform::setProperty(const string& propertyName, const EmuValuesList& valu
             m_muteTape = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "fastReset") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_fastReset = values[0].asString() == "yes";
+            return true;
+        }
+    } else if (propertyName == "fastResetCpuTicks") {
+            m_fastResetCpuTicks = values[0].asInt();
+            return true;
     }
     return false;
 }
@@ -330,6 +344,8 @@ string Platform::getPropertyStringValue(const string& propertyName)
         return m_codePage == CP_RK ? "rk" : "koi8";
     else if (propertyName == "muteTape")
         return m_muteTape ? "yes" : "no";
+    else if (propertyName == "fastReset")
+        return m_fastResetCpuTicks ? m_fastReset ? "yes" : "no" : "";
 
     return "";
 }

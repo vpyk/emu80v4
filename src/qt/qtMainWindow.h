@@ -116,6 +116,7 @@ private slots:
     void onResetPlatform();
     void onResetAll();
     void onMute();
+    void onFastReset();
     void onLoadRamDisk();
     void onSaveRamDisk();
 
@@ -217,6 +218,7 @@ private:
     QAction* m_smartAction;
     QAction* m_autosaveAction;
     QAction* m_muteAction;
+    QAction* m_fastResetAction;
 };
 
 #endif // QTMAINWINDOW_H

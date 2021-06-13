@@ -98,6 +98,8 @@ class Platform : public ParentObject
         std::string m_helpFile = "";
         CodePage m_codePage = CP_RK;
         bool m_muteTape = false;
+        bool m_fastReset = false;
+        int m_fastResetCpuTicks = 0;
 };
 
 

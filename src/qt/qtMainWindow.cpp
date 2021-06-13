@@ -729,6 +729,17 @@ void MainWindow::createActions()
     // Mute tape output toolbar button
     //m_toolBar->addAction(m_muteTapeAction);
 
+    // Fast Reset
+    m_fastResetAction = new QAction(QIcon(":/icons/fast_reset.png"), tr("Fast Reset"), this);
+    m_fastResetAction->setCheckable(true);
+    m_fastResetAction->setToolTip(tr("Fast Reset (Alt-U)"));
+    QList<QKeySequence> fastResetKeyList;
+    ADD_HOTKEY(fastResetKeyList, Qt::Key_U);
+    m_fastResetAction->setShortcuts(fastResetKeyList);
+    addAction(m_fastResetAction);
+    settingsMenu->addAction(m_fastResetAction);
+    connect(m_fastResetAction, SIGNAL(triggered()), this, SLOT(onFastReset()));
+
     // Mute
     m_muteAction = new QAction(QIcon(":/icons/mute.png"), tr("Mute"), this);
     m_muteAction->setCheckable(true);
@@ -908,6 +919,7 @@ void MainWindow::createActions()
     m_presetButton->setPopupMode(QToolButton::InstantPopup);
     m_toolBar->addWidget(m_presetButton);
 
+    m_toolBar->addAction(m_fastResetAction);
     m_toolBar->addAction(m_muteAction);
 
     QMenu* helpMenu = m_menuBar->addMenu(tr("Help"));
@@ -1814,6 +1826,14 @@ void MainWindow::onMuteTape()
 }
 
 
+void MainWindow::onFastReset()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName(), "fastReset", m_fastResetAction->isChecked() ? "yes" : "no");
+    m_settingsDialog->updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onSettings()
 {
     if (m_settingsDialog)
@@ -1993,6 +2013,14 @@ void MainWindow::updateActions()
     else {
         m_muteTapeAction->setVisible(true);
         m_muteTapeAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(m_palWindow->getPlatformObjectName(), "fastReset");
+    if (val == "")
+        m_fastResetAction->setVisible(false);
+    else {
+        m_fastResetAction->setVisible(true);
+        m_fastResetAction->setChecked(val == "yes");
     }
 
     val = emuGetPropertyValue(platform + "kbdLayout", "layout");
