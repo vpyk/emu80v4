@@ -107,6 +107,15 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_wavLabel = new QLabel("", this);
             m_wavLabel->setVisible(false);
 
+            m_fpsLabel->setToolTip(tr("Emulator FPS"));
+            m_speedLabel->setToolTip(tr("Emulation speed"));
+            m_kbdLabel->setToolTip(tr("Keyboard layout"));
+            m_colorLabel->setToolTip(tr("Color mode"));
+            m_crtModeLabel->setToolTip(tr("Screen mode"));
+            m_imageSizeLabel->setToolTip(tr("Image size in emulator"));
+            m_tapeLabel->setToolTip(tr("Tape file I/O"));
+            m_wavLabel->setToolTip(tr("Wav file I/O"));
+
             m_statusBar = statusBar();
             m_statusBar->addWidget(m_fpsLabel);
             m_statusBar->addWidget(m_speedLabel);
