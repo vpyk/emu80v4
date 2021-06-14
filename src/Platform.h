@@ -90,6 +90,7 @@ class Platform : public ParentObject
         FileLoader* m_loader = nullptr;
         Keyboard* m_keyboard = nullptr;
         RamDisk* m_ramDisk = nullptr;
+        EmuObjectGroup* m_tapeGrp = nullptr;
 
         int m_defConfigTabId = 0;
 

@@ -595,7 +595,11 @@ void MainWindow::createActions()
     // Tape hook on/off
     m_tapeHookAction = new QAction(QIcon(":/icons/tape.png"), tr("Tape hook"), this);
     m_tapeHookAction->setCheckable(true);
-    m_tapeHookAction->setToolTip(tr("Tape hook"));
+    m_tapeHookAction->setToolTip(tr("Tape hook (Alt-T)"));
+    QList<QKeySequence> tapeHookKeyList;
+    ADD_HOTKEY(tapeHookKeyList, Qt::Key_T);
+    m_tapeHookAction->setShortcuts(tapeHookKeyList);
+    addAction(m_tapeHookAction);
     settingsMenu->addAction(m_tapeHookAction);
     m_toolBar->addAction(m_tapeHookAction);
     connect(m_tapeHookAction, SIGNAL(triggered()), this, SLOT(onTapeHook()));

@@ -87,7 +87,8 @@ enum SysReq
     SR_MUTE,
     SR_FASTRESET,
     SR_LOADRAMDISK,
-    SR_SAVERAMDISK
+    SR_SAVERAMDISK,
+    SR_TAPEHOOK
 };
 
 

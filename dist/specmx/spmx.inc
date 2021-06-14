@@ -304,6 +304,12 @@ laSelector.addItem = jcuken, "Йцукен"
 laSelector.addItem = smart, "«Умная» раскладка"
 configTab.addControl = 3, &laSelector
 
+#tapeGrp.enabled
+ConfigRadioSelector tapeSelector = &tapeGrp, enabled, "Перехват магнитофона"
+tapeSelector.addItem = yes, "Вкл."
+tapeSelector.addItem = no, "Выкл."
+configTab.addControl = 3, &tapeSelector
+
 #platform.codePage
 ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
 codePageSelector.addItem = rk, "РК-86"

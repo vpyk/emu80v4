@@ -102,6 +102,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
                 return SR_FASTRESET;
             case PK_INS:
                 return isShiftPressed ? SR_COPYTXT : SR_NONE;
+            case PK_T:
+                return SR_TAPEHOOK;
             default:
                 return SR_NONE;
         } else {

@@ -119,6 +119,18 @@ Platform::Platform(string configFileName, string name)
         if ((m_keyboard = dynamic_cast<Keyboard*>(*it)))
             break;
 
+    // ищем объект - группу tapeGrp
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
+        EmuObjectGroup* grp = dynamic_cast<EmuObjectGroup*>(*it);
+        if (grp) {
+            name = grp->getName();
+            if (name.substr(name.find_last_of(".")) == ".tapeGrp") {
+                m_tapeGrp = grp;
+                break;
+            }
+        }
+    }
+
     init();
 
     if (m_window)
@@ -252,6 +264,20 @@ void Platform::sysReq(SysReq sr)
                 g_emulation->getConfig()->updateConfig();
             }
             break;
+        case SR_TAPEHOOK:
+            if (m_tapeGrp) {
+                //EmuValuesList param;
+                string val = m_tapeGrp->getPropertyStringValue("enabled");
+                if (val == "yes")
+                    val = "no";
+                else if (val == "no")
+                    val = "yes";
+                else
+                    break;
+
+                m_tapeGrp->setProperty("enabled", val);
+                g_emulation->getConfig()->updateConfig();
+            }
         default:
             break;
     }
