@@ -1828,8 +1828,8 @@ void MainWindow::onMuteTape()
 
 void MainWindow::onFastReset()
 {
-    //emuSysReq(m_palWindow, SR_FASTRESET);
-    emuSetPropertyValue(m_palWindow->getPlatformObjectName(), "fastReset", m_fastResetAction->isChecked() ? "yes" : "no"); // equivalent to the one above
+    emuSysReq(m_palWindow, SR_FASTRESET);
+    //emuSetPropertyValue(m_palWindow->getPlatformObjectName(), "fastReset", m_fastResetAction->isChecked() ? "yes" : "no"); // equivalent to the one above
 
     m_settingsDialog->updateConfig();
     saveConfig();

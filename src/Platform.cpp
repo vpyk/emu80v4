@@ -247,8 +247,10 @@ void Platform::sysReq(SysReq sr)
             m_ramDisk->saveToFile();
             break;
         case SR_FASTRESET:
-            if (m_fastResetCpuTicks)
+            if (m_fastResetCpuTicks) {
                 m_fastReset = !m_fastReset;
+                g_emulation->getConfig()->updateConfig();
+            }
             break;
         default:
             break;
