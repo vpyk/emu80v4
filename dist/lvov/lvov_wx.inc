@@ -83,8 +83,14 @@ codePageSelector.addItem = rk, "РК-86"
 codePageSelector.addItem = koi8, "КОИ-8"
 configTab.addControl = 3, &codePageSelector
 
-loader.allowMultiblock = yes
+#loader.allowMultiblock
 ConfigRadioSelector multiblockSelector = &loader, allowMultiblock, "Мультиблочная загрузка"
 multiblockSelector.addItem = yes, "Вкл."
 multiblockSelector.addItem = no, "Выкл."
 configTab.addControl = 3, &multiblockSelector
+
+#platform.fastReset
+ConfigRadioSelector fastResetSelector = &platform, fastReset, "Быстрый сброс"
+fastResetSelector.addItem = yes, "Вкл."
+fastResetSelector.addItem = no, "Выкл."
+configTab.addControl = 3, &fastResetSelector

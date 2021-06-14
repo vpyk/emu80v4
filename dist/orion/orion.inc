@@ -45,6 +45,12 @@ platform.helpFile = @HELP_FILE
 # Code page: rk, koi8 (default = rk)
 platform.codePage = rk
 
+# Fast reset
+platform.fastReset = yes
+platform.fastResetCpuTicks = 3000000
+
+
+
 Ram ram0 = 0xF000
 Ram ram1 = 0xF000
 Ram ram2 = 0xF000
@@ -285,3 +291,9 @@ ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица си
 codePageSelector.addItem = rk, "РК-86"
 codePageSelector.addItem = koi8, "КОИ-8"
 configTab.addControl = 3, &codePageSelector
+
+#platform.fastReset
+ConfigRadioSelector fastResetSelector = &platform, fastReset, "Быстрый сброс"
+fastResetSelector.addItem = yes, "Вкл."
+fastResetSelector.addItem = no, "Выкл."
+configTab.addControl = 3, &fastResetSelector
