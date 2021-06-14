@@ -123,8 +123,8 @@ enum EmuKey
     EK_SHOME, // 7
     EK_SEND,  // 9
     EK_END,   // 3
-    EK_PHOME, // .
-    EK_PEND,  // 0
+    EK_PHOME, // 0
+    EK_PEND,  // .
     EK_MENU,  // 5
 
     // Added in Lvov

@@ -1080,6 +1080,8 @@ EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
         return EK_DEL;
     case PK_PGUP:
         return EK_LANG;
+    case PK_KP_0:
+        return EK_PHOME;
     default:
         break;
     }
@@ -1091,8 +1093,6 @@ EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
     switch (keyCode) {
     case PK_KP_1:
         return EK_HOME;
-    case PK_PGUP:
-        return EK_CLEAR;
     case PK_LCTRL:
     case PK_RCTRL:
         return EK_CTRL;
@@ -1119,7 +1119,7 @@ EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
     case PK_KP_3:
         return EK_END;   // 3
     case PK_KP_PERIOD:
-        return EK_PHOME; // .
+        return EK_PEND;  // .
     case PK_KP_0:
         return EK_PEND;  // 0
     case PK_KP_5:
