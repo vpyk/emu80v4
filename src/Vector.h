@@ -177,6 +177,7 @@ class VectorAddrSpace : public AddressableDevice
         void enableRom() {m_romEnabled = true;}
         void disableRom() {m_romEnabled = false;}
         void ramDiskControl(int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage);
+        void eramControl(int eramSegment, int eramPageStartAddr, int eramPageEndAddr);
 
         static EmuObject* create(const EmuValuesList&) {return new VectorAddrSpace();}
 
@@ -192,6 +193,10 @@ class VectorAddrSpace : public AddressableDevice
         bool m_stackDiskEnabled = false;
         int m_inRamDiskPage = 0;
         int m_stackDiskPage = 0;
+        int m_eramSegment = 0;
+        uint16_t m_eramPageStartAddr = 0xA000;
+        uint16_t m_eramPageEndAddr = 0xDFFF;
+        bool m_eram = false;
 };
 
 
@@ -342,6 +347,23 @@ class VectorRamDiskSelector : public AddressableDevice
         uint8_t readByte(int)  override {return 0xff;}
 
         static EmuObject* create(const EmuValuesList&) {return new VectorRamDiskSelector();}
+
+    private:
+        VectorAddrSpace* m_vectorAddrSpace = nullptr;
+};
+
+
+class VectorEramSelector : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        void attachVectorAddrSpace(VectorAddrSpace* vectorAddrSpace) {m_vectorAddrSpace = vectorAddrSpace;}
+
+        void writeByte(int, uint8_t value) override;
+        uint8_t readByte(int)  override {return 0xff;}
+
+        static EmuObject* create(const EmuValuesList&) {return new VectorEramSelector();}
 
     private:
         VectorAddrSpace* m_vectorAddrSpace = nullptr;

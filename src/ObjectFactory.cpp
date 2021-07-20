@@ -202,6 +202,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(VectorZ80CpuWaits);
     REG_EMU_CLASS(VectorKbdLayout);
     REG_EMU_CLASS(VectorRamDiskSelector);
+    REG_EMU_CLASS(VectorEramSelector);
     REG_EMU_CLASS(VectorFddControlRegister);
     REG_EMU_CLASS(Covox);
     REG_EMU_CLASS(SdCard);

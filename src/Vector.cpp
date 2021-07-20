@@ -39,11 +39,29 @@ void VectorAddrSpace::reset() {
     m_stackDiskEnabled = false;
     m_inRamDiskPage = 0;
     m_stackDiskPage = 0;
+    m_eramSegment = 0;
+    m_eramPageStartAddr = 0xA000;
+    m_eramPageEndAddr = 0xDFFF;
 }
 
 
 void VectorAddrSpace::writeByte(int addr, uint8_t value)
 {
+    if (m_eram) {
+        // ERAM
+        if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
+            m_ramDisk->writeByte(m_eramSegment * 0x40000 + m_stackDiskPage * 0x10000 + addr, value);
+        else if (m_inRamPagesMask & 2 && addr >= m_eramPageStartAddr && addr <= m_eramPageEndAddr)
+            m_ramDisk->writeByte(m_eramSegment * 0x40000 + m_inRamDiskPage * 0x10000 + addr, value);
+        else {
+            if (addr >= 0x8000 && m_crtRenderer)
+                m_crtRenderer->vidMemWriteNotify();
+            m_mainMemory->writeByte(addr, value);
+        }
+        return;
+    }
+
+    // Barkar
     if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         m_ramDisk->writeByte(m_stackDiskPage * 0x10000 + addr, value);
     else if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
@@ -58,6 +76,19 @@ void VectorAddrSpace::writeByte(int addr, uint8_t value)
 
 uint8_t VectorAddrSpace::readByte(int addr)
 {
+    if (m_eram) {
+        // ERAM
+        if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
+            return m_ramDisk->readByte(m_eramSegment * 0x40000 + m_stackDiskPage * 0x10000 + addr);
+        if (m_inRamPagesMask & 2 && addr >= m_eramPageStartAddr && addr <= m_eramPageEndAddr)
+            return m_ramDisk->readByte(m_eramSegment * 0x40000 + m_inRamDiskPage * 0x10000 + addr);
+        if (m_romEnabled && addr < 0x8000)
+            return m_rom->readByte(addr); // add rom check
+        else
+            return m_mainMemory->readByte(addr);
+    }
+
+    // Barkar
     if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         return m_ramDisk->readByte(m_stackDiskPage * 0x10000 + addr);
     if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
@@ -75,6 +106,14 @@ void VectorAddrSpace::ramDiskControl(int inRamPagesMask, bool stackEnabled, int 
     m_stackDiskEnabled = stackEnabled;
     m_inRamDiskPage = inRamPage;
     m_stackDiskPage = stackPage;
+}
+
+
+void VectorAddrSpace::eramControl(int eramSegment, int eramPageStartAddr, int eramPageEndAddr)
+{
+    m_eramSegment = eramSegment;
+    m_eramPageStartAddr = eramPageStartAddr;
+    m_eramPageEndAddr = eramPageEndAddr;
 }
 
 
@@ -98,6 +137,11 @@ bool VectorAddrSpace::setProperty(const std::string& propertyName, const EmuValu
     } else if (propertyName == "crtRenderer") {
             attachCrtRenderer(static_cast<VectorRenderer*>(g_emulation->findObject(values[0].asString())));
             return true;
+    } else if (propertyName == "eram") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_eram = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
 
@@ -829,6 +873,50 @@ void VectorRamDiskSelector::writeByte(int, uint8_t value)
 {
     if (m_vectorAddrSpace)
         m_vectorAddrSpace->ramDiskControl(((value & 0x40) >> 6) | ((value & 0x20) >> 4) | ((value & 0x20) >> 3) | ((value & 0x80) >> 4), value & 0x10, value & 0x3, (value >> 2) & 0x3);
+}
+
+
+bool VectorEramSelector::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "addrSpace") {
+        attachVectorAddrSpace(static_cast<VectorAddrSpace*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
+}
+
+
+void VectorEramSelector::writeByte(int, uint8_t value)
+{
+    int start, end, segment;
+    if (value & 4) {
+        start = 0x0000;
+        end = 0xFFFF;
+    } else switch (value & 3) {
+    case 0:
+        start = 0xA000;
+        end = 0xDFFF;
+        break;
+    case 1:
+        start = 0x8000;
+        end = 0xDFFF;
+        break;
+    case 2:
+        start = 0x8000;
+        end = 0xFFFF;
+        break;
+    default: // case 3
+        start = 0x0100;
+        end = 0x7FFF;
+    }
+    segment = (value >> 3) & 7;
+
+    if (m_vectorAddrSpace)
+        m_vectorAddrSpace->eramControl(segment, start, end);
 }
 
 
