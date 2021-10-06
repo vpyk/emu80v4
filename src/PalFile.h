@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,9 +20,13 @@
 
 
 #ifdef PAL_QT
-#include "qt/qtPalFile.h"
+  #include "qt/qtPalFile.h"
 #endif // PAL_QT
 
 #ifdef PAL_SDL
-#include "sdl/sdlPalFile.h"
+  #ifndef PAL_WASM
+    #include "sdl/sdlPalFile.h"
+  #else
+    #include "wasm/wasmPalFile.h"
+  #endif // !PAL_WASM
 #endif // PAL_SDL

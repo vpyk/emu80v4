@@ -134,9 +134,14 @@ void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
 
 #else
 
+#ifndef PAL_WASM
 std::string palOpenFileDialog(std::string, std::string, bool, PalWindow*) {
     return "";
 }
+
+void palUpdateConfig() {
+}
+#endif //!PAL_WASM
 
 void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
 {
@@ -214,9 +219,6 @@ void palSetRunFileName(std::string) {
 }
 
 void palShowConfigWindow(int) {
-}
-
-void palUpdateConfig() {
 }
 
 void palAddTabToConfigWindow(int, std::string) {

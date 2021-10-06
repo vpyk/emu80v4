@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,12 @@
 #include "sdlPalWindow.h"
 #include "sdlGlExt.h"
 
+#ifdef PAL_WASM
+#include "../wasm/wasmEmuCalls.h"
+#endif
+
+ #include "../lite/litePal.h"
+
 using namespace std;
 
 PalWindow::PalWindow()
@@ -32,6 +38,10 @@ PalWindow::PalWindow()
 
     m_lastX = SDL_WINDOWPOS_UNDEFINED;
     m_lastY = SDL_WINDOWPOS_UNDEFINED;
+
+#ifdef PAL_WASM
+    wasmSetWindowId(this);
+#endif
 }
 
 
@@ -74,15 +84,22 @@ void PalWindow::maximize()
 
 void PalWindow::applyParams()
 {
-    if (!m_window || m_params.style != m_prevParams.style)
+    if (!m_window)
         recreateWindow();
-    else {
-        if (m_params.vsync != m_prevParams.vsync)
-            recreateRenderer();
 
-        if (m_params.width != m_prevParams.width || m_params.height != m_prevParams.height)
-            SDL_SetWindowSize(m_window, m_params.width  != 0 && m_params.width > 100 ? m_params.width : 100,
-                                        m_params.height != 0 && m_params.height > 75 ? m_params.height : 75);
+    else if (m_params.style != m_prevParams.style)
+#ifndef PAL_WASM
+        recreateWindow();
+#else  // PAL_WASM
+        SDL_SetWindowFullscreen(m_window, m_params.style == PWS_FULLSCREEN ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+#endif // !PAL_WASM
+
+    if (m_params.vsync != m_prevParams.vsync)
+        recreateRenderer();
+
+    if (m_params.width != m_prevParams.width || m_params.height != m_prevParams.height) {
+        SDL_SetWindowSize(m_window, m_params.width  != 0 && m_params.width > 100 ? m_params.width : 100,
+                                    m_params.height != 0 && m_params.height > 75 ? m_params.height : 75);
     }
 
     if (m_params.visible != m_prevParams.visible)
@@ -159,6 +176,7 @@ void PalWindow::recreateWindow()
 
     if (!m_params.visible)
         flags |= SDL_WINDOW_HIDDEN;
+
 
     m_window = SDL_CreateWindow(m_params.title.c_str(), x, y, w, h, flags);
     PalWindow::m_windowsMap.insert(make_pair(SDL_GetWindowID(m_window), this));
@@ -299,11 +317,30 @@ void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, d
 
     glBindTexture(GL_TEXTURE_2D, texture);
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_params.smoothing == ST_NEAREST ? GL_NEAREST : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_params.smoothing == ST_NEAREST ? GL_NEAREST : GL_LINEAR);
 
+#ifndef PAL_WASM
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
-
+#else // PAL_WASM
+    size_t bitmapSize = imageWidth * imageHeight;
+    uint8_t* rgbPixels = new uint8_t[bitmapSize * sizeof(uint32_t)];
+    uint8_t* src = reinterpret_cast<uint8_t*>(pixels);
+    uint8_t* dst = rgbPixels + 2;
+    for (int i = 0; i < bitmapSize; i++) {
+        *dst-- = *src++;
+        *dst-- = *src++;
+        *dst = *src++;
+        dst += 3;
+        *dst = *src++;
+        dst += 3;
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbPixels);
+    delete[] rgbPixels;
+#endif
     if (!blend && !useAlpha) {
         glDisable(GL_BLEND);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -382,17 +419,17 @@ void PalWindow::screenshotRequest(const std::string& ssFileName)
 
 void PalWindow::createGlContext()
 {
-	if (m_glContext)
+    if (m_glContext)
         SDL_GL_DeleteContext(m_glContext);
 
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	m_glContext = SDL_GL_CreateContext(m_window);
+    m_glContext = SDL_GL_CreateContext(m_window);
 
-	if (!m_glContext) {
+    if (!m_glContext) {
         m_glAvailable = false;
         return;
-	}
+    }
 
     if (!sdlInitGLExtensions())
     {

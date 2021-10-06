@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Loading...</title>
+</head>
+<body style="overflow: hidden;">
+  <canvas id="canvas" style="margin: 0px;" oncontextmenu="event.preventDefault()" onclick="window.focus()" tabindex=-1></canvas>
+
+  <script>
+    var Module = {
+        canvas: (() => { return document.getElementById("canvas"); })()
+    };
+  </script>
+
+  <script src="emuframe.js"></script>
+</body>
+</html>

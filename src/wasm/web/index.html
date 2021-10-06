@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html data-theme="light" lang="ru">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="emu80.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-collapsible@1.0.4/dist/css/bulma-collapsible.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-collapsible@1.0.4/dist/js/bulma-collapsible.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js"></script>
+    <script src="const.js"></script>
+    <title>Emu80 online</title>
+  </head>
+  <body>
+    <section class="section">
+      <!--<div class="container is-max-widescreen">-->
+      <div class="container">
+        <div class="block">
+          <!--<img src="icons/emu80.png">-->
+          <h3 class="title is-size-3"><a href="."><span id="caption">Emu80 online</span></a></h3>
+        </div>
+        <div class="box">
+          <div class="columns">
+            <div class="column">
+              <div class="select is-small">
+                <select id="platformSelect" onChange="platformChange()">
+                  <option value="">--Выберите платформу--</option>
+                </select>
+              </div>
+              <button class="button is-small" onClick="runPlatform()">Запустить</button>
+            </div>
+            <div id="fileSelectDiv" class="column" style="visibility: hidden">
+              <div class="select is-small">
+                <select id="fileSelect" onChange="fileChange()">
+                  <option value="">--Примеры программ--</option>
+                </select>
+              </div>
+              <button class="button is-small" onClick="runFile()">Запустить</button>
+            </div>
+            <div class="column">
+              <button id="fullscreenButton" class="button is-small" style="float: right;" onClick="emuSysReq(SR_FULLSCREEN)" title="Полноэкранный режим (Alt-Enter)">
+                На полный экран
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="block">
+            <button id="fileButton" class="button is-small" onClick="openFile()" disabled="disabled" title="Открыть и запустить (Alt-F3)">
+              <img src="icons/open_run.png" alt="">&nbsp;
+              Открыть...
+            </button>
+            <button id="diskAButton" class="button is-small" onClick="emuSysReqNotFocus(SR_DISKA)" title="Выбрать образ диска A (Alt-A)" disabled>
+              <img src="icons/disk_a.png" alt="">&nbsp;
+              ...
+            </button>
+            &nbsp;&nbsp;
+            <button id = "resetButton" class="button is-small" onClick="emuSysReq(SR_RESET)" disabled="disabled" title="Перезагрузить (Alt-F11)">
+              <img src="icons/reset.png" alt="">&nbsp;Сброс
+            </button>
+            <button id="pauseButton" class="button is-small" onClick="onPause(this)" title="Пауза (Alt-P)">
+              <img src="icons/pause.png" alt="">&nbsp;
+            </button>
+            &nbsp;&nbsp;
+            <div class="select is-small">
+              <select id="scalingSelect" onChange="onScalingChange(this)" title="Размер экрана (Alt-1/2/3/4)">
+                <option value="1x">1x</option>
+                <option value="2x">2x</option>
+                <option value="3x">3x</option>
+                <option value="4x">4x</option>
+              </select>
+            </div>
+            <button id="visibleAreaButton" class="button is-small" onClick="emuSysReq(SR_CROPTOVISIBLE)" title="Видимая область (Alt-V)">
+              <img src="icons/crop.png" alt="">&nbsp;
+            </button>
+            <button id="parButton" class="button is-small" onClick="emuSysReq(SR_ASPECTCORRECTION)" title="Учитывать PAR (Alt-R)">
+              <img src="icons/aspect.png" alt="">&nbsp;
+            </button>
+            <button id="wideButton" class="button is-small" onClick="emuSysReq(SR_WIDESCREEN)" title="Переключить широкоэкранный режим (Alt-N)">
+              <img src="icons/wide.png" alt="">&nbsp;
+            </button>
+            <!--<button id="smoothingButton" class="button is-small" onClick="emuSysReq(SR_SMOOTHING)" title="Переключить режим сглаживания (Alt-S)">
+              <img src="icons/sm_sharp.png">&nbsp;
+            </button>-->
+            <div class="select is-small">
+              <select id="smoothingSelect" onChange="onSmoothingChange(this)" title="Переключить режим сглаживания (Alt-S)">
+                <option value="nearest">Выкл.</option>
+                <option value="bilinear">Билинейное</option>
+                <option value="sharp">Sharp</option>
+              </select>
+            </div>
+            &nbsp;&nbsp;
+            <div class="select is-small">
+              <select id="layoutSelect" onChange="onLayoutChange(this)" title="Раскладка клавиатуры (Alt-K/Q/J)">
+                <option value="smart">Smart</option>
+                <option value="qwerty">QWERTY</option>
+                <option value="jcuken">ЙЦУКЕН</option>
+              </select>
+            </div>
+            <div class="select is-small">
+              <select id="colorSelect" onChange="onColorChange(this)" title="Режим цвета (Alt-C)">
+              </select>
+            </div>
+            <!--<button id="colorButton" class="button is-small" onClick="emuSysReq(SR_COLOR)" title="Переключить режим цвета (Alt-C)">
+              <img src="icons/color.png" alt="">&nbsp;
+            </button>-->
+            <button id="fontButton" class="button is-small" onClick="emuSysReq(SR_FONT)" title="Переключить пользовательский шрифт (Alt-F)">
+              <img src="icons/font.png" alt="">&nbsp;
+            </button>
+            <button id="muteButton" class="button is-small" onClick="onMute(this)" title="Отключить звук (Alt-M)">
+              <img src="icons/mute.png" alt="">&nbsp;
+            </button>
+            &nbsp;&nbsp;
+            <button id="infoButton" class="button is-small" onClick="onInfo(this)" title="Показать техническую информацию">
+              <span class="icon is-small">
+                <i class="fas fa-info"></i>
+              </span>
+            </button>
+            <!--<button id="testButton" class="button is-small" onClick="test()">Test</button>-->
+          </div>
+          <div>
+            <iframe id="iframe" src="dummyframe.html" marginwidth="0" marginheight="0" allow="fullscreen">
+            </iframe>
+          </div>
+          <div id="infoDiv" style="display:none;">
+            Screen mode: <span id="screenModeSpan"></span>&nbsp;&nbsp;DMA %: <span id="dmaSpan"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title" style="font-size: 90%; color: #008">
+              <a href="#collapsible-card" data-action="collapse">Горячие клавиши:</a>
+            </p>
+            <a href="#collapsible-card" data-action="collapse" class="card-header-icon is-hidden-fullscreen" aria-label="more options">
+              <span class="icon">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </a>
+          </header>
+          <div id="collapsible-card" class="is-collapsible">
+            <div class="card-content">
+              <div style="column-count: 2; column-gap: 4%; font-size: 80%;">
+                Alt-F11 – reset<br>
+                Alt-Q – раскладка Querty<br>
+                Alt-J – раскладка Йцукен<br>
+                Alt-K – «Умная» раскладка<br>
+                Alt-1..5 – пресет: 1x-5x<br>
+                Alt-F – оригинальный/альтернативный шрифт<br>
+                Alt-C – переключить режим цвета<br>
+                Alt-R – переключить учитывание Aspect Ratio<br>
+                Alt-V – переключить отображение только видимой области экрана<br>
+                Alt-N – переключить формат экрана 4:3 / 16:9<br>
+                Alt-M – переключение беззвучного режима<br>
+                Alt-Enter – полноэкранный режим<br>
+                End – ускоренная работа при нажатой клавише (4x)<br>
+                Pause – пауза/возобновление<br>
+                Alt-L – загрузка файла<br>
+                Alt-W – загрузка WAV-файла<br>
+                Alt-F3 – загрузка файла с запуском<br>
+                Alt-A – выбор диска A<br>
+                Alt-B – выбор диска B<br>
+                Alt-Shift-C – выбор диска 3(C)<br>
+                Alt-Shift-D – выбор диска 4(D)<br>
+                Alt-E – выбор электронного диска<br>
+                Alt-O – сохранение электронного диска<br>
+                Alt-Shift-H – выбор жесткого диска<br>
+              </div>
+            <p><i>Вместо клавиши Alt может быть использована клавиша Meta (Win)</i></p>
+            </div>
+          </div>
+        </div>
+
+        <footer class="footer">
+          <div class="content has-text-centered">
+            <p>
+              <strong>Emu80 v.4</strong> emulator, © Viktor Pykhonin, 2016-2024.
+              The <a href="https://github.com/vpyk/emu80v4">source code</a> is licensed under
+              <a href="https://opensource.org/license/gpl-3-0">GPL v.3</a> open source license.
+            </p>
+            <p>Последнее обновление 10.07.2024</p>
+          </div>
+        </footer>    
+
+      </div>
+
+    
+    </section>
+    <script>
+      document.documentElement.style.setProperty('--bulma-link-text', '#280090');
+      bulmaCollapsible.attach();
+    </script>
+    <script src="emu80.js"></script>
+  </body>
+</html>

@@ -38,4 +38,6 @@ const std::vector<PlatformInfo>* emuGetPlatforms();
 void emuSelectPlatform(const std::string& platform);
 unsigned emuGetEmulationSpeedFactor();
 
+void emuExitFullscreenMode(PalWindow* wnd);
+
 #endif // EMUCALLS_H

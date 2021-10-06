@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,7 +26,11 @@
 #elif defined PAL_WX
     #define TARGET ""
 #else
-    #define TARGET "/lite"
+    #ifdef PAL_WASM
+        #define TARGET "/wasm"
+    #else
+        #define TARGET "/lite"
+    #endif
 #endif
 
 #define VERSION VER_STR TARGET

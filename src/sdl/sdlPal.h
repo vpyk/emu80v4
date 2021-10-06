@@ -63,4 +63,9 @@ std::string palGetDefaultPlatform();
 void palCopyTextToClipboard(const char* text);
 std::string palGetTextFromClipboard();
 
+#ifdef PAL_WASM
+std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
+#endif //PAL_WASM
+
+
 #endif // SDLPAL_H

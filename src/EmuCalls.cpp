@@ -108,3 +108,10 @@ unsigned emuGetEmulationSpeedFactor()
 {
     return g_emulation->getPausedState() ? 0 : g_emulation->getSpeedUpFactor();
 }
+
+
+// Turns off fullscreen mode (for wasm version)
+void emuExitFullscreenMode(PalWindow* wnd)
+{
+    static_cast<EmuWindow*>(wnd)->setFullScreen(false);
+}

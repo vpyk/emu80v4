@@ -409,6 +409,7 @@ void Platform::draw()
 
 void Platform::showDebugger()
 {
+#ifndef PAL_WASM
     if (m_cpu->getType() == Cpu::CPU_8080 || m_cpu->getType() == Cpu::CPU_Z80) {
         if (!m_dbgWindow) {
             m_dbgWindow = new DebugWindow(this);
@@ -417,6 +418,7 @@ void Platform::showDebugger()
         }
         m_dbgWindow->startDebug();
     }
+#endif
 }
 
 

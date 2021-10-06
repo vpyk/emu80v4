@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,11 @@
 
 #include <SDL2/SDL.h>
 
+#ifdef PAL_WASM
+    #include <emscripten.h>
+    #include <emscripten/fetch.h>
+#endif
+
 #include "sdlPal.h"
 #include "sdlPalWindow.h"
 
@@ -29,9 +34,17 @@
 #include "../EmuTypes.h"
 #include "../Shortcuts.h"
 
+#ifdef PAL_WASM
+    #include "../wasm/wasmEmuCalls.h"
+#endif
+
 using namespace std;
 
-#define BUF_NUM 3
+#ifndef PAL_WASM
+    #define BUF_NUM 3
+#else
+    #define BUF_NUM 5
+#endif
 
 static string basePath;
 
@@ -62,9 +75,18 @@ bool palSdlInit()
     // https://bugzilla.libsdl.org/show_bug.cgi?id=2089
     SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
 
+#ifndef PAL_WASM
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+#else
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_EVENTS) != 0)
+#endif
         return false;
+
+#ifndef PAL_WASM
     ::basePath = SDL_GetBasePath();
+#else
+    ::basePath = "";
+#endif
 
     return true;
 }
@@ -105,17 +127,33 @@ void palResume()
 
 static bool palProcessEvents();
 
+
+#ifndef PAL_WASM
 void palExecute()
 {
     while (!palProcessEvents())
         emuEmulationCycle();
 }
+#endif
+
+
+#ifdef PAL_WASM
+void palExecute()
+{
+    emscripten_set_main_loop([] () {
+            palProcessEvents();
+            emuEmulationCycle();
+        }, -1, 1);
+}
+#endif
 
 
 void palSdlQuit()
 {
+#ifdef PAL_WASM
+    wasmDeleteUserFile();
+#endif
     SDL_CloseAudioDevice(audioDevId);
-
     SDL_Quit();
 }
 
@@ -165,6 +203,8 @@ string palMakeFullFileName(string fileName)
 }
 
 
+#ifndef PAL_WASM
+
 int palReadFromFile(const string& fileName, int offset, int sizeToRead, uint8_t* buffer, bool useBasePath)
 {
     string fullFileName;
@@ -184,7 +224,6 @@ int palReadFromFile(const string& fileName, int offset, int sizeToRead, uint8_t*
     else
         return 0;
 }
-
 
 uint8_t* palReadFile(const string& fileName, int &fileSize, bool useBasePath)
 {
@@ -212,6 +251,99 @@ uint8_t* palReadFile(const string& fileName, int &fileSize, bool useBasePath)
     else
         return nullptr;
 }
+
+#endif
+
+
+#ifdef PAL_WASM
+
+static emscripten_fetch_t* fetch = nullptr;
+
+static void fetchCompleted(emscripten_fetch_t* fetch)
+{
+    ::fetch = fetch;
+}
+
+static void waitForFetchCompleted()
+{
+    while (!fetch)
+        emscripten_sleep(25);
+}
+
+static void endFetch()
+{
+    emscripten_fetch_close(fetch);
+    fetch = nullptr;
+}
+
+int palReadFromFile(const string& fileName, int offset, int sizeToRead, uint8_t* buffer, bool useBasePath)
+{
+    if (fileName != "$") {
+        emscripten_fetch_attr_t attr;
+        emscripten_fetch_attr_init(&attr);
+        strcpy(attr.requestMethod, "GET");
+        attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+        attr.onsuccess = fetchCompleted;
+        attr.onerror = fetchCompleted;
+        emscripten_fetch(&attr, fileName.c_str());
+        waitForFetchCompleted();
+        if (fetch->status == 200) {
+            if (sizeToRead > fetch->numBytes)
+                sizeToRead = fetch->numBytes;
+            memcpy(buffer, fetch->data + offset, sizeToRead);
+            endFetch();
+            return sizeToRead;
+        } else {
+            endFetch();
+            return 0;
+        }
+    } else {
+        return wasmReadFromFile(/*fileName,*/ offset, sizeToRead, buffer);
+        /*uint8_t* userFileData;
+        int userFileSize;
+        wasmGetUserFile(userFileData, userFileSize);
+        if (sizeToRead > userFileSize)
+            sizeToRead = userFileSize;
+        memcpy(buffer, userFileData + offset, sizeToRead);
+        return sizeToRead;*/
+    }
+}
+
+
+uint8_t* palReadFile(const string& fileName, int &fileSize, bool useBasePath)
+{
+    if (fileName != "$") {
+        emscripten_fetch_attr_t attr;
+        emscripten_fetch_attr_init(&attr);
+        strcpy(attr.requestMethod, "GET");
+        attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+        attr.onsuccess = fetchCompleted;
+        attr.onerror = fetchCompleted;
+        emscripten_fetch(&attr, fileName.c_str());
+        waitForFetchCompleted();
+        if (fetch->status == 200) {
+            uint8_t* buf = new uint8_t[fetch->numBytes];
+            memcpy(buf, fetch->data, fetch->numBytes);
+            fileSize = fetch->numBytes;
+            endFetch();
+            return buf;
+        } else {
+            endFetch();
+            return nullptr;
+        }
+    } else {
+        return wasmReadFile(/*fileName,*/ fileSize);
+        /*uint8_t* userFileData;
+        int userFileSize;
+        wasmGetUserFile(userFileData, userFileSize);
+        uint8_t* buf = new uint8_t[userFileSize];
+        memcpy(buf, userFileData, userFileSize);
+        fileSize = userFileSize;
+        return buf;*/
+    }
+}
+
+#endif
 
 
 static PalKeyCode TranslateScanCode(SDL_Scancode scanCode)
@@ -522,6 +654,7 @@ static bool palProcessEvents()
                     break;
 
                 }
+#ifndef PAL_WASM
             case SDL_WINDOWEVENT:
                 if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && SDL_GetWindowFromID(event.window.windowID))
                     emuFocusWnd(PalWindow::windowById(event.window.windowID));
@@ -532,6 +665,7 @@ static bool palProcessEvents()
                 if (SDL_GetWindowFromID(event.drop.windowID))
                     emuDropFile(PalWindow::windowById(event.drop.windowID), event.drop.file);
                 break;
+#endif
         }
     }
 
@@ -614,3 +748,26 @@ string palGetDefaultPlatform()
 {
     return "";
 }
+
+
+#ifdef PAL_WASM
+
+EM_ASYNC_JS(int, jsSelectAndLoadFile, (), {
+    if (typeof window.top.selectAndLoadFile === "function")
+        return await window.top.selectAndLoadFile();
+    else
+        return 0;
+});
+
+string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window)
+{
+    if (write)
+        return "";
+
+    if (jsSelectAndLoadFile())
+        return "$";
+    else
+        return "";
+}
+
+#endif //PAL_WASM

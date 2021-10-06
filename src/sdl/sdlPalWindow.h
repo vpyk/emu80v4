@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -148,6 +148,7 @@ class PalWindow
 
 
         const char* c_fShader = R"(
+            precision highp float;
             uniform sampler2D texture1;
             uniform vec2 textureSize;
             uniform bool sharp;
