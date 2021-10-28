@@ -19,6 +19,7 @@
 #include "KbdLayout.h"
 #include "Keyboard.h"
 #include "Platform.h"
+#include "Emulation.h"
 
 
 using namespace std;
@@ -84,7 +85,10 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
                     if (lang != m_langPressed)
                         kbd->processKey(EK_LANG, lang == isPressed);
                 }
-                kbd->processKey(emuKey, isPressed);
+                if (!m_helper || !isPressed)
+                    kbd->processKey(emuKey, isPressed);
+                else // delayed key press
+                    m_helper->enqueueKeyPress(emuKey);
             }
 
             break;
@@ -114,6 +118,9 @@ bool KbdLayout::setProperty(const string& propertyName, const EmuValuesList& val
             return true;
         } else
             return false;
+    } else if (propertyName == "helper") {
+        m_helper = static_cast<KbdLayoutHelper*>(g_emulation->findObject(values[0].asString()));
+        return true;
     }
     return false;
 }
@@ -889,4 +896,43 @@ EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& s
     }
     lang = false;
     return key;
+}
+
+
+KbdLayoutHelper::KbdLayoutHelper()
+{
+    pause();
+    setFrequency(1000000); // 1 µs
+}
+
+
+void KbdLayoutHelper::enqueueKeyPress(EmuKey key)
+{
+    m_key = key;
+    resume();
+    syncronize();
+    m_curClock += m_kDiv * m_delay;
+}
+
+
+void KbdLayoutHelper::operate()
+{
+    Keyboard* kbd = m_platform->getKeyboard();
+    kbd->processKey(m_key, true);
+    pause();
+}
+
+
+bool KbdLayoutHelper::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "delay") {
+        if (values[0].isInt()) {
+            m_delay = values[0].asInt();
+            return true;
+        }
+    }
+    return false;
 }

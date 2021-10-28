@@ -227,6 +227,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Kr04PpiColor8255Circuit);
     REG_EMU_CLASS(Kr04Pit8253SoundSource);
     REG_EMU_CLASS(Kr04FileLoader);
+    REG_EMU_CLASS(KbdLayoutHelper);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

@@ -172,6 +172,8 @@ enum EmuKey
 };
 
 
+class KbdLayoutHelper;
+
 
 class KbdLayout : public EmuObject
 {
@@ -212,6 +214,8 @@ class KbdLayout : public EmuObject
         EmuKey m_lastNonUnicodeKey = EK_NONE;
         PalKeyCode m_lastPalKeyPressedCode = PK_NONE;
 
+        KbdLayoutHelper* m_helper = nullptr;
+
         EmuKey translateCommonKeysQwerty(PalKeyCode keyCode);
         EmuKey translateCommonKeysJcuken(PalKeyCode keyCode);
 };
@@ -227,5 +231,24 @@ class RkKbdLayout : public KbdLayout
     public:
         static EmuObject* create(const EmuValuesList&) {return new RkKbdLayout();}
 };
+
+
+class KbdLayoutHelper : public ActiveDevice
+{
+    public:
+        KbdLayoutHelper();
+        void operate() override;
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        void setDelayMs(uint64_t delay);
+        void enqueueKeyPress(EmuKey key);
+
+        static EmuObject* create(const EmuValuesList&) {return new KbdLayoutHelper();}
+
+    private:
+        EmuKey m_key = EK_NONE;
+        uint64_t m_delay = 5000; //delay in us
+};
+
 
 #endif  // KBDLAYOUT_H
