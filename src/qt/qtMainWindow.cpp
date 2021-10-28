@@ -1021,6 +1021,25 @@ void MainWindow::tuneMenu()
 
         m_colorColor2Action->setVisible(false);
         m_colorColor2Action->setEnabled(false);
+    } else if (platformGroup == "kr04") {
+        hasColor = true;
+        m_colorLabel->setVisible(false);
+
+        m_colorMonoOrigAction->setVisible(false);
+        m_colorMonoOrigAction->setEnabled(false);
+
+        m_colorMonoAction->setVisible(true);
+        m_colorMonoAction->setEnabled(true);
+
+        m_colorColor1Action->setVisible(true);
+        m_colorColor1Action->setEnabled(true);
+        m_colorColor1Action->setText(tr("Color"));
+        m_colorColor1Action->setData("color");
+
+        m_colorColor2Action->setVisible(true);
+        m_colorColor2Action->setEnabled(true);
+        m_colorColor2Action->setText(tr("Color Module"));
+        m_colorColor2Action->setData("colorModule");
     } else if (platformGroup == "spec") {
         hasColor = true;
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -154,12 +154,19 @@ bool Dma8257::dmaRequest(int channel, uint8_t &value, uint64_t clock)
         m_count[2] = m_count[3];
     }
     m_count[channel] = (m_count[channel] & 0xc000) | (((m_count[channel] & 0x3fff) - 1) & 0x3fff);
-    if ((m_count[channel] & 0xc000) == 0x4000)
-        // read
-        value = m_addrSpace->readByte(m_addr[channel]);
-    else if ((m_count[channel] & 0xc000) == 0x8000)
+    if ((m_count[channel] & 0xc000) == 0x4000) {
         // write
-        m_addrSpace->writeByte(m_addr[channel], value);
+        if (m_swapRw)
+            value = m_addrSpace->readByte(m_addr[channel]);
+        else
+            m_addrSpace->writeByte(m_addr[channel], value);
+    } else if ((m_count[channel] & 0xc000) == 0x8000) {
+        // read
+        if (m_swapRw)
+            m_addrSpace->writeByte(m_addr[channel], value);
+        else
+            value = m_addrSpace->readByte(m_addr[channel]);
+    }
     m_addr[channel]++;
     if ((m_count[channel] & 0x3fff) == 0x3fff) {
         // End of block transfer
@@ -207,6 +214,12 @@ bool Dma8257::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
     } else if (propertyName == "cpu") {
         attachCpu(static_cast<Cpu*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "swapRW") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_swapRw = values[0].asString() == "yes";
+            return true;
+        }
         return true;
     }
 

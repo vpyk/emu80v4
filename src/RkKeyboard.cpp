@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ void RkKeyboard::resetKeys()
     m_mask = 0;
     m_ctrlKeys = 0;
 }
+
 
 void RkKeyboard::processKey(EmuKey key, bool isPressed)
 {
@@ -104,7 +105,6 @@ void RkKeyboard::processKey(EmuKey key, bool isPressed)
 }
 
 
-
 void RkKeyboard::setMatrixMask(uint8_t mask)
 {
     m_mask = ~mask;
@@ -128,7 +128,6 @@ uint8_t RkKeyboard::getMatrixData()
 
     return ~val;
 }
-
 
 
 uint8_t RkKeyboard::getCtrlKeys()
@@ -159,4 +158,61 @@ bool RkKeyboard::setProperty(const string& propertyName, const EmuValuesList& va
             return false;
     }
     return false;
+}
+
+
+
+Ms7007Keyboard::Ms7007Keyboard()
+{
+    resetKeys();
+}
+
+
+void Ms7007Keyboard::resetKeys()
+{
+    for (int i = 0; i < 8; i++)
+        m_keys[i] = 0;
+    m_mask = 0;
+}
+
+
+void Ms7007Keyboard::processKey(EmuKey key, bool isPressed)
+{
+    if (key == EK_NONE)
+        return;
+
+    int i, j;
+
+    for (i = 0; i < 8; i++)
+        for (j = 0; j < 11; j++)
+            if (key == m_keyMatrix[i][j])
+                goto found;
+    return;
+
+    found:
+    if (isPressed)
+        m_keys[i] |= (1 << j);
+    else
+        m_keys[i] &= ~(1 << j);
+}
+
+
+void Ms7007Keyboard::setMatrixMask(uint8_t mask)
+{
+    m_mask = ~mask;
+}
+
+
+
+uint16_t Ms7007Keyboard::getMatrixData()
+{
+    uint16_t val = 0;
+    uint8_t mask = m_mask;
+    for (int i = 0; i < 8; i++) {
+        if (mask & 1)
+            val |= m_keys[i];
+        mask >>= 1;
+    }
+
+    return ~val;
 }

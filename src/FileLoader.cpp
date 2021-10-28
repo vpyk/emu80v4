@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@
 #include "TapeRedirector.h"
 #include "FileLoader.h"
 
+
 using namespace std;
+
 
 void FileLoader::attachAddrSpace(AddressableDevice* as)
 {
@@ -168,6 +170,9 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         if (cpu) {
             cpu->disableHooks();
             g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+
+            afterReset();
+
             cpu->enableHooks();
             cpu->setPC(begAddr);
             if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {

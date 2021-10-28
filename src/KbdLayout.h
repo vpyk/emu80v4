@@ -141,6 +141,27 @@ enum EmuKey
     EK_LAT, // ЛАТ
     EK_RUS, // РУС
 
+    // Added in MS7007
+    EK_HELP,
+    EK_SET,
+    EK_EXEC,
+    EK_RESET,
+    EK_NP_0,
+    EK_NP_1,
+    EK_NP_2,
+    EK_NP_3,
+    EK_NP_4,
+    EK_NP_5,
+    EK_NP_6,
+    EK_NP_7,
+    EK_NP_8,
+    EK_NP_9,
+    EK_NP_PLUSMUL,
+    EK_NP_MINUSDIV,
+    EK_NP_PERIOD,
+    EK_NP_COMMA,
+    EK_NP_CR,
+
     // Joystick
     EK_JS_UP,
     EK_JS_DOWN,

@@ -136,6 +136,8 @@
 		<Unit filename="KbdLayout.cpp" />
 		<Unit filename="KbdLayout.h" />
 		<Unit filename="Keyboard.h" />
+		<Unit filename="Kr04.cpp" />
+		<Unit filename="Kr04.h" />
 		<Unit filename="Lvov.cpp" />
 		<Unit filename="Lvov.h" />
 		<Unit filename="Main.cpp" />

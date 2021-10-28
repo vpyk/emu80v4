@@ -96,7 +96,8 @@ bool RkTapeInHook::hookProc()
         if (m_file->getPos() == 0 && m_file->peekByte() == 0xE6)
             inByte = m_file->readByte(); // если файл с первым синхробайтом (*.gam), то пропускаем его
 
-        if ((af & 0xff00) != 0x0800 && m_file->getPos() != 0 && inByte != 0xe6)
+        //if ((af & 0xff00) != 0x0800 && m_file->getPos() != 0 && inByte != 0xe6)
+        if ((af & 0x8000) && m_file->getPos() != 0 && inByte != 0xe6)
             m_file->waitForSequence(&sb, 1);
 
         inByte = m_file->readByte();
@@ -105,7 +106,7 @@ bool RkTapeInHook::hookProc()
     if (m_file->isCancelled())
         return false;
 
-    cpu->setAF((af & 0xFF) | (inByte << 8));
+    cpu->setAF((af & 0xFE) | (inByte << 8));
 
     static_cast<Cpu8080Compatible*>(m_cpu)->ret();
 

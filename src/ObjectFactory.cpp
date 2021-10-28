@@ -63,6 +63,7 @@
 #include "SdCard.h"
 #include "SdAdapters.h"
 #include "Lvov.h"
+#include "Kr04.h"
 
 #include "EmuConfig.h"
 
@@ -217,6 +218,15 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(LvovCpuWaits);
     REG_EMU_CLASS(LvovCpuCycleWaits);
     REG_EMU_CLASS(LvovFileLoader);
+    REG_EMU_CLASS(Kr04Core);
+    REG_EMU_CLASS(Kr04Ppi8255Circuit);
+    REG_EMU_CLASS(Kr04Renderer);
+    //REG_EMU_CLASS(Ms7007Keyboard);
+    REG_EMU_CLASS(Kr04Keyboard);
+    REG_EMU_CLASS(Kr04KbdLayout);
+    REG_EMU_CLASS(Kr04PpiColor8255Circuit);
+    REG_EMU_CLASS(Kr04Pit8253SoundSource);
+    REG_EMU_CLASS(Kr04FileLoader);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

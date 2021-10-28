@@ -45,7 +45,7 @@ class Crt8275Renderer : public TextCrtRenderer
 
         virtual const uint8_t* getCurFontPtr(bool, bool, bool) {return nullptr;}
         virtual const uint8_t* getAltFontPtr(bool, bool, bool) {return nullptr;}
-        virtual uint32_t getCurFgColor(bool, bool, bool) = 0;
+        virtual uint32_t getCurFgColor(bool, bool, bool) {return 0xFFFFFF;}
         virtual uint32_t getCurBgColor(bool, bool, bool) {return 0x000000;}
         virtual void customDrawSymbolLine(uint32_t*, uint8_t, int, bool, bool, bool, bool, bool, bool) {}
         virtual char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt);
@@ -67,6 +67,8 @@ class Crt8275Renderer : public TextCrtRenderer
 
         bool m_useRvv;
         bool m_dashedLten = false;
+
+        int m_visibleOffsetX = 0;
 
         int m_dataSize = 0;
 

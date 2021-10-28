@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -103,5 +103,37 @@ class RkKeyboard : public Keyboard
         uint8_t m_mask;
 
 };
+
+
+class Ms7007Keyboard : public Keyboard
+{
+    public:
+        Ms7007Keyboard();
+
+        void resetKeys() override;
+        void processKey(EmuKey key, bool isPressed) override;
+
+        void setMatrixMask(uint8_t mask);
+        uint16_t getMatrixData();
+
+        static EmuObject* create(const EmuValuesList&) {return new Ms7007Keyboard();}
+
+    private:
+
+    const EmuKey m_keyMatrix[8][11] = {
+            {EK_NP_COMMA,    EK_ESC,       EK_SEMICOLON, EK_F1,    EK_F2,         EK_F3,   EK_4,      EK_F4,    EK_F5,     EK_7,        EK_8        },
+            {EK_NP_MINUSDIV, EK_TAB,       EK_J,         EK_1,     EK_2,          EK_3,    EK_E,      EK_5,     EK_6,      EK_LBRACKET, EK_RBRACKET },
+            {EK_NONE,        EK_CTRL,      EK_F,         EK_C,     EK_U,          EK_K,    EK_P,      EK_N,     EK_G,      EK_L,        EK_D        },
+            {EK_NONE,        EK_GRAPH,     EK_Q,         EK_Y,     EK_W,          EK_A,    EK_I,      EK_R,     EK_O,      EK_B,        EK_AT       },
+            {EK_SHIFT,       EK_LANG,      EK_FIX,       EK_CARET, EK_S,          EK_M,    EK_SPACE,  EK_T,     EK_X,      EK_LEFT,     EK_COMMA    },
+            {EK_NP_7,        EK_NP_0,      EK_NP_1,      EK_NP_4,  EK_NP_PLUSMUL, EK_BSP,  EK_RIGHT,  EK_DOWN,  EK_PERIOD, EK_BKSLASH,  EK_V        },
+            {EK_NP_8,        EK_NP_PERIOD, EK_NP_2,      EK_NP_5,  EK_EXEC,       EK_SET,  EK_CR,     EK_UP,    EK_UNDSCR, EK_H,        EK_Z        },
+            {EK_NP_9,        EK_NP_CR,     EK_NP_3,      EK_NP_6,  EK_CLEAR,      EK_HELP, EK_COLON,  EK_SLASH, EK_MINUS,  EK_0,        EK_9        }
+        };
+
+        uint16_t m_keys[8];
+        uint8_t m_mask;
+};
+
 
 #endif  // RKKEYBOARD_H

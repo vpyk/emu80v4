@@ -705,7 +705,7 @@ void Crt8275Raster::operate()
         // normal display
         m_curClock += m_crt->m_nCharsPerRow * m_kDiv;
         m_isHrtcActive = true;
-        //! m_core->hrtc(true);
+        m_core->hrtc(true, m_curScanLine);
     } else {
         // HRTC active
         m_curClock += m_crt->m_nHrChars * m_kDiv;

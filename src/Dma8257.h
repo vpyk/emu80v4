@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ class Dma8257 : public AddressableDevice
         uint8_t m_modeReg;
         uint8_t m_statusReg;
         bool m_isLoByte;
+        bool m_swapRw = true; // swap MEMW & MEMR, default for RK86 etc.
         //int m_kDiv = 1;
 };
 
