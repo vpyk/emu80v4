@@ -61,7 +61,7 @@ void TapeRedirector::openFile()
         closeFile();
 
     if (m_permanentFileName == "") {
-        m_fileName = palOpenFileDialog("Open rk file", m_filter + "|Wav Files (*.wav)|*.wav;*.WAV|CSW Files (*.csw)|*.csw;*.CSW", m_rwMode == "w", m_platform->getWindow());
+        m_fileName = palOpenFileDialog(m_rwMode == "w" ? "Save tape file" : "Open tape file", m_filter + "|Wav Files (*.wav)|*.wav;*.WAV|CSW Files (*.csw)|*.csw;*.CSW", m_rwMode == "w", m_platform->getWindow());
         g_emulation->restoreFocus();
     }
     else
