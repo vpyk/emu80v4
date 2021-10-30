@@ -42,6 +42,7 @@ class Dma8257 : public AddressableDevice
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         void reset() override;
+        std::string getDebugInfo() override;
 
         void attachCpu(Cpu* cpu);
         void attachAddrSpace(AddressableDevice* as);
@@ -71,6 +72,9 @@ class Dma8257 : public AddressableDevice
         bool m_isLoByte;
         bool m_swapRw = true; // swap MEMW & MEMR, default for RK86 etc.
         //int m_kDiv = 1;
+
+        uint16_t m_initAddr[4] = {0, 0, 0, 0};
+        uint16_t m_initCount[4] = {0, 0, 0, 0};
 };
 
 #endif // DMA8257_H
