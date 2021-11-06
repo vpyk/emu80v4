@@ -25,11 +25,12 @@
 #include "Keyboard.h"
 #include "Ppi8255Circuit.h"
 #include "FileLoader.h"
+#include "Pit8253Sound.h"
 
-class GeneralSoundSource;
 class Fdc1793;
 class AddrSpaceMapper;
 
+class SpecMxPit8253SoundSource;
 
 class SpecMxMemPageSelector : public AddressableDevice
 {
@@ -265,8 +266,11 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
         // Источник звука - вывод на магнитофон
         GeneralSoundSource* m_tapeSoundSource = nullptr;
 
-        // Источник звука - встроенный динамик
+        // Источник звука - встроенный динамик (для обычного Специалиста)
         GeneralSoundSource* m_beepSoundSource = nullptr;
+
+        // Источник звука - тaймер ВИ53 (для Специалиста-MX)
+        SpecMxPit8253SoundSource* m_pitSoundSource = nullptr;
 
     private:
         // Клавиатура типа РК86
@@ -323,6 +327,23 @@ class SpecMxFileLoader : public FileLoader
     private:
         AddressableDevice* m_ramDisk = nullptr;
         AddrSpaceMapper* m_pageMapper = nullptr;
+};
+
+
+class SpecMxPit8253SoundSource : public Pit8253SoundSource
+{
+    public:
+        int calcValue() override;
+
+        void setGate(bool gate);
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecMxPit8253SoundSource();}
+
+    private:
+        bool m_gate = false;
+        int m_sumValue;
+
+        void updateStats();
 };
 
 

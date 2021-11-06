@@ -32,6 +32,7 @@
 #include "SoundMixer.h"
 #include "WavReader.h"
 #include "Cpu.h"
+#include "Pit8253.h"
 
 using namespace std;
 
@@ -385,6 +386,8 @@ void SpecPpi8255Circuit::setPortC(uint8_t value)
     m_kbd->setVMatrixMask(m_kbdMask);
     if (m_beepSoundSource)
         m_beepSoundSource->setValue((value & 0x20) >> 5);
+    if (m_pitSoundSource)
+        m_pitSoundSource->setGate(value & 0x20);
     m_tapeSoundSource->setValue((value & 0x80) >> 7);
     m_platform->getCore()->tapeOut(value & 0x80);
     if (m_videoRam)
@@ -444,6 +447,9 @@ bool SpecPpi8255Circuit::setProperty(const string& propertyName, const EmuValues
         return true;
     } else if (propertyName == "beepSoundSource") {
         m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "pitSoundSource") {
+        m_pitSoundSource = static_cast<SpecMxPit8253SoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 
@@ -856,4 +862,48 @@ void SpecRomDisk::setPortA(uint8_t value)
 void SpecRomDisk::setPortC(uint8_t value)
 {
     m_curAddr = (m_curAddr & ~0xff00) | (value << 8);
+}
+
+
+void SpecMxPit8253SoundSource::updateStats()
+{
+    if (m_pit) {
+        m_pit->updateState();
+        m_sumValue += m_pit->getCounter(0)->getAvgOut();
+        m_sumValue += m_pit->getCounter(2)->getAvgOut();
+    }
+}
+
+
+int SpecMxPit8253SoundSource::calcValue()
+{
+    Pit8253Counter* cnt0 = m_pit->getCounter(0);
+    Pit8253Counter* cnt1 = m_pit->getCounter(1);
+    Pit8253Counter* cnt2 = m_pit->getCounter(2);
+
+    cnt0->updateState();
+    cnt1->updateState();
+
+    int t = m_pit->getCounter(0)->getSumOutTicks();
+    cnt2->operateForTicks(t);
+
+    int res = 0;
+    bool out2 = cnt2->getOut();
+    if ((m_gate && out2) || (!m_gate && !out2))
+        res = MAX_SND_AMP;
+    else if (m_gate && !out2)
+        res = MAX_SND_AMP - cnt0->getAvgOut();
+
+    cnt0->resetStats();
+    cnt1->resetStats();
+    cnt2->resetStats();
+
+    return m_muted ? 0 : res;
+}
+
+
+void SpecMxPit8253SoundSource::setGate(bool gate)
+{
+    //updateStats();
+    m_gate = gate;
 }
