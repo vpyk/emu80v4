@@ -867,16 +867,6 @@ void SpecRomDisk::setPortC(uint8_t value)
 
 void SpecMxPit8253SoundSource::updateStats()
 {
-    if (m_pit) {
-        m_pit->updateState();
-        m_sumValue += m_pit->getCounter(0)->getAvgOut();
-        m_sumValue += m_pit->getCounter(2)->getAvgOut();
-    }
-}
-
-
-int SpecMxPit8253SoundSource::calcValue()
-{
     Pit8253Counter* cnt0 = m_pit->getCounter(0);
     Pit8253Counter* cnt1 = m_pit->getCounter(1);
     Pit8253Counter* cnt2 = m_pit->getCounter(2);
@@ -884,19 +874,33 @@ int SpecMxPit8253SoundSource::calcValue()
     cnt0->updateState();
     cnt1->updateState();
 
-    int t = m_pit->getCounter(0)->getSumOutTicks();
-    cnt2->operateForTicks(t);
 
-    int res = 0;
+    uint64_t clocksTotal, clocksHi;
+    cnt0->getStats(clocksTotal, clocksHi);
+
+    cnt2->operateForTicks(cnt1->getSumOutTicks());
+
     bool out2 = cnt2->getOut();
-    if ((m_gate && out2) || (!m_gate && !out2))
-        res = MAX_SND_AMP;
-    else if (m_gate && !out2)
-        res = MAX_SND_AMP - cnt0->getAvgOut();
+    m_sumClocksTotal += clocksTotal;
+    if (!m_gate)
+        m_sumClocksHi += out2 ? clocksTotal : clocksHi;
 
     cnt0->resetStats();
     cnt1->resetStats();
     cnt2->resetStats();
+}
+
+
+int SpecMxPit8253SoundSource::calcValue()
+{
+    updateStats();
+
+    int res = 0;
+    if (m_sumClocksTotal != 0)
+        res = m_sumClocksHi * MAX_SND_AMP / m_sumClocksTotal;
+
+    m_sumClocksTotal = 0;
+    m_sumClocksHi = 0;
 
     return m_muted ? 0 : res;
 }
@@ -904,6 +908,6 @@ int SpecMxPit8253SoundSource::calcValue()
 
 void SpecMxPit8253SoundSource::setGate(bool gate)
 {
-    //updateStats();
+    updateStats();
     m_gate = gate;
 }

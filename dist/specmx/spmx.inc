@@ -92,8 +92,6 @@ fddRegs.fdc = &fdc
 
 Pit8253 pit
 pit.frequency = 2000000
-RkPit8253SoundSource sndSource
-sndSource.pit = &pit
 
 SpecMxMemPageSelector pageSelector
 pageSelector.mapper = &lowerAddrSpace

@@ -55,6 +55,7 @@ class Pit8253Counter : public EmuObject //PassiveDevice
 
         int getAvgOut();
         int getSumOutTicks() {return m_sumOutTicks;}
+        void getStats(uint64_t& clocksTotal, uint64_t& clocksHi);
         void resetStats();
 
         void updateState();
