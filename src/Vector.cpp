@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -665,7 +665,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
 // Port 01
 void VectorPpi8255Circuit::setPortC(uint8_t value)
 {
-    m_tapeSoundSource->setValue(value & 1);
+    m_tapeSoundSource->setValue(~value & 1);
     m_platform->getCore()->tapeOut(value & 1);
 }
 
