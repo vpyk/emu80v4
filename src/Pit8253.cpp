@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,24 +49,24 @@ void Pit8253Counter::operateForTicks(int ticks)
 
     switch (m_mode) {
         case 0:
-            //m_tempSumOut = 0;
-            if (m_isCounting && !m_out) {
-                if (ticks >= m_counter) {
-                    m_tempSumOut += (ticks - m_counter);
-                    m_isCounting = false;
-                    m_out = true;
-                    ++m_sumOutTicks;
-                }
-            } else
-                m_tempSumOut += ticks;
-            m_counter = (m_counter - ticks) & 0xffff;
+            if (m_isCounting) {
+                if (!m_out) {
+                    if (ticks >= m_counter) {
+                        m_tempSumOut += (ticks - m_counter);
+                        m_out = true;
+                        ++m_sumOutTicks;
+                    }
+                    m_counter = (m_counter - ticks) & 0xffff;
+                } else
+                    m_tempSumOut += ticks;
+            }
             break;
         case 3:
             {
-                //m_tempSumOut = 0;
-
-                if (!m_isCounting)
+                if (!m_isCounting) {
                     m_tempSumOut += ticks;
+                    break;
+                }
 
                 int hiPeriod = (m_counterInitValue + 1) / 2;
                 int loPeriod = m_counterInitValue / 2;
@@ -139,7 +139,7 @@ void Pit8253Counter::updateState()
     int ticks = curFastClock / m_kDiv - m_prevFastClock / m_kDiv;
 #endif
 
-    if (m_out || !m_isCounting)
+    if (m_out)
 #ifndef LESS_64BIT_DIVS
         m_tempAddOutClocks -= (m_prevClock % m_kDiv);
 #else
@@ -149,7 +149,7 @@ void Pit8253Counter::updateState()
 
     operateForTicks(ticks);
 
-    if (m_out || !m_isCounting)
+    if (m_out)
 #ifndef LESS_64BIT_DIVS
         m_tempAddOutClocks += (curClock % m_kDiv);
 #else
