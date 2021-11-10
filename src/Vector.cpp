@@ -410,7 +410,7 @@ void VectorRenderer::renderFrame()
     if (m_showBorder)
         memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     else {
-        uint32_t* ptr = m_frameBuf + 626 * 24 + 57;
+        uint32_t* ptr = m_frameBuf + 626 * 16 + 57;
         for (int i = 0; i < 256 * 512; i += 512) {
             memcpy(m_pixelData + i, ptr, 512 * sizeof(uint32_t));
             ptr += 626;
