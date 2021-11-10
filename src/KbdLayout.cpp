@@ -861,21 +861,6 @@ EmuKey RkKbdLayout::translateKey(PalKeyCode keyCode)
         case PK_LCTRL:
             return EK_CTRL;
 
-        // Клавиши Специалиста
-        // !!! перенести в SpecKbdLayout, добавить EK_RPT
-        case PK_F6:
-            return EK_F6;
-        case PK_F7:
-            return EK_F7;
-        case PK_F8:
-            return EK_F8;
-        case PK_F9:
-            return EK_F9;
-        case PK_F10:
-            return EK_F10;
-        case PK_F11:
-            return EK_F11;
-
         default:
             return EK_NONE;
     }

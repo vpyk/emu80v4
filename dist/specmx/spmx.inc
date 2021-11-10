@@ -138,7 +138,7 @@ GeneralSoundSource tapeSoundSource
 SpecMxPit8253SoundSource pitSoundSource
 pitSoundSource.pit = &pit
 
-RkKbdLayout kbdLayout
+SpecKbdLayout kbdLayout
 SpecKeyboard keyboard
 keyboard.matrix = @kbd
 

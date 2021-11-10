@@ -110,6 +110,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(SpecCore);
     REG_EMU_CLASS(SpecMxFddControlRegisters);
     REG_EMU_CLASS(SpecKeyboard);
+    REG_EMU_CLASS(SpecKbdLayout);
     REG_EMU_CLASS(SpecPpi8255Circuit);
     REG_EMU_CLASS(SpecRomDisk);
     REG_EMU_CLASS(SpecFileLoader);

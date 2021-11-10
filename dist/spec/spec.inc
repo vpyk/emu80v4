@@ -74,7 +74,7 @@ GeneralSoundSource tapeSoundSource
 #tapeSoundSource.muted = yes
 GeneralSoundSource beepSoundSource
 
-RkKbdLayout kbdLayout
+SpecKbdLayout kbdLayout
 SpecKeyboard keyboard
 #keyboard.matrix = "original"
 

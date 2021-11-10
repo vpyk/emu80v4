@@ -199,7 +199,7 @@ class SpecKeyboard : public Keyboard
             { EK_CR,    EK_BSP,   EK_PERIOD,  EK_COLON,    EK_MINUS,     EK_CLEAR },
             { EK_LF,    EK_SLASH, EK_BKSLASH, EK_H,        EK_0,         EK_F11   },
             { EK_RIGHT, EK_COMMA, EK_V,       EK_Z,        EK_9,         EK_F10   },
-            { EK_CTRL,/*RPT*/  EK_AT,    EK_D,       EK_RBRACKET, EK_8,         EK_F9    },
+            { EK_RPT,   EK_AT,    EK_D,       EK_RBRACKET, EK_8,         EK_F9    },
             { EK_LEFT,  EK_B,     EK_L,       EK_LBRACKET, EK_7,         EK_F8    },
             { EK_SPACE, EK_X,     EK_O,       EK_G,        EK_6,         EK_F7    },
             { EK_ESC,   EK_T,     EK_R,       EK_N,        EK_5,         EK_F6    },
@@ -234,6 +234,16 @@ class SpecKeyboard : public Keyboard
         uint8_t m_hMask;
 
         bool m_shift;
+};
+
+
+class SpecKbdLayout : public RkKbdLayout
+{
+    public:
+        static EmuObject* create(const EmuValuesList&) {return new SpecKbdLayout();}
+
+    protected:
+        EmuKey translateKey(PalKeyCode keyCode) override;
 };
 
 

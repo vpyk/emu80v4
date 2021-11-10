@@ -589,6 +589,45 @@ string SpecKeyboard::getPropertyStringValue(const string& propertyName)
 }
 
 
+EmuKey SpecKbdLayout::translateKey(PalKeyCode keyCode)
+{
+    switch (keyCode) {
+    case PK_LCTRL:
+    case PK_RCTRL:
+        return EK_RPT;
+    default:
+        break;
+    }
+
+    EmuKey key = RkKbdLayout::translateKey(keyCode);
+    if (key != EK_NONE)
+        return key;
+
+    switch (keyCode) {
+    case PK_F6:
+        return EK_F6;
+    case PK_F7:
+        return EK_F7;
+    case PK_F8:
+        return EK_F8;
+    case PK_F9:
+        return EK_F9;
+    case PK_F10:
+        return EK_F10;
+    case PK_F11:
+        return EK_F11;
+    case PK_LCTRL:
+    case PK_RCTRL:
+        return EK_RPT;
+
+    default:
+        return EK_NONE;
+    }
+
+    return key;
+}
+
+
 bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
 {
     int fileSize;
