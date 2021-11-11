@@ -6,7 +6,7 @@ For license info, see the file "COPYING.txt"
 Эмулятор поддерживает ПК Радио-86РК, Апогей, Партнёр, Микроша, Специалист, Eureka, Специалист-MX, Орион, Микроша, ПК-8000, Вектор, Львов и некоторые их модификации
 
 ## Ссылки
-* Сайт проекта: [http://emu80.org](http://emu80.org) (временно не обновляется)
+* Сайт проекта: [http://emu80.org](http://emu80.org)
 * Обсуждение на форуме zx-pk.ru: [http://zx-pk.ru/threads/27488-emu80-v-4.html](http://zx-pk.ru/threads/27488-emu80-v-4.html)
 * Обсуждение на форуме nedopc.org: [http://www.nedopc.org/forum/viewtopic.php?f=43&t=17234](http://www.nedopc.org/forum/viewtopic.php?f=43&t=17234)
 
