@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -176,22 +176,28 @@ bool palQtInit(int& argc, char** argv)
 }
 
 
-void palQtQuit()
-{
-    delete translator;
-    delete application;
-}
-
-
 const string& palGetBasePath()
 {
     return basePath;
 }
 
 
-static QAudioOutput* audio;
+static QAudioOutput* audio = nullptr;
 
-static EmuAudioIoDevice* audioDevice = 0;
+static EmuAudioIoDevice* audioDevice = nullptr;
+
+
+void palQtQuit()
+{
+    if (audioDevice)
+        delete audioDevice;
+    if (audio)
+        audio->stop();
+
+    delete translator;
+    delete application;
+}
+
 
 void palStart()
 {
