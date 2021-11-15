@@ -43,6 +43,9 @@ REG DELETE HKCU\Software\Classes\Emu80.rke /f
 REG DELETE HKCU\Software\Classes\.lvt /f
 REG DELETE HKCU\Software\Classes\Emu80.lvt /f
 
+REG DELETE HKCU\Software\Classes\.rk4 /f
+REG DELETE HKCU\Software\Classes\Emu80.rk4 /f
+
 
 set IE4UINIT=%SYSTEMROOT%\SYSTEM32\ie4uinit.exe
 if exist %IE4UINIT% goto proceed
