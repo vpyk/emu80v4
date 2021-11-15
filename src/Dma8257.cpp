@@ -22,6 +22,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -196,7 +197,9 @@ bool Dma8257::dmaRequest(int channel, uint8_t &value, uint64_t clock)
               else
                   offs = 0;*/
         }
-        m_cpu->hrq(4 * m_kDiv + offs);
+        int dmaClocks = 4 * m_kDiv + offs;
+        m_cpu->hrq(dmaClocks);
+        m_consDmaClocks += dmaClocks;
     }
     return true;
 }
@@ -258,4 +261,35 @@ string Dma8257::getDebugInfo()
         }
     }
     return ss.str();
+}
+
+
+void Dma8257::calcDmaPercentage()
+{
+    uint64_t cpuClocks = m_cpu->getClock() - m_consStartCpuClock;
+    m_dmaPercentage = (m_consStartCpuClock && cpuClocks) ? m_consDmaClocks * 100. / cpuClocks : 0.0;
+    m_consStartCpuClock = m_cpu->getClock();
+    m_consDmaClocks = 0;
+}
+
+
+string Dma8257::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = AddressableDevice::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "percentage") {
+        // average within 1.5 s (every 3 times)
+        m_calcCnt = (m_calcCnt + 1) % 3;
+        if (!m_calcCnt)
+            calcDmaPercentage();
+        ostringstream oss;
+        oss << setprecision(2) << m_dmaPercentage;
+        return m_dmaPercentage != 0.0 ? oss.str() : "";
+    }
+
+    return "";
 }

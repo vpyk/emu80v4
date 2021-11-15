@@ -127,6 +127,7 @@ private:
     QLabel* m_fpsLabel;
     QLabel* m_speedLabel;
     QLabel* m_crtModeLabel;
+    QLabel* m_dmaTimeLabel;
     QLabel* m_imageSizeLabel;
     QLabel* m_kbdLabel;
     QLabel* m_colorLabel;

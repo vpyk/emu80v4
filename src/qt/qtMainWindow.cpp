@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -101,6 +101,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_colorLabel = new QLabel("", this);
             m_crtModeLabel = new QLabel("", this);
             m_crtModeLabel->setVisible(false);
+            m_dmaTimeLabel = new QLabel("", this);
+            m_dmaTimeLabel->setVisible(false);
             m_imageSizeLabel = new QLabel("", this);
             m_tapeLabel = new QLabel("", this);
             m_tapeLabel->setVisible(false);
@@ -112,6 +114,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_kbdLabel->setToolTip(tr("Keyboard layout"));
             m_colorLabel->setToolTip(tr("Color mode"));
             m_crtModeLabel->setToolTip(tr("Screen mode"));
+            m_dmaTimeLabel->setToolTip(tr("Time consumed during DMA"));
             m_imageSizeLabel->setToolTip(tr("Image size in emulator"));
             m_tapeLabel->setToolTip(tr("Tape file I/O"));
             m_wavLabel->setToolTip(tr("Wav file I/O"));
@@ -125,6 +128,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_statusBar->addWidget(m_wavLabel);
             m_statusBar->addWidget(m_crtModeLabel);
             m_statusBar->addWidget(m_imageSizeLabel);
+            m_statusBar->addWidget(m_dmaTimeLabel);
         }
 
         tuneMenu();
@@ -1223,6 +1227,12 @@ void MainWindow::onFpsTimer()
         crtMode= emuGetPropertyValue(platform + "crtRenderer", "crtMode");
     m_crtModeLabel->setText(QString::fromUtf8(crtMode.c_str()));
     m_crtModeLabel->setVisible(crtMode != "");
+
+    std::string dmaTime = "";
+    if (m_palWindow)
+        dmaTime = emuGetPropertyValue(platform + "dma", "percentage");
+    m_dmaTimeLabel->setText(/*tr("DMA: ") + */QString::fromUtf8(dmaTime.c_str()) + " %");
+    m_dmaTimeLabel->setVisible(dmaTime != "");
 
     m_imageSizeLabel->setText(QString::number(m_paintWidget->getImageWidth()) + QString::fromUtf8(u8"\u00D7") + QString::number(m_paintWidget->getImageHeight()));
 

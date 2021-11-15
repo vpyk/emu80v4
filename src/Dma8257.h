@@ -41,6 +41,7 @@ class Dma8257 : public AddressableDevice
         virtual ~Dma8257() {}
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
         void reset() override;
         std::string getDebugInfo() override;
 
@@ -75,6 +76,12 @@ class Dma8257 : public AddressableDevice
 
         uint16_t m_initAddr[4] = {0, 0, 0, 0};
         uint16_t m_initCount[4] = {0, 0, 0, 0};
+
+        uint64_t m_consStartCpuClock = 0;
+        uint64_t m_consDmaClocks = 0;
+        float m_dmaPercentage = 0.0;
+        int m_calcCnt = 0;
+        void calcDmaPercentage();
 };
 
 #endif // DMA8257_H
