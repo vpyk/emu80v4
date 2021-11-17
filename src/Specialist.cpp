@@ -478,13 +478,45 @@ void SpecKeyboard::processKey(EmuKey key, bool isPressed)
     if (key == EK_NONE)
         return;
 
+    if (m_kbdType == SKT_LIK) {
+        // replace
+        switch(key) {
+        case EK_ESC:
+            key = EK_F1;
+            break;
+        case EK_TAB:
+            key = EK_NONE;
+            break;
+        default:
+            break;
+        }
+    } else if (m_kbdType == SKT_EUREKA) {
+        // switch some keys
+        switch(key) {
+        case EK_F11:
+            key = EK_TAB;
+            break;
+        case EK_TAB:
+            key = EK_F11;
+            break;
+        case EK_F10:
+            key = EK_ESC;
+            break;
+        case EK_ESC:
+            key = EK_F10;
+            break;
+        default:
+            break;
+        }
+    }
+
     int i, j;
     bool isFound = false;
 
     // Основная матрица
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 12; j++) {
-            if ((m_mxMatrix ? m_keyMatrixMx[j][i] : m_keyMatrix[j][i]) == key) {
+            if ((m_kbdType == SKT_MX ? m_keyMatrixMx[j][i] : m_keyMatrix[j][i]) == key) {
                 isFound = true;
                 break;
             }
@@ -562,10 +594,16 @@ bool SpecKeyboard::setProperty(const string& propertyName, const EmuValuesList& 
 
     if (propertyName == "matrix") {
         if (values[0].asString() == "original") {
-            m_mxMatrix = false;
+            m_kbdType = SKT_ORIGINAL;
             return true;
         } else if (values[0].asString() == "ramfos") {
-            m_mxMatrix = true;
+            m_kbdType = SKT_MX;
+            return true;
+        } else if (values[0].asString() == "lik") {
+            m_kbdType = SKT_LIK;
+            return true;
+        } else if (values[0].asString() == "eureka") {
+            m_kbdType = SKT_EUREKA;
             return true;
         } else
             return false;
@@ -583,7 +621,18 @@ string SpecKeyboard::getPropertyStringValue(const string& propertyName)
         return res;
 
     if (propertyName == "matrix")
-        return m_mxMatrix ? "ramfos" : "original";
+        switch (m_kbdType) {
+        case SKT_ORIGINAL:
+            return "original";
+        case SKT_MX:
+            return "ramfos";
+        case SKT_LIK:
+            return "lik";
+        case SKT_EUREKA:
+            return "eureka";
+        default:
+            return "";
+        }
 
     return "";
 }
@@ -616,9 +665,8 @@ EmuKey SpecKbdLayout::translateKey(PalKeyCode keyCode)
         return EK_F10;
     case PK_F11:
         return EK_F11;
-    case PK_LCTRL:
-    case PK_RCTRL:
-        return EK_RPT;
+    case PK_F12:
+        return EK_CLEAR;
 
     default:
         return EK_NONE;

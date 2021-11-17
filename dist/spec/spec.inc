@@ -76,7 +76,7 @@ GeneralSoundSource beepSoundSource
 
 SpecKbdLayout kbdLayout
 SpecKeyboard keyboard
-#keyboard.matrix = "original"
+keyboard.matrix = @KBD
 
 SpecPpi8255Circuit ppiCircuit
 ppiCircuit.specKeyboard = &keyboard

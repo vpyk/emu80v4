@@ -430,6 +430,8 @@ void SettingsDialog::fillControlValues()
     ui->kbdTypeGroupBox->setVisible(val != "");
     ui->kbdOriginalRadioButton->setChecked(val == "original");
     ui->kbdRamfosRadioButton->setChecked(val == "ramfos");
+    ui->kbdLikRadioButton->setChecked(val == "lik");
+    ui->kbdEurekaRadioButton->setChecked(val == "eureka");
 
     // Fast reset
     val = m_options["platform.fastReset"];
@@ -889,6 +891,10 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "original";
     else if (ui->kbdRamfosRadioButton->isChecked())
         val = "ramfos";
+    else if (ui->kbdLikRadioButton->isChecked())
+        val = "lik";
+    else if (ui->kbdEurekaRadioButton->isChecked())
+        val = "eureka";
     m_options["keyboard.matrix"] = val;
 
     saveRunningConfig();

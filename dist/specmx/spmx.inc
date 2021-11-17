@@ -140,7 +140,7 @@ pitSoundSource.pit = &pit
 
 SpecKbdLayout kbdLayout
 SpecKeyboard keyboard
-keyboard.matrix = @kbd
+keyboard.matrix = @KBD
 
 SpecPpi8255Circuit ppiCircuit
 ppiCircuit.specKeyboard = &keyboard

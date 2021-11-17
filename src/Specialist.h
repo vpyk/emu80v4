@@ -178,6 +178,13 @@ class SpecMxFddControlRegisters : public AddressableDevice
 class SpecKeyboard : public Keyboard
 {
     public:
+        enum SpecKeyboardType {
+            SKT_ORIGINAL,
+            SKT_MX,
+            SKT_LIK,
+            SKT_EUREKA
+        };
+
         SpecKeyboard();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -225,7 +232,8 @@ class SpecKeyboard : public Keyboard
             { EK_LANG,  EK_Q,     EK_F,       EK_J,        EK_SEMICOLON, EK_ESC   }
         };
 
-        bool m_mxMatrix = false;
+        //bool m_mxMatrix = false;
+        SpecKeyboardType m_kbdType = SKT_ORIGINAL;
 
         uint8_t m_vKeys[12];
         uint16_t m_vMask;

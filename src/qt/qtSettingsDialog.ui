@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -1297,7 +1297,21 @@
           <item>
            <widget class="QRadioButton" name="kbdRamfosRadioButton">
             <property name="text">
-             <string notr="true">RAMFOS</string>
+             <string notr="true">RAMFOS (MX)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="kbdLikRadioButton">
+            <property name="text">
+             <string>Lik</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="kbdEurekaRadioButton">
+            <property name="text">
+             <string notr="true">Eureka</string>
             </property>
            </widget>
           </item>
@@ -1499,10 +1513,13 @@
   <tabstop>smartRadioButton</tabstop>
   <tabstop>kbdOriginalRadioButton</tabstop>
   <tabstop>kbdRamfosRadioButton</tabstop>
+  <tabstop>kbdLikRadioButton</tabstop>
+  <tabstop>kbdEurekaRadioButton</tabstop>
   <tabstop>numpadJoystickCheckBox</tabstop>
   <tabstop>langComboBox</tabstop>
   <tabstop>rkCodePageRadioButton</tabstop>
   <tabstop>koi8CodePageRadioButton</tabstop>
+  <tabstop>fastResetCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
