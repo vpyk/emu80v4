@@ -300,6 +300,13 @@ uint32_t Kr04PpiColor8255Circuit::translateColor(int rgb)
 }
 
 
+void Kr04Pit8253SoundSource::tuneupPit()
+{
+    m_pit->getCounter(0)->setExtClockMode(true);
+    m_pit->getCounter(1)->setExtClockMode(true);
+}
+
+
 int Kr04Pit8253SoundSource::calcValue()
 {
     int res = 0;

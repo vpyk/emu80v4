@@ -34,6 +34,7 @@ class Pit8253SoundSource : public SoundSource
         int calcValue() override;
 
         void attachPit(Pit8253* pit);
+        virtual void tuneupPit() {}
 
         static EmuObject* create(const EmuValuesList&) {return new Pit8253SoundSource();}
 

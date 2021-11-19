@@ -179,11 +179,7 @@ class Kr04Pit8253SoundSource : public Pit8253SoundSource
 
         static EmuObject* create(const EmuValuesList&) {return new Kr04Pit8253SoundSource();}
 
-    private:
-        //bool m_gate = false;
-        //int m_sumValue;
-
-        //void updateStats();
+        void tuneupPit() override;
 };
 
 

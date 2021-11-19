@@ -28,7 +28,7 @@ using namespace std;
 void Pit8253SoundSource::attachPit(Pit8253* pit)
 {
     m_pit = pit;
-    pit->getCounter(2)->setExtClockMode(true);
+    tuneupPit();
 }
 
 

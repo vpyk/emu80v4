@@ -357,6 +357,8 @@ class SpecMxPit8253SoundSource : public Pit8253SoundSource
 
         static EmuObject* create(const EmuValuesList&) {return new SpecMxPit8253SoundSource();}
 
+        void tuneupPit() override;
+
     private:
         bool m_gate = false;
         int m_sumValue;

@@ -952,6 +952,12 @@ void SpecRomDisk::setPortC(uint8_t value)
 }
 
 
+void SpecMxPit8253SoundSource::tuneupPit()
+{
+    m_pit->getCounter(2)->setExtClockMode(true);
+}
+
+
 void SpecMxPit8253SoundSource::updateStats()
 {
     Pit8253Counter* cnt0 = m_pit->getCounter(0);
