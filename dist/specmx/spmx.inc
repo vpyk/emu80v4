@@ -295,6 +295,8 @@ configTab.addControl = 2, &cropSelector
 ConfigRadioSelector kbdSelector = &keyboard, matrix, "Тип клавиатуры"
 kbdSelector.addItem = original, "Оригинальная"
 kbdSelector.addItem = ramfos, "RAMFOS"
+kbdSelector.addItem = eureka, "Eureka"
+kbdSelector.addItem = lik, "Lik"
 configTab.addControl = 3, &kbdSelector
 
 #kbdLayout.layout
