@@ -21,6 +21,8 @@
 #ifndef PIT8253_H
 #define PIT8253_H
 
+//#include <string>
+
 #include "EmuObjects.h"
 
 // Uncomment for Raspberry Pi etc.
@@ -117,6 +119,7 @@ class Pit8253 : public AddressableDevice
 
         void setFrequency(int64_t freq) override;
         void reset() override;
+        //std::string getDebugInfo() override;
 
         // derived from AddressableDevice
         void writeByte(int addr, uint8_t value) override;
