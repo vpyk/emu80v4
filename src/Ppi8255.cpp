@@ -45,6 +45,12 @@ void Ppi8255::reset()
     m_chBMode = PCM_IN;
     m_chCHiMode = PCM_IN;
     m_chCLoMode = PCM_IN;
+    if (m_ppiCircuit) {
+        m_ppiCircuit->setPortAMode(true);
+        m_ppiCircuit->setPortBMode(true);
+        m_ppiCircuit->setPortCLoMode(true);
+        m_ppiCircuit->setPortCHiMode(true);
+    }
 }
 
 

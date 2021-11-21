@@ -232,6 +232,9 @@ void Kr04Ppi8255Circuit::setPortA(uint8_t value)
 
 void Kr04Ppi8255Circuit::setPortC(uint8_t value)
 {
+    if (m_portCLoInputMode)
+        value |= 0x0F;
+
     if (m_tapeSoundSource)
         m_tapeSoundSource->setValue(value & 8);
     m_platform->getCore()->tapeOut(value & 8);
@@ -239,6 +242,14 @@ void Kr04Ppi8255Circuit::setPortC(uint8_t value)
     m_mapper->setCurPage(value & 0x3);
 
     m_renderer->setHiRes(value & 4);
+}
+
+
+void Kr04Ppi8255Circuit::setPortCLoMode(bool isInput)
+{
+    m_portCLoInputMode = isInput;
+    if (isInput)
+        setPortC(getPortC() | 0x03);
 }
 
 
