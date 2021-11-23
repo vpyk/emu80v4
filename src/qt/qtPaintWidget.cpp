@@ -140,9 +140,15 @@ void PaintWidget::paintScreen(QPainter* painter, QRect dstRect)
 
     QRect srcRect(0, 0, m_image->width(), m_image->height());
 
-    if (!m_image2)
+    if (!m_image2) {
+        /*int kx = dstRect.width() / m_image->width() + 1;
+        int ky = dstRect.height() / m_image->height() + 1;
+        auto scaledImage = m_image->scaled(m_image->width() * kx, m_image->height() * ky);
+        QRect scaledRect(srcRect.left(), srcRect.top(), srcRect.width() * kx, srcRect.height() * ky);
+        painter->drawImage(dstRect, scaledImage, scaledRect);*/
+
         painter->drawImage(dstRect, *m_image, srcRect);
-    else if (m_useAlpha) {
+    } else if (m_useAlpha) {
         painter->drawImage(dstRect, *m_image, srcRect);
         QRectF srcRect2(0, 0, m_image2->width(), m_image2->height());
         painter->drawImage(dstRect, *m_image2, srcRect2);
