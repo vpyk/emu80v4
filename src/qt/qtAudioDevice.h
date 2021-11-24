@@ -34,12 +34,6 @@ class EmuAudioIoDevice : public QIODevice
         void start();
         void stop();
 
-        /*virtual bool atEnd() const {}
-        virtual qint64 pos() const {}
-        virtual bool seek(qint64 pos) {}
-        virtual qint64 size() const {}
-        virtual bool waitForReadyRead(int msecs) {}*/
-
     protected:
         qint64 readData(char* data, qint64 maxSize) override;
         qint64 writeData(const char*, qint64) override {return 0;}
@@ -52,7 +46,6 @@ class EmuAudioIoDevice : public QIODevice
 
         int m_minSamples;
         int m_maxSamples;
-   int maxt = 0;
 
         int16_t m_buf[16384];
 };

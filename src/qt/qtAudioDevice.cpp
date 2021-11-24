@@ -51,10 +51,7 @@ qint64 EmuAudioIoDevice::readData(char *data, qint64 maxSize)
     } else if (m_pos > m_maxSamples)
         m_pos = m_minSamples * 2;
 
-    if (maxt < m_pos) maxt = m_pos; // !!!
-    if (maxt == 16384) maxt = 0;    // !!!
-
-     if (maxSize >= m_pos * 2) {
+    if (maxSize >= m_pos * 2) {
         memcpy(data, m_buf, m_pos * 2);
         int read = m_pos * 2;
         m_pos = 0;

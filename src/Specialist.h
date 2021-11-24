@@ -361,7 +361,6 @@ class SpecMxPit8253SoundSource : public Pit8253SoundSource
 
     private:
         bool m_gate = false;
-        int m_sumValue;
 
         uint64_t m_sumClocksTotal = 0;
         uint64_t m_sumClocksHi = 0;
