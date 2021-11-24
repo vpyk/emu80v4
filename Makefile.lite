@@ -21,7 +21,7 @@ OBJECTS_LITE = $(SOURCES_LITE:.cpp=.o)
 all: Emu80lite
 
 Emu80lite: $(OBJECTS_LITE)
-	$(CC) $(LDFLAGS) $(OBJECTS_LITE) -o $@
+	$(CC) $(OBJECTS_LITE) $(LDFLAGS) -o $@
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
