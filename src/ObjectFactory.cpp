@@ -94,7 +94,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(GeneralSoundSource);
     REG_EMU_CLASS(Pit8253SoundSource);
     REG_EMU_CLASS(RkPit8253SoundSource);
-    //REG_EMU_CLASS(MikroshaPit8253SoundSource);
+    REG_EMU_CLASS(MikroshaPit8253SoundSource);
     REG_EMU_CLASS(OrionMemPageSelector);
     REG_EMU_CLASS(OrionRenderer);
     REG_EMU_CLASS(OrionScreenSelector);

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ void SoundMixer::operate()
 {
     int sample = 0;
     for(auto it = m_soundSources.begin(); it != m_soundSources.end(); it++)
-        sample += (*it)->calcValue();
+        sample += m_volume < 7 ? (*it)->calcValue() : abs((*it)->calcValue());
 
     if (!m_muted)
         palPlaySample((sample >> m_sampleShift) + m_silenceLevel);
@@ -83,7 +83,7 @@ void SoundMixer::setVolume(int volume)
     m_volume = volume;
     m_sampleShift = 7 - volume;
 
-    if (volume <= 5)
+    if (volume <= 6)
         m_silenceLevel = 0;
     else
         m_silenceLevel = -32768;
@@ -108,6 +108,26 @@ SoundSource::~SoundSource()
 }
 
 
+void SoundSource::setNegative(bool negative)
+{
+    m_negative = negative;
+    updateAmpFactor();
+}
+
+
+void SoundSource::setMuted(bool muted)
+{
+    m_muted = muted;
+    updateAmpFactor();
+}
+
+
+void SoundSource::updateAmpFactor()
+{
+    m_ampFactor = m_muted ? 0 : m_negative ? -1 : 1;
+}
+
+
 bool SoundSource::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
@@ -115,7 +135,12 @@ bool SoundSource::setProperty(const std::string& propertyName, const EmuValuesLi
 
     if (propertyName == "muted") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
-            m_muted = values[0].asString() == "yes";
+            setMuted(values[0].asString() == "yes");
+            return true;
+        }
+    } else if (propertyName == "polarity") {
+        if (values[0].asString() == "positive" || values[0].asString() == "negative") {
+            setNegative(values[0].asString() == "negative");
             return true;
         }
     }
@@ -170,5 +195,5 @@ int GeneralSoundSource::calcValue()
     sumVal = 0;
     initClock = g_emulation->getCurClock();
 
-    return m_muted ? 0 : res;
+    return res * m_ampFactor;
 }

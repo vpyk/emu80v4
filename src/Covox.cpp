@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -63,5 +63,5 @@ int Covox::calcValue()
     m_sumVal = 0;
     m_initClock = g_emulation->getCurClock();
 
-    return m_muted ? 0 : res;
+    return res * m_ampFactor;
 }

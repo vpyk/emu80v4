@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -92,18 +92,9 @@ void MikroshaPpi8255Circuit::setPortB(uint8_t value)
 }
 
 
-MikroshaPpi8255Circuit::~MikroshaPpi8255Circuit()
-{
-    if (m_pitSoundSource)
-        delete m_pitSoundSource;
-}
-
-
 void MikroshaPpi8255Circuit::attachPit(Pit8253* pit)
 {
     m_pit = pit;
-    m_pitSoundSource = new MikroshaPit8253SoundSource();
-    m_pitSoundSource->attachPit(pit);
 }
 
 
@@ -123,6 +114,9 @@ bool MikroshaPpi8255Circuit::setProperty(const string& propertyName, const EmuVa
 
     if (propertyName == "pit") {
         attachPit(static_cast<Pit8253*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "pitSoundSource") {
+        m_pitSoundSource = static_cast<MikroshaPit8253SoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
     return false;
@@ -223,7 +217,7 @@ int MikroshaPit8253SoundSource::calcValue()
     for (int i = 0; i < 3; i++)
         m_pit->getCounter(i)->resetStats();
 
-    return m_muted ? 0 : res;
+    return res * m_ampFactor;
 }
 
 

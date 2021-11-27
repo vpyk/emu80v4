@@ -332,7 +332,7 @@ int Kr04Pit8253SoundSource::calcValue()
         m_pit->getCounter(2)->resetStats();
     }
 
-    return m_muted ? 0 : res;
+    return res * m_ampFactor;
 }
 
 

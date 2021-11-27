@@ -49,7 +49,7 @@ class MikroshaPit8253SoundSource : public Pit8253SoundSource
 
         void setGate(bool gate);
 
-        //static EmuObject* create(const EmuValuesList&) {return new MikroshaPit8253SoundSource();}
+        static EmuObject* create(const EmuValuesList&) {return new MikroshaPit8253SoundSource();}
 
     private:
         bool m_gate = false;
@@ -64,7 +64,7 @@ class MikroshaPpi8255Circuit : public RkPpi8255Circuit
 {
     public:
         MikroshaPpi8255Circuit() : RkPpi8255Circuit() {}
-        virtual ~MikroshaPpi8255Circuit();
+        //virtual ~MikroshaPpi8255Circuit();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 

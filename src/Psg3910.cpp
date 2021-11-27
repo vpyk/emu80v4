@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -230,13 +230,13 @@ uint16_t Psg3910::getOutput()
 
 int Psg3910SoundSource::calcValue()
 {
-    return m_psg && !m_muted ? m_psg->getOutput() : 0;
+    return m_psg ? m_psg->getOutput() * m_ampFactor : 0;
 }
 
 
 bool Psg3910SoundSource::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (SoundSource::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "psg") {

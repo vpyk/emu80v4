@@ -665,7 +665,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
 // Port 01
 void VectorPpi8255Circuit::setPortC(uint8_t value)
 {
-    m_tapeSoundSource->setValue(~value & 1);
+    m_tapeSoundSource->setValue(value & 1);
     m_platform->getCore()->tapeOut(value & 1);
 }
 

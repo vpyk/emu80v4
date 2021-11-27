@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -995,7 +995,7 @@ int SpecMxPit8253SoundSource::calcValue()
     m_sumClocksTotal = 0;
     m_sumClocksHi = 0;
 
-    return m_muted ? 0 : res;
+    return res * m_ampFactor;
 }
 
 

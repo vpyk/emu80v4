@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -425,5 +425,5 @@ WavSoundSource::WavSoundSource(WavReader* wavReader) : SoundSource()
 
 int WavSoundSource::calcValue()
 {
-    return m_muted ? 0 : m_wavReader->getCurValue() ? MAX_SND_AMP / 2 : 0;
+    return m_wavReader->getCurValue() ? MAX_SND_AMP / 2 * m_ampFactor : 0;
 }

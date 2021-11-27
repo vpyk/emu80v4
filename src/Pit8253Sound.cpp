@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,13 +45,13 @@ int Pit8253SoundSource::calcValue()
         }
     }
 
-    return m_muted ? 0 : res;
+    return res * m_ampFactor;
 }
 
 
 bool Pit8253SoundSource::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (SoundSource::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "pit") {
@@ -84,5 +84,5 @@ int RkPit8253SoundSource::calcValue()
         m_pit->getCounter(2)->resetStats();
     }
 
-    return m_muted ? 0 : res;
+    return res * m_ampFactor;
 }
