@@ -1856,7 +1856,7 @@ unsigned CpuZ80::simz80()
             (cbits & 0x10) | ((cbits >> 8) & 1);
         break;
     case 0xC0:          /* RET NZ */
-        if (!TSTFLAG(Z)) POP(PC);
+        if (!TSTFLAG(Z)) { POP(PC); cycles += cc_ex[op];}
         break;
     case 0xC1:          /* POP BC */
         POP(BC);
@@ -1888,7 +1888,7 @@ unsigned CpuZ80::simz80()
         PUSH(PC); PC = 0;
         break;
     case 0xC8:          /* RET Z */
-        if (TSTFLAG(Z)) POP(PC);
+        if (TSTFLAG(Z)) { POP(PC); cycles += cc_ex[op];}
         break;
     case 0xC9:          /* RET */
         POP(PC);
@@ -1920,7 +1920,7 @@ unsigned CpuZ80::simz80()
         PUSH(PC); PC = 8;
         break;
     case 0xD0:          /* RET NC */
-        if (!TSTFLAG(C)) POP(PC);
+        if (!TSTFLAG(C)) { POP(PC); cycles += cc_ex[op]; }
         break;
     case 0xD1:          /* POP DE */
         POP(DE);
@@ -1952,7 +1952,7 @@ unsigned CpuZ80::simz80()
         PUSH(PC); PC = 0x10;
         break;
     case 0xD8:          /* RET C */
-        if (TSTFLAG(C)) POP(PC);
+        if (TSTFLAG(C)) { POP(PC); cycles += cc_ex[op]; }
         break;
     case 0xD9:          /* EXX */
         regs_sel = 1 - regs_sel;
@@ -1984,7 +1984,7 @@ unsigned CpuZ80::simz80()
         PUSH(PC); PC = 0x18;
         break;
     case 0xE0:          /* RET PO */
-        if (!TSTFLAG(P)) POP(PC);
+        if (!TSTFLAG(P)) { POP(PC); cycles += cc_ex[op]; }
         break;
     case 0xE1:          /* POP HL */
         POP(HL);
@@ -2011,7 +2011,7 @@ unsigned CpuZ80::simz80()
         PUSH(PC); PC = 0x20;
         break;
     case 0xE8:          /* RET PE */
-        if (TSTFLAG(P)) POP(PC);
+        if (TSTFLAG(P)) { POP(PC); cycles += cc_ex[op]; }
         break;
     case 0xE9:          /* JP (HL) */
         PC = HL;
@@ -2458,7 +2458,7 @@ unsigned CpuZ80::simz80()
         PUSH(PC); PC = 0x28;
         break;
     case 0xF0:          /* RET P */
-        if (!TSTFLAG(S)) POP(PC);
+        if (!TSTFLAG(S)) { POP(PC); cycles += cc_ex[op]; }
         break;
     case 0xF1:          /* POP AF */
         POP(AF);
@@ -2485,7 +2485,7 @@ unsigned CpuZ80::simz80()
         PUSH(PC); PC = 0x30;
         break;
     case 0xF8:          /* RET M */
-        if (TSTFLAG(S)) POP(PC);
+        if (TSTFLAG(S)) { POP(PC); cycles += cc_ex[op]; }
         break;
     case 0xF9:          /* LD SP,HL */
         SP = HL;
