@@ -805,7 +805,7 @@ int VectorCpuWaits::getCpuWaitStates(int, int, int normalClocks)
 
 int VectorZ80CpuWaits::getCpuWaitStates(int, int opcode, int normalClocks)
 {
-    static const int waits[24] = {0, 0, 0, 0, 0, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 5, 4, 7, 0, 5};
+    static const int waits[24] = {0, 0, 0, 0, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 4, 3, 2, 1, 4, 3, 0, 5};
     // 8, 11, 12, 13, 15 should be revised
     switch (normalClocks) {
     case 8:
@@ -813,22 +813,27 @@ int VectorZ80CpuWaits::getCpuWaitStates(int, int opcode, int normalClocks)
             return 4;
         break;
     case 11:
-        if ((opcode & 0xCF) == 0xC5 /* PUSH qq */ ||
-            (opcode & 0xC7) == 0xC0 /* RET cc if cc = true */ ||
-            (opcode & 0xC7) == 0xC7 /* RST p */)
+        if ((opcode & 0xCF) == 0xC5 ||   // PUSH qq
+            (opcode & 0xC7) == 0xC0 ||   // RET cc if cc = true
+            (opcode & 0xC7) == 0xC7)     // RST p
             return 5;
         break;
-    case 12:
-        if ((opcode & 0xFF) == 0xCB || (opcode & 0xFF) == 0xEB || (opcode & 0xFF) == 0xED) // BIT b, (HL) or IN r,(C) or OUT (C),r
-            return 0;
-        break;
-    case 13:
-        if ((opcode & 0xFF) == 0x10) // DJNZ, if B<>0
-            return 7;
+    case 14:
+        if ((opcode & 0xFFDF) == 0xE1DD) // POP ix/iy
+            return 6;
         break;
     case 15:
-        if (opcode == 0xE5DD || opcode == 0xE5FD) // PUSH ix/iy
+        if ((opcode & 0xFFDF) == 0xE5DD) // PUSH ix/iy
             return 5;
+        break;
+    case 19:
+        if ((opcode & 0xFF) == 0xE3 ||   // EX (SP),HL
+            (opcode & 0xFFDF) == 0x36DD) // LD (ix+d),n
+            return 5;
+        break;
+    case 23:
+        if ((opcode & 0xFEDF) == 0x34DD) // INC/DEC (ix/iy+d)
+            return 1;
         break;
     default:
         break;
