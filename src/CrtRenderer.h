@@ -65,8 +65,12 @@ class CrtRenderer : public EmuObject
         virtual bool isRasterPresent() {return true;}
         void swapBuffers();
 
+        const char* generateTextScreen(char16_t* wTextArray, int w, int h);
+
     private:
         unsigned m_frameNo = 0;
+
+        std::string m_textScreen;
 };
 
 
@@ -95,8 +99,6 @@ class TextCrtRenderer : public CrtRenderer
         virtual void primaryRenderFrame() = 0;
         virtual void altRenderFrame() = 0;
 
-        const char* generateTextScreen(char16_t* wTextArray, int w, int h);
-
         const char16_t* c_rkSymbols =
             u" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢✿ "
             u" !\"#¤%&'()*+,-./0123456789:;<=>?"
@@ -108,9 +110,6 @@ class TextCrtRenderer : public CrtRenderer
             u" !\"#$%&'()*+,-./0123456789:;<=>?"
             u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
             u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
-
-    private:
-        std::string m_textScreen;
 };
 
 #endif // CRTRENDERER_H
