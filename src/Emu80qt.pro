@@ -34,6 +34,7 @@ DEFINES += PAL_QT
 
 SOURCES += \
     Covox.cpp \
+    Korvet.cpp \
     Kr04.cpp \
     Main.cpp \
     AddrSpace.cpp \
@@ -149,6 +150,7 @@ HEADERS  += \
     Globals.h \
     KbdLayout.h \
     Keyboard.h \
+    Korvet.h \
     Kr04.h \
     Lvov.h \
     Memory.h \

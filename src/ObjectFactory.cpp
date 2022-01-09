@@ -65,6 +65,7 @@
 #include "SdAdapters.h"
 #include "Lvov.h"
 #include "Kr04.h"
+#include "Korvet.h"
 
 #include "EmuConfig.h"
 
@@ -232,6 +233,22 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Kr04Pit8253SoundSource);
     REG_EMU_CLASS(Kr04FileLoader);
     REG_EMU_CLASS(KbdLayoutHelper);
+    REG_EMU_CLASS(KorvetAddrSpaceSelector);
+    REG_EMU_CLASS(KorvetAddrSpace);
+    REG_EMU_CLASS(KorvetCore);
+    REG_EMU_CLASS(KorvetRenderer);
+    REG_EMU_CLASS(KorvetPpi8255Circuit);
+    REG_EMU_CLASS(KorvetPpi8255Circuit2);
+    REG_EMU_CLASS(KorvetGraphicsAdapter);
+    REG_EMU_CLASS(KorvetTextAdapter);
+    REG_EMU_CLASS(KorvetColorRegister);
+    REG_EMU_CLASS(KorvetLutRegister);
+    REG_EMU_CLASS(KorvetKeyboard);
+    REG_EMU_CLASS(KorvetKbdLayout);
+    REG_EMU_CLASS(KorvetKeyboardRegisters);
+    REG_EMU_CLASS(KorvetFddMotor);
+    REG_EMU_CLASS(KorvetPit8253SoundSource);
+    REG_EMU_CLASS(KorvetCpuCycleWaits);
 
 
     reg("ConfigTab", &EmuConfigTab::create);

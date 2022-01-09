@@ -1009,7 +1009,8 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("Color (Akimenko)"));
         m_colorColor2Action->setData("color2");
-    } else if (platformGroup == "apogey" || platformGroup == "orion" || platformGroup == "lvov" || platformGroup == "vector" || platformGroup == "pk8000") {
+    } else if (platformGroup == "apogey" || platformGroup == "orion" || platformGroup == "lvov" ||
+               platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "korvet") {
         hasColor = true;
 
         m_colorMonoOrigAction->setVisible(false);
@@ -1070,7 +1071,8 @@ void MainWindow::tuneMenu()
 
     m_copyTextAction->setVisible(platformGroup == "apogey" || platformGroup == "rk86" ||
                                  platformGroup == "partner" || platformGroup == "mikrosha" ||
-                                 platformGroup == "mikro80" || platformGroup == "ut88");
+                                 platformGroup == "mikro80" || platformGroup == "ut88" ||
+                                 platformGroup == "korvet");
 
     m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 }
