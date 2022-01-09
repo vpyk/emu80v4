@@ -40,6 +40,7 @@ class CpuZ80 : public Cpu8080Compatible
         void reset() override;
 
         void intRst(int vect) override;
+        void intCall(uint16_t addr) override;
         void ret() override;
 
         uint16_t getAF() override;

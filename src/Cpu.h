@@ -99,6 +99,7 @@ class Cpu8080Compatible : public Cpu
         void removeHook(CpuHook* hook) override;
 
         virtual void intRst(int vect) = 0;
+        virtual void intCall(uint16_t addr) = 0;
         virtual void ret() = 0;
 
         void hrq(int ticks) override;

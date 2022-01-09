@@ -2620,6 +2620,24 @@ void CpuZ80::intRst(int vect)
 }
 
 
+void CpuZ80::intCall(uint16_t addr)
+{
+    if (IFF != 0) {
+        IFF = 0;
+        m_core->inte(false);
+        if (GetBYTE(PC) == 0x76) {
+            PC++;
+            m_curClock = g_emulation->getCurClock();
+        }
+        PUSH(PC);
+        PC = addr;
+        m_curClock += m_kDiv * 19;
+        if (m_waits)
+            m_curClock += m_waits->getCpuWaitStates(0, 0xCD, 17);
+    }
+}
+
+
 void CpuZ80::ret() {
     POP(PC);
 }

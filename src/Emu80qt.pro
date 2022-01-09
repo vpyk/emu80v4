@@ -73,6 +73,7 @@ SOURCES += \
     Pal.cpp \
     Parameters.cpp \
     Partner.cpp \
+    Pic8259.cpp \
     Pit8253.cpp \
     Pit8253Sound.cpp \
     Pk8000.cpp \
@@ -162,6 +163,7 @@ HEADERS  += \
     PalWindow.h \
     Parameters.h \
     Partner.h \
+    Pic8259.h \
     Pit8253.h \
     Pit8253Sound.h \
     Pk8000.h \

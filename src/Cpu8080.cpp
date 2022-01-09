@@ -1778,6 +1778,22 @@ void Cpu8080::intRst(int vect) {
 }
 
 
+void Cpu8080::intCall(uint16_t addr) {
+    if (IFF != 0) {
+        IFF = 0;
+        m_core->inte(false);
+        if (RD_BYTE(PC) == 0x76) {
+            PC++;
+            m_curClock = g_emulation->getCurClock();
+        }
+        PUSH(PC);
+        PC = addr;
+        m_statusWord = 0xA2;
+        m_curClock += m_kDiv * 17;
+    }
+}
+
+
 uint16_t Cpu8080::getAF() {
     i8080_store_flags();
     return AF;

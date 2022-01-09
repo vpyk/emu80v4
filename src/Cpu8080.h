@@ -84,6 +84,7 @@ class Cpu8080 : public Cpu8080Compatible
         void operate() override;
 
         void intRst(int vect) override;
+        void intCall(uint16_t addr) override;
         void ret() override;
 
         uint16_t getAF() override;
