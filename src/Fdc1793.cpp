@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     m_images[m_disk]->setCurTrack(m_track);
                     m_images[m_disk]->startSectorAccess(m_sector - 1);
                     m_accessMode = FAM_READING;
-                    m_status = 0x3;
+                    m_status = 0x03;
                     break;
                 case 0xA:
                 case 0xB:
@@ -170,7 +170,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     m_images[m_disk]->setCurTrack(m_track);
                     m_images[m_disk]->startSectorAccess(m_sector - 1);
                     m_accessMode = FAM_WRITING;
-                    m_status = 0x3;
+                    m_status = 0x03;
                     break;
                 case 0xC:
                     // read address
@@ -184,12 +184,13 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     m_addressId[5] = 0;
                     m_addressIdCnt = 6;
                     m_accessMode = FAM_READING;
-                    m_status = 0x3;
+                    m_status = 0x02;
                     break;
                 case 0xD:
                     // force interrupt
                     m_accessMode = FAM_WAITING;
-                    m_status = 0x1;
+                    m_addressIdCnt = 0;
+                    m_status = 0x01;
                     break;
             }
             break;
@@ -210,11 +211,11 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                 if (!m_images[m_disk]->getReadyStatus()) {
                     if (m_lastCommand == 0xB) {
                         m_images[m_disk]->startSectorAccess(m_sector++);
-                        m_status = 0x3;
+                        m_status = 0x03;
                     }
                     else {
                         m_accessMode = FAM_WAITING;
-                        m_status = 0x0;
+                        m_status = 0x00;
                     }
                 }
             }
@@ -315,18 +316,18 @@ uint8_t Fdc1793::readByte(int addr)
                     m_data = m_addressId[6 - m_addressIdCnt--];
                     if (m_addressIdCnt == 0) {
                         m_accessMode = FAM_WAITING;
-                        m_status = 0x0;
+                        m_status = 0x00;
                     }
                 } else if (m_images[m_disk]) {
                     m_data = m_images[m_disk]->readNextByte();
                     if (!m_images[m_disk]->getReadyStatus()) {
                         if (m_lastCommand == 9) {
                             m_images[m_disk]->startSectorAccess(m_sector++);
-                            m_status = 0x1;
+                            m_status = 0x01;
                         }
                         else {
                             m_accessMode = FAM_WAITING;
-                            m_status = 0x0;
+                            m_status = 0x00;
                         }
                     }
                 }
