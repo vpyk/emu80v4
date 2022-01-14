@@ -258,6 +258,7 @@ void MainWindow::setFullScreen(bool fullscreen)
         m_toolBar->setVisible(visible);
     if (fullscreen) {
         layout()->setSizeConstraint(QLayout::SetNoConstraint);
+        setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         showFullScreen();
     } else
         showNormal();
