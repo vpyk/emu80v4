@@ -30,21 +30,16 @@
 class Ppi8255Circuit : public EmuObject
 {
     public:
-        virtual uint8_t getPortA() {return m_portA;}
-        virtual uint8_t getPortB() {return m_portB;}
-        virtual uint8_t getPortC() {return m_portC;}
-        virtual void setPortA(uint8_t val) {m_portA = val;}
-        virtual void setPortB(uint8_t val) {m_portB = val;}
-        virtual void setPortC(uint8_t val) {m_portC = val;}
+        virtual uint8_t getPortA() {return 0xFF;}
+        virtual uint8_t getPortB() {return 0xFF;}
+        virtual uint8_t getPortC() {return 0xFF;}
+        virtual void setPortA(uint8_t) {}
+        virtual void setPortB(uint8_t) {}
+        virtual void setPortC(uint8_t) {}
         virtual void setPortAMode(bool) {}
         virtual void setPortBMode(bool) {}
         virtual void setPortCLoMode(bool) {}
         virtual void setPortCHiMode(bool) {}
-
-    private:
-        uint8_t m_portA = 0;
-        uint8_t m_portB = 0;
-        uint8_t m_portC = 0;
 };
 
 
