@@ -280,6 +280,7 @@ class VectorPpi8255Circuit2 : public Ppi8255Circuit
 
         // derived from Ppi8255Circuit
         void setPortA(uint8_t value) override; // port 03
+        uint8_t getPortA() override {return 0x00;} // dummy USPID joystick
 
         void attachCovox(Covox* covox) {m_covox = covox;}
 
