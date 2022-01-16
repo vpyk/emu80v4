@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QPainter>
 #include <QOpenGLContext>
-#include <QPaintEvent>
-//#include <QMessageBox>
+#include <QOpenGLTexture>
+#include <QMouseEvent>
 #include <QGuiApplication>
 #include <QClipboard>
 
 #include "qtPaintWidget.h"
-
 
 PaintWidget::PaintWidget(QWidget *parent) :
     QOpenGLWidget(parent)
@@ -47,49 +45,21 @@ PaintWidget::~PaintWidget()
         delete m_image;
     if (m_image2)
         delete m_image2;
+
+    delete m_program;
 }
 
-
-void PaintWidget::draw()
-{
-    m_needPaint = true;
-    //repaint();
-    update();
-}
 
 // Save screenshot or copy it to clipboard if filename is empty
 void PaintWidget::screenshot(const QString& ssFileName)
 {
-    /*QImage fullImg = grabFramebuffer();
-    QImage img = fullImg.copy(m_dstRect);*/
-
-    if (!m_image) // to be on the safe side
-        return;
-
-    int width = m_dstRect.width();
-    int height = m_dstRect.height();
-
-    QImage img(width, height, QImage::Format_RGB32);
-    QPainter painter;
-    painter.begin(&img);
-    painter.fillRect(QRect(0, 0, width, height), m_fillColor);
-    paintScreen(&painter, QRect(0, 0, width, height));
-    painter.end();
+    QImage fullImg = grabFramebuffer();
+    QImage img = fullImg.copy(m_dstRect);
 
     if (ssFileName != "")
         img.save(ssFileName);
     else
         QGuiApplication::clipboard()->setImage(img);
-
-    /*if (!img.save(ssFileName))
-    {
-        QMessageBox msgBox(this);
-        msgBox.setWindowTitle("Emu80");
-        msgBox.setText(tr("Error saving screenshot!"));
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.addButton(QMessageBox::Ok);
-        msgBox.exec();
-    }*/
 }
 
 
@@ -101,6 +71,7 @@ void PaintWidget::colorFill(QColor color)
         delete m_imageData;
         m_image = nullptr;
     }
+    update();
 }
 
 
@@ -137,57 +108,153 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
     memcpy(m_imageData, pixels, imageWidth * imageHeight * 4);
     m_image = new QImage(m_imageData, imageWidth, imageHeight, QImage::Format_RGB32);
     m_img1aspectRatio = aspectRatio;
+
+    update();
 }
 
 
-void PaintWidget::paintScreen(QPainter* painter, QRect dstRect)
+void PaintWidget::initializeGL()
 {
-    painter->setRenderHint(QPainter::SmoothPixmapTransform, m_antialiasing);
+    initializeOpenGLFunctions();
 
-    QRect srcRect(0, 0, m_image->width(), m_image->height());
+    m_vbo.create();
+    m_vbo.bind();
+    m_vbo.allocate(c_vertices, 16 * sizeof(float));
 
-    if (!m_image2) {
-        /*int kx = dstRect.width() / m_image->width() + 1;
-        int ky = dstRect.height() / m_image->height() + 1;
-        auto scaledImage = m_image->scaled(m_image->width() * kx, m_image->height() * ky);
-        QRect scaledRect(srcRect.left(), srcRect.top(), srcRect.width() * kx, srcRect.height() * ky);
-        painter->drawImage(dstRect, scaledImage, scaledRect);*/
+    QOpenGLShader *vShader = new QOpenGLShader(QOpenGLShader::Vertex);
+    QOpenGLShader *fShader = new QOpenGLShader(QOpenGLShader::Fragment);
 
-        painter->drawImage(dstRect, *m_image, srcRect);
-    } else if (m_useAlpha) {
-        painter->drawImage(dstRect, *m_image, srcRect);
-        QRectF srcRect2(0, 0, m_image2->width(), m_image2->height());
-        painter->drawImage(dstRect, *m_image2, srcRect2);
-    } else {
-        painter->setOpacity(1);
-        painter->fillRect(dstRect, Qt::black);
-        painter->drawImage(dstRect, *m_image, srcRect);
-        QRectF srcRect2(0, 0, m_image2->width(), m_image2->height());
-        painter->setOpacity(0.5);
-        painter->drawImage(dstRect, *m_image2, srcRect2);
+    if (!vShader->compileSourceCode(R"(
+        attribute highp vec2 vertCoord;
+        attribute highp vec2 texCoord;
+
+        varying highp vec2 vTexCoord;
+        varying vec2 prescale;
+
+        uniform highp vec2 textureSize;
+        uniform highp vec2 outputSize;
+        uniform highp vec2 destSize;
+        //uniform highp vec2 destPos;
+
+        void main()
+        {
+            mediump vec2 scale = destSize / outputSize;
+            gl_Position = vec4(vertCoord * scale, 0.0, 1.0);
+            vTexCoord = texCoord * textureSize;
+            prescale = ceil(outputSize / textureSize);
+        })")) {
+        qDebug() << vShader->log();
     }
+
+    if (!fShader->compileSourceCode(R"(
+        uniform sampler2D texture1;
+        uniform highp vec2 textureSize;
+        uniform bool sharp;
+
+        varying highp vec2 vTexCoord;
+        varying highp vec2 prescale;
+
+        void main()
+        {
+            if (sharp) {
+                const mediump vec2 halfp = vec2(0.5);
+                highp vec2 texel_floored = floor(vTexCoord);
+                highp vec2 s = fract(vTexCoord);
+                highp vec2 region_range = halfp - halfp / prescale;
+
+                highp vec2 center_dist = s - halfp;
+                highp vec2 f = (center_dist - clamp(center_dist, -region_range, region_range)) * prescale + halfp;
+
+                highp vec2 mod_texel = min(texel_floored + f, textureSize-halfp);
+                gl_FragColor = texture2D(texture1, mod_texel / textureSize);
+            } else
+                gl_FragColor = texture2D(texture1, (vTexCoord + 0.002) / textureSize);
+        })")) {
+        qDebug() << fShader->log();
+    }
+
+    m_program = new QOpenGLShaderProgram;
+    m_program->addShader(vShader);
+    m_program->addShader(fShader);
+    m_program->bindAttributeLocation("vertCoord", PROGRAM_VERTEX_ATTRIBUTE);
+    m_program->bindAttributeLocation("texCoord", PROGRAM_TEXCOORD_ATTRIBUTE);
+    m_program->link();
+
+    m_program->bind();
+    //m_program->setUniformValue("texture", 0);
+    m_program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
+    m_program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
+    m_program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 2, sizeof(float) * 4);
+    m_program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, sizeof(float) * 2, 2, sizeof(float) * 4);
+
+    //m_program->setUniformValue("sharp", m_antialiasing);
+
+    delete vShader;
+    delete fShader;
 }
 
 
-void PaintWidget::paintEvent(QPaintEvent*)
+void PaintWidget::paintImageGL(QImage* img, double aspectRatio)
 {
-    if (!m_needPaint)
-        return;
-    m_needPaint = false;
+    int dstWidth, dstHeight, dstX, dstY;
+    static_cast<MainWindow*>(parent())->getPalWindow()->calcDstRect(img->width(), img->height(), aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
 
-    QPainter* painter = new QPainter();
-    painter->begin(this);
-    painter->fillRect(QRect(0, 0, width(), height()), m_fillColor);
+    m_program->setUniformValue("sharp", m_antialiasing);
+    m_program->setUniformValue("textureSize", img->size());
+    m_program->setUniformValue("destSize", QSize(dstWidth, dstHeight));
+    //m_program->setUniformValue("destPos", m_dstRect.topLeft());
 
-    if (m_image)
-        paintScreen(painter, m_dstRect);
+    /*if (!m_texture) {
+        m_texture = new QOpenGLTexture(*img);
+        m_texture->setMagnificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
+        m_texture->setMinificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
+        m_texture->bind();
+    } else
+        m_texture->setData(*img, QOpenGLTexture::DontGenerateMipMaps);
+    m_texture->bind();*/
+    QOpenGLTexture* texture = new QOpenGLTexture(*img, QOpenGLTexture::DontGenerateMipMaps);
+    texture->setMagnificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
+    texture->setMinificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
+    texture->bind();
 
-    painter->end();
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-    delete painter;
+    delete texture;
+}
+
+
+void PaintWidget::paintGL()
+{
+    glClearColor(m_fillColor.red() / 255.0, m_fillColor.green() / 255.0, m_fillColor.blue() / 255.0, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    if (m_image) {
+        glDisable(GL_BLEND);
+        paintImageGL(m_image, m_img1aspectRatio);
+
+        if (m_image2) {
+            if (m_useAlpha) {
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                paintImageGL(m_image2, m_img2aspectRatio);
+            } else {
+                glEnable(GL_BLEND);
+                glBlendColor(0.0, 0.0, 0.0, 0.5);
+                glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+                paintImageGL(m_image2, m_img2aspectRatio);
+            }
+        }
+    }
 
     static_cast<MainWindow*>(parent())->incFrameCount();
 }
+
+
+void PaintWidget::resizeGL(int w, int h)
+{
+    m_program->setUniformValue("outputSize", QSize(w, h));
+}
+
 
 /*void PaintWidget::setVsync(bool vsync)
 {

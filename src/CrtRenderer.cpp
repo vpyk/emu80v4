@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ void CrtRenderer::swapBuffers()
     m_prevSizeY = m_sizeY;
     m_prevPixelData = m_pixelData;
     m_prevBufSize = m_bufSize;
+    m_prevAspectRatio = m_aspectRatio;
 
     m_sizeX = w;
     m_sizeY = h;

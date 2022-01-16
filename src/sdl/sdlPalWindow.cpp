@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 
 #include "sdlPalWindow.h"
+#include "sdlGlExt.h"
 
 using namespace std;
 
@@ -131,8 +132,15 @@ void PalWindow::recreateWindow()
                 h = m_lastHeight;
             }
         }
-        SDL_DestroyRenderer(m_renderer);
+
+        if (m_renderer)
+            SDL_DestroyRenderer(m_renderer);
         m_renderer = nullptr;
+
+        if (m_glContext)
+            SDL_GL_DeleteContext(m_glContext);
+        m_glContext = nullptr;
+
         SDL_GetDisplayBounds(SDL_GetWindowDisplayIndex(m_window), &displayBounds);
         PalWindow::m_windowsMap.erase(SDL_GetWindowID(m_window));
         SDL_DestroyWindow(m_window);
@@ -145,7 +153,7 @@ void PalWindow::recreateWindow()
         h = displayBounds.h;
     }
 
-    Uint32 flags = 0;
+    Uint32 flags = SDL_WINDOW_OPENGL;
 
     if (m_params.style == PWS_SIZABLE)
         flags |= SDL_WINDOW_RESIZABLE;
@@ -158,7 +166,10 @@ void PalWindow::recreateWindow()
     m_window = SDL_CreateWindow(m_params.title.c_str(), x, y, w, h, flags);
     PalWindow::m_windowsMap.insert(make_pair(SDL_GetWindowID(m_window), this));
 
-    recreateRenderer();
+    createGlContext();
+
+    if (!m_glAvailable)
+        recreateRenderer();
 }
 
 
@@ -190,6 +201,11 @@ void PalWindow::focusChanged(bool /*isFocused*/)
 
 void PalWindow::drawFill(uint32_t color)
 {
+    if (m_glAvailable) {
+        drawFillGl(color);
+        return;
+    }
+
     uint8_t red = (color & 0xFF0000) >> 16;
     uint8_t green = (color & 0xFF00) >> 8;
     uint8_t blue = color & 0xFF;
@@ -199,8 +215,26 @@ void PalWindow::drawFill(uint32_t color)
 }
 
 
+void PalWindow::drawFillGl(uint32_t color)
+{
+    SDL_GL_MakeCurrent(m_window, m_glContext);
+
+    uint8_t red = (color & 0xFF0000) >> 16;
+    uint8_t green = (color & 0xFF00) >> 8;
+    uint8_t blue = color & 0xFF;
+
+    glClearColor(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+
 void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
+    if (m_glAvailable) {
+        drawImageGl(pixels, imageWidth, imageHeight, aspectRatio, blend, useAlpha);
+        return;
+    }
+
     int width, height;
     SDL_GetWindowSize(m_window, &width, &height);
 
@@ -239,8 +273,65 @@ void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, dou
 }
 
 
+void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
+{
+    SDL_GL_MakeCurrent(m_window, m_glContext);
+
+    int outWidth, outHeight;
+    SDL_GetWindowSize(m_window, &outWidth, &outHeight);
+
+    if (!blend && !useAlpha)
+        calcDstRect(imageWidth, imageHeight, aspectRatio, outWidth, outHeight, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
+
+    glViewport(0, 0, outWidth, outHeight);
+
+    int sharpLocation = glGetUniformLocation(m_program, "sharp");
+    glUniform1i(sharpLocation, m_params.antialiasing);
+
+    int texSizeLocation = glGetUniformLocation(m_program, "textureSize");
+    glUniform2f(texSizeLocation, float(imageWidth), float(imageHeight));
+
+    int outSizeLocation = glGetUniformLocation(m_program, "outputSize");
+    glUniform2f(outSizeLocation, float(outWidth), float(outHeight));
+
+    int dstSizeLocation = glGetUniformLocation(m_program, "destSize");
+    glUniform2f(dstSizeLocation, float(m_dstWidth), float(m_dstHeight));
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_params.antialiasing ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_params.antialiasing ? GL_LINEAR : GL_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+
+    if (!blend && !useAlpha) {
+        glDisable(GL_BLEND);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    } else if (useAlpha) {// || blend)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    } else if (blend) {
+        glEnable(GL_BLEND);
+        glBlendColor(0.0f, 0.0f, 0.0f, 0.5f);
+        glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
+
+    glDeleteTextures(1, &texture);
+}
+
+
 void PalWindow::drawEnd()
 {
+    if (m_glAvailable) {
+        drawEndGl();
+        return;
+    }
+
     SDL_RenderPresent(m_renderer);
 
     // Screenshot
@@ -256,9 +347,97 @@ void PalWindow::drawEnd()
 }
 
 
+void PalWindow::drawEndGl()
+{
+    //SDL_GL_MakeCurrent(m_window, m_glContext);
+    SDL_GL_SwapWindow(m_window);
+
+    if (!m_ssFileName.empty()) {
+        int w, h;
+        SDL_GetWindowSize(m_window, &w, &h);
+        uint8_t* pixels = new uint8_t[w * h * 3];
+
+        int scrW = min(w, m_dstWidth);
+        int scrH = min(h, m_dstHeight);
+
+        int scrX = max(m_dstX, 0);
+        int scrY = max(m_dstY, 0);
+
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+        // flip vertical and crop while creating surface
+        SDL_Surface* bitmap = SDL_CreateRGBSurfaceWithFormatFrom(pixels + ((scrY + scrH - 1) * w + scrX) * 3, scrW, scrH, 24, -w * 3, SDL_PIXELFORMAT_RGB24);
+        SDL_SaveBMP(bitmap, m_ssFileName.c_str());
+
+        delete[] pixels;
+        m_ssFileName = "";
+    }
+}
+
+
 void PalWindow::screenshotRequest(const std::string& ssFileName)
 {
     m_ssFileName = ssFileName;
+}
+
+
+void PalWindow::createGlContext()
+{
+	if (m_glContext)
+        SDL_GL_DeleteContext(m_glContext);
+
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	m_glContext = SDL_GL_CreateContext(m_window);
+
+	if (!m_glContext) {
+        m_glAvailable = false;
+        return;
+	}
+
+    if (!sdlInitGLExtensions())
+    {
+        m_glAvailable = false;
+        SDL_GL_DeleteContext(m_glContext);
+        return;
+    }
+
+    SDL_GL_SetSwapInterval(m_params.vsync ? 1 : 0);
+
+    glGenBuffers(1, &m_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(c_vertices), c_vertices, GL_STATIC_DRAW);
+
+    GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &c_vShader, NULL);
+    glCompileShader(vertex);
+
+    GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &c_fShader, NULL);
+    glCompileShader(fragment);
+
+    m_program = glCreateProgram();
+    glAttachShader(m_program, vertex);
+    glAttachShader(m_program, fragment);
+
+    glBindAttribLocation(m_program, PROGRAM_VERTEX_ATTRIBUTE, "vertCoord");
+    glBindAttribLocation(m_program, PROGRAM_TEXCOORD_ATTRIBUTE, "texCoord");
+
+    glLinkProgram(m_program);
+
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+
+    glUseProgram(m_program);
+
+    glVertexAttribPointer(PROGRAM_VERTEX_ATTRIBUTE, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
+    glEnableVertexAttribArray(PROGRAM_VERTEX_ATTRIBUTE);
+
+    glVertexAttribPointer(PROGRAM_TEXCOORD_ATTRIBUTE, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(PROGRAM_TEXCOORD_ATTRIBUTE);
+
+    return;
 }
 
 

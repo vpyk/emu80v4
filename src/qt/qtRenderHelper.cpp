@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -55,7 +55,8 @@ void RenderHelper::setPaintWidget(PaintWidget* widget)
 
 void RenderHelper::onTimer()
 {
-    drawAll();
+    getApplication()->processEvents();
+
     if (!m_paused)
         emuEmulationCycle();
     else
@@ -80,14 +81,6 @@ void RenderHelper::resume()
 {
     m_paused = false;
     m_timer->start();
-}
-
-
-void RenderHelper::drawAll()
-{
-    for (auto it = m_windowList.begin(); it != m_windowList.end(); it++)
-        (*it)->getPaintWidget()->draw();
-    getApplication()->processEvents();
 }
 
 

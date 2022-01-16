@@ -88,6 +88,7 @@
 			<Add library="gdi32" />
 			<Add library="winmm" />
 			<Add library="dxguid" />
+			<Add library="opengl32" />
 			<Add directory="$(#sdl2.lib)" />
 			<Add directory="$(#wx)/lib" />
 		</Linker>
@@ -247,6 +248,7 @@
 			<Option target="Lite-Debug" />
 			<Option target="Lite-Release" />
 		</Unit>
+		<Unit filename="sdl/sdlGlExt.h" />
 		<Unit filename="sdl/sdlPal.cpp" />
 		<Unit filename="sdl/sdlPal.h" />
 		<Unit filename="sdl/sdlPalFile.cpp" />
@@ -274,9 +276,6 @@
 		</Unit>
 		<Unit filename="wx/wxPal.h" />
 		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
 			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>

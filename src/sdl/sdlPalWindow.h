@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include <map>
 
 #include <SDL2/SDL.h>
+#include <GL/gl.h>
 
 #include "../EmuTypes.h"
 #include "../PalKeys.h"
@@ -100,6 +101,77 @@ class PalWindow
         std::string m_ssFileName = "";
 
         static std::map<uint32_t, PalWindow*> m_windowsMap;
+
+        // OpenGL related
+        bool m_glAvailable = true;
+        SDL_GLContext m_glContext = NULL;
+        GLuint m_VBO;
+        GLuint m_program;
+
+        void createGlContext();
+        void drawFillGl(uint32_t color);
+        void drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, double aspectratio,
+                         bool blend = false, bool useAlpha = false);
+        void drawEndGl();
+
+        void paintGl();
+
+        const int PROGRAM_VERTEX_ATTRIBUTE   = 0;
+        const int PROGRAM_TEXCOORD_ATTRIBUTE = 1;
+
+        const GLfloat c_vertices[16] = {
+            1.0, -1.0,  1.0, 1.0,
+           -1.0, -1.0,  0.0, 1.0,
+           -1.0,  1.0,  0.0, 0.0,
+            1.0,  1.0,  1.0, 0.0
+        };
+
+        const char* c_vShader = R"(
+            attribute vec2 vertCoord;
+            attribute vec2 texCoord;
+
+            varying vec2 vTexCoord;
+            varying vec2 prescale;
+
+            uniform vec2 textureSize;
+            uniform vec2 outputSize;
+            uniform vec2 destSize;
+
+            void main()
+            {
+                vec2 scale = destSize / outputSize;
+                gl_Position = vec4(vertCoord * scale, 0.0, 1.0);
+                vTexCoord = texCoord * textureSize;
+                prescale = ceil(outputSize / textureSize);
+            })";
+
+
+        const char* c_fShader = R"(
+            uniform sampler2D texture1;
+            uniform vec2 textureSize;
+            uniform bool sharp;
+
+            varying vec2 vTexCoord;
+            varying vec2 prescale;
+
+            void main()
+            {
+                if (sharp) {
+                    const /*mediump*/ vec2 halfp = vec2(0.5);
+                    vec2 texel_floored = floor(vTexCoord);
+                    vec2 s = fract(vTexCoord);
+                    vec2 region_range = halfp - halfp / prescale;
+
+                    vec2 center_dist = s - halfp;
+                    vec2 f = (center_dist - clamp(center_dist, -region_range, region_range)) * prescale + halfp;
+
+                    vec2 mod_texel = min(texel_floored + f, textureSize-halfp);
+                    gl_FragColor = texture2D(texture1, mod_texel / textureSize);
+                } else
+                    gl_FragColor = texture2D(texture1, (vTexCoord + 0.002) / textureSize);
+            })";
+
 };
+
 
 #endif // SDLPALWINDOW_H

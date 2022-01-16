@@ -75,6 +75,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="`sdl2-config --libs`" />
+			<Add library="libGL" />
 		</Linker>
 		<Unit filename="AddrSpace.cpp" />
 		<Unit filename="AddrSpace.h" />
@@ -232,6 +233,7 @@
 			<Option target="Lite-Debug" />
 			<Option target="Lite-Release" />
 		</Unit>
+		<Unit filename="sdl/sdlGlExt.h" />
 		<Unit filename="sdl/sdlPal.cpp" />
 		<Unit filename="sdl/sdlPal.h" />
 		<Unit filename="sdl/sdlPalFile.cpp" />

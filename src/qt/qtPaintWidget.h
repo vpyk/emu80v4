@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,12 +21,16 @@
 
 #include <QWidget>
 #include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLTexture>
 
 #include "qtMainWindow.h"
 #include "qtPalWindow.h"
 
 //class GrWidget : public QWidget
-class PaintWidget : public QOpenGLWidget
+class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
         Q_OBJECT
 
@@ -36,7 +40,6 @@ class PaintWidget : public QOpenGLWidget
 
         void drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend = false, bool useAlpha = false);
         void colorFill(QColor color);
-        void draw();
         void screenshot(const QString& ssFileName);
         void setHideCursor(bool hide);
 
@@ -47,17 +50,20 @@ class PaintWidget : public QOpenGLWidget
         int getImageHeight() {return m_dstRect.height();}
 
     protected:
-        void paintEvent(QPaintEvent *) override;
         void mouseMoveEvent(QMouseEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
         void mouseDoubleClickEvent(QMouseEvent *event) override;
         void wheelEvent(QWheelEvent *event) override;
 
+        void initializeGL() override;
+        void resizeGL(int w, int h) override;
+        void paintGL() override;
+
     private slots:
         void onHideCursorTimer();
 
     private:
-        void paintScreen(QPainter* painter, QRect dstRect);
+        void paintImageGL(QImage* img, double aspectRatio);
 
         QImage* m_image = nullptr;
         QImage* m_image2 = nullptr;
@@ -66,7 +72,6 @@ class PaintWidget : public QOpenGLWidget
         double m_img1aspectRatio;
         double m_img2aspectRatio;
 
-        bool m_needPaint = false;
         bool m_useAlpha = false;
         QColor m_fillColor = Qt::black;
         QRect m_dstRect;
@@ -76,6 +81,23 @@ class PaintWidget : public QOpenGLWidget
         bool m_hideCursor = true;
         QTimer m_hideCursorTimer;
         bool m_cursorHidden = false;
+
+        QOpenGLShaderProgram* m_program;
+        QOpenGLBuffer m_vbo;
+
+        QOpenGLTexture* m_texture = nullptr;
+
+        float c_vertices[16] = {
+            1.0, -1.0,  1.0, 1.0,
+           -1.0, -1.0,  0.0, 1.0,
+           -1.0,  1.0,  0.0, 0.0,
+            1.0,  1.0,  1.0, 0.0
+        };
 };
+
+
+#define PROGRAM_VERTEX_ATTRIBUTE 0
+#define PROGRAM_TEXCOORD_ATTRIBUTE 1
+
 
 #endif // QTPAINTWIDGET_H
