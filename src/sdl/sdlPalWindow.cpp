@@ -350,6 +350,7 @@ void PalWindow::drawEnd()
 void PalWindow::drawEndGl()
 {
     //SDL_GL_MakeCurrent(m_window, m_glContext);
+
     SDL_GL_SwapWindow(m_window);
 
     if (!m_ssFileName.empty()) {
