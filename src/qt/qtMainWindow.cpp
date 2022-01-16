@@ -120,6 +120,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_wavLabel->setToolTip(tr("Wav file I/O"));
 
             m_statusBar = statusBar();
+            m_statusBar->setStyleSheet("QStatusBar::item { border: 1px inset #B0B0B0;}");
             m_statusBar->addWidget(m_fpsLabel);
             m_statusBar->addWidget(m_speedLabel);
             m_statusBar->addWidget(m_kbdLabel);
