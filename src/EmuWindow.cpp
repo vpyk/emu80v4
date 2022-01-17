@@ -195,70 +195,82 @@ void EmuWindow::hide()
 }
 
 
-void EmuWindow::calcDstRect(EmuPixelData frame)
+
+void EmuWindow::calcDstRectP(EmuPixelData frame)
 {
     m_curImgWidth = frame.width;
     m_curImgHeight = frame.height;
+    getSize(m_curWindowWidth, m_curWindowHeight);
+
+    calcDstRect(frame.width, frame.height, frame.aspectRatio, m_curWindowWidth, m_curWindowHeight, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
+}
+
+
+
+void EmuWindow::calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio, int wndWidth, int wndHeight, int& dstWidth, int& dstHeight, int& dstX, int& dstY)
+{
+    //m_curImgWidth = frame.width;
+    //m_curImgHeight = frame.height;
 
     double aspectRatio = 1.0;
     if (m_aspectCorrection)
-        aspectRatio = m_useCustomScreenFormat ? frame.aspectRatio * 0.75 * m_customScreenFormat : m_wideScreen ? frame.aspectRatio / 0.75 : frame.aspectRatio;
+        aspectRatio = m_useCustomScreenFormat ? srcAspectRatio * 0.75 * m_customScreenFormat : m_wideScreen ? srcAspectRatio / 0.75 : srcAspectRatio;
 
     FrameScale tempFs = m_frameScale;
 
     if (m_isFullscreenMode)
         tempFs = m_isAntialiased ? FS_FIT_KEEP_AR : FS_BEST_FIT;
 
-    getSize(m_curWindowWidth, m_curWindowHeight);
+    //getSize(m_curWindowWidth, m_curWindowHeight);
 
     switch(tempFs) {
         case FS_1X:
-            m_dstWidth = frame.width * aspectRatio + .5;
-            m_dstHeight = frame.height;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * aspectRatio + .5;
+            dstHeight = srcHeight;
+            dstX = (wndWidth - dstWidth) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_2X:
-            m_dstWidth = frame.width * 2 * aspectRatio + .5;
-            m_dstHeight = frame.height * 2;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * 2 * aspectRatio + .5;
+            dstHeight = srcHeight * 2;
+            dstX = (wndWidth - dstWidth) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_3X:
-            m_dstWidth = frame.width * 3 * aspectRatio + .5;
-            m_dstHeight = frame.height * 3;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * 3 * aspectRatio + .5;
+            dstHeight = srcHeight * 3;
+            dstX = (wndWidth - dstWidth) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_4X:
-            m_dstWidth = frame.width * 4 * aspectRatio + .5;
-            m_dstHeight = frame.height * 4;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * 4 * aspectRatio + .5;
+            dstHeight = srcHeight * 4;
+            dstX = (wndWidth - dstWidth) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_5X:
-            m_dstWidth = frame.width * 5 * aspectRatio + .5;
-            m_dstHeight = frame.height * 5;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * 5 * aspectRatio + .5;
+            dstHeight = srcHeight * 5;
+            dstX = (wndWidth - dstWidth) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_2X3:
-            m_dstWidth = frame.width * (m_aspectCorrection ? 2 : 3) * aspectRatio + .5;
-            m_dstHeight = frame.height * 2;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * (m_aspectCorrection ? 2 : 3) * aspectRatio + .5;
+            dstHeight = srcHeight * 2;
+            dstX = (wndWidth - dstWidth) / 2;
+            m_dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_3X5:
-            m_dstWidth = frame.width * (m_aspectCorrection ? 3 : 5) * aspectRatio + .5;
-            m_dstHeight = frame.height * 3;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * (m_aspectCorrection ? 3 : 5) * aspectRatio + .5;
+            dstHeight = srcHeight * 3;
+            dstX = (wndWidth - dstWidth) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_4X6:
-            m_dstWidth = frame.width * (m_aspectCorrection ? 4 : 6) * aspectRatio + .5;
-            m_dstHeight = frame.height * 4;
-            m_dstX = (m_curWindowWidth - m_dstWidth) / 2;
-            m_dstY = (m_curWindowHeight - m_dstHeight) / 2;
+            dstWidth = srcWidth * (m_aspectCorrection ? 4 : 6) * aspectRatio + .5;
+            dstHeight = srcHeight * 4;
+            dstX = (wndWidth - dstWidth) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_BEST_FIT: {
             int scaleX = 1;
@@ -271,32 +283,32 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
                 scaleY = 3;
             }
 
-            int timesX = m_curWindowWidth / (frame.width * scaleX * aspectRatio + .5);
-            int timesY = m_curWindowHeight / (frame.height * scaleY);
+            int timesX = wndWidth / (srcWidth * scaleX * aspectRatio + .5);
+            int timesY = wndHeight / (srcHeight * scaleY);
 
             timesX = timesX < timesY ? timesX * scaleX: timesY * scaleX;
             timesY = timesX < timesY ? timesX * scaleY: timesY * scaleY;
 
             if (timesX == 0 || timesY == 0) {
-                m_dstWidth = m_curWindowWidth;
-                m_dstHeight = m_curWindowHeight;
-                m_dstX = 0;
-                m_dstY = 0;
+                dstWidth = wndWidth;
+                dstHeight = wndHeight;
+                dstX = 0;
+                dstY = 0;
             } else {
-                int dx = int((m_curWindowWidth - frame.width * timesX * aspectRatio + .5)) / 2;
-                int dy = (m_curWindowHeight - frame.height * timesY) / 2;
-                m_dstX = dx;
-                m_dstY = dy;
-                m_dstWidth = frame.width * timesX * aspectRatio + .5;
-                m_dstHeight = frame.height * timesY;
+                int dx = int((wndWidth - srcWidth * timesX * aspectRatio + .5)) / 2;
+                int dy = (wndHeight - srcHeight * timesY) / 2;
+                dstX = dx;
+                dstY = dy;
+                dstWidth = srcWidth * timesX * aspectRatio + .5;
+                dstHeight = srcHeight * timesY;
             }
             break;
         }
         case FS_FIT:
-            m_dstWidth = m_curWindowWidth;
-            m_dstHeight = m_curWindowHeight;
-            m_dstX = 0;
-            m_dstY = 0;
+            dstWidth = wndWidth;
+            dstHeight = wndHeight;
+            dstX = 0;
+            dstY = 0;
             break;
         case FS_FIT_KEEP_AR:
             double ar = aspectRatio;
@@ -305,18 +317,18 @@ void EmuWindow::calcDstRect(EmuPixelData frame)
             else if (aspectRatio == 1 && m_frameScale == FS_3X5)
                 ar = ar * 5 / 3;
 
-        int newW = m_curWindowHeight * frame.width * ar / frame.height + .5;
-            int newH = m_curWindowWidth * frame.height / ar / frame.width + .5;
-            if (newW <= m_curWindowWidth) {
-                m_dstWidth = newW;
-                m_dstHeight = m_curWindowHeight;
-                m_dstX = (m_curWindowWidth - newW) / 2;
-                m_dstY = 0;
+        int newW = wndHeight * srcWidth * ar / srcHeight + .5;
+            int newH = wndWidth * srcHeight / ar / srcWidth + .5;
+            if (newW <= wndWidth) {
+                dstWidth = newW;
+                dstHeight = wndHeight;
+                dstX = (wndWidth - newW) / 2;
+                dstY = 0;
             } else {
-                m_dstWidth = m_curWindowWidth;
-                m_dstHeight = newH;
-                m_dstX = 0;
-                m_dstY = (m_curWindowHeight - newH) / 2;
+                dstWidth = wndWidth;
+                dstHeight = newH;
+                dstX = 0;
+                dstY = (wndHeight - newH) / 2;
             }
             break;
     }
@@ -382,7 +394,7 @@ void EmuWindow::drawFrame(EmuPixelData frame)
         return;
     }
 
-    calcDstRect(frame);
+    calcDstRectP(frame);
 
     if ((m_windowStyle == WS_AUTOSIZE) && !m_isFullscreenMode
           && (m_frameScale == FS_1X || m_frameScale == FS_2X || m_frameScale == FS_3X || m_frameScale == FS_4X || m_frameScale == FS_5X || m_frameScale == FS_2X3 || m_frameScale == FS_3X5 || m_frameScale == FS_4X6)

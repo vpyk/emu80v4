@@ -60,6 +60,7 @@ class PalWindow
 
         virtual std::string getPlatformObjectName() = 0;
         EmuWindowType getWindowType() {return m_windowType;}
+        virtual void calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio, int wndWidth, int wndHeight, int& dstWidth, int& dstHeight, int& dstX, int& dstY) = 0;
 
     protected:
         SDL_Window* m_window = nullptr;

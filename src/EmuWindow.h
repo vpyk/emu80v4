@@ -72,6 +72,8 @@ class EmuWindow : public EmuObject, public PalWindow
 
         void init() override;
 
+        void calcDstRect(int srcWidth, int srcHeight, double srcAspectRatio, int wndWidth, int wndHeight, int& dstWidth, int& dstHeight, int& dstX, int& dstY) override;
+
         virtual void processKey(PalKeyCode, bool) {}
         virtual void closeRequest() {}
 
@@ -132,7 +134,7 @@ class EmuWindow : public EmuObject, public PalWindow
         int m_dstWidth;
         int m_dstHeight;
 
-        void calcDstRect(EmuPixelData frame);
+        void calcDstRectP(EmuPixelData frame);
         void interlaceFields(EmuPixelData frame);
         void prepareScanline(EmuPixelData frame);
 

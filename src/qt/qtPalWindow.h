@@ -60,6 +60,7 @@ class PalWindow
 
         virtual std::string getPlatformObjectName() = 0;
         virtual EmuWindowType getWindowType() {return m_windowType;}
+        virtual void calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio, int wndWidth, int wndHeight, int& dstWidth, int& dstHeight, int& dstX, int& dstY) = 0;
 
         MainWindow* getQtWindow() {return m_qtWindow;}
 
