@@ -136,6 +136,8 @@
 		<Unit filename="KbdLayout.cpp" />
 		<Unit filename="KbdLayout.h" />
 		<Unit filename="Keyboard.h" />
+		<Unit filename="Korvet.cpp" />
+		<Unit filename="Korvet.h" />
 		<Unit filename="Kr04.cpp" />
 		<Unit filename="Kr04.h" />
 		<Unit filename="Lvov.cpp" />
@@ -162,6 +164,8 @@
 		<Unit filename="Parameters.h" />
 		<Unit filename="Partner.cpp" />
 		<Unit filename="Partner.h" />
+		<Unit filename="Pic8259.cpp" />
+		<Unit filename="Pic8259.h" />
 		<Unit filename="Pit8253.cpp" />
 		<Unit filename="Pit8253.h" />
 		<Unit filename="Pit8253Sound.cpp" />
@@ -177,6 +181,8 @@
 		<Unit filename="Ppi8255Circuit.h" />
 		<Unit filename="PpiAtaAdapter.cpp" />
 		<Unit filename="PpiAtaAdapter.h" />
+		<Unit filename="Psg3910.cpp" />
+		<Unit filename="Psg3910.h" />
 		<Unit filename="RamDisk.cpp" />
 		<Unit filename="RamDisk.h" />
 		<Unit filename="RfsTapeHooks.cpp" />
