@@ -45,6 +45,7 @@ public:
     void incFrameCount();
 
     void setPalWindow(PalWindow* palWindow);
+    PalWindow* getPalWindow() {return m_palWindow;}
     void showWindow();
     void mouseClick(int x, int y, PalMouseKey key);
 

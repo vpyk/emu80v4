@@ -410,18 +410,18 @@ void EmuWindow::drawFrame(EmuPixelData frame)
     drawFill(0x282828);
 
     if (m_fieldsMixing != FM_INTERLACE && m_fieldsMixing != FM_SCANLINE) {
-        drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, m_dstX, m_dstY, m_dstWidth, m_dstHeight, false, false);
+        drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, false, false);
         if (m_fieldsMixing == FM_MIX && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) {
-            drawImage((uint32_t*)frame.prevPixelData, frame.prevWidth, frame.prevHeight, m_dstX, m_dstY, m_dstWidth, m_dstHeight, true, false);
+            drawImage((uint32_t*)frame.prevPixelData, frame.prevWidth, frame.prevHeight, frame.prevAspectRatio, true, false);
         }
     } else if (m_fieldsMixing == FM_INTERLACE && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) { // FM_INTERLACE
         if (frame.frameNo & 1)
             interlaceFields(frame);
         if (m_interlacedImage)
-            drawImage(m_interlacedImage, frame.width, frame.height * 2, m_dstX, m_dstY, m_dstWidth, m_dstHeight, false, false);
+            drawImage(m_interlacedImage, frame.width, frame.height * 2, frame.aspectRatio, false, false);
     } else { // if (m_fieldsMixing == FM_SCANLINE)
         prepareScanline(frame);
-        drawImage(m_interlacedImage, frame.width, frame.height * 2, m_dstX, m_dstY, m_dstWidth, m_dstHeight, false, false);
+        drawImage(m_interlacedImage, frame.width, frame.height * 2, frame.aspectRatio, false, false);
     }
 }
 
@@ -431,7 +431,8 @@ void EmuWindow::drawOverlay(EmuPixelData frame)
     if (frame.width == 0 || frame.height == 0 || !frame.pixelData)
         return;
 
-    drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, m_dstX, m_dstY, m_dstWidth, m_dstHeight, true, true);
+    //drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, m_dstX, m_dstY, m_dstWidth, m_dstHeight, true, true);
+    drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, true, true);
 
 /*    if (m_fieldsMixing == FM_MIX && frame.prevPixelData) {
         drawImage((uint32_t*)frame.prevPixelData, frame.prevWidth, frame.prevHeight, m_dstX, m_dstY, m_dstWidth, m_dstHeight, true, true);

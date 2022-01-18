@@ -23,6 +23,7 @@
 #include <QOpenGLWidget>
 
 #include "qtMainWindow.h"
+#include "qtPalWindow.h"
 
 //class GrWidget : public QWidget
 class PaintWidget : public QOpenGLWidget
@@ -33,7 +34,7 @@ class PaintWidget : public QOpenGLWidget
         explicit PaintWidget(QWidget *parent = 0);
         ~PaintWidget();
 
-        void drawImage(uint32_t* pixels, int imageWidth, int imageHeight, int dstX, int dstY, int dstWidth, int dstHeight, bool blend = false, bool useAlpha = false);
+        void drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend = false, bool useAlpha = false);
         void colorFill(QColor color);
         void draw();
         void screenshot(const QString& ssFileName);
@@ -62,6 +63,8 @@ class PaintWidget : public QOpenGLWidget
         QImage* m_image2 = nullptr;
         uchar* m_imageData;
         uchar* m_imageData2;
+        double m_img1aspectRatio;
+        double m_img2aspectRatio;
 
         bool m_needPaint = false;
         bool m_useAlpha = false;

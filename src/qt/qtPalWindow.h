@@ -72,7 +72,7 @@ class PalWindow
         void applyParams();
 
         void drawFill(uint32_t color);
-        void drawImage(uint32_t* pixels, int imageWidth, int imageHeight, int dstX, int dstY, int dstWidth, int dstHeight, bool blend = false, bool useAlpha = false);
+        void drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend = false, bool useAlpha = false);
         void drawEnd();
         void screenshotRequest(const std::string& ssFileName);
 

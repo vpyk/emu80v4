@@ -104,8 +104,11 @@ void PaintWidget::colorFill(QColor color)
 }
 
 
-void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, int dstX, int dstY, int dstWidth, int dstHeight, bool blend, bool useAlpha)
+void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
+    int dstWidth, dstHeight, dstX, dstY;
+    static_cast<MainWindow*>(parent())->getPalWindow()->calcDstRect(imageWidth, imageHeight, aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
+
     m_dstRect.setRect(dstX, dstY, dstWidth, dstHeight);
 
     if (m_image2) {
@@ -118,6 +121,7 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, i
         m_imageData2 = new uchar[imageWidth * imageHeight * 4];
         memcpy(m_imageData2, pixels, imageWidth * imageHeight * 4);
         m_image2 = new QImage(m_imageData2, imageWidth, imageHeight, useAlpha ? QImage::Format_ARGB32 : QImage::Format_RGB32);
+        m_img2aspectRatio = aspectRatio;
         if (!useAlpha)
             *m_image2 = m_image2->convertToFormat(QImage::Format_ARGB32); // add alpha channel
         m_useAlpha = useAlpha;
@@ -131,6 +135,7 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, i
     m_imageData = new uchar[imageWidth * imageHeight * 4];
     memcpy(m_imageData, pixels, imageWidth * imageHeight * 4);
     m_image = new QImage(m_imageData, imageWidth, imageHeight, QImage::Format_RGB32);
+    m_img1aspectRatio = aspectRatio;
 }
 
 

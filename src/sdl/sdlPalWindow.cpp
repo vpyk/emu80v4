@@ -198,8 +198,12 @@ void PalWindow::drawFill(uint32_t color)
 }
 
 
-void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, int dstX, int dstY, int dstWidth, int dstHeight, bool blend, bool useAlpha)
+void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
+    int width, height, dstWidth, dstHeight, dstX, dstY;
+    SDL_GetWindowSize(m_window, &width, &height);
+    calcDstRect(imageWidth, imageHeight, aspectRatio, width, height, dstWidth, dstHeight, dstX, dstY);
+
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, m_params.antialiasing ? "2" : "0");
 
     SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(pixels, imageWidth, imageHeight,

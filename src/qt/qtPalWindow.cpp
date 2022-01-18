@@ -151,10 +151,10 @@ void PalWindow::drawFill(uint32_t color)
 }
 
 
-void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, int dstX, int dstY, int dstWidth, int dstHeight, bool blend, bool useAlpha)
+void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
     if (m_qtWindow)
-        m_qtWindow->getPaintWidget()->drawImage(pixels, imageWidth, imageHeight, dstX, dstY, dstWidth, dstHeight, blend, useAlpha);
+        m_qtWindow->getPaintWidget()->drawImage(pixels, imageWidth, imageHeight, aspectRatio, blend, useAlpha);
 }
 
 
