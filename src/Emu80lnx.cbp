@@ -181,6 +181,8 @@
 		<Unit filename="Ppi8255Circuit.h" />
 		<Unit filename="PpiAtaAdapter.cpp" />
 		<Unit filename="PpiAtaAdapter.h" />
+		<Unit filename="PrnWriter.cpp" />
+		<Unit filename="PrnWriter.h" />
 		<Unit filename="Psg3910.cpp" />
 		<Unit filename="Psg3910.h" />
 		<Unit filename="RamDisk.cpp" />
