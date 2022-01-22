@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ class EmuWindow;
 class SoundMixer;
 class EmuConfig;
 class WavReader;
+class PrnWriter;
 class Platform;
 
 
@@ -88,6 +89,7 @@ class Emulation : public ParentObject
         inline SoundMixer* getSoundMixer() {return m_mixer;}
         inline EmuConfig* getConfig() {return m_config;}
         inline WavReader* getWavReader() {return m_wavReader;}
+        inline PrnWriter* getPrnWriter() {return m_prnWriter;}
 
         void setFrequency(int64_t freq) override;
         int64_t getFrequency() {return m_frequency;}
@@ -131,6 +133,7 @@ class Emulation : public ParentObject
         EmuConfig* m_config;
         SoundMixer* m_mixer;
         WavReader* m_wavReader;
+        PrnWriter* m_prnWriter;
 
         Platform* m_lastActivePlatform = nullptr;
 

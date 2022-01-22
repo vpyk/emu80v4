@@ -29,5 +29,6 @@
         <file>icons/mute_tape.png</file>
         <file>icons/emu80.png</file>
         <file>icons/fast_reset.png</file>
+        <file>icons/printer.png</file>
     </qresource>
 </RCC>

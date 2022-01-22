@@ -82,6 +82,7 @@ SOURCES += \
     PlatformCore.cpp \
     Ppi8255.cpp \
     PpiAtaAdapter.cpp \
+    PrnWriter.cpp \
     Psg3910.cpp \
     RamDisk.cpp \
     RfsTapeHooks.cpp \
@@ -174,6 +175,7 @@ HEADERS  += \
     Ppi8255.h \
     Ppi8255Circuit.h \
     PpiAtaAdapter.h \
+    PrnWriter.h \
     Psg3910.h \
     RamDisk.h \
     RfsTapeHooks.h \

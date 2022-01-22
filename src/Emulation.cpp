@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "EmuConfig.h"
 #include "SoundMixer.h"
 #include "WavReader.h"
+#include "PrnWriter.h"
 #include "FileLoader.h"
 
 using namespace std;
@@ -57,6 +58,9 @@ Emulation::Emulation(int argc, char** argv)
 
     m_wavReader = new WavReader;
     m_wavReader->setName("wavReader");
+
+    m_prnWriter = new PrnWriter;
+    m_prnWriter->setName("prnWriter");
 
     ConfigReader cr("emu80.conf");
     cr.processConfigFile(this);
@@ -418,6 +422,18 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
             if (m_wavReader) {
                 m_wavReader->chooseAndLoadFile();
             }
+            break;
+        case SR_PRNCAPTURE_ON:
+            m_prnWriter->startPrinting();
+            break;
+        case SR_PRNCAPTURE_OFF:
+            m_prnWriter->stopPrinting();
+            break;
+        case SR_PRNCAPTURE:
+            if (!m_prnWriter->isPrinting())
+                m_prnWriter->startPrinting();
+            else
+                m_prnWriter->stopPrinting();
             break;
         case SR_MUTE:
             m_mixer->toggleMute();

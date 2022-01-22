@@ -299,6 +299,7 @@ class KorvetPpi8255Circuit2 : public Ppi8255Circuit
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         // derived from Ppi8255Circuit
+        void setPortA(uint8_t value) override;
         void setPortC(uint8_t value) override;
 
         static EmuObject* create(const EmuValuesList&) {return new KorvetPpi8255Circuit2();}
@@ -306,6 +307,8 @@ class KorvetPpi8255Circuit2 : public Ppi8255Circuit
     private:
         Covox* m_covox = nullptr;
         KorvetPit8253SoundSource* m_pitSoundSource = nullptr;
+        uint8_t m_printerData = 0;
+        bool m_printerAck = 0;
 };
 
 

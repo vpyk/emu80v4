@@ -104,6 +104,7 @@ private slots:
     void onPlatformConfig();
     void onPlatformSelect();
     void onTapeHook();
+    void onPrinterCapture();
     void onMuteTape();
     void onScreenshot();
     void onCopyImage();
@@ -134,6 +135,7 @@ private:
     QLabel* m_colorLabel;
     QLabel* m_tapeLabel;
     QLabel* m_wavLabel;
+    QLabel* m_prnLabel;
     void createActions();
     void fillPlatformListMenu();
     void tuneMenu();
@@ -221,6 +223,7 @@ private:
     QAction* m_autosaveAction;
     QAction* m_muteAction;
     QAction* m_fastResetAction;
+    QAction* m_printerCaptureAction;
 };
 
 #endif // QTMAINWINDOW_H

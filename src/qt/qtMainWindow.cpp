@@ -108,6 +108,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_tapeLabel->setVisible(false);
             m_wavLabel = new QLabel("", this);
             m_wavLabel->setVisible(false);
+            m_prnLabel = new QLabel("", this);
+            m_prnLabel->setVisible(false);
 
             m_fpsLabel->setToolTip(tr("Emulator FPS"));
             m_speedLabel->setToolTip(tr("Emulation speed"));
@@ -118,6 +120,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_imageSizeLabel->setToolTip(tr("Image size in emulator"));
             m_tapeLabel->setToolTip(tr("Tape file I/O"));
             m_wavLabel->setToolTip(tr("Wav file I/O"));
+            m_prnLabel->setToolTip(tr("Printer capture"));
 
             m_statusBar = statusBar();
             m_statusBar->setStyleSheet("QStatusBar::item { border: 1px inset #B0B0B0;}");
@@ -127,6 +130,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_statusBar->addWidget(m_colorLabel);
             m_statusBar->addWidget(m_tapeLabel);
             m_statusBar->addWidget(m_wavLabel);
+            m_statusBar->addWidget(m_prnLabel);
             m_statusBar->addWidget(m_crtModeLabel);
             m_statusBar->addWidget(m_imageSizeLabel);
             m_statusBar->addWidget(m_dmaTimeLabel);
@@ -607,6 +611,18 @@ void MainWindow::createActions()
     m_layoutButton->setPopupMode(QToolButton::InstantPopup);
     m_toolBar->addWidget(m_layoutButton);
 
+    // Printer capture on/off
+    m_printerCaptureAction = new QAction(QIcon(":/icons/printer.png"), tr("Printer capture"), this);
+    m_printerCaptureAction->setCheckable(true);
+    m_printerCaptureAction->setToolTip(tr("Capture printer output (Shift-Alt-P)"));
+    QList<QKeySequence> printerCaptureKeyList;
+    ADD_HOTKEY(printerCaptureKeyList, Qt::SHIFT + Qt::Key_P);
+    m_printerCaptureAction->setShortcuts(printerCaptureKeyList);
+    addAction(m_printerCaptureAction);
+    settingsMenu->addAction(m_printerCaptureAction);
+    m_toolBar->addAction(m_printerCaptureAction);
+    connect(m_printerCaptureAction, SIGNAL(triggered()), this, SLOT(onPrinterCapture()));
+
     // Tape hook on/off
     m_tapeHookAction = new QAction(QIcon(":/icons/tape.png"), tr("Tape hook"), this);
     m_tapeHookAction->setCheckable(true);
@@ -1076,6 +1092,8 @@ void MainWindow::tuneMenu()
                                  platformGroup == "mikro80" || platformGroup == "ut88" ||
                                  platformGroup == "korvet");
 
+    m_printerCaptureAction->setVisible(platformGroup == "korvet");
+
     m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 }
 
@@ -1276,6 +1294,15 @@ void MainWindow::onFpsTimer()
         m_tapeLabel->setText(labelText + " " + qFileName);
     }
     m_tapeLabel->setVisible(fileName != "");
+
+    fileName = emuGetPropertyValue("prnWriter", "fileName");
+    if (!fileName.empty()) {
+        QString qFileName = QString::fromUtf8(fileName.c_str());
+        qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+        m_prnLabel->setText(tr("Printing to:") + " " + qFileName);
+        m_prnLabel->setVisible(true);
+    } else
+        m_prnLabel->setVisible(false);
 
     std::string position;
     fileName = emuGetPropertyValue("wavWriter", "currentFile");
@@ -1961,6 +1988,16 @@ void MainWindow::onSaveRamDisk()
 }
 
 
+void MainWindow::onPrinterCapture()
+{
+    QAction* action = (QAction*)sender();
+    std::string colorMode(action->data().toString().toUtf8().constData());
+
+    emuSysReq(m_palWindow, ((QAction*)(sender()))->isChecked() ? SR_PRNCAPTURE_ON : SR_PRNCAPTURE_OFF);
+    updateConfig(); //updateActions();
+}
+
+
 void MainWindow::updateConfig()
 {
     if (m_palWindow->getWindowType() != EWT_EMULATION)
@@ -2096,4 +2133,6 @@ void MainWindow::updateActions()
     }
 
     m_wideScreenAction->setEnabled(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".window", "wideScreen") != "custom");
+
+    m_printerCaptureAction->setChecked(!emuGetPropertyValue("prnWriter", "fileName").empty());
 }

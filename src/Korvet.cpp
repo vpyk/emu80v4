@@ -31,6 +31,7 @@
 #include "Pit8253.h"
 #include "Pic8259.h"
 #include "WavReader.h"
+#include "PrnWriter.h"
 
 // Korvet implementation
 
@@ -419,7 +420,9 @@ string KorvetRenderer::getPropertyStringValue(const string& propertyName)
 
 uint8_t KorvetPpi8255Circuit::getPortA()
 {
-    return m_addr | (g_emulation->getWavReader()->getCurValue() ? 0x01 : 0x00) | (m_vbl ? 0x02 : 0x00) | (m_textAdapter->getAttr() ? 0x08 : 0x00);
+    return m_addr | (g_emulation->getWavReader()->getCurValue() ? 0x01 : 0x00) |
+           (m_vbl ? 0x02 : 0x00) | (m_textAdapter->getAttr() ? 0x08 : 0x00) |
+           0x04; //(g_emulation->getPrnWriter()->getReady() ? 0x00 : 0x01);
 }
 
 
@@ -476,11 +479,23 @@ bool KorvetPpi8255Circuit::setProperty(const string& propertyName, const EmuValu
 }
 
 
+void KorvetPpi8255Circuit2::setPortA(uint8_t value)
+{
+    m_printerData = value;
+}
+
+
 void KorvetPpi8255Circuit2::setPortC(uint8_t value)
 {
     const int c_covoxValues[4] = {0, 7, 7, 15};
     m_covox->setValue(c_covoxValues[value & 3]);
     m_pitSoundSource->setGate(value & 8);
+
+    bool newAck = value & 0x20;
+    if (m_printerAck && !newAck) {
+        g_emulation->getPrnWriter()->printByte(~m_printerData);
+    }
+    m_printerAck = newAck;
 }
 
 
