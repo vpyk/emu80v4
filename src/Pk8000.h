@@ -354,8 +354,9 @@ class Pk8000Ppi8255Circuit2 : public Ppi8255Circuit
 
         // derived from Ppi8255Circuit
         void setPortA(uint8_t value) override; // port 84h
-        //void setPortB(uint8_t value) override; // port 85h
+        void setPortB(uint8_t value) override; // port 85h
         void setPortC(uint8_t value) override; // port 86h
+        uint8_t getPortC() override; // port 86h
 
         void attachAddrSpaceMapper(int bank, AddrSpaceMapper* addrSpaceMapper);
 
@@ -363,6 +364,10 @@ class Pk8000Ppi8255Circuit2 : public Ppi8255Circuit
 
     protected:
         Pk8000Renderer* m_renderer = nullptr;
+
+    private:
+        uint8_t m_printerData = 0;
+        bool m_printerStrobe = true;
 };
 
 

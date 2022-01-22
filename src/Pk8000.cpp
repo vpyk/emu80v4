@@ -30,6 +30,7 @@
 #include "Fdc1793.h"
 #include "WavReader.h"
 #include "TapeRedirector.h"
+#include "PrnWriter.h"
 
 using namespace std;
 
@@ -575,12 +576,31 @@ void Pk8000Ppi8255Circuit2::setPortA(uint8_t value)
 }
 
 
+// port 85h - printer data
+void Pk8000Ppi8255Circuit2::setPortB(uint8_t value)
+{
+    m_printerData = value;
+}
+
+
 // port 86h
 void Pk8000Ppi8255Circuit2::setPortC(uint8_t value)
 {
     if (m_renderer) {
         m_renderer->setBlanking(!(value & 0x10));
     }
+
+    bool newStrobe = value & 0x80;
+    if (m_printerStrobe && !newStrobe) {
+        g_emulation->getPrnWriter()->printByte(m_printerData);
+    }
+    m_printerStrobe = newStrobe;
+}
+
+
+uint8_t Pk8000Ppi8255Circuit2::getPortC()
+{
+    return 0xFB; // printer not busy
 }
 
 
