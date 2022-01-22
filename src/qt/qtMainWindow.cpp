@@ -1092,7 +1092,7 @@ void MainWindow::tuneMenu()
                                  platformGroup == "mikro80" || platformGroup == "ut88" ||
                                  platformGroup == "korvet");
 
-    m_printerCaptureAction->setVisible(platformGroup == "korvet");
+    m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector");
 
     m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 }

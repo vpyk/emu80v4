@@ -491,11 +491,11 @@ void KorvetPpi8255Circuit2::setPortC(uint8_t value)
     m_covox->setValue(c_covoxValues[value & 3]);
     m_pitSoundSource->setGate(value & 8);
 
-    bool newAck = value & 0x20;
-    if (m_printerAck && !newAck) {
+    bool newStrobe = value & 0x20;
+    if (!m_printerStrobe && newStrobe) {
         g_emulation->getPrnWriter()->printByte(~m_printerData);
     }
-    m_printerAck = newAck;
+    m_printerStrobe = newStrobe;
 }
 
 

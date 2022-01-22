@@ -25,6 +25,12 @@
 using namespace std;
 
 
+PrnWriter::~PrnWriter()
+{
+    stopPrinting();
+}
+
+
 void PrnWriter::startPrinting()
 {
     stopPrinting();

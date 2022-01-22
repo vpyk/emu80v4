@@ -308,7 +308,7 @@ class KorvetPpi8255Circuit2 : public Ppi8255Circuit
         Covox* m_covox = nullptr;
         KorvetPit8253SoundSource* m_pitSoundSource = nullptr;
         uint8_t m_printerData = 0;
-        bool m_printerAck = 0;
+        bool m_printerStrobe = false;
 };
 
 

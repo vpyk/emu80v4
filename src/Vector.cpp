@@ -29,6 +29,7 @@
 #include "SoundMixer.h"
 #include "WavReader.h"
 #include "Covox.h"
+#include "PrnWriter.h"
 
 using namespace std;
 
@@ -964,4 +965,16 @@ void VectorPpi8255Circuit2::setPortA(uint8_t value)
     if (m_covox) {
         m_covox->setValue(value >> 1);
     }
+
+    m_printerData = value;
+}
+
+
+void VectorPpi8255Circuit2::setPortC(uint8_t value)
+{
+    bool newStrobe = value & 0x10;
+    if (m_printerStrobe && !newStrobe) {
+        g_emulation->getPrnWriter()->printByte(m_printerData);
+    }
+    m_printerStrobe = newStrobe;
 }

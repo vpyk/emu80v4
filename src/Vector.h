@@ -281,6 +281,8 @@ class VectorPpi8255Circuit2 : public Ppi8255Circuit
         // derived from Ppi8255Circuit
         void setPortA(uint8_t value) override; // port 03
         uint8_t getPortA() override {return 0x00;} // dummy USPID joystick
+        uint8_t getPortC() override {return 0x0E;} // unset printer busy bit
+        void setPortC(uint8_t value) override; // port 03
 
         void attachCovox(Covox* covox) {m_covox = covox;}
 
@@ -289,6 +291,9 @@ class VectorPpi8255Circuit2 : public Ppi8255Circuit
     private:
         // Источник звука - ковокс
         Covox* m_covox;
+
+        uint8_t m_printerData = 0;
+        bool m_printerStrobe = true;
 };
 
 
