@@ -784,6 +784,8 @@ EmuKey KorvetKbdLayout::translateKey(PalKeyCode keyCode)
         return EK_LANG;
     case PK_KP_0:
         return EK_PHOME;
+    case PK_DOWN:
+        return m_downAsNumpad5 ? EK_MENU : EK_DOWN;
     default:
         break;
     }
@@ -970,4 +972,35 @@ void KorvetPit8253SoundSource::setGate(bool gate)
 int KorvetCpuCycleWaits::getCpuCycleWaitStates(int memTag, bool /*write*/)
 {
     return memTag ? 2 : 0;
+}
+
+
+bool KorvetKbdLayout::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (KbdLayout::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "downAsNumpad5") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_downAsNumpad5 = values[0].asString() == "yes";
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+string KorvetKbdLayout::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = KbdLayout::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "downAsNumpad5")
+        return m_downAsNumpad5 ? "yes" : "no";
+
+    return "";
 }

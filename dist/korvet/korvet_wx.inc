@@ -1,4 +1,4 @@
-# Файл настроек
+# Р¤Р°Р№Р» РЅР°СЃС‚СЂРѕРµРє
 @OPT_FILE = "korvet/korvet.opt"
 
 ######## Include Saved Options ########
@@ -12,7 +12,7 @@ ConfigTab configTab = @NAME
 configTab.optFileName = @OPT_FILE
 
 #window.frameScale
-ConfigRadioSelector scaleSelector = &window, frameScale, "Масштабирование"
+ConfigRadioSelector scaleSelector = &window, frameScale, "РњР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ"
 scaleSelector.addItem = 1x, "1x"
 scaleSelector.addItem = 2x, "2x"
 scaleSelector.addItem = 3x, "3x"
@@ -20,66 +20,72 @@ scaleSelector.addItem = 4x, "4x"
 scaleSelector.addItem = 5x, "5x"
 scaleSelector.addItem = 2x3, "2x3"
 scaleSelector.addItem = 3x5, "3x5"
-scaleSelector.addItem = fit, "Растянуть во все окно"
-scaleSelector.addItem = fitKeepAR, "Растянуть с сохранением пропорций"
-scaleSelector.addItem = bestFit, "Растянуть с целым коэффициентом"
+scaleSelector.addItem = fit, "Р Р°СЃС‚СЏРЅСѓС‚СЊ РІРѕ РІСЃРµ РѕРєРЅРѕ"
+scaleSelector.addItem = fitKeepAR, "Р Р°СЃС‚СЏРЅСѓС‚СЊ СЃ СЃРѕС…СЂР°РЅРµРЅРёРµРј РїСЂРѕРїРѕСЂС†РёР№"
+scaleSelector.addItem = bestFit, "Р Р°СЃС‚СЏРЅСѓС‚СЊ СЃ С†РµР»С‹Рј РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРј"
 configTab.addControl = 1, &scaleSelector
 
 #window.windowStyle
-ConfigRadioSelector styleSelector = &window, windowStyle, "Размер окна"
-styleSelector.addItem = autosize, "Автоматически подстраивать"
-styleSelector.addItem = sizable, "Изменяемый пользователем"
-styleSelector.addItem = fixed, "Фиксированный"
+ConfigRadioSelector styleSelector = &window, windowStyle, "Р Р°Р·РјРµСЂ РѕРєРЅР°"
+styleSelector.addItem = autosize, "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїРѕРґСЃС‚СЂР°РёРІР°С‚СЊ"
+styleSelector.addItem = sizable, "РР·РјРµРЅСЏРµРјС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј"
+styleSelector.addItem = fixed, "Р¤РёРєСЃРёСЂРѕРІР°РЅРЅС‹Р№"
 configTab.addControl = 1, &styleSelector
 
 #window.fieldsMixing
-ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
-mixSelector.addItem = none, "Выкл."
-mixSelector.addItem = mix, "Вкл."
-mixSelector.addItem = interlace, "Чередование"
-mixSelector.addItem = scanline, "Имитация линий растра"
+ConfigRadioSelector mixSelector = &window, fieldsMixing, "РЎРјРµС€РёРІР°РЅРёРµ РїРѕР»СѓРєР°РґСЂРѕРІ"
+mixSelector.addItem = none, "Р’С‹РєР»."
+mixSelector.addItem = mix, "Р’РєР»."
+mixSelector.addItem = interlace, "Р§РµСЂРµРґРѕРІР°РЅРёРµ"
+mixSelector.addItem = scanline, "РРјРёС‚Р°С†РёСЏ Р»РёРЅРёР№ СЂР°СЃС‚СЂР°"
 configTab.addControl = 1, &mixSelector
 
 #window.antialiasing
-ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
-aaSelector.addItem = no, "Выкл."
-aaSelector.addItem = yes, "Вкл."
+ConfigRadioSelector aaSelector = &window, antialiasing, "РЎРіР»Р°Р¶РёРІР°РЅРёРµ"
+aaSelector.addItem = no, "Р’С‹РєР»."
+aaSelector.addItem = yes, "Р’РєР»."
 configTab.addControl = 2, &aaSelector
 
 #window.aspectCorrection
-ConfigRadioSelector arSelector = &window, aspectCorrection, "Учитывать Aspect Ratio"
-arSelector.addItem = no, "Нет (1:1)"
-arSelector.addItem = yes, "Оригинальный AR"
+ConfigRadioSelector arSelector = &window, aspectCorrection, "РЈС‡РёС‚С‹РІР°С‚СЊ Aspect Ratio"
+arSelector.addItem = no, "РќРµС‚ (1:1)"
+arSelector.addItem = yes, "РћСЂРёРіРёРЅР°Р»СЊРЅС‹Р№ AR"
 configTab.addControl = 2, &arSelector
 
 #window.wideScreen
-ConfigRadioSelector wsSelector = &window, wideScreen, "Формат экрана"
+ConfigRadioSelector wsSelector = &window, wideScreen, "Р¤РѕСЂРјР°С‚ СЌРєСЂР°РЅР°"
 wsSelector.addItem = no, "4:3"
 wsSelector.addItem = yes, "16:9"
-wsSelector.addItem = custom, "Пользовательский"
+wsSelector.addItem = custom, "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёР№"
 configTab.addControl = 2, &wsSelector
 
 #crtRenderer.visibleArea
-ConfigRadioSelector cropSelector = &crtRenderer, visibleArea, "Отображать только видимую область"
-cropSelector.addItem = no, "Нет"
-cropSelector.addItem = yes, "Да"
+ConfigRadioSelector cropSelector = &crtRenderer, visibleArea, "РћС‚РѕР±СЂР°Р¶Р°С‚СЊ С‚РѕР»СЊРєРѕ РІРёРґРёРјСѓСЋ РѕР±Р»Р°СЃС‚СЊ"
+cropSelector.addItem = no, "РќРµС‚"
+cropSelector.addItem = yes, "Р”Р°"
 configTab.addControl = 2, &cropSelector
 
 #kbdLayout.layout
-ConfigRadioSelector laSelector = &kbdLayout, layout, "Раскладка клавиатуры"
+ConfigRadioSelector laSelector = &kbdLayout, layout, "Р Р°СЃРєР»Р°РґРєР° РєР»Р°РІРёР°С‚СѓСЂС‹"
 laSelector.addItem = qwerty, "Qwerty"
-laSelector.addItem = jcuken, "Йцукен"
-laSelector.addItem = smart, "«Умная» раскладка"
+laSelector.addItem = jcuken, "Р™С†СѓРєРµРЅ"
+laSelector.addItem = smart, "В«РЈРјРЅР°СЏВ» СЂР°СЃРєР»Р°РґРєР°"
 configTab.addControl = 3, &laSelector
 
+#kbdLayout.downAsNumpad5
+ConfigRadioSelector d5Selector = &kbdLayout, downAsNumpad5, "РљР»Р°РІРёС€Р° Р’РЅРёР· СЂР°Р±РѕС‚Р°РµС‚ РєР°Рє Numpad 5 (РњРµРЅСЋ)"
+d5Selector.addItem = no, "Р’С‹РєР»."
+d5Selector.addItem = yes, "Р’РєР»."
+configTab.addControl = 3, &d5Selector
+
 #tapeGrp.enabled
-ConfigRadioSelector tapeSelector = &tapeGrp, enabled, "Перехват обращений к магнитофону"
-tapeSelector.addItem = yes, "Вкл."
-tapeSelector.addItem = no, "Выкл."
+ConfigRadioSelector tapeSelector = &tapeGrp, enabled, "РџРµСЂРµС…РІР°С‚ РѕР±СЂР°С‰РµРЅРёР№ Рє РјР°РіРЅРёС‚РѕС„РѕРЅСѓ"
+tapeSelector.addItem = yes, "Р’РєР»."
+tapeSelector.addItem = no, "Р’С‹РєР»."
 configTab.addControl = 3, &tapeSelector
 
 #platform.codePage
-ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица символов отладчика"
-codePageSelector.addItem = rk, "РК-86"
-codePageSelector.addItem = koi8, "КОИ-8"
+ConfigRadioSelector codePageSelector = &platform, codePage, "РўР°Р±Р»РёС†Р° СЃРёРјРІРѕР»РѕРІ РѕС‚Р»Р°РґС‡РёРєР°"
+codePageSelector.addItem = rk, "Р Рљ-86"
+codePageSelector.addItem = koi8, "РљРћР-8"
 configTab.addControl = 3, &codePageSelector

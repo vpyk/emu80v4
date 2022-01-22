@@ -385,12 +385,18 @@ class KorvetKeyboard : public Keyboard
 class KorvetKbdLayout : public KbdLayout
 {
     public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
         static EmuObject* create(const EmuValuesList&) {return new KorvetKbdLayout();}
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
         EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
         bool processSpecialKeys(PalKeyCode keyCode) override;
+
+    private:
+        bool m_downAsNumpad5 = false;
 };
 
 

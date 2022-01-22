@@ -1329,6 +1329,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="downAsNumpad5CheckBox">
+         <property name="text">
+          <string>Down key acts as Numpad 5 (Menu)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_7">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1516,6 +1523,7 @@
   <tabstop>kbdLikRadioButton</tabstop>
   <tabstop>kbdEurekaRadioButton</tabstop>
   <tabstop>numpadJoystickCheckBox</tabstop>
+  <tabstop>downAsNumpad5CheckBox</tabstop>
   <tabstop>langComboBox</tabstop>
   <tabstop>rkCodePageRadioButton</tabstop>
   <tabstop>koi8CodePageRadioButton</tabstop>

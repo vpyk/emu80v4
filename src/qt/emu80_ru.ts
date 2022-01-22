@@ -1214,68 +1214,73 @@
         <translation>Джойстик только на доп. цифровой клавиатуре</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1351"/>
+        <location filename="qtSettingsDialog.ui" line="1334"/>
+        <source>Down key acts as Numpad 5 (Menu)</source>
+        <translation>Клавиша Вниз вместо Numpad 5 (Меню)</translation>
+    </message>
+    <message>
+        <location filename="qtSettingsDialog.ui" line="1358"/>
         <source>Misc.</source>
         <translation>Разное</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1357"/>
+        <location filename="qtSettingsDialog.ui" line="1364"/>
         <source>Fast reset</source>
         <translation>Быстрый сброс</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1409"/>
+        <location filename="qtSettingsDialog.ui" line="1416"/>
         <source>Auto save</source>
         <translation>Автоматически сохранять настройки</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1432"/>
+        <location filename="qtSettingsDialog.ui" line="1439"/>
         <source>Ok</source>
         <translation>Ок</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1452"/>
+        <location filename="qtSettingsDialog.ui" line="1459"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1445"/>
+        <location filename="qtSettingsDialog.ui" line="1452"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="344"/>
+        <location filename="qtSettingsDialog.cpp" line="345"/>
         <source>Color</source>
         <translation>Цветной</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="349"/>
+        <location filename="qtSettingsDialog.cpp" line="350"/>
         <source>Color mode 1 (Tolkalin)</source>
         <translation>Цветной (схема Толкалина)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="351"/>
+        <location filename="qtSettingsDialog.cpp" line="352"/>
         <source>Color mode 2 (Akimenko)</source>
         <translation>Цветной (схема Акименко)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="356"/>
+        <location filename="qtSettingsDialog.cpp" line="357"/>
         <source>4-color mode</source>
         <translation>4-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="358"/>
+        <location filename="qtSettingsDialog.cpp" line="359"/>
         <source>8-color mode</source>
         <translation>8-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="907"/>
+        <location filename="qtSettingsDialog.cpp" line="916"/>
         <source>Emu80: warning</source>
         <oldsource>Warning</oldsource>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="908"/>
+        <location filename="qtSettingsDialog.cpp" line="917"/>
         <source>Some settings will take effect after emulator restart</source>
         <translation>Некоторые настройки вступят в силу после перезапуска эмулятора</translation>
     </message>
