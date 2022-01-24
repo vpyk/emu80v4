@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ class Pk8000Renderer : public CrtRenderer, public IActive
         bool m_blanking = false;
         bool m_activeArea = false;
         unsigned m_ticksPerPixel;
+        unsigned m_nextLineBank = 0;
         uint16_t m_nextLineSgBase = 0;
         const uint32_t* m_palette = c_pk8000ColorPalette;
 

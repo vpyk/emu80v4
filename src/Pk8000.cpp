@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -163,6 +163,7 @@ void Pk8000Renderer::operate()
         m_curScanlineClock = m_curClock;
         m_curScanlinePixel = 0;
         m_curBlankingPixel = 0;
+        m_bank = m_nextLineBank;
         m_sgBase = m_nextLineSgBase;
 
         m_curClock += m_ticksPerScanLineSideBorder;
@@ -190,8 +191,12 @@ void Pk8000Renderer::attachScreenMemoryBank(int bank, Ram* screenMemoryBank)
 
 void Pk8000Renderer::setScreenBank(unsigned bank)
 {
-    if (bank < 4)
-        m_bank = bank;
+    if (bank < 4) {
+        int curPixel = (g_emulation->getCurClock() - m_curScanlineClock) / m_ticksPerPixel;
+        m_nextLineBank = bank;
+        if (curPixel + m_pixelsPerOutInstruction < 80) // for ease, actually exact value must be used, w/o correction
+            m_bank = bank;
+    }
 }
 
 
@@ -199,7 +204,7 @@ void Pk8000Renderer::setSymGenBufferBase(uint16_t base)
 {
     int curPixel = (g_emulation->getCurClock() - m_curScanlineClock) / m_ticksPerPixel;
     m_nextLineSgBase = base;
-    if (curPixel < 320 - m_pixelsPerOutInstruction) // for ease, actually exact value must be used, w/o correction
+    if (curPixel < 80 - m_pixelsPerOutInstruction) // for ease, actually exact value must be used, w/o correction
         m_sgBase = base;
 }
 
