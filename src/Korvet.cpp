@@ -139,11 +139,11 @@ void KorvetCore::inte(bool isActive)
 
 void KorvetCore::vrtc(bool isActive)
 {
-    m_pic->irq(4, isActive);
+//    m_pic->irq(4, isActive);
 
     if (m_curVrtc != isActive) {
         m_curVrtc = isActive;
-        m_ppiCircuit->setVbl(isActive);
+        m_ppiCircuit->setVbl(!isActive);
         m_pit->getCounter(2)->setGate(!isActive);
     }
 }
@@ -158,6 +158,11 @@ void KorvetCore::hrtc(bool isActive, int)
         m_pic->irq(5, isActive);
 }
 
+
+void KorvetCore::int4(bool isActive)
+{
+    m_pic->irq(4, isActive);
+}
 
 void KorvetCore::int7()
 {
@@ -245,9 +250,12 @@ void KorvetRenderer::operate()
         renderFrame();
     }
 
-    if (m_curLine == 295)
+    if (m_curLine == 293)
+        static_cast<KorvetCore*>(m_platform->getCore())->int4(false);
+    if (m_curLine == 295) {
         m_platform->getCore()->vrtc(true);
-    else if (m_curLine == 39)
+        static_cast<KorvetCore*>(m_platform->getCore())->int4(true);
+    } else if (m_curLine == 39)
         m_platform->getCore()->vrtc(false);
 
     m_curClock += g_emulation->getFrequency() / 10000000 * 640;

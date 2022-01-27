@@ -90,6 +90,7 @@ class KorvetCore : public PlatformCore
         void hrtc(bool, int) override;
         void inte(bool isActive) override;
 
+        void int4(bool isActive);
         void int7();
 
         void attachCrtRenderer(CrtRenderer* crtRenderer);
