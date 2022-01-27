@@ -67,6 +67,28 @@ void Pit8253Counter::operateForTicks(int ticks)
                     m_tempSumOut += ticks;
             }
             break;
+        case 2:
+            {
+                if (!m_isCounting) {
+                    m_tempSumOut += ticks;
+                    break;
+                }
+
+                int fullCycles = ticks / m_counterInitValue;
+
+                m_tempSumOut += fullCycles * (m_counterInitValue - 1);
+                m_sumOutTicks += fullCycles;
+                ticks -= fullCycles * m_counterInitValue;
+
+                m_counter -= ticks;
+                m_tempSumOut += ticks;
+                if (m_counter <= 0) {
+                    m_tempSumOut--;
+                    m_sumOutTicks++;
+                    m_counter += 65536;
+                }
+            }
+            break;
         case 3:
             {
                 if (!m_isCounting) {
@@ -98,7 +120,7 @@ void Pit8253Counter::operateForTicks(int ticks)
 
                 if (ticks < last) {
                     counter -= ticks;
-                    if (m_isCounting && m_out)
+                    if (m_out)
                         m_tempSumOut += ticks;
                 } else if (ticks < last + nextPeriod) {
                     counter = nextPeriod - (ticks - last);
@@ -122,7 +144,6 @@ void Pit8253Counter::operateForTicks(int ticks)
             }
             break;
         case 1:
-        case 2:
         case 4:
         case 5:
         default:
@@ -225,12 +246,12 @@ void Pit8253Counter::setMode(int mode)
             m_out = false;
             m_isCounting = false;
             break;
+        case 2:
         case 3:
             m_isCounting = false;
             m_out = true;
             break;
         case 1:
-        case 2:
         case 4:
         case 5:
             // not implemented yet
@@ -250,10 +271,10 @@ void Pit8253Counter::setHalfOfCounter()
     switch (m_mode) {
         case 0:
             m_isCounting = false;
+        case 2:
         case 3:
             break;
         case 1:
-        case 2:
         case 4:
         case 5:
             // not implemented yet
@@ -278,13 +299,13 @@ void Pit8253Counter::setCounter(uint16_t counter)
             m_isCounting = true;
             m_out = false;
             break;
+        case 2:
         case 3:
             if (!m_isCounting)
                 m_counter = m_counterInitValue;
             m_isCounting = true;
             break;
         case 1:
-        case 2:
         case 4:
         case 5:
         default:
@@ -307,6 +328,7 @@ void Pit8253Counter::setGate(bool gate)
         case 0:
             m_isCounting = gate;
             break;
+        case 2:
         case 3:
             m_isCounting = gate;
             m_out = !gate;
@@ -324,6 +346,7 @@ bool Pit8253Counter::getOut()
     switch (m_mode) {
         case 0:
             return m_out;
+        case 2:
         case 3:
             return (m_isCounting && m_out) || !m_gate;
         default:
