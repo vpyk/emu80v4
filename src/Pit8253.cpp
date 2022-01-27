@@ -76,13 +76,19 @@ void Pit8253Counter::operateForTicks(int ticks)
 
                 int hiPeriod = (m_counterInitValue + 1) / 2;
                 int loPeriod = m_counterInitValue / 2;
-
-                int fullCycles = ticks / m_counterInitValue;
-                if (m_isCounting) {
-                    m_tempSumOut += fullCycles * hiPeriod;
-                    m_sumOutTicks += fullCycles;
+                if (m_counterInitValue == 3)
+                    loPeriod = 32769;
+                else if (m_counterInitValue == 1) {
+                    hiPeriod = 32769;
+                    loPeriod = 32768;
                 }
-                ticks -= fullCycles * m_counterInitValue;
+
+                int fullPeriod = hiPeriod + loPeriod;
+
+                int fullCycles = ticks / fullPeriod;
+                m_tempSumOut += fullCycles * hiPeriod;
+                m_sumOutTicks += fullCycles;
+                ticks -= fullCycles * fullPeriod;
 
                 int counter = m_out ? (m_counter + 1) / 2 : m_counter / 2;
 
@@ -96,26 +102,22 @@ void Pit8253Counter::operateForTicks(int ticks)
                         m_tempSumOut += ticks;
                 } else if (ticks < last + nextPeriod) {
                     counter = nextPeriod - (ticks - last);
-                    if (m_isCounting) {
-                        if (m_out)
-                            m_tempSumOut += last;
-                        else
-                            m_tempSumOut += (ticks - last);
-                    }
+                    if (m_out)
+                        m_tempSumOut += last;
+                    else
+                        m_tempSumOut += (ticks - last);
                     m_out = !m_out;
                     if (m_out)
                         ++m_sumOutTicks;
                 } else { // if (ticks >= last + nextPeriod)
                     counter = curPeriod - (ticks - last - nextPeriod);
-                    if (m_isCounting) {
-                        if (m_out)
-                            m_tempSumOut += (ticks - nextPeriod);
-                        else
-                            m_tempSumOut += nextPeriod;
-                    }
+                    if (m_out)
+                        m_tempSumOut += (ticks - nextPeriod);
+                    else
+                        m_tempSumOut += nextPeriod;
                 }
                 m_counter = counter * 2;
-                if (m_counter > m_counterInitValue)
+                if (m_counter > fullPeriod)
                     --m_counter;
             }
             break;
