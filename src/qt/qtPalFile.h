@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017–2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017–2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,6 +40,11 @@ class PalFile
         int64_t getPos();
         void seek(int position);
         void skip(int len);
+
+        static bool create(std::string fileName);
+        static bool del(std::string fileName);
+        static bool mkDir(std::string dirName);
+        static bool moveRename(std::string src, std::string dst);
 
     private:
         QFile* m_file = nullptr;

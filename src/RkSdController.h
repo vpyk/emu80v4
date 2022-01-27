@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@
 
 #include <string>
 #include <list>
+
+#include "Pal.h"
+#include "PalFile.h"
 
 #include "Ppi8255Circuit.h"
 
@@ -77,7 +80,10 @@ class RkSdController : public Ppi8255Circuit
 
     enum ErrorCode {
         ERR_DISK_ERR = 0x02,
+        ERR_NOT_OPENED = 0x03,
         ERR_NO_PATH = 0x04,
+        ERR_DIR_NOT_EMPTY = 0x07,
+        ERR_FILE_EXISTS = 0x08,
         ERR_MAX_FILES = 0x0A,
         ERR_RECV_STRING = 0x0B,
         ERR_INVALID_COMMAND = 0x0C,
@@ -86,12 +92,16 @@ class RkSdController : public Ppi8255Circuit
         ERR_OK_CMD = 0x43,
         ERR_OK_READ = 0x44,
         ERR_OK_ENTRY = 0x45,
+        ERR_OK_WRITE = 0x46,
         ERR_OK_ADDR = 0x47,
         ERR_OK_BLOCK = 0x4F
     };
 
+        bool m_readOnly = false;
 
         CommandStage m_stage = CS_WAIT40;
+        int m_subStage = 0;
+        int m_cmd;
         std::string m_sdDir;
         uint8_t m_prevValue = 0;
 
@@ -113,9 +123,23 @@ class RkSdController : public Ppi8255Circuit
         uint8_t* m_execFileBuffer = nullptr;
         std::list<PalFileInfo*> m_fileList;
 
-        uint8_t* m_openFileBuffer = nullptr;
+        PalFile m_file;
+
+        std::string m_curFileName;
+        std::string m_curFileMode = "rw";
+        unsigned m_curFileSize;
         unsigned m_filePos;
-        unsigned m_fileSize;
+
+        std::string m_file2Name;
+        std::string m_file2Mode = "rw";
+        unsigned m_file2Size;
+        std::string m_srcDir;
+        unsigned m_file2Pos;
+
+        bool m_fileIsOpen = false;
+
+        uint16_t m_bytesToWrite;
+        uint16_t m_curBytesToWrite;
 
         void resetState();
         void createErrorAnswer(ErrorCode error);

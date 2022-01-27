@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 using namespace std;
 
 
-const static unsigned c_inBufferSize = 500;
 const static unsigned c_romBufferSize = 128;
+const unsigned c_inBufferSize = 512 + 2;
 
 
 RkSdController::RkSdController(std::string sdDir)
@@ -55,9 +55,6 @@ RkSdController::~RkSdController()
     for (auto it = m_fileList.begin(); it != m_fileList.end(); it++)
         delete (*it);
     m_fileList.clear();
-
-    if (m_openFileBuffer)
-        delete[] m_openFileBuffer;
 }
 
 
@@ -99,6 +96,7 @@ void RkSdController::setPortB(uint8_t value)
         if (m_prevValue & 0x20 && !(value & 0x20)) {
             m_outValue = ERR_OK_DISK;
             m_stage = CS_PREPARE;
+            m_subStage = 0;
             m_inBufferPos = 0;
         } else if (value & 0x1F)
             resetState();
@@ -111,15 +109,18 @@ void RkSdController::setPortB(uint8_t value)
         break;
     case CS_REQUEST:
         if (m_prevValue & 0x20 && !(value & 0x20)) {
-            if (m_inBufferPos < c_inBufferSize)
+            if (m_inBufferPos < c_inBufferSize) {
                 m_inBuffer[m_inBufferPos++] = m_inValue;
-            else {
+            } else {
                 m_stage = CS_ANSWER;
                 createErrorAnswer(ERR_RECV_STRING);
             }
+            if (m_subStage == 0)
+                m_cmd = m_inBuffer[0];
             if (cmd()) {
                 m_stage = CS_ANSWER;
                 m_outBufferPos = 0;
+                m_outValue = m_outBuffer[0];
             }
         } else if (value & 0x1F)
             resetState();
@@ -127,6 +128,11 @@ void RkSdController::setPortB(uint8_t value)
     case CS_ANSWER:
         if (m_prevValue & 0x20 && !(value & 0x20) && m_outBufferPos < m_outBufferSize) {
             m_outValue = m_outBuffer[m_outBufferPos++];
+            if (m_outBufferPos == m_outBufferSize) {
+                m_stage = CS_PREPARE;
+                m_inBufferPos = 0;
+                m_subStage++;
+            }
         } else if (value & 0x1F)
             resetState();
         break;
@@ -139,6 +145,7 @@ void RkSdController::setPortB(uint8_t value)
 void RkSdController::resetState()
 {
     m_stage = CS_WAIT40;
+    m_subStage = 0;
     m_prevValue = 0;
 }
 
@@ -151,13 +158,6 @@ void RkSdController::createErrorAnswer(ErrorCode error)
     m_outBufferPos = 0;
     m_outBuffer[m_outBufferPos++] = error;
     m_outBufferSize = m_outBufferPos;
-}
-
-
-void RkSdController::error()
-{
-    m_outValue = ERR_DISK_ERR;
-    resetState();
 }
 
 
@@ -199,7 +199,7 @@ bool RkSdController::loadRkFile(const std::string& fileName)
 
 bool RkSdController::cmd()
 {
-        switch (m_inBuffer[0]) {
+        switch (m_cmd) {
         case CMD_BOOT:
             return cmdBoot();
         case CMD_VER:
@@ -305,6 +305,8 @@ bool RkSdController::cmdFind()
     if (m_inBufferPos < 4 || m_inBuffer[m_inBufferPos - 3] != 0)
         return false;
 
+    m_fileIsOpen = false;
+
     unsigned maxItems = m_inBuffer[m_inBufferPos - 2] | (m_inBuffer[m_inBufferPos - 1] << 8);
 
     string dir = string((char*)(m_inBuffer + 1));
@@ -400,16 +402,74 @@ bool RkSdController::cmdOpen()
     uint8_t mode = m_inBuffer[1];
 
     switch (mode) {
-    case O_OPEN:
-        m_openFileBuffer = palReadFile(m_sdDir + (char*)(m_inBuffer + 2), (int&)m_fileSize, true);
-        createErrorAnswer(m_openFileBuffer ? ERR_OK_CMD : ERR_NO_PATH);
+    case O_OPEN: {
+        m_curFileName = m_sdDir + (char*)(m_inBuffer + 2);
+        m_curFileMode = m_readOnly ? "r" : "rw";
+        m_curFileSize = 0;
+        bool res = m_file.open(m_curFileName, m_curFileMode);
+        if (res) {
+            m_curFileSize = m_file.getSize();
+            m_file.close();
+            m_fileIsOpen = true;
+        }
+        createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH);
+        m_filePos = 0; }
+        break;
+    case O_CREATE: {
+        if (m_readOnly) {
+            createErrorAnswer(ERR_DISK_ERR);
+            return false;
+        }
+        m_curFileName = m_sdDir + (char*)(m_inBuffer + 2);
+        m_curFileMode = "rw";
+        m_curFileSize = 0;
+        bool res = PalFile::create(m_curFileName);
+        m_fileIsOpen = res;
+        createErrorAnswer(res ? ERR_OK_CMD : ERR_FILE_EXISTS); }
         m_filePos = 0;
         break;
-    case O_CREATE:
-    case O_MKDIR:
-    case O_DELETE:
+    case O_MKDIR: {
+            if (m_readOnly) {
+                createErrorAnswer(ERR_DISK_ERR);
+                return false;
+            }
+            string dirName = m_sdDir + (char*)(m_inBuffer + 2);
+            bool res = PalFile::mkDir(dirName);
+            m_fileIsOpen = false;
+            createErrorAnswer(res ? ERR_OK_CMD : ERR_FILE_EXISTS); }
+            break;
+    case O_DELETE: {
+        if (m_readOnly) {
+            createErrorAnswer(ERR_DISK_ERR);
+            return false;
+        }
+        string fileName = m_sdDir + (char*)(m_inBuffer + 2);
+        bool res = PalFile::del(fileName);
+        createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH); }
+        break;
+    case O_SWAP: {
+            string tempStr = m_file2Name;
+            m_file2Name = m_curFileName;
+            m_curFileName = tempStr;
+
+            tempStr = m_file2Mode;
+            m_file2Mode = m_curFileMode;
+            m_curFileMode = tempStr;
+
+            int tempInt = m_file2Size;
+            m_file2Size = m_curFileSize;
+            m_curFileSize = tempInt;
+
+            tempInt = m_file2Pos;
+            m_file2Pos = m_filePos;
+            m_filePos = tempInt;
+
+            createErrorAnswer(ERR_OK_CMD);
+        }
+        break;
     default:
         createErrorAnswer(ERR_INVALID_COMMAND);
+        return false;
     }
 
     return true;
@@ -424,20 +484,42 @@ bool RkSdController::cmdLseek()
     uint8_t mode = m_inBuffer[1];
     int32_t offset = m_inBuffer[2] + (m_inBuffer[3] << 8) + (m_inBuffer[4] << 16) + (m_inBuffer[5] << 24);
 
+    int out;
     switch (mode) {
-    case 100:
-    case 101:
-    case 102:
-        createErrorAnswer(ERR_INVALID_COMMAND);
+    case 0: //seek set
+        m_filePos = offset;
+        out = m_filePos;
+        break;
+    case 1: // seek cur
+        m_filePos += offset;
+        out = m_filePos;
+        break;
+    case 2: // seek end
+        m_filePos = m_curFileSize + offset;
+        out = m_filePos;
+        break;
+    case 100: // get file size
+        out = m_curFileSize;
+        break;
+    case 101: // get disk size
+    case 102: // get free space
+        out = 0x100000;
         break;
     default:
-        if (mode == 0)
-            m_filePos = offset;
-        else if (mode == 1)
-            m_filePos += offset;
-        else
-            m_filePos = m_fileSize + offset;
+        createErrorAnswer(ERR_INVALID_COMMAND);
+        return false;
     }
+
+    if (m_outBuffer)
+        delete[] m_outBuffer;
+    m_outBuffer = new uint8_t[5];
+    m_outBufferPos = 0;
+    m_outBuffer[m_outBufferPos++] = ERR_OK_CMD;
+    m_outBuffer[m_outBufferPos++] = out & 0xFF;
+    m_outBuffer[m_outBufferPos++] = (out >> 8) & 0xFF;
+    m_outBuffer[m_outBufferPos++] = (out >> 16) & 0xFF;
+    m_outBuffer[m_outBufferPos++] = (out >> 24) & 0xFF;
+    m_outBufferSize = m_outBufferPos;
 
     return true;
 }
@@ -448,9 +530,14 @@ bool RkSdController::cmdRead()
     if (m_inBufferPos < 3)
         return false;
 
+    if (!m_fileIsOpen) {
+        createErrorAnswer(ERR_NOT_OPENED);
+        return false;
+    }
+
     uint16_t bytesToRead = m_inBuffer[1] + (m_inBuffer[2] << 8);
-    if (bytesToRead > m_fileSize - m_filePos)
-        bytesToRead = m_fileSize - m_filePos;
+    if (bytesToRead > m_curFileSize - m_filePos)
+        bytesToRead = m_curFileSize - m_filePos;
 
     if (m_outBuffer)
         delete[] m_outBuffer;
@@ -462,7 +549,12 @@ bool RkSdController::cmdRead()
     m_outBuffer[pos++] = bytesToRead & 0xFF;
     m_outBuffer[pos++] = (uint8_t)(bytesToRead >> 8);
 
-    memcpy(m_outBuffer + pos, m_openFileBuffer + m_filePos, bytesToRead);
+    m_file.open(m_curFileName, m_curFileMode);
+    m_file.seek(m_filePos);
+    for (int i = 0; i < bytesToRead; i++) {
+        m_outBuffer[pos + i] = m_file.read8();
+    }
+    m_file.close();
     pos += bytesToRead;
     m_filePos += bytesToRead;
 
@@ -476,13 +568,77 @@ bool RkSdController::cmdRead()
 
 bool RkSdController::cmdWrite()
 {
-    error();
-    return false;
+    if (m_readOnly) {
+        createErrorAnswer(ERR_DISK_ERR);
+        return false;
+    }
+
+    if (m_subStage == 0) {
+        if (m_inBufferPos < 3)
+            return false;
+
+        if (!m_fileIsOpen) {
+            createErrorAnswer(ERR_NOT_OPENED);
+            return false;
+        }
+
+        m_bytesToWrite = m_inBuffer[1] + (m_inBuffer[2] << 8);
+
+        if (m_bytesToWrite == 0) {
+            createErrorAnswer(ERR_OK_CMD);
+            return true;
+        }
+    } else {
+        if (m_inBufferPos < m_curBytesToWrite)
+            return false;
+
+        m_file.open(m_curFileName, m_curFileMode);
+        m_file.seek(m_filePos);
+        for (int i = 0; i < m_curBytesToWrite; i++) {
+            m_file.write8(m_inBuffer[i]);
+        }
+        m_file.close();
+        m_filePos += m_curBytesToWrite;
+
+        m_bytesToWrite -= m_curBytesToWrite;
+    }
+
+    if (!m_bytesToWrite) {
+        createErrorAnswer(ERR_OK_CMD);
+        return true;
+    }
+
+    m_curBytesToWrite = (m_bytesToWrite > c_inBufferSize - 2) ? c_inBufferSize - 2 : m_bytesToWrite;
+
+    m_outBuffer = new uint8_t[3];
+    m_outBufferPos = 0;
+    m_outBuffer[m_outBufferPos++] = ERR_OK_WRITE;
+    m_outBuffer[m_outBufferPos++] = m_curBytesToWrite & 0xFF;
+    m_outBuffer[m_outBufferPos++] = m_curBytesToWrite >> 8;
+    m_outBufferSize = m_outBufferPos;
+
+    return true;
 }
 
 
 bool RkSdController::cmdMove()
 {
-    error();
-    return false;
+    if (m_readOnly) {
+        createErrorAnswer(ERR_DISK_ERR);
+        return false;
+    }
+
+    if (m_subStage == 0) {
+        if (m_inBufferPos < 3 || m_inBuffer[m_inBufferPos - 1] != 0)
+            return false;
+        m_srcDir = (char*)(m_inBuffer + 1);
+        createErrorAnswer(ERR_OK_WRITE);
+    } else {
+        if (m_inBufferPos < 2 || m_inBuffer[m_inBufferPos - 1] != 0)
+            return false;
+        bool res = PalFile::moveRename(m_sdDir + m_srcDir, m_sdDir + (char*)(m_inBuffer));
+        createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH);
+    }
+
+    return true;
 }

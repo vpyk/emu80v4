@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 
 #include <QFile>
+#include <QDir>
 
 #include "qtPalFile.h"
 
@@ -128,4 +129,46 @@ int64_t PalFile::getPos()
 bool PalFile::eof()
 {
     return m_file->atEnd();
+}
+
+
+bool PalFile::create(std::string fileName)
+{
+    QFile file(QString::fromUtf8(fileName.c_str()));
+    if (file.exists())
+        return false;
+    bool res = file.open(QIODevice::ReadWrite);
+    if (res)
+        file.close();
+
+    return res;
+}
+
+
+bool PalFile::del(std::string fileName)
+{
+    QString qFileName = QString::fromUtf8(fileName.c_str());
+    QDir dir;
+    if (dir.exists(qFileName))
+        return (dir.remove(qFileName) || dir.rmdir(qFileName));
+    return false;
+}
+
+
+bool PalFile::mkDir(string dirName)
+{
+    QDir dir(QString::fromUtf8(dirName.c_str()));
+    if (dir.exists())
+        return false;
+    dir.mkpath(QString::fromUtf8(dirName.c_str()));
+    return true;
+}
+
+
+bool PalFile::moveRename(string src, string dst)
+{
+    QDir dir;
+    QString qSrc = QString::fromUtf8(src.c_str());
+    QString qDst = QString::fromUtf8(dst.c_str());
+    return dir.rename(qSrc, qDst);
 }
