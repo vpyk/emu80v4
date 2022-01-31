@@ -258,7 +258,7 @@ void EmuWindow::calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio,
             dstWidth = srcWidth * (m_aspectCorrection ? 2 : 3) * aspectRatio + .5;
             dstHeight = srcHeight * 2;
             dstX = (wndWidth - dstWidth) / 2;
-            m_dstY = (wndHeight - dstHeight) / 2;
+            dstY = (wndHeight - dstHeight) / 2;
             break;
         case FS_3X5:
             dstWidth = srcWidth * (m_aspectCorrection ? 3 : 5) * aspectRatio + .5;
