@@ -107,9 +107,10 @@ void PaintWidget::colorFill(QColor color)
 void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
     int dstWidth, dstHeight, dstX, dstY;
-    static_cast<MainWindow*>(parent())->getPalWindow()->calcDstRect(imageWidth, imageHeight, aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
-
-    m_dstRect.setRect(dstX, dstY, dstWidth, dstHeight);
+    if (!blend && !useAlpha) {
+        static_cast<MainWindow*>(parent())->getPalWindow()->calcDstRect(imageWidth, imageHeight, aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
+        m_dstRect.setRect(dstX, dstY, dstWidth, dstHeight);
+    }
 
     if (m_image2) {
         delete m_image2;

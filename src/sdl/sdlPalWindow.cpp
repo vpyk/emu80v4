@@ -200,9 +200,11 @@ void PalWindow::drawFill(uint32_t color)
 
 void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
-    int width, height, dstWidth, dstHeight, dstX, dstY;
+    int width, height;
     SDL_GetWindowSize(m_window, &width, &height);
-    calcDstRect(imageWidth, imageHeight, aspectRatio, width, height, dstWidth, dstHeight, dstX, dstY);
+
+    if (!blend && !useAlpha)
+        calcDstRect(imageWidth, imageHeight, aspectRatio, width, height, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, m_params.antialiasing ? "2" : "0");
 
@@ -212,7 +214,7 @@ void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, dou
     SDL_SetTextureBlendMode(texture, blend ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
     if (blend && !useAlpha)
         SDL_SetTextureAlphaMod(texture, 0x80);
-    SDL_Rect dstRect = {dstX, dstY, dstWidth, dstHeight};
+    SDL_Rect dstRect = {m_dstX, m_dstY, m_dstWidth, m_dstHeight};
     SDL_RenderCopy(m_renderer, texture, NULL, &dstRect);
 
     // Screenshot processing

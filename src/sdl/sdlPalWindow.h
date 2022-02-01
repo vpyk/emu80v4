@@ -90,6 +90,11 @@ class PalWindow
         int m_lastWidth;
         int m_lastHeight;
 
+        int m_dstWidth;
+        int m_dstHeight;
+        int m_dstX;
+        int m_dstY;
+
         SDL_Surface* m_ssSurface = nullptr;
         SDL_Renderer* m_ssRenderer = nullptr;
         std::string m_ssFileName = "";

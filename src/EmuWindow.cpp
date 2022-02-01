@@ -195,22 +195,10 @@ void EmuWindow::hide()
 }
 
 
-
-void EmuWindow::calcDstRectP(EmuPixelData frame)
-{
-    m_curImgWidth = frame.width;
-    m_curImgHeight = frame.height;
-    getSize(m_curWindowWidth, m_curWindowHeight);
-
-    calcDstRect(frame.width, frame.height, frame.aspectRatio, m_curWindowWidth, m_curWindowHeight, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
-}
-
-
-
 void EmuWindow::calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio, int wndWidth, int wndHeight, int& dstWidth, int& dstHeight, int& dstX, int& dstY)
 {
-    //m_curImgWidth = frame.width;
-    //m_curImgHeight = frame.height;
+    if (m_fieldsMixing == FM_INTERLACE || m_fieldsMixing == FM_SCANLINE)
+        srcHeight /= 2;
 
     double aspectRatio = 1.0;
     if (m_aspectCorrection)
@@ -220,8 +208,6 @@ void EmuWindow::calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio,
 
     if (m_isFullscreenMode)
         tempFs = m_isAntialiased ? FS_FIT_KEEP_AR : FS_BEST_FIT;
-
-    //getSize(m_curWindowWidth, m_curWindowHeight);
 
     switch(tempFs) {
         case FS_1X:
@@ -394,7 +380,15 @@ void EmuWindow::drawFrame(EmuPixelData frame)
         return;
     }
 
-    calcDstRectP(frame);
+    m_curImgWidth = frame.width;
+    m_curImgHeight = frame.height;
+    getSize(m_curWindowWidth, m_curWindowHeight);
+
+    if (m_fieldsMixing != FM_INTERLACE && m_fieldsMixing != FM_SCANLINE)
+        calcDstRect(frame.width, frame.height, frame.aspectRatio, m_curWindowWidth, m_curWindowHeight, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
+    else
+        calcDstRect(frame.width, frame.height * 2, frame.aspectRatio, m_curWindowWidth, m_curWindowHeight, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
+
 
     if ((m_windowStyle == WS_AUTOSIZE) && !m_isFullscreenMode
           && (m_frameScale == FS_1X || m_frameScale == FS_2X || m_frameScale == FS_3X || m_frameScale == FS_4X || m_frameScale == FS_5X || m_frameScale == FS_2X3 || m_frameScale == FS_3X5 || m_frameScale == FS_4X6)
@@ -431,7 +425,6 @@ void EmuWindow::drawOverlay(EmuPixelData frame)
     if (frame.width == 0 || frame.height == 0 || !frame.pixelData)
         return;
 
-    //drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, m_dstX, m_dstY, m_dstWidth, m_dstHeight, true, true);
     drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, true, true);
 
 /*    if (m_fieldsMixing == FM_MIX && frame.prevPixelData) {

@@ -134,7 +134,6 @@ class EmuWindow : public EmuObject, public PalWindow
         int m_dstWidth;
         int m_dstHeight;
 
-        void calcDstRectP(EmuPixelData frame);
         void interlaceFields(EmuPixelData frame);
         void prepareScanline(EmuPixelData frame);
 
