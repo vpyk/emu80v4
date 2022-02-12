@@ -1766,7 +1766,8 @@ void MainWindow::onReset()
 
 void MainWindow::onPause()
 {
-    emuSysReq(m_palWindow, SR_PAUSE);
+    bool paused = ((QAction*)sender())->isChecked();
+    emuSysReq(m_palWindow, paused ? SR_PAUSEON : SR_PAUSEOFF);
 }
 
 
