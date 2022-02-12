@@ -31,6 +31,32 @@ class PalWindow;
 class PaintWidget;
 class SettingsDialog;
 
+
+const int LAST_FILES_QTY = 7;
+
+class LastFileList
+{
+public:
+    LastFileList(const QString& type) : m_type(type) {}
+
+    void setPlatformName(const QString& name);
+    void addToLastFiles(const QString& fileName);
+    int getSize() {return m_list.size();}
+    QString getLastFile();
+    void tuneActions(QAction** actions);
+
+private:
+    QString m_platform;
+    QString m_type;
+    QList<QString> m_list;
+    bool m_loaded = false;
+
+    QString getKeyPrefix();
+    void loadLastFiles();
+    void saveLastFiles();
+};
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -94,7 +120,15 @@ private slots:
     void onFullwindow();
     void onExit();
     void onDiskA();
+    void onUnmountDiskA();
+    void onReadOnlyDiskA();
+    void onDiskALastFiles();
+    void onAutoMountDiskA();
     void onDiskB();
+    void onUnmountDiskB();
+    void onReadOnlyDiskB();
+    void onDiskBLastFiles();
+    void onAutoMountDiskB();
     void onCrop();
     void onAspect();
     void onWideScreen();
@@ -142,6 +176,9 @@ private:
     void createDebugActions();
     PalKeyCode translateKey(QKeyEvent* evt);
     void saveConfig();
+    void updateLastFiles();
+
+    LastFileList m_fddLastFiles = LastFileList("fdd");
 
     QTimer m_fpsTimer;
     int m_frameCount = 0;
@@ -158,8 +195,15 @@ private:
 
     SettingsDialog* m_settingsDialog = nullptr;
 
+    QIcon m_diskAOnIcon = QIcon(":/icons/disk_a.png");
+    QIcon m_diskAOffIcon = QIcon(":/icons/disk_a_off.png");
+    QIcon m_diskBOnIcon = QIcon(":/icons/disk_b.png");
+    QIcon m_diskBOffIcon = QIcon(":/icons/disk_b_off.png");
+
     QMenu* m_colorModeMenu = nullptr;
     QMenu* m_platformListMenu = nullptr;
+    QMenu* m_diskAMenu = nullptr;
+    QMenu* m_diskBMenu = nullptr;
 
     QMenuBar* m_menuBar = nullptr;
     QToolBar* m_toolBar = nullptr;
@@ -172,7 +216,15 @@ private:
     QAction* m_loadRunAction;
     QAction* m_loadWavAction;
     QAction* m_diskAAction;
+    QAction* m_diskAMenuAction;
+    QAction* m_diskAUnmountAction;
+    QAction* m_diskAReadOnlyAction;
+    QAction* m_diskAAutoMountAction;
     QAction* m_diskBAction;
+    QAction* m_diskBMenuAction;
+    QAction* m_diskBUnmountAction;
+    QAction* m_diskBReadOnlyAction;
+    QAction* m_diskBAutoMountAction;
     QAction* m_loadRamDiskAction;
     QAction* m_saveRamDiskAction;
     QAction* m_menuDiskSeparator;
@@ -224,6 +276,10 @@ private:
     QAction* m_muteAction;
     QAction* m_fastResetAction;
     QAction* m_printerCaptureAction;
+
+    QAction* m_fddALastFilesActions[LAST_FILES_QTY];
+    QAction* m_fddBLastFilesActions[LAST_FILES_QTY];
 };
+
 
 #endif // QTMAINWINDOW_H

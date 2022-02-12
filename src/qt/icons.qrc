@@ -30,5 +30,7 @@
         <file>icons/emu80.png</file>
         <file>icons/fast_reset.png</file>
         <file>icons/printer.png</file>
+        <file>icons/disk_a_off.png</file>
+        <file>icons/disk_b_off.png</file>
     </qresource>
 </RCC>

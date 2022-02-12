@@ -30,8 +30,10 @@ bool PalFile::open(string fileName, string mode)
 
 void PalFile::close()
 {
-    if (m_file)
+    if (m_file) {
         SDL_RWclose(m_file);
+        m_file = nullptr;
+    }
 }
 
 

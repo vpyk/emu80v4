@@ -32,6 +32,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QSettings>
 
 #include <string>
 
@@ -134,6 +135,11 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_statusBar->addWidget(m_crtModeLabel);
             m_statusBar->addWidget(m_imageSizeLabel);
             m_statusBar->addWidget(m_dmaTimeLabel);
+        }
+
+        {
+            QString groupName = QString::fromUtf8(getPlatformGroupName().c_str());
+            m_fddLastFiles.setPlatformName(groupName);
         }
 
         tuneMenu();
@@ -351,31 +357,82 @@ void MainWindow::createActions()
     fileMenu->addSeparator();
     m_toolBar->addSeparator();
 
+
     // Select disk A
-    m_diskAAction = new QAction(QIcon(":/icons/disk_a.png"), tr("Disk A..."), this);
-    m_diskAAction->setToolTip(tr("Load disk A image (Alt-A)"));
+    m_diskAMenu = new QMenu(tr("Disk A"));
+    m_diskAMenu->setIcon(m_diskAOffIcon);
+
+    m_diskAAction = new QAction(tr("Select disk A image..."), this);
+    m_diskAMenuAction = m_diskAMenu->menuAction();
+    m_diskAMenuAction->setToolTip(tr("Load disk A image (Alt-A)"));
     QList<QKeySequence> diskAKeysList;
     ADD_HOTKEY(diskAKeysList, Qt::Key_A);
-    //diskAKeysList.append(QKeySequence(Qt::ALT + Qt::Key_A));
-    //diskAKeysList.append(QKeySequence(Qt::META + Qt::Key_A));
     m_diskAAction->setShortcuts(diskAKeysList);
     addAction(m_diskAAction);
-    fileMenu->addAction(m_diskAAction);
-    m_toolBar->addAction(m_diskAAction);
+    m_diskAMenu->addAction(m_diskAAction);
+    m_toolBar->addAction(m_diskAMenuAction);
     connect(m_diskAAction, SIGNAL(triggered()), this, SLOT(onDiskA()));
+    connect(m_diskAMenuAction, SIGNAL(triggered()), this, SLOT(onDiskA()));
+
+    m_diskAUnmountAction = new QAction(tr("Unmount"), this);
+    m_diskAMenu->addAction(m_diskAUnmountAction);
+    m_diskAMenu->addSeparator();
+    m_diskAReadOnlyAction = new QAction(tr("Read only"), this);
+    m_diskAReadOnlyAction->setCheckable(true);
+    m_diskAMenu->addAction(m_diskAReadOnlyAction);
+    m_diskAAutoMountAction = new QAction(tr("Auto mount on startup"), this);
+    m_diskAAutoMountAction->setCheckable(true);
+    m_diskAMenu->addAction(m_diskAAutoMountAction);
+    connect(m_diskAUnmountAction, SIGNAL(triggered()), this, SLOT(onUnmountDiskA()));
+    connect(m_diskAReadOnlyAction, SIGNAL(triggered()), this, SLOT(onReadOnlyDiskA()));
+    connect(m_diskAAutoMountAction, SIGNAL(triggered()), this, SLOT(onAutoMountDiskA()));
+
+
+    m_diskAMenu->addSeparator();
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_fddALastFilesActions[i] = new QAction(this);
+        m_diskAMenu->addAction(m_fddALastFilesActions[i]);
+        connect(m_fddALastFilesActions[i], SIGNAL(triggered()), this, SLOT(onDiskALastFiles()));
+    }
 
     // Select disk B
-    m_diskBAction = new QAction(QIcon(":/icons/disk_b.png"), tr("Disk B..."), this);
-    m_diskBAction->setToolTip(tr("Load disk B image (Alt-B)"));
+    m_diskBMenu = new QMenu(tr("Disk B"));
+    m_diskBMenu->setIcon(m_diskBOffIcon);
+
+    m_diskBAction = new QAction(tr("Select disk B image..."), this);
+    m_diskBMenuAction = m_diskBMenu->menuAction();
+    m_diskBMenuAction->setToolTip(tr("Load disk B image (Alt-B)"));
     QList<QKeySequence> diskBKeysList;
     ADD_HOTKEY(diskBKeysList, Qt::Key_B);
-    //diskBKeysList.append(QKeySequence(Qt::ALT + Qt::Key_B));
-    //diskBKeysList.append(QKeySequence(Qt::META + Qt::Key_B));
     m_diskBAction->setShortcuts(diskBKeysList);
     addAction(m_diskBAction);
-    fileMenu->addAction(m_diskBAction);
-    m_toolBar->addAction(m_diskBAction);
+    m_diskBMenu->addAction(m_diskBAction);
+    m_toolBar->addAction(m_diskBMenuAction);
     connect(m_diskBAction, SIGNAL(triggered()), this, SLOT(onDiskB()));
+    connect(m_diskBMenuAction, SIGNAL(triggered()), this, SLOT(onDiskB()));
+
+    m_diskBUnmountAction = new QAction(tr("Unmount"), this);
+    m_diskBMenu->addAction(m_diskBUnmountAction);
+    m_diskBMenu->addSeparator();
+    m_diskBReadOnlyAction = new QAction(tr("Read only"), this);
+    m_diskBReadOnlyAction->setCheckable(true);
+    m_diskBMenu->addAction(m_diskBReadOnlyAction);
+    m_diskBAutoMountAction = new QAction(tr("Auto mount on startup"), this);
+    m_diskBAutoMountAction->setCheckable(true);
+    m_diskBMenu->addAction(m_diskBAutoMountAction);
+    connect(m_diskBUnmountAction, SIGNAL(triggered()), this, SLOT(onUnmountDiskB()));
+    connect(m_diskBReadOnlyAction, SIGNAL(triggered()), this, SLOT(onReadOnlyDiskB()));
+    connect(m_diskBAutoMountAction, SIGNAL(triggered()), this, SLOT(onAutoMountDiskB()));
+
+    m_diskBMenu->addSeparator();
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_fddBLastFilesActions[i] = new QAction(this);
+        m_diskBMenu->addAction(m_fddBLastFilesActions[i]);
+        connect(m_fddBLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onDiskBLastFiles()));
+    }
+
+    fileMenu->addMenu(m_diskAMenu);
+    fileMenu->addMenu(m_diskBMenu);
 
     m_menuDiskSeparator = fileMenu->addSeparator();
 
@@ -1095,6 +1152,8 @@ void MainWindow::tuneMenu()
     m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000");
 
     m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
+
+    updateLastFiles();
 }
 
 
@@ -1818,12 +1877,88 @@ void MainWindow::onLoadWav()
 void MainWindow::onDiskA()
 {
     emuSysReq(m_palWindow, SR_DISKA);
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskA", "fileName").c_str());
+    m_fddLastFiles.addToLastFiles(lastFileName);
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onUnmountDiskA()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskA", "fileName", "");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onReadOnlyDiskA()
+{
+    bool readOnly = m_diskAReadOnlyAction->isChecked();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskA", "readOnly", readOnly ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onDiskALastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskA", "fileName", action->text().toStdString());
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onAutoMountDiskA()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskA", "autoMount", m_diskAAutoMountAction->isChecked() ? "yes" : "no");
+    updateConfig();
+    saveConfig();
 }
 
 
 void MainWindow::onDiskB()
 {
     emuSysReq(m_palWindow, SR_DISKB);
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskB", "fileName").c_str());
+    m_fddLastFiles.addToLastFiles(lastFileName);
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onUnmountDiskB()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskB", "fileName", "");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onReadOnlyDiskB()
+{
+    bool readOnly = m_diskBReadOnlyAction->isChecked();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskB", "readOnly", readOnly ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onDiskBLastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskB", "fileName", action->text().toStdString());
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onAutoMountDiskB()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskB", "autoMount", m_diskBAutoMountAction->isChecked() ? "yes" : "no");
+    updateConfig();
+    saveConfig();
 }
 
 
@@ -2030,12 +2165,48 @@ void MainWindow::updateActions()
     std::string val;
 
     val = emuGetPropertyValue(platform + "diskA", "label");
-    m_diskAAction->setVisible(val != "");
+    m_diskAMenuAction->setVisible(!val.empty());
+    m_diskAAction->setVisible(!val.empty()); // turn off shortcut
+    if (!val.empty()) {
+        QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskA", "fileName").c_str());
+        if (qFileName.isEmpty()) {
+            m_diskAUnmountAction->setEnabled(false);
+            m_diskAUnmountAction->setText(tr("Unmount"));
+            m_diskAMenuAction->setIcon(m_diskAOffIcon);
+        } else {
+            m_diskAUnmountAction->setEnabled(true);
+            qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+            m_diskAUnmountAction->setText(tr("Unmount ") + " " + qFileName);
+            m_diskAMenuAction->setIcon(m_diskAOnIcon);
+        }
+    }
+    val = emuGetPropertyValue(platform + "diskA", "readOnly");
+    m_diskAReadOnlyAction->setChecked(val == "yes");
+    val = emuGetPropertyValue(platform + "diskA", "autoMount");
+    m_diskAAutoMountAction->setChecked(val == "yes");
 
     val = emuGetPropertyValue(platform + "diskB", "label");
-    m_diskBAction->setVisible(val != "");
+    m_diskBMenuAction->setVisible(!val.empty());
+    m_diskBAction->setVisible(!val.empty()); // turn off shortcut
+    if (!val.empty()) {
+        QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskB", "fileName").c_str());
+        if (qFileName.isEmpty()) {
+            m_diskBUnmountAction->setEnabled(false);
+            m_diskBUnmountAction->setText(tr("Unmount"));
+            m_diskBMenuAction->setIcon(m_diskBOffIcon);
+        } else {
+            m_diskBUnmountAction->setEnabled(true);
+            qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+            m_diskBUnmountAction->setText(tr("Unmount ") + " " + qFileName);
+            m_diskBMenuAction->setIcon(m_diskBOnIcon);
+        }
+    }
+    val = emuGetPropertyValue(platform + "diskB", "readOnly");
+    m_diskBReadOnlyAction->setChecked(val == "yes");
+    val = emuGetPropertyValue(platform + "diskB", "autoMount");
+    m_diskBAutoMountAction->setChecked(val == "yes");
 
-    bool disksVisible = m_diskAAction->isVisible() || m_diskBAction->isVisible();
+    bool disksVisible = m_diskAMenuAction->isVisible() || m_diskBMenuAction->isVisible();
     m_menuDiskSeparator->setVisible(disksVisible);
     m_toolbarDiskSeparator->setVisible(disksVisible);
 
@@ -2135,4 +2306,108 @@ void MainWindow::updateActions()
     m_wideScreenAction->setEnabled(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".window", "wideScreen") != "custom");
 
     m_printerCaptureAction->setChecked(!emuGetPropertyValue("prnWriter", "fileName").empty());
+}
+
+
+void MainWindow::updateLastFiles()
+{
+    m_fddLastFiles.tuneActions(m_fddALastFilesActions);
+    m_fddLastFiles.tuneActions(m_fddBLastFilesActions);
+}
+
+// LastFileList implementation
+
+void LastFileList::setPlatformName(const QString& name)
+{
+    m_platform = name;
+    m_loaded = false;
+}
+
+
+QString LastFileList::getKeyPrefix()
+{
+    return m_platform + "/" + m_type + "/";
+}
+
+
+void LastFileList::loadLastFiles()
+{
+    QString keyPrefix = getKeyPrefix();
+
+    QSettings settings;
+    settings.beginGroup("Last_files");
+
+    m_list.clear();
+    for (int i = 1; i <= LAST_FILES_QTY; i++) {
+        QString value = settings.value(keyPrefix + QString::number(i)).toString();
+        if (!value.isEmpty())
+            m_list.append(value);
+    }
+
+    settings.endGroup();
+}
+
+
+void LastFileList::addToLastFiles(const QString& fileName)
+{
+    if (fileName.isEmpty()) // just in case
+        return;
+
+    int i = 0;
+    for (auto it = m_list.begin(); it != m_list.end(); it++, i++)
+        if (fileName == *it) {
+            // if item is already in list, move it to the top
+            m_list.move(i, 0);
+            return;
+        }
+
+    m_list.prepend(fileName);
+
+    if (m_list.size() > LAST_FILES_QTY)
+        m_list.removeLast();
+
+    saveLastFiles();
+}
+
+
+void LastFileList::saveLastFiles()
+{
+    QString keyPrefix = getKeyPrefix();
+
+    QSettings settings;
+    settings.beginGroup("Last_files");
+
+    int i = 1;
+    for (auto it = m_list.begin(); it != m_list.end(); it++, i++)
+        settings.setValue(keyPrefix + QString::number(i), *it);
+
+    settings.endGroup();
+
+    m_loaded = true;
+}
+
+
+QString LastFileList::getLastFile()
+{
+    if (!m_list.isEmpty()) {
+        return *m_list.begin();
+    } else {
+        return "";
+    }
+}
+
+
+void LastFileList::tuneActions(QAction** actions)
+{
+    if (!m_loaded)
+        loadLastFiles();
+
+    int i = 0;
+    for (auto it = m_list.begin(); it != m_list.end(); it++, i++) {
+        actions[i]->setText(*it);
+        actions[i]->setVisible(true);
+    }
+    for (; i < LAST_FILES_QTY; i++) {
+        actions[i]->setVisible(false);
+    }
 }

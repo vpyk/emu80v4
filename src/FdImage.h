@@ -67,6 +67,8 @@ class FdImage : public EmuObject
         int m_sectorSize;
         bool m_isWriteProtected;
         std::string m_fileName;
+        std::string m_permanentFileName;
+        bool m_autoMount = false;
         std::string m_filter;
         PalFile m_file;
         std::string m_label;

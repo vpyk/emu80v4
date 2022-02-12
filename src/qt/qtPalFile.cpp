@@ -46,8 +46,10 @@ bool PalFile::open(string fileName, string mode)
 
 void PalFile::close()
 {
-    m_file->close();
-    m_file = nullptr;
+    if (m_file) {
+        m_file->close();
+        m_file = nullptr;
+    }
 }
 
 

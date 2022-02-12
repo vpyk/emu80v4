@@ -56,8 +56,18 @@ void FdImage::reset()
 
 bool FdImage::assignFileName(string fileName)
 {
-    m_fileName = palMakeFullFileName(fileName);
-    m_file.open(m_fileName.c_str(), m_isWriteProtected ? "r" : "r+");
+    if (m_file.isOpen() && fileName == m_fileName)
+        return true;
+
+    m_file.close();
+
+    if (!fileName.empty()) {
+        m_fileName = palMakeFullFileName(fileName);
+        m_file.open(m_fileName.c_str(), m_isWriteProtected ? "r" : "r+");
+    }
+
+    if (!m_file.isOpen())
+        m_fileName = "";
 
     reset();
 
@@ -189,7 +199,13 @@ bool FdImage::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
 
     if (propertyName == "fileName") {
-        return assignFileName(values[0].asString());
+        bool res = assignFileName(values[0].asString());
+        if (m_autoMount)
+            m_permanentFileName = m_fileName;
+        return res;
+    } else if (propertyName == "permanentFileName") {
+        m_permanentFileName = values[0].asString();
+        return m_permanentFileName.empty() ? true : assignFileName(m_permanentFileName);
     } else if (propertyName == "filter") {
         m_filter = values[0].asString();
         return true;
@@ -201,6 +217,15 @@ bool FdImage::setProperty(const string& propertyName, const EmuValuesList& value
             setWriteProtection(true);
         else if (values[0].asString() == "no")
             setWriteProtection(false);
+        return true;
+    } else if (propertyName == "autoMount") {
+        if (values[0].asString() == "yes") {
+            m_autoMount = true;
+            m_permanentFileName = m_fileName;
+        } else if (values[0].asString() == "no") {
+            m_autoMount = false;
+            m_permanentFileName = "";
+        }
         return true;
     }
     return false;
@@ -219,6 +244,12 @@ string FdImage::getPropertyStringValue(const string& propertyName)
         return m_label;
     else if (propertyName == "fileName" && m_file.isOpen())
         return m_fileName;
+    else if (propertyName == "permanentFileName")
+        return m_permanentFileName;
+    else if (propertyName == "readOnly")
+        return getWriteProtectStatus() ? "yes" : "no";
+    else if (propertyName == "autoMount")
+        return m_autoMount ? "yes" : "no";
 
     return "";
 }

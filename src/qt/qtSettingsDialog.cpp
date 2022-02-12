@@ -108,10 +108,10 @@ void SettingsDialog::setRunningConfigValue(QString option, QString value)
 }
 
 
-void SettingsDialog::loadRunningConfigValue(QString option)
+void SettingsDialog::loadRunningConfigValue(QString option, bool force)
 {
     QString value = getRunningConfigValue(option);
-    if (value != "")
+    if (value != "" || force)
         m_options[option] = value;
 }
 
@@ -160,6 +160,12 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("keyboard.matrix");
     loadRunningConfigValue("platform.codePage");
     loadRunningConfigValue("platform.fastReset");
+    loadRunningConfigValue("diskA.readOnly");
+    loadRunningConfigValue("diskB.readOnly");
+    loadRunningConfigValue("diskA.autoMount");
+    loadRunningConfigValue("diskB.autoMount");
+    loadRunningConfigValue("diskA.permanentFileName", m_options.contains("diskA.autoMount"));
+    loadRunningConfigValue("diskB.permanentFileName", m_options.contains("diskB.autoMount"));
 }
 
 
@@ -173,7 +179,7 @@ void SettingsDialog::writeInitialSavedConfig()
     settings.beginGroup(m_platformGroup);
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (value != "" && option.left(10) != "emulation." && option != "locale" && option != "showHelp" &&
+        if (/*value != "" &&*/ option.left(10) != "emulation." && option != "locale" && option != "showHelp" &&
                 option != "maxFps" && option != "sampleRate" && option != "vsync" && option != "limitFps" &&
                 !settings.contains(option))
             settings.setValue(option, value);
@@ -339,7 +345,7 @@ void SettingsDialog::fillControlValues()
     ui->debugIllegalCheckBox->setChecked(val == "yes");
 
     // Color mode
-    val = m_options["crtRenderer.colorMode"];
+    val = m_options.value("crtRenderer.colorMode", "");
     ui->colorGroupBox->setVisible(m_platformGroup == "apogey" || m_platformGroup == "rk86" || m_platformGroup == "spec");
     if (m_platformGroup == "apogey") {
         ui->color1RadioButton->setText(tr("Color"));
@@ -370,12 +376,12 @@ void SettingsDialog::fillControlValues()
     ui->mixingScanlineRadioButton->setChecked(val == "scanline");
 
     // Visible area
-    val = m_options["crtRenderer.visibleArea"];
+    val = m_options.value("crtRenderer.visibleArea", "");
     ui->cropCheckBox->setEnabled(val != "");
     ui->cropCheckBox->setChecked(val == "yes");
 
     // Alternate font
-    val = m_options["crtRenderer.altRenderer"];
+    val = m_options.value("crtRenderer.altRenderer", "");
     ui->altFontCheckBox->setEnabled(val != "");
     ui->altFontCheckBox->setChecked(val == "yes");
 
@@ -395,23 +401,23 @@ void SettingsDialog::fillControlValues()
     ui->speedUpCheckBox->setChecked(suf != 1);
 
     // Tape redirect
-    val = m_options["tapeGrp.enabled"];
+    val = m_options.value("tapeGrp.enabled", "");
     ui->tapeRedirectCheckBox->setVisible(val != "");
     ui->tapeRedirectCheckBox->setChecked(val == "yes");
 
     // Mute tape
-    val = m_options["tapeSoundSource.muted"];
+    val = m_options.value("tapeSoundSource.muted", "");
     ui->muteTapeCheckBox->setVisible(val != "");
     ui->muteTapeCheckBox->setChecked(val == "yes");
 
     // Suppress file opening on reset
-    val = m_options["tapeInHook.suspendAfterResetForMs"];
+    val = m_options.value("tapeInHook.suspendAfterResetForMs", "");
     ui->tapeSuppressOpeningCheckBox->setVisible(val != "");
     int sar = val.toInt();
     ui->tapeSuppressOpeningCheckBox->setChecked(sar > 0);
 
     // Allow multiblock
-    val = m_options["loader.allowMultiblock"];
+    val = m_options.value("loader.allowMultiblock", "");
     ui->tapeMultiblockCheckBox->setVisible(val != "");
     ui->tapeMultiblockCheckBox->setChecked(val == "yes");
 
@@ -422,17 +428,17 @@ void SettingsDialog::fillControlValues()
     ui->smartRadioButton->setChecked(val == "smart");
 
     // Numpad joystick
-    val = m_options["kbdLayout.numpadJoystick"];
+    val = m_options.value("kbdLayout.numpadJoystick", "");
     ui->numpadJoystickCheckBox->setVisible(val != "");
     ui->numpadJoystickCheckBox->setChecked(val == "yes");
 
     // Down as numpad 5
-    val = m_options["kbdLayout.downAsNumpad5"];
+    val = m_options.value("kbdLayout.downAsNumpad5", "");
     ui->downAsNumpad5CheckBox->setVisible(val != "");
     ui->downAsNumpad5CheckBox->setChecked(val == "yes");
 
     // Keyboard matrix
-    val = m_options["keyboard.matrix"];
+    val = m_options.value("keyboard.matrix", "");
     ui->kbdTypeGroupBox->setVisible(val != "");
     ui->kbdOriginalRadioButton->setChecked(val == "original");
     ui->kbdRamfosRadioButton->setChecked(val == "ramfos");
@@ -440,7 +446,7 @@ void SettingsDialog::fillControlValues()
     ui->kbdEurekaRadioButton->setChecked(val == "eureka");
 
     // Fast reset
-    val = m_options["platform.fastReset"];
+    val = m_options.value("platform.fastReset", "");
     ui->fastResetCheckBox->setVisible(val != "");
     ui->fastResetCheckBox->setChecked(val == "yes");
 }
@@ -941,9 +947,10 @@ void SettingsDialog::saveStoredConfig()
     QSettings settings;
 
     settings.beginGroup(m_platformGroup);
-    foreach (QString option, m_options.keys()) {
+    //foreach (QString option, m_options.keys()) {
+    for (const auto& option: m_options.keys()) {
         QString value = m_options.value(option);
-        if (option.left(10) != "emulation." && value != "" && option != "locale" && option != "showHelp" &&
+        if (option.left(10) != "emulation." /*&& value != ""*/ && option != "locale" && option != "showHelp" &&
                 option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync")
             settings.setValue(option, value);
     }

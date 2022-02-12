@@ -102,7 +102,7 @@ private:
 
     QString getRunningConfigValue(QString option);
     void setRunningConfigValue(QString option, QString value);
-    void loadRunningConfigValue(QString option);
+    void loadRunningConfigValue(QString option, bool force = false);
 
     bool m_presetComboBoxEventsAllowed = true;
     void adjustPresetComboBoxState();
