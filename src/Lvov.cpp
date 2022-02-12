@@ -27,6 +27,7 @@
 #include "Cpu.h"
 #include "TapeRedirector.h"
 #include "WavReader.h"
+#include "PrnWriter.h"
 
 using namespace std;
 
@@ -227,13 +228,29 @@ void LvovPpi8255Circuit1::setPortC(uint8_t value)
     if (m_beepSoundSource)
         m_beepSoundSource->setValue(m_pc0 || !m_pb7);
 
+    bool newStrobe = value & 0x04;
+    if (m_printerStrobe && !newStrobe) {
+        g_emulation->getPrnWriter()->printByte(~m_printerData);
+        m_printerReady = false;
+    }
+    m_printerStrobe = newStrobe;
+
+
     m_addrSpaceMapper->setCurPage(value >> 1 & 1);
 }
 
 
 uint8_t LvovPpi8255Circuit1::getPortC()
 {
-    return g_emulation->getWavReader()->getCurValue() ? 0x10 : 0x00;
+    uint8_t printerReady = m_printerReady ? 0x40 : 0x00;
+    m_printerReady = true;
+    return (g_emulation->getWavReader()->getCurValue() ? 0x10 : 0x00) | printerReady;
+}
+
+
+void LvovPpi8255Circuit1::setPortA(uint8_t value)
+{
+    m_printerData = value;
 }
 
 

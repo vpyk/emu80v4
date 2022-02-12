@@ -135,11 +135,9 @@ class LvovPpi8255Circuit1 : public Ppi8255Circuit
 
         // derived from Ppi8255Circuit
         uint8_t getPortC() override;
+        void setPortA(uint8_t value) override;
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
-
-        // attach Lvov keyboard
-        //void attachSpecKeyboard(LvovKeyboard* kbd);
 
         // attach LvovRenderer
         void attachRenderer(LvovRenderer* renderer) {m_renderer = renderer;}
@@ -161,6 +159,10 @@ class LvovPpi8255Circuit1 : public Ppi8255Circuit
         // sound related bits
         bool m_pb7 = false;
         bool m_pc0 = false;
+
+        uint8_t m_printerData = 0;
+        bool m_printerStrobe = true;
+        bool m_printerReady = true;
 
         // address space mapper to switch memory pages
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;

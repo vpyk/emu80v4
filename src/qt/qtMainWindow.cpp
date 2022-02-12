@@ -1223,7 +1223,7 @@ void MainWindow::tuneMenu()
                                  platformGroup == "mikro80" || platformGroup == "ut88" ||
                                  platformGroup == "korvet");
 
-    m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000");
+    m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "lvov");
 
     m_loadAction->setVisible(platformGroup != "korvet");
     m_loadRunAction->setVisible(platformGroup != "korvet");
