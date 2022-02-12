@@ -32,5 +32,9 @@
         <file>icons/printer.png</file>
         <file>icons/disk_a_off.png</file>
         <file>icons/disk_b_off.png</file>
+        <file>icons/disk_c.png</file>
+        <file>icons/disk_c_off.png</file>
+        <file>icons/disk_d.png</file>
+        <file>icons/disk_d_off.png</file>
     </qresource>
 </RCC>

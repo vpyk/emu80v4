@@ -440,6 +440,10 @@ void KorvetPpi8255Circuit::setPortB(uint8_t value)
         m_fdc->setDrive(0);
     else if (value & 2)
         m_fdc->setDrive(1);
+    else if (value & 4)
+        m_fdc->setDrive(2);
+    else if (value & 8)
+        m_fdc->setDrive(3);
     m_fdc->setHead((value & 0x10) >> 4);
     //m_fdc->setHead(((value & 0x10) >> 4) ^ 1);
     if (value & 0x20 && !m_motorBit)

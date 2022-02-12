@@ -45,7 +45,7 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
             case PK_W:
                 return SR_LOADWAV;
             case PK_D:
-                return SR_DEBUG;
+                return isShiftPressed ? SR_DISKD : SR_DEBUG;
             case PK_X:
                 return SR_EXIT;
             case PK_Q:
@@ -59,7 +59,7 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
             case PK_V:
                 return SR_CROPTOVISIBLE;
             case PK_C:
-                return SR_COLOR;
+                return isShiftPressed ? SR_DISKC : SR_COLOR;
             case PK_A:
                 return SR_DISKA;
             case PK_B:

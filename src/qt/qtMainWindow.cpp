@@ -431,8 +431,82 @@ void MainWindow::createActions()
         connect(m_fddBLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onDiskBLastFiles()));
     }
 
+    // Select disk C
+    m_diskCMenu = new QMenu(tr("Disk C"));
+    m_diskCMenu->setIcon(m_diskCOffIcon);
+
+    m_diskCAction = new QAction(tr("Select disk C image..."), this);
+    m_diskCMenuAction = m_diskCMenu->menuAction();
+    m_diskCMenuAction->setToolTip(tr("Load disk C image (Shift-Alt-C)"));
+    QList<QKeySequence> diskCKeysList;
+    ADD_HOTKEY(diskCKeysList, Qt::Key_Shift + Qt::Key_C);
+    m_diskCAction->setShortcuts(diskCKeysList);
+    addAction(m_diskCAction);
+    m_diskCMenu->addAction(m_diskCAction);
+    m_toolBar->addAction(m_diskCMenuAction);
+    connect(m_diskCAction, SIGNAL(triggered()), this, SLOT(onDiskC()));
+    connect(m_diskCMenuAction, SIGNAL(triggered()), this, SLOT(onDiskC()));
+
+    m_diskCUnmountAction = new QAction(tr("Unmount"), this);
+    m_diskCMenu->addAction(m_diskCUnmountAction);
+    m_diskCMenu->addSeparator();
+    m_diskCReadOnlyAction = new QAction(tr("Read only"), this);
+    m_diskCReadOnlyAction->setCheckable(true);
+    m_diskCMenu->addAction(m_diskCReadOnlyAction);
+    m_diskCAutoMountAction = new QAction(tr("Auto mount on startup"), this);
+    m_diskCAutoMountAction->setCheckable(true);
+    m_diskCMenu->addAction(m_diskCAutoMountAction);
+    connect(m_diskCUnmountAction, SIGNAL(triggered()), this, SLOT(onUnmountDiskC()));
+    connect(m_diskCReadOnlyAction, SIGNAL(triggered()), this, SLOT(onReadOnlyDiskC()));
+    connect(m_diskCAutoMountAction, SIGNAL(triggered()), this, SLOT(onAutoMountDiskC()));
+
+    m_diskCMenu->addSeparator();
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_fddCLastFilesActions[i] = new QAction(this);
+        m_diskCMenu->addAction(m_fddCLastFilesActions[i]);
+        connect(m_fddCLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onDiskCLastFiles()));
+    }
+
+    // Select disk D
+    m_diskDMenu = new QMenu(tr("Disk D"));
+    m_diskDMenu->setIcon(m_diskDOffIcon);
+
+    m_diskDAction = new QAction(tr("Select disk D image..."), this);
+    m_diskDMenuAction = m_diskDMenu->menuAction();
+    m_diskDMenuAction->setToolTip(tr("Load disk D image (Shift-Alt-D)"));
+    QList<QKeySequence> diskDKeysList;
+    ADD_HOTKEY(diskDKeysList, Qt::Key_Shift + Qt::Key_D);
+    m_diskDAction->setShortcuts(diskDKeysList);
+    addAction(m_diskDAction);
+    m_diskDMenu->addAction(m_diskDAction);
+    m_toolBar->addAction(m_diskDMenuAction);
+    connect(m_diskDAction, SIGNAL(triggered()), this, SLOT(onDiskD()));
+    connect(m_diskDMenuAction, SIGNAL(triggered()), this, SLOT(onDiskD()));
+
+    m_diskDUnmountAction = new QAction(tr("Unmount"), this);
+    m_diskDMenu->addAction(m_diskDUnmountAction);
+    m_diskDMenu->addSeparator();
+    m_diskDReadOnlyAction = new QAction(tr("Read only"), this);
+    m_diskDReadOnlyAction->setCheckable(true);
+    m_diskDMenu->addAction(m_diskDReadOnlyAction);
+    m_diskDAutoMountAction = new QAction(tr("Auto mount on startup"), this);
+    m_diskDAutoMountAction->setCheckable(true);
+    m_diskDMenu->addAction(m_diskDAutoMountAction);
+    connect(m_diskDUnmountAction, SIGNAL(triggered()), this, SLOT(onUnmountDiskD()));
+    connect(m_diskDReadOnlyAction, SIGNAL(triggered()), this, SLOT(onReadOnlyDiskD()));
+    connect(m_diskDAutoMountAction, SIGNAL(triggered()), this, SLOT(onAutoMountDiskD()));
+
+    m_diskDMenu->addSeparator();
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_fddDLastFilesActions[i] = new QAction(this);
+        m_diskDMenu->addAction(m_fddDLastFilesActions[i]);
+        connect(m_fddDLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onDiskDLastFiles()));
+    }
+
     fileMenu->addMenu(m_diskAMenu);
     fileMenu->addMenu(m_diskBMenu);
+    fileMenu->addMenu(m_diskCMenu);
+    fileMenu->addMenu(m_diskDMenu);
 
     m_menuDiskSeparator = fileMenu->addSeparator();
 
@@ -1965,6 +2039,94 @@ void MainWindow::onAutoMountDiskB()
 }
 
 
+void MainWindow::onDiskC()
+{
+    emuSysReq(m_palWindow, SR_DISKC);
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskC", "fileName").c_str());
+    m_fddLastFiles.addToLastFiles(lastFileName);
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onUnmountDiskC()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskC", "fileName", "");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onReadOnlyDiskC()
+{
+    bool readOnly = m_diskCReadOnlyAction->isChecked();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskC", "readOnly", readOnly ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onDiskCLastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskC", "fileName", action->text().toStdString());
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onAutoMountDiskC()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskC", "autoMount", m_diskCAutoMountAction->isChecked() ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onDiskD()
+{
+    emuSysReq(m_palWindow, SR_DISKD);
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskD", "fileName").c_str());
+    m_fddLastFiles.addToLastFiles(lastFileName);
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onUnmountDiskD()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskD", "fileName", "");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onReadOnlyDiskD()
+{
+    bool readOnly = m_diskDReadOnlyAction->isChecked();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskD", "readOnly", readOnly ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onDiskDLastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskD", "fileName", action->text().toStdString());
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onAutoMountDiskD()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskD", "autoMount", m_diskDAutoMountAction->isChecked() ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onCrop()
 {
     emuSysReq(m_palWindow, SR_CROPTOVISIBLE);
@@ -2209,7 +2371,49 @@ void MainWindow::updateActions()
     val = emuGetPropertyValue(platform + "diskB", "autoMount");
     m_diskBAutoMountAction->setChecked(val == "yes");
 
-    bool disksVisible = m_diskAMenuAction->isVisible() || m_diskBMenuAction->isVisible();
+    val = emuGetPropertyValue(platform + "diskC", "label");
+    m_diskCMenuAction->setVisible(!val.empty());
+    m_diskCAction->setVisible(!val.empty()); // turn off shortcut
+    if (!val.empty()) {
+        QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskC", "fileName").c_str());
+        if (qFileName.isEmpty()) {
+            m_diskCUnmountAction->setEnabled(false);
+            m_diskCUnmountAction->setText(tr("Unmount"));
+            m_diskCMenuAction->setIcon(m_diskCOffIcon);
+        } else {
+            m_diskCUnmountAction->setEnabled(true);
+            qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+            m_diskCUnmountAction->setText(tr("Unmount ") + " " + qFileName);
+            m_diskCMenuAction->setIcon(m_diskCOnIcon);
+        }
+    }
+    val = emuGetPropertyValue(platform + "diskC", "readOnly");
+    m_diskCReadOnlyAction->setChecked(val == "yes");
+    val = emuGetPropertyValue(platform + "diskC", "autoMount");
+    m_diskCAutoMountAction->setChecked(val == "yes");
+
+    val = emuGetPropertyValue(platform + "diskD", "label");
+    m_diskDMenuAction->setVisible(!val.empty());
+    m_diskDAction->setVisible(!val.empty()); // turn off shortcut
+    if (!val.empty()) {
+        QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskD", "fileName").c_str());
+        if (qFileName.isEmpty()) {
+            m_diskDUnmountAction->setEnabled(false);
+            m_diskDUnmountAction->setText(tr("Unmount"));
+            m_diskDMenuAction->setIcon(m_diskDOffIcon);
+        } else {
+            m_diskDUnmountAction->setEnabled(true);
+            qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+            m_diskDUnmountAction->setText(tr("Unmount ") + " " + qFileName);
+            m_diskDMenuAction->setIcon(m_diskDOnIcon);
+        }
+    }
+    val = emuGetPropertyValue(platform + "diskD", "readOnly");
+    m_diskDReadOnlyAction->setChecked(val == "yes");
+    val = emuGetPropertyValue(platform + "diskD", "autoMount");
+    m_diskDAutoMountAction->setChecked(val == "yes");
+
+    bool disksVisible = m_diskAMenuAction->isVisible() || m_diskBMenuAction->isVisible() || m_diskCMenuAction->isVisible() || m_diskDMenuAction->isVisible();
     m_menuDiskSeparator->setVisible(disksVisible);
     m_toolbarDiskSeparator->setVisible(disksVisible);
 
@@ -2316,6 +2520,8 @@ void MainWindow::updateLastFiles()
 {
     m_fddLastFiles.tuneActions(m_fddALastFilesActions);
     m_fddLastFiles.tuneActions(m_fddBLastFilesActions);
+    m_fddLastFiles.tuneActions(m_fddCLastFilesActions);
+    m_fddLastFiles.tuneActions(m_fddDLastFilesActions);
 }
 
 // LastFileList implementation

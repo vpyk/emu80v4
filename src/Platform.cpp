@@ -92,6 +92,10 @@ Platform::Platform(string configFileName, string name)
                 m_diskA = img;
             else if (img->getLabel() == "B")
                 m_diskB = img;
+            else if (img->getLabel() == "C")
+                m_diskC = img;
+            else if (img->getLabel() == "D")
+                m_diskD = img;
         }
 
     // ищем объект - загрузчик, должен быть единственным
@@ -234,6 +238,16 @@ void Platform::sysReq(SysReq sr)
             // open disk B image
             if (m_diskB)
                 m_diskB->chooseFile();
+            break;
+        case SR_DISKC:
+            // open floppy disk C image
+            if (m_diskC)
+                m_diskC->chooseFile();
+            break;
+        case SR_DISKD:
+            // open floppy disk D image
+            if (m_diskD)
+                m_diskD->chooseFile();
             break;
         case SR_LOAD:
             if (m_loader) {

@@ -129,6 +129,16 @@ private slots:
     void onReadOnlyDiskB();
     void onDiskBLastFiles();
     void onAutoMountDiskB();
+    void onDiskC();
+    void onUnmountDiskC();
+    void onReadOnlyDiskC();
+    void onDiskCLastFiles();
+    void onAutoMountDiskC();
+    void onDiskD();
+    void onUnmountDiskD();
+    void onReadOnlyDiskD();
+    void onDiskDLastFiles();
+    void onAutoMountDiskD();
     void onCrop();
     void onAspect();
     void onWideScreen();
@@ -199,11 +209,17 @@ private:
     QIcon m_diskAOffIcon = QIcon(":/icons/disk_a_off.png");
     QIcon m_diskBOnIcon = QIcon(":/icons/disk_b.png");
     QIcon m_diskBOffIcon = QIcon(":/icons/disk_b_off.png");
+    QIcon m_diskCOnIcon = QIcon(":/icons/disk_c.png");
+    QIcon m_diskCOffIcon = QIcon(":/icons/disk_c_off.png");
+    QIcon m_diskDOnIcon = QIcon(":/icons/disk_d.png");
+    QIcon m_diskDOffIcon = QIcon(":/icons/disk_d_off.png");
 
     QMenu* m_colorModeMenu = nullptr;
     QMenu* m_platformListMenu = nullptr;
     QMenu* m_diskAMenu = nullptr;
     QMenu* m_diskBMenu = nullptr;
+    QMenu* m_diskCMenu = nullptr;
+    QMenu* m_diskDMenu = nullptr;
 
     QMenuBar* m_menuBar = nullptr;
     QToolBar* m_toolBar = nullptr;
@@ -225,6 +241,16 @@ private:
     QAction* m_diskBUnmountAction;
     QAction* m_diskBReadOnlyAction;
     QAction* m_diskBAutoMountAction;
+    QAction* m_diskCAction;
+    QAction* m_diskCMenuAction;
+    QAction* m_diskCUnmountAction;
+    QAction* m_diskCReadOnlyAction;
+    QAction* m_diskCAutoMountAction;
+    QAction* m_diskDAction;
+    QAction* m_diskDMenuAction;
+    QAction* m_diskDUnmountAction;
+    QAction* m_diskDReadOnlyAction;
+    QAction* m_diskDAutoMountAction;
     QAction* m_loadRamDiskAction;
     QAction* m_saveRamDiskAction;
     QAction* m_menuDiskSeparator;
@@ -279,6 +305,8 @@ private:
 
     QAction* m_fddALastFilesActions[LAST_FILES_QTY];
     QAction* m_fddBLastFilesActions[LAST_FILES_QTY];
+    QAction* m_fddCLastFilesActions[LAST_FILES_QTY];
+    QAction* m_fddDLastFilesActions[LAST_FILES_QTY];
 };
 
 

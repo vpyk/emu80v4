@@ -101,6 +101,8 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-K\t– «Умная» раскладка\n"
         "Alt-A\t– выбор диска A\n"
         "Alt-B\t– выбор диска B\n"
+        "Alt-Shift-C\t– выбор диска 3(C)\n"
+        "Alt-Shift-D\t– выбор диска 4(D)\n"
         "Alt-E\t– выбор электронного диска"
         ;
 

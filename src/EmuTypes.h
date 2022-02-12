@@ -59,6 +59,8 @@ enum SysReq
     SR_SMART,
     SR_DISKA,
     SR_DISKB,
+    SR_DISKC,
+    SR_DISKD,
     SR_FONT,
     SR_COLOR,
     SR_1X,

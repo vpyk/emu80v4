@@ -87,6 +87,8 @@ class Platform : public ParentObject
         CrtRenderer* m_renderer = nullptr;
         FdImage* m_diskA = nullptr;
         FdImage* m_diskB = nullptr;
+        FdImage* m_diskC = nullptr;
+        FdImage* m_diskD = nullptr;
         FileLoader* m_loader = nullptr;
         Keyboard* m_keyboard = nullptr;
         RamDisk* m_ramDisk = nullptr;
