@@ -983,9 +983,23 @@ void SettingsDialog::saveStoredConfig()
 void SettingsDialog::resetPlatformOptions()
 {
     QSettings settings;
+
     settings.beginGroup(m_platformGroup);
     settings.remove("");
     settings.endGroup();
+
+    settings.beginGroup("last_files");
+    settings.beginGroup(m_platformGroup);
+    settings.remove("");
+    settings.endGroup();
+    settings.endGroup();
+
+    settings.beginGroup("dirs");
+    settings.beginGroup(m_platformGroup);
+    settings.remove("");
+    settings.endGroup();
+    settings.endGroup();
+
     settings.sync();
 
     m_options.clear();
