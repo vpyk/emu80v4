@@ -191,6 +191,10 @@ std::string MainWindow::getPlatformGroupName()
 
 void MainWindow::setClientSize(int width, int height)
 {
+    // minimum window size
+    if (width != 0 && width < 100) width = 100;
+    if (height != 0 && height < 75) height = 75;
+
     m_clientWidth = width;
     m_clientHeight = height;
 

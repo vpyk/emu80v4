@@ -80,7 +80,8 @@ void PalWindow::applyParams()
             recreateRenderer();
 
         if (m_params.width != m_prevParams.width || m_params.height != m_prevParams.height)
-            SDL_SetWindowSize(m_window, m_params.width, m_params.height);
+            SDL_SetWindowSize(m_window, m_params.width  != 0 && m_params.width > 100 ? m_params.width : 100,
+                                        m_params.height != 0 && m_params.height > 75 ? m_params.height : 75);
     }
 
     //if (m_params.antialiasing != m_prevParams.antialiasing)
