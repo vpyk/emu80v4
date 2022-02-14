@@ -92,7 +92,17 @@ void FdImage::chooseFile()
 
 void FdImage::setWriteProtection(bool isWriteProtected)
 {
+    bool reopen = m_file.isOpen() && (m_isWriteProtected != isWriteProtected);
+
     m_isWriteProtected = isWriteProtected;
+
+    if (reopen) {
+        int pos = m_file.getPos();
+        m_file.close();
+        assignFileName(m_fileName);
+        if (m_file.isOpen())
+            m_file.seek(pos);
+    }
 }
 
 
