@@ -499,7 +499,7 @@ void KorvetPpi8255Circuit2::setPortA(uint8_t value)
 
 void KorvetPpi8255Circuit2::setPortC(uint8_t value)
 {
-    const int c_covoxValues[4] = {0, 7, 7, 15};
+    const int c_covoxValues[4] = {-7, 0, 0, 7};
     m_covox->setValue(c_covoxValues[value & 3]);
     m_pitSoundSource->setGate(value & 8);
 
