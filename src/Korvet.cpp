@@ -822,7 +822,7 @@ EmuKey KorvetKbdLayout::translateKey(PalKeyCode keyCode)
         return EK_FIX;
     case PK_F12:
         return EK_STOP;
-    case PK_F11:
+    case PK_F9:
         return EK_SEL;
     case PK_KP_MUL:
         return EK_INS;
