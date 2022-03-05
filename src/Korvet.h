@@ -153,7 +153,7 @@ class KorvetTextAdapter : public AddressableDevice
 
     private:
         int m_attrMask = 0;
-        bool m_curAttr = false;
+        uint8_t m_curAttr = 0;
         uint8_t* m_symbols;
         uint8_t* m_attrs; // 0xFF if inverted else 0
 };
