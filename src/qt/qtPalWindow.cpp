@@ -98,7 +98,7 @@ void PalWindow::applyParams()
         switch (m_params.style) {
         case PWS_SIZABLE:
             m_qtWindow->setClientSize(0, 0);
-            m_qtWindow->adjustClientSize();
+            //m_qtWindow->adjustClientSize();
             break;
         case PWS_FIXED:
             m_qtWindow->setClientSize(m_params.width, m_params.height);
