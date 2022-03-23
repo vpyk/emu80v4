@@ -43,7 +43,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void screenshot(const QString& ssFileName);
         void setHideCursor(bool hide);
 
-        void setAntialiasing(bool aa) {m_antialiasing = aa;}
+        void setSmoothing(SmoothingType smoothing) {m_smoothing = smoothing;}
         //void setVsync(bool vsync);
 
         int getImageWidth() {return m_dstRect.width();}
@@ -76,7 +76,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         QColor m_fillColor = Qt::black;
         QRect m_dstRect;
 
-        bool m_antialiasing = false;
+        SmoothingType m_smoothing = ST_SHARP;
 
         bool m_hideCursor = true;
         QTimer m_hideCursorTimer;

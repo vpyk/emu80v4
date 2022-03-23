@@ -30,8 +30,8 @@ window.frameScale = 2x
 # Window fields mixing: none, mix, interlace, scanline (default = none)
 #window.fieldsMixing = mix
 
-# Image antialiasing (default = no)
-window.antialiasing = no
+# Image smoothing (default = sharp)
+window.smoothing = sharp
 
 # Aspect correction (default = no)
 window.aspectCorrection = no
@@ -262,11 +262,12 @@ cropSelector.addItem = no, "Нет"
 cropSelector.addItem = yes, "Да"
 configTab.addControl = 1, &cropSelector
 
-#window.antialiasing
-ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
-aaSelector.addItem = no, "Выкл."
-aaSelector.addItem = yes, "Вкл."
-configTab.addControl = 1, &aaSelector
+#window.smoothing
+ConfigRadioSelector smSelector = &window, smoothing, "Сглаживание"
+smSelector.addItem = nearest, "Выкл."
+smSelector.addItem = bilinear, "Билинейное"
+smSelector.addItem = sharp, "Границы пикселей (рекомендуется)"
+configTab.addControl = 1, &smSelector
 
 #kayboard.matrix
 ConfigRadioSelector kbdSelector = &keyboard, matrix, "Тип клавиатуры"

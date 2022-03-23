@@ -24,7 +24,7 @@ using namespace std;
 PalWindow::PalWindow()
 {
     m_params.style = m_prevParams.style = PWS_FIXED;
-    m_params.antialiasing = m_prevParams.antialiasing = false;
+    m_params.smoothing = m_prevParams.smoothing = ST_SHARP;
     m_params.width = m_prevParams.width = 800;
     m_params.height = m_prevParams.height = 600;
     m_params.visible = m_prevParams.visible = false;
@@ -85,9 +85,6 @@ void PalWindow::applyParams()
                                         m_params.height != 0 && m_params.height > 75 ? m_params.height : 75);
     }
 
-    //if (m_params.antialiasing != m_prevParams.antialiasing)
-        //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, m_params.antialiasing ? "2" : "0");
-
     if (m_params.visible != m_prevParams.visible)
         m_params.visible ? SDL_ShowWindow(m_window) : SDL_HideWindow(m_window);
 
@@ -97,7 +94,7 @@ void PalWindow::applyParams()
     m_prevParams.style = m_params.style;
     m_prevParams.title = m_params.title;
     m_prevParams.visible = m_params.visible;
-    m_prevParams.antialiasing = m_params.antialiasing;
+    m_prevParams.smoothing = m_params.smoothing;
     m_prevParams.vsync = m_params.vsync;
     if (m_params.style != PWS_FULLSCREEN) {
         m_prevParams.width = m_params.width;
@@ -241,7 +238,7 @@ void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, dou
     if (!blend && !useAlpha)
         calcDstRect(imageWidth, imageHeight, aspectRatio, width, height, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
 
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, m_params.antialiasing ? "2" : "0");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, m_params.smoothing != ST_NEAREST ? "2" : "0");
 
     SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(pixels, imageWidth, imageHeight,
                                                     32, imageWidth * 4, 0x00FF0000, 0x0000FF00, 0x000000FF, useAlpha ? 0xFF000000 : 0);
@@ -286,7 +283,7 @@ void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, d
     glViewport(0, 0, outWidth, outHeight);
 
     int sharpLocation = glGetUniformLocation(m_program, "sharp");
-    glUniform1i(sharpLocation, m_params.antialiasing);
+    glUniform1i(sharpLocation, m_params.smoothing == ST_SHARP);
 
     int texSizeLocation = glGetUniformLocation(m_program, "textureSize");
     glUniform2f(texSizeLocation, float(imageWidth), float(imageHeight));
@@ -302,8 +299,8 @@ void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, d
 
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_params.antialiasing ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_params.antialiasing ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_params.smoothing == ST_NEAREST ? GL_NEAREST : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_params.smoothing == ST_NEAREST ? GL_NEAREST : GL_LINEAR);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
 

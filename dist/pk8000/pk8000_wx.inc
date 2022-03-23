@@ -40,11 +40,12 @@ mixSelector.addItem = interlace, "Чередование"
 mixSelector.addItem = scanline, "Имитация линий растра"
 configTab.addControl = 1, &mixSelector
 
-#window.antialiasing
-ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
-aaSelector.addItem = no, "Выкл."
-aaSelector.addItem = yes, "Вкл."
-configTab.addControl = 2, &aaSelector
+#window.smoothing
+ConfigRadioSelector smSelector = &window, smoothing, "Сглаживание"
+smSelector.addItem = nearest, "Выкл."
+smSelector.addItem = bilinear, "Билинейное"
+smSelector.addItem = sharp, "Границы пикселей (рекомендуется)"
+configTab.addControl = 2, &smSelector
 
 #window.aspectCorrection
 ConfigRadioSelector arSelector = &window, aspectCorrection, "Учитывать Aspect Ratio"

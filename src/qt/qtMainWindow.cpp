@@ -868,16 +868,41 @@ void MainWindow::createActions()
     settingsMenu->addAction(m_wideScreenAction);
 
     // Smoothing
-    m_smoothingAction = new QAction(QIcon(":/icons/smooth.png"), tr("Smoothing"), this);
-    m_smoothingAction->setCheckable(true);
-    m_smoothingAction->setToolTip(tr("Smoothing (Alt-S)"));
-    QList<QKeySequence> smoothingKeysList;
-    ADD_HOTKEY(smoothingKeysList, Qt::Key_S);
-    //smoothingKeysList.append(QKeySequence(Qt::ALT + Qt::Key_S));
-    //smoothingKeysList.append(QKeySequence(Qt::META + Qt::Key_S));
-    m_smoothingAction->setShortcuts(smoothingKeysList);
+    m_smoothingMenu = new QMenu(tr("Smoothing"), this);
+    QActionGroup* smoothingGroup = new QActionGroup(m_smoothingMenu);
+
+    m_smoothingNearestAction = new QAction(m_smoothingNearestIcon, tr("Nearest"), this);
+    m_smoothingNearestAction->setCheckable(true);
+    m_smoothingNearestAction->setData("nearest");
+    m_smoothingMenu->addAction(m_smoothingNearestAction);
+    smoothingGroup->addAction(m_smoothingNearestAction);
+    connect(m_smoothingNearestAction, SIGNAL(triggered()), this, SLOT(onSmoothingSelect()));
+
+    m_smoothingSharpAction = new QAction(m_smoothingSharpIcon, tr("Sharp (pixel edges)"), this);
+    m_smoothingSharpAction->setCheckable(true);
+    m_smoothingSharpAction->setData("sharp");
+    m_smoothingMenu->addAction(m_smoothingSharpAction);
+    smoothingGroup->addAction(m_smoothingSharpAction);
+    connect(m_smoothingSharpAction, SIGNAL(triggered()), this, SLOT(onSmoothingSelect()));
+
+    m_smoothingBilinearAction = new QAction(m_smoothingBilinearIcon, tr("Bilinear"), this);
+    m_smoothingBilinearAction->setCheckable(true);
+    m_smoothingBilinearAction->setData("bilinear");
+    m_smoothingMenu->addAction(m_smoothingBilinearAction);
+    smoothingGroup->addAction(m_smoothingBilinearAction);
+    connect(m_smoothingBilinearAction, SIGNAL(triggered()), this, SLOT(onSmoothingSelect()));
+
+    m_smoothingMenu->setIcon(QIcon(":/icons/smooth.png"));
+    m_smoothingAction = m_smoothingMenu->menuAction();
+    m_smoothingAction->setToolTip(tr("Smoothing mode (Alt-S)"));
     addAction(m_smoothingAction);
     m_toolBar->addAction(m_smoothingAction);
+    settingsMenu->addAction(m_smoothingAction);
+
+    QList<QKeySequence> smoothingKeyList;
+    ADD_HOTKEY(smoothingKeyList, Qt::Key_S);
+    m_smoothingAction->setShortcuts(smoothingKeyList);
+
     settingsMenu->addAction(m_smoothingAction);
     connect(m_smoothingAction, SIGNAL(triggered()), this, SLOT(onSmoothing()));
 
@@ -2162,7 +2187,21 @@ void MainWindow::onFont()
 
 void MainWindow::onSmoothing()
 {
-    emuSysReq(m_palWindow, SR_ANTIALIASING);
+    emuSysReq(m_palWindow, SR_SMOOTHING);
+    saveConfig();
+}
+
+
+void MainWindow::onSmoothingSelect()
+{
+    if (!m_smoothingMenu)
+        return;
+
+    QAction* action = (QAction*)sender();
+    std::string smoothingMode(action->data().toString().toUtf8().constData());
+
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".window", "smoothing", smoothingMode);
+    updateConfig();
     saveConfig();
 }
 
@@ -2459,13 +2498,19 @@ void MainWindow::updateActions()
         m_wideScreenAction->setChecked(val == "yes");
     }
 
-    val = emuGetPropertyValue(platform + "window", "antialiasing");
-    if (val == "")
-        m_smoothingAction->setVisible(false);
-    else {
-        m_smoothingAction->setVisible(true);
-        m_smoothingAction->setChecked(val == "yes");
-    }
+    val = emuGetPropertyValue(platform + "window", "smoothing");
+    m_smoothingAction->setVisible(true);
+    if (val == "nearest") {
+        m_smoothingNearestAction->setChecked(true);
+        m_smoothingMenu->setIcon(m_smoothingNearestIcon);
+    } else if (val == "bilinear") {
+        m_smoothingBilinearAction->setChecked(true);
+        m_smoothingMenu->setIcon(m_smoothingBilinearIcon);
+    } else if (val == "sharp") {
+        m_smoothingSharpAction->setChecked(true);
+        m_smoothingMenu->setIcon(m_smoothingSharpIcon);
+    } else
+        m_smoothingMenu->setVisible(false);
 
     val = emuGetPropertyValue(platform + "tapeGrp", "enabled");
     if (val == "")

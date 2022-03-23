@@ -28,7 +28,7 @@ static MainWindow* qtWindow = nullptr;
 PalWindow::PalWindow()
 {
     m_params.style = m_prevParams.style = PWS_SIZABLE;
-    m_params.antialiasing = m_prevParams.antialiasing = false;
+    m_params.smoothing = m_prevParams.smoothing = ST_SHARP;
     m_params.width = m_prevParams.width = 0;
     m_params.height = m_prevParams.height = 0;
     m_params.visible = m_prevParams.visible = false;
@@ -57,7 +57,7 @@ void PalWindow::initPalWindow()
 
         // default parameters
         m_qtWindow->setClientSize(0, 0);
-        m_qtWindow->getPaintWidget()->setAntialiasing(false);
+        m_qtWindow->getPaintWidget()->setSmoothing(ST_SHARP);
         m_qtWindow->setPalWindow(this);
     }
 }
@@ -112,8 +112,8 @@ void PalWindow::applyParams()
     if (m_params.title != m_prevParams.title)
         m_qtWindow->setWindowTitle(m_params.title.c_str());
 
-    if (m_params.antialiasing != m_prevParams.antialiasing)
-        m_qtWindow->getPaintWidget()->setAntialiasing(m_params.antialiasing);
+    if (m_params.smoothing != m_prevParams.smoothing)
+        m_qtWindow->getPaintWidget()->setSmoothing(m_params.smoothing);
 
     /*if (m_params.vsync != m_prevParams.vsync)
         m_qtWindow->getPaintWidget()->setVsync(m_params.vsync);*/
@@ -124,7 +124,7 @@ void PalWindow::applyParams()
     m_prevParams.style = m_params.style;
     m_prevParams.title = m_params.title;
     m_prevParams.visible = m_params.visible;
-    m_prevParams.antialiasing = m_params.antialiasing;
+    m_prevParams.smoothing = m_params.smoothing;
     //m_prevParams.vsync = m_params.vsync;
     if (m_params.style != PWS_FULLSCREEN) {
         m_prevParams.width = m_params.width;

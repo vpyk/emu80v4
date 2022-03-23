@@ -187,8 +187,6 @@ void PaintWidget::initializeGL()
     m_program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 2, sizeof(float) * 4);
     m_program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, sizeof(float) * 2, 2, sizeof(float) * 4);
 
-    //m_program->setUniformValue("sharp", m_antialiasing);
-
     delete vShader;
     delete fShader;
 }
@@ -199,22 +197,14 @@ void PaintWidget::paintImageGL(QImage* img, double aspectRatio)
     int dstWidth, dstHeight, dstX, dstY;
     static_cast<MainWindow*>(parent())->getPalWindow()->calcDstRect(img->width(), img->height(), aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
 
-    m_program->setUniformValue("sharp", m_antialiasing);
+    m_program->setUniformValue("sharp", m_smoothing == ST_SHARP);
     m_program->setUniformValue("textureSize", img->size());
     m_program->setUniformValue("destSize", QSize(dstWidth, dstHeight));
     //m_program->setUniformValue("destPos", m_dstRect.topLeft());
 
-    /*if (!m_texture) {
-        m_texture = new QOpenGLTexture(*img);
-        m_texture->setMagnificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
-        m_texture->setMinificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
-        m_texture->bind();
-    } else
-        m_texture->setData(*img, QOpenGLTexture::DontGenerateMipMaps);
-    m_texture->bind();*/
     QOpenGLTexture* texture = new QOpenGLTexture(*img, QOpenGLTexture::DontGenerateMipMaps);
-    texture->setMagnificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
-    texture->setMinificationFilter(m_antialiasing ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
+    texture->setMagnificationFilter(m_smoothing != ST_NEAREST ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
+    texture->setMinificationFilter(m_smoothing != ST_NEAREST ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
     texture->bind();
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

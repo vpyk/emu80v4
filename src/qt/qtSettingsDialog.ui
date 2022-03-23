@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>585</width>
-    <height>516</height>
+    <height>563</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -96,10 +96,14 @@
          <property name="title">
           <string>Video</string>
          </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::ExpandingFieldsGrow</enum>
-          </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="frLabel">
+            <property name="text">
+             <string>Maximum FPS* :</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
@@ -142,14 +146,14 @@
             </item>
            </layout>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
              <string notr="true">V-Sync*:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QCheckBox" name="vsyncCheckBox">
             <property name="enabled">
              <bool>true</bool>
@@ -162,13 +166,6 @@
             </property>
             <property name="text">
              <string>Enable</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="frLabel">
-            <property name="text">
-             <string>Maximum FPS* :</string>
             </property>
            </widget>
           </item>
@@ -717,136 +714,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="smoothCheckBox">
-         <property name="text">
-          <string>Smoothing</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="aspectCheckBox">
-         <property name="text">
-          <string>Original aspect ratio</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <item>
-          <spacer name="horizontalSpacer_10">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="wideLabel">
-           <property name="text">
-            <string>Screen format:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="wideComboBox">
-           <item>
-            <property name="text">
-             <string notr="true">4:3</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string notr="true">16:9</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Custom</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_9">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_11">
-         <item>
-          <spacer name="horizontalSpacer_11">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Custom format:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="customFormatLineEdit">
-           <property name="inputMask">
-            <string notr="true">0.000</string>
-           </property>
-           <property name="text">
-            <string notr="true">1.666</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_12">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="cropCheckBox">
-         <property name="text">
-          <string>Show visible area</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1094,11 +961,164 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="smoothingGroupBox">
+         <property name="title">
+          <string>Smoothing</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <item>
+           <widget class="QRadioButton" name="smoothingNearestRadioButton">
+            <property name="text">
+             <string>Nearest</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="smoothingSharpRadioButton">
+            <property name="text">
+             <string>Sharp (smooth pixel edges)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="smoothingBilinearRadioButton">
+            <property name="text">
+             <string>Bilinear</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="altFontCheckBox">
          <property name="text">
           <string>Alternate font (8×16, 8×12, 8×8)</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cropCheckBox">
+         <property name="text">
+          <string>Show visible area</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="aspectCheckBox">
+         <property name="text">
+          <string>Original aspect ratio</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <item>
+          <spacer name="horizontalSpacer_15">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="wideLabel">
+           <property name="text">
+            <string>Screen format:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="wideComboBox">
+           <item>
+            <property name="text">
+             <string notr="true">4:3</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">16:9</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Custom</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_16">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <item>
+          <spacer name="horizontalSpacer_13">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Custom format:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="customFormatLineEdit">
+           <property name="inputMask">
+            <string notr="true">0.000</string>
+           </property>
+           <property name="text">
+            <string notr="true">1.666</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_14">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <spacer name="verticalSpacer_6">
@@ -1489,11 +1509,6 @@
   <tabstop>stretchRadioButton</tabstop>
   <tabstop>stretchPropRadioButton</tabstop>
   <tabstop>stretchPropIntRadioButton</tabstop>
-  <tabstop>smoothCheckBox</tabstop>
-  <tabstop>aspectCheckBox</tabstop>
-  <tabstop>wideComboBox</tabstop>
-  <tabstop>customFormatLineEdit</tabstop>
-  <tabstop>cropCheckBox</tabstop>
   <tabstop>debugHltCheckBox</tabstop>
   <tabstop>debugIllegalCheckBox</tabstop>
   <tabstop>upper8080checkBox</tabstop>
@@ -1507,7 +1522,14 @@
   <tabstop>mixingMixRadioButton</tabstop>
   <tabstop>mixingInterlaceRadioButton</tabstop>
   <tabstop>mixingScanlineRadioButton</tabstop>
+  <tabstop>smoothingNearestRadioButton</tabstop>
+  <tabstop>smoothingSharpRadioButton</tabstop>
+  <tabstop>smoothingBilinearRadioButton</tabstop>
   <tabstop>altFontCheckBox</tabstop>
+  <tabstop>cropCheckBox</tabstop>
+  <tabstop>aspectCheckBox</tabstop>
+  <tabstop>wideComboBox</tabstop>
+  <tabstop>customFormatLineEdit</tabstop>
   <tabstop>wavChannelComboBox</tabstop>
   <tabstop>speedUpCheckBox</tabstop>
   <tabstop>speedUpSpinBox</tabstop>
@@ -1538,8 +1560,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>440</x>
-     <y>469</y>
+     <x>493</x>
+     <y>552</y>
     </hint>
     <hint type="destinationlabel">
      <x>543</x>

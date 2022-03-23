@@ -144,6 +144,7 @@ private slots:
     void onWideScreen();
     void onFont();
     void onSmoothing();
+    void onSmoothingSelect();
     void onPlatform();
     void onPlatformConfig();
     void onPlatformSelect();
@@ -205,17 +206,21 @@ private:
 
     SettingsDialog* m_settingsDialog = nullptr;
 
-    QIcon m_diskAOnIcon = QIcon(":/icons/disk_a.png");
-    QIcon m_diskAOffIcon = QIcon(":/icons/disk_a_off.png");
-    QIcon m_diskBOnIcon = QIcon(":/icons/disk_b.png");
-    QIcon m_diskBOffIcon = QIcon(":/icons/disk_b_off.png");
-    QIcon m_diskCOnIcon = QIcon(":/icons/disk_c.png");
-    QIcon m_diskCOffIcon = QIcon(":/icons/disk_c_off.png");
-    QIcon m_diskDOnIcon = QIcon(":/icons/disk_d.png");
-    QIcon m_diskDOffIcon = QIcon(":/icons/disk_d_off.png");
+    QIcon m_diskAOnIcon             = QIcon(":/icons/disk_a.png");
+    QIcon m_diskAOffIcon            = QIcon(":/icons/disk_a_off.png");
+    QIcon m_diskBOnIcon             = QIcon(":/icons/disk_b.png");
+    QIcon m_diskBOffIcon            = QIcon(":/icons/disk_b_off.png");
+    QIcon m_diskCOnIcon             = QIcon(":/icons/disk_c.png");
+    QIcon m_diskCOffIcon            = QIcon(":/icons/disk_c_off.png");
+    QIcon m_diskDOnIcon             = QIcon(":/icons/disk_d.png");
+    QIcon m_diskDOffIcon            = QIcon(":/icons/disk_d_off.png");
+    QIcon m_smoothingNearestIcon    = QIcon(":/icons/sm_nearest.png");
+    QIcon m_smoothingBilinearIcon   = QIcon(":/icons/sm_bilinear.png");
+    QIcon m_smoothingSharpIcon      = QIcon(":/icons/sm_sharp.png");
 
     QMenu* m_colorModeMenu = nullptr;
     QMenu* m_platformListMenu = nullptr;
+    QMenu* m_smoothingMenu = nullptr;
     QMenu* m_diskAMenu = nullptr;
     QMenu* m_diskBMenu = nullptr;
     QMenu* m_diskCMenu = nullptr;
@@ -283,6 +288,9 @@ private:
     QAction* m_fullscreenAction;
     QAction* m_fullwindowAction;
     QAction* m_smoothingAction;
+    QAction* m_smoothingNearestAction;
+    QAction* m_smoothingBilinearAction;
+    QAction* m_smoothingSharpAction;
     QAction* m_preset1xAction;
     QAction* m_preset2xAction;
     QAction* m_preset3xAction;

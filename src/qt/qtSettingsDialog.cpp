@@ -136,7 +136,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("emulation.debugSwapF5F9");
     loadRunningConfigValue("window.windowStyle");
     loadRunningConfigValue("window.frameScale");
-    loadRunningConfigValue("window.antialiasing");
+    loadRunningConfigValue("window.smoothing");
     loadRunningConfigValue("window.aspectCorrection");
     loadRunningConfigValue("window.wideScreen");
     loadRunningConfigValue("window.customScreenFormat");
@@ -327,8 +327,10 @@ void SettingsDialog::fillControlValues()
     }
 
     // Smoothing
-    val = m_options["window.antialiasing"];
-    ui->smoothCheckBox->setChecked(val == "yes");
+    val = m_options["window.smoothing"];
+    ui->smoothingNearestRadioButton->setChecked(val == "nearest");
+    ui->smoothingSharpRadioButton->setChecked(val == "sharp");
+    ui->smoothingBilinearRadioButton->setChecked(val == "bilinear");
 
     // Aspect ratio
     val = m_options["window.aspectCorrection"];
@@ -487,26 +489,26 @@ void SettingsDialog::on_presetComboBox_currentIndexChanged(int index)
         ui->autoSizeRadioButton->setChecked(true);
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(index - 1);
-        ui->smoothCheckBox->setChecked(false);
+        ui->smoothingNearestRadioButton->setChecked(true);
         ui->aspectCheckBox->setChecked(false);
         break;
     case 9:
         ui->fixedSizeRadioButton->setChecked(true);
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(1);
-        ui->smoothCheckBox->setChecked(false);
+        ui->smoothingNearestRadioButton->setChecked(true);
         ui->aspectCheckBox->setChecked(false);
         break;
     case 10:
         ui->userSizeRadioButton->setChecked(true);
         ui->stretchRadioButton->setChecked(true);
-        ui->smoothCheckBox->setChecked(true);
+        ui->smoothingNearestRadioButton->setChecked(true);
         ui->aspectCheckBox->setChecked(true);
         break;
     case 11:
         ui->userSizeRadioButton->setChecked(true);
         ui->stretchPropRadioButton->setChecked(true);
-        ui->smoothCheckBox->setChecked(true);
+        ui->smoothingNearestRadioButton->setChecked(true);
         ui->aspectCheckBox->setChecked(true);
         break;
     }
@@ -532,65 +534,65 @@ void SettingsDialog::adjustPresetComboBoxState()
     if (ui->autoSizeRadioButton->isChecked() &&
             ui->fixedScaleRadioButton->isChecked() &&
             ui->fixedScaleComboBox->currentIndex() == 0 &&
-            !ui->smoothCheckBox->isChecked() &&
+            ui->smoothingNearestRadioButton->isChecked() &&
             !ui->aspectCheckBox->isChecked())
         ui->presetComboBox->setCurrentIndex(1);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 1 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(2);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 2 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(3);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 3 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(4);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 4 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(5);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 5 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(6);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 6 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(7);
     else if (ui->autoSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 7 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(8);
     else if (ui->fixedSizeRadioButton->isChecked() &&
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 1 &&
-             !ui->smoothCheckBox->isChecked() &&
+             ui->smoothingNearestRadioButton->isChecked() &&
              !ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(9);
     else if (ui->userSizeRadioButton->isChecked() &&
              ui->stretchRadioButton->isChecked() &&
-             ui->smoothCheckBox->isChecked() &&
+             !ui->smoothingNearestRadioButton->isChecked() &&
              ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(10);
     else if (ui->userSizeRadioButton->isChecked() &&
              ui->stretchPropRadioButton->isChecked() &&
-             ui->smoothCheckBox->isChecked() &&
+             !ui->smoothingNearestRadioButton->isChecked() &&
              ui->aspectCheckBox->isChecked())
          ui->presetComboBox->setCurrentIndex(11);
     else
@@ -648,13 +650,6 @@ void SettingsDialog::on_stretchPropIntRadioButton_toggled(bool checked)
 {
     if (checked)
         adjustPresetComboBoxState();
-}
-
-
-void SettingsDialog::on_smoothCheckBox_toggled(bool checked)
-{
-    Q_UNUSED(checked);
-    adjustPresetComboBoxState();
 }
 
 
@@ -801,7 +796,15 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "bestFit";
     m_options["window.frameScale"] = val;
 
-    m_options["window.antialiasing"] = ui->smoothCheckBox->isChecked() ? "yes" : "no";
+    val = "";
+    if (ui->smoothingNearestRadioButton->isChecked())
+        val = "nearest";
+    else if (ui->smoothingSharpRadioButton->isChecked())
+        val = "sharp";
+    else if (ui->smoothingBilinearRadioButton->isChecked())
+        val = "bilinear";
+    if (val != "")
+        m_options["window.smoothing"] = val;
 
 
     m_options["window.aspectCorrection"] = ui->aspectCheckBox->isChecked() ? "yes" : "no";
@@ -1062,4 +1065,22 @@ void SettingsDialog::onResetShowHelp()
     m_options["showHelp"] = "no";
     ui->showHelpCheckBox->setChecked(false);
     saveConfig();
+}
+
+void SettingsDialog::on_smoothingNearestRadioButton_toggled(bool checked)
+{
+    if (checked)
+        adjustPresetComboBoxState();
+}
+
+void SettingsDialog::on_smoothingSharpRadioButton_toggled(bool checked)
+{
+    if (checked)
+        adjustPresetComboBoxState();
+}
+
+void SettingsDialog::on_smoothingBilinearRadioButton_toggled(bool checked)
+{
+    if (checked)
+        adjustPresetComboBoxState();
 }

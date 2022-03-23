@@ -77,7 +77,7 @@ enum SysReq
     SR_CROPTOVISIBLE,
     SR_ASPECTCORRECTION,
     SR_WIDESCREEN,
-    SR_ANTIALIASING,
+    SR_SMOOTHING,
     SR_EXIT,
     SR_SPEEDUP,
     SR_SPEEDNORMAL,
@@ -101,6 +101,12 @@ enum EmuWindowType {
     EWT_UNDEFINED,
     EWT_EMULATION,
     EWT_DEBUG
+};
+
+enum SmoothingType {
+    ST_NEAREST,
+    ST_BILINEAR,
+    ST_SHARP
 };
 
 struct PlatformInfo

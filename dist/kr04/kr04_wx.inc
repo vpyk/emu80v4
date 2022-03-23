@@ -35,11 +35,12 @@ styleSelector.addItem = sizable, "Изменяемый пользователе�
 styleSelector.addItem = fixed, "Фиксированный"
 configTab.addControl = 1, &styleSelector
 
-#window.antialiasing
-ConfigRadioSelector aaSelector = &window, antialiasing, "Сглаживание"
-aaSelector.addItem = no, "Выкл."
-aaSelector.addItem = yes, "Вкл."
-configTab.addControl = 1, &aaSelector
+#window.smoothing
+ConfigRadioSelector smSelector = &window, smoothing, "Сглаживание"
+smSelector.addItem = nearest, "Выкл."
+smSelector.addItem = bilinear, "Билинейное"
+smSelector.addItem = sharp, "Границы пикселей (рекомендуется)"
+configTab.addControl = 1, &smSelector
 
 #window.aspectCorrection
 ConfigRadioSelector arSelector = &window, aspectCorrection, "Учитывать Aspect Ratio"

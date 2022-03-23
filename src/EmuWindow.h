@@ -86,7 +86,7 @@ class EmuWindow : public EmuObject, public PalWindow
         void setFrameScale(FrameScale fs);
         void setFieldsMixing(FieldsMixing fm);
         void setWindowStyle(WindowStyle ws);
-        void setAntialiasing(bool aal);
+        void setSmoothing(SmoothingType smoothing);
         void setFullScreen(bool fullscreen);
         void setAspectCorrection(bool aspectCorrection);
         void setWideScreen(bool wideScreen);
@@ -113,7 +113,6 @@ class EmuWindow : public EmuObject, public PalWindow
         int m_curWindowWidth;
         int m_curWindowHeight;
 
-        bool m_isAntialiased = false;
         bool m_isFullscreenMode = false;
         bool m_aspectCorrection = false;
         bool m_wideScreen = false;
@@ -125,6 +124,7 @@ class EmuWindow : public EmuObject, public PalWindow
         FrameScale m_frameScale = FS_BEST_FIT;
         FieldsMixing m_fieldsMixing = FM_NONE;
         WindowStyle m_windowStyle = WS_AUTOSIZE;
+        SmoothingType m_smoothing = ST_SHARP;
 
         int m_curImgWidth = 0;
         int m_curImgHeight = 0;

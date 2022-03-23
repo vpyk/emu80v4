@@ -89,7 +89,7 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
             case PK_M:
                 return isShiftPressed ? SR_MAXIMIZE : SR_MUTE;
             case PK_S:
-                return SR_ANTIALIASING;
+                return SR_SMOOTHING;
             case PK_R:
                 return SR_ASPECTCORRECTION;
             case PK_N:

@@ -41,7 +41,7 @@ EmuWindow::EmuWindow()
     m_params.height = m_defWindowHeight;
     m_params.title = "";
     m_params.vsync = g_emulation->getVsync();
-    m_params.antialiasing = false;
+    m_params.smoothing = ST_SHARP;
 
     applyParams();
 }
@@ -148,10 +148,10 @@ void EmuWindow::setFieldsMixing(FieldsMixing fm)
 }
 
 
-void EmuWindow::setAntialiasing(bool aal)
+void EmuWindow::setSmoothing(SmoothingType smoothing)
 {
-    m_isAntialiased = aal;
-    m_params.antialiasing = aal;
+    m_smoothing = smoothing;
+    m_params.smoothing = smoothing;
     applyParams();
 }
 
@@ -207,7 +207,7 @@ void EmuWindow::calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio,
     FrameScale tempFs = m_frameScale;
 
     if (m_isFullscreenMode)
-        tempFs = m_isAntialiased ? FS_FIT_KEEP_AR : FS_BEST_FIT;
+        tempFs = m_smoothing != ST_NEAREST ? FS_FIT_KEEP_AR : FS_BEST_FIT;
 
     switch(tempFs) {
         case FS_1X:
@@ -448,7 +448,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_1X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_1X);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -456,7 +456,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_2X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_2X);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -464,7 +464,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_3X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_3X);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -472,7 +472,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_4X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_4X);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -480,7 +480,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_5X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_5X);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -488,7 +488,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_2X3:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_2X3);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -496,7 +496,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_3X5:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_3X5);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -504,7 +504,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_4X6:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_4X6);
-            setAntialiasing(false);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = false;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -513,7 +513,7 @@ void EmuWindow::sysReq(SysReq sr)
             if (!m_isFullscreenMode)
                 setWindowStyle(WS_SIZABLE);
             setFrameScale(FS_FIT_KEEP_AR);
-            setAntialiasing(true);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = true;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -522,7 +522,7 @@ void EmuWindow::sysReq(SysReq sr)
             if (!m_isFullscreenMode)
                 setWindowStyle(WS_SIZABLE);
             setFrameScale(FS_FIT);
-            setAntialiasing(true);
+            setSmoothing(ST_SHARP);
             m_aspectCorrection = true;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -530,7 +530,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_MAXIMIZE:
             setWindowStyle(WS_SIZABLE);
             setFrameScale(FS_FIT_KEEP_AR);
-            setAntialiasing(true);
+            setSmoothing(ST_SHARP);
             maximize();
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -545,8 +545,17 @@ void EmuWindow::sysReq(SysReq sr)
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             break;
-        case SR_ANTIALIASING:
-            setAntialiasing(!m_isAntialiased);
+        case SR_SMOOTHING:
+            switch (m_smoothing) {
+                case ST_NEAREST:
+                    setSmoothing(ST_SHARP);
+                    break;
+                case ST_SHARP:
+                    setSmoothing(ST_BILINEAR);
+                    break;
+                case ST_BILINEAR:
+                    setSmoothing(ST_NEAREST);
+            }
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             break;
@@ -648,12 +657,15 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             setDefaultWindowSize(m_defWindowWidth, values[0].asInt());
             return true;
         }
-    } else if (propertyName == "antialiasing") {
-        if (values[0].asString() == "yes") {
-            setAntialiasing(true);
+    } else if (propertyName == "smoothing") {
+        if (values[0].asString() == "nearest") {
+            setSmoothing(ST_NEAREST);
             return true;
-        } else if (values[0].asString() == "no") {
-            setAntialiasing(false);
+        } else if (values[0].asString() == "bilinear") {
+            setSmoothing(ST_BILINEAR);
+            return true;
+        } else if (values[0].asString() == "sharp") {
+            setSmoothing(ST_SHARP);
             return true;
         }
     } else if (propertyName == "fullscreen") {
@@ -752,8 +764,15 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
             case FM_SCANLINE:
                 return "scanline";
         }
-    } else if (propertyName == "antialiasing") {
-        return m_isAntialiased ? "yes" : "no";
+    } else if (propertyName == "smoothing") {
+        switch (m_smoothing) {
+            case ST_NEAREST:
+                return "nearest";
+            case ST_BILINEAR:
+                return "bilinear";
+            case ST_SHARP:
+                return "sharp";
+        }
     } else if (propertyName == "aspectCorrection") {
         return m_aspectCorrection ? "yes" : "no";
     } else if (propertyName == "wideScreen") {
