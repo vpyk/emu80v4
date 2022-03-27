@@ -160,7 +160,7 @@ void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, dou
 
 void PalWindow::drawEnd()
 {
-    // nothing to do it Qt
+    m_qtWindow->getPaintWidget()->update();
 }
 
 

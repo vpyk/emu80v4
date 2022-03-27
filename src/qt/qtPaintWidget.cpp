@@ -71,7 +71,7 @@ void PaintWidget::colorFill(QColor color)
         delete m_imageData;
         m_image = nullptr;
     }
-    update();
+    //update();
 }
 
 
@@ -109,7 +109,7 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
     m_image = new QImage(m_imageData, imageWidth, imageHeight, QImage::Format_RGB32);
     m_img1aspectRatio = aspectRatio;
 
-    update();
+    //update();
 }
 
 

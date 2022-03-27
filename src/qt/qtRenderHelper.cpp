@@ -36,7 +36,7 @@ RenderHelper* g_renderHelper;
 RenderHelper::RenderHelper(QWidget *parent) : QObject(parent)
 {
     m_timer = new QTimer();
-    m_timer->setInterval(0);
+    m_timer->setInterval(5);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 }
 
