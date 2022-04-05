@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,16 +35,17 @@ class PalWindow;
 
 enum FrameScale {
     FS_BEST_FIT,
-    FS_1X,
+    /*FS_1X,
     FS_2X,
     FS_3X,
     FS_4X,
     FS_5X,
     FS_2X3,
     FS_3X5,
-    FS_4X6,
+    FS_4X6,*/
+    FS_FIXED,
     FS_FIT,
-    FS_FIT_KEEP_AR
+    //FS_FIT_KEEP_AR
 };
 
 enum FieldsMixing {
@@ -84,6 +85,7 @@ class EmuWindow : public EmuObject, public PalWindow
         void setDefaultWindowSize(int width, int height);
         void setCaption(std::string caption);
         void setFrameScale(FrameScale fs);
+        void setFixedYScale(int yScale);
         void setFieldsMixing(FieldsMixing fm);
         void setWindowStyle(WindowStyle ws);
         void setSmoothing(SmoothingType smoothing);
@@ -92,6 +94,7 @@ class EmuWindow : public EmuObject, public PalWindow
         void setWideScreen(bool wideScreen);
         void setCustomScreenFormat(bool custom);
         void setCustomScreenFormatValue(double format);
+        void setSquarePixels(bool squarePixels);
         void toggleFullScreen();
 
         void drawFrame(EmuPixelData frame);
@@ -118,6 +121,7 @@ class EmuWindow : public EmuObject, public PalWindow
         bool m_wideScreen = false;
         bool m_useCustomScreenFormat = false;
         double m_customScreenFormat = 5. / 3.;
+        bool m_squarePixels = false;
 
         std::string m_caption = "";
 
@@ -125,6 +129,7 @@ class EmuWindow : public EmuObject, public PalWindow
         FieldsMixing m_fieldsMixing = FM_NONE;
         WindowStyle m_windowStyle = WS_AUTOSIZE;
         SmoothingType m_smoothing = ST_SHARP;
+        int m_scaleY;
 
         int m_curImgWidth = 0;
         int m_curImgHeight = 0;
@@ -139,6 +144,8 @@ class EmuWindow : public EmuObject, public PalWindow
 
         uint32_t* m_interlacedImage = nullptr;
         int m_interlacedImageSize = 0;
+
+        double calcBestAspectRatio(double srcAspectRatio, int scaleY);
 };
 
 #endif // EMUWINDOW_H

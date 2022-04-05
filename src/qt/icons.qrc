@@ -17,7 +17,6 @@
         <file>icons/debug.png</file>
         <file>icons/forward.png</file>
         <file>icons/keyboard.png</file>
-        <file>icons/preset.png</file>
         <file>icons/font.png</file>
         <file>icons/screenshot.png</file>
         <file>icons/mute.png</file>
@@ -38,5 +37,12 @@
         <file>icons/sm_nearest.png</file>
         <file>icons/sm_sharp.png</file>
         <file>icons/sm_bilinear.png</file>
+        <file>icons/1x.png</file>
+        <file>icons/2x.png</file>
+        <file>icons/3x.png</file>
+        <file>icons/4x.png</file>
+        <file>icons/5x.png</file>
+        <file>icons/resizable.png</file>
+        <file>icons/preset.png</file>
     </qresource>
 </RCC>

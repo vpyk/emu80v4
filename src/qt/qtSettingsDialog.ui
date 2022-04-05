@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
-    <height>563</height>
+    <width>540</width>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -411,57 +411,32 @@
            </item>
            <item>
             <property name="text">
-             <string>1x, auto size, no smoothing</string>
+             <string notr="true">1x</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>2x, auto size, no smoothing</string>
+             <string notr="true">2x</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>3x, auto size, no smoothing</string>
+             <string notr="true">3x</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>4x, auto size, no smoothing</string>
+             <string notr="true">4x</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>5x, auto size, no smoothing</string>
+             <string notr="true">5x</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>2x3, auto size, no smoothing</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>3x5, auto size, no smoothing</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>4x6, auto size, no smoothing</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>2x, fixed size</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Stretch, user-changeable, smoothing</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Fit, user-changeable, original aspect ratio, smoothing</string>
+             <string>Sizeable</string>
             </property>
            </item>
           </widget>
@@ -657,21 +632,6 @@
                 <string notr="true">5x</string>
                </property>
               </item>
-              <item>
-               <property name="text">
-                <string notr="true">2x3</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string notr="true">3x5</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string notr="true">4x6</string>
-               </property>
-              </item>
              </widget>
             </item>
             <item>
@@ -697,13 +657,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="stretchPropRadioButton">
-            <property name="text">
-             <string>Fit to window</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QRadioButton" name="stretchPropIntRadioButton">
             <property name="text">
              <string>Fit to window with integer scale factor</string>
@@ -714,12 +667,164 @@
         </widget>
        </item>
        <item>
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="aspectCheckBox">
+         <property name="text">
+          <string>Exact original aspect ratio</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <widget class="QGroupBox" name="arOnGroupBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Exact aspect ratio ON mode settings</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_21">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <item>
+               <widget class="QLabel" name="wideLabel">
+                <property name="text">
+                 <string>Screen format:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="wideComboBox">
+                <item>
+                 <property name="text">
+                  <string notr="true">4:3</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string notr="true">16:9</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Custom</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_9">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <item>
+               <spacer name="horizontalSpacer_13">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Custom format:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="customFormatLineEdit">
+                <property name="inputMask">
+                 <string notr="true">0.000</string>
+                </property>
+                <property name="text">
+                 <string notr="true">1.666</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="arOffgroupBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Exact aspect ratio OFF mode settings</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_22">
+            <item>
+             <widget class="QRadioButton" name="adaptArRadioButton">
+              <property name="text">
+               <string>Adaptive AR (integer scale)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="sqrArRadioButton">
+              <property name="text">
+               <string>Square pixels (1:1)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1005,122 +1110,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="aspectCheckBox">
-         <property name="text">
-          <string>Original aspect ratio</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_13">
-         <item>
-          <spacer name="horizontalSpacer_15">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="wideLabel">
-           <property name="text">
-            <string>Screen format:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="wideComboBox">
-           <item>
-            <property name="text">
-             <string notr="true">4:3</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string notr="true">16:9</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Custom</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_16">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_12">
-         <item>
-          <spacer name="horizontalSpacer_13">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Custom format:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="customFormatLineEdit">
-           <property name="inputMask">
-            <string notr="true">0.000</string>
-           </property>
-           <property name="text">
-            <string notr="true">1.666</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_14">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
         <spacer name="verticalSpacer_6">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1403,22 +1392,6 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1497,7 +1470,6 @@
   <tabstop>okPushButton</tabstop>
   <tabstop>cancelPushButton</tabstop>
   <tabstop>applyPushButton</tabstop>
-  <tabstop>configTabWidget</tabstop>
   <tabstop>presetComboBox</tabstop>
   <tabstop>autoSizeRadioButton</tabstop>
   <tabstop>userSizeRadioButton</tabstop>
@@ -1507,7 +1479,6 @@
   <tabstop>fixedScaleRadioButton</tabstop>
   <tabstop>fixedScaleComboBox</tabstop>
   <tabstop>stretchRadioButton</tabstop>
-  <tabstop>stretchPropRadioButton</tabstop>
   <tabstop>stretchPropIntRadioButton</tabstop>
   <tabstop>debugHltCheckBox</tabstop>
   <tabstop>debugIllegalCheckBox</tabstop>
@@ -1527,9 +1498,6 @@
   <tabstop>smoothingBilinearRadioButton</tabstop>
   <tabstop>altFontCheckBox</tabstop>
   <tabstop>cropCheckBox</tabstop>
-  <tabstop>aspectCheckBox</tabstop>
-  <tabstop>wideComboBox</tabstop>
-  <tabstop>customFormatLineEdit</tabstop>
   <tabstop>wavChannelComboBox</tabstop>
   <tabstop>speedUpCheckBox</tabstop>
   <tabstop>speedUpSpinBox</tabstop>

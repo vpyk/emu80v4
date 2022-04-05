@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -903,7 +903,7 @@ void MainWindow::createActions()
     ADD_HOTKEY(smoothingKeyList, Qt::Key_S);
     m_smoothingAction->setShortcuts(smoothingKeyList);
 
-    settingsMenu->addAction(m_smoothingAction);
+    //settingsMenu->addAction(m_smoothingAction);
     connect(m_smoothingAction, SIGNAL(triggered()), this, SLOT(onSmoothing()));
 
     // Font
@@ -950,70 +950,84 @@ void MainWindow::createActions()
 
     QMenu* viewMenu = m_menuBar->addMenu(tr("View"));
 
-    QMenu* presetMenu = viewMenu->addMenu(tr("Presets"));
+    //QMenu* presetMenu = viewMenu->addMenu(tr("Presets"));
+    QMenu* m_presetMenu = new QMenu (tr("Window size"), this);
+    QActionGroup* presetGroup = new QActionGroup(m_presetMenu);
+    m_presetMenu->setIcon(m_presetIcon);
 
     // 1x preset
-    m_preset1xAction = new QAction(tr("Preset: 1x"), this);
+    m_preset1xAction = new QAction(m_1xIcon, tr("Fixed: 1x"), this);
     //m_preset1xAction->setToolTip(tr("Preset: 1x (Alt-1)"));
+    m_preset1xAction->setCheckable(true);
     QList<QKeySequence> preset1xKeysList;
     ADD_HOTKEY(preset1xKeysList, Qt::Key_1);
     //preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
     //preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
+    presetGroup->addAction(m_preset1xAction);
     m_preset1xAction->setShortcuts(preset1xKeysList);
     addAction(m_preset1xAction);
-    presetMenu->addAction(m_preset1xAction);
+    m_presetMenu->addAction(m_preset1xAction);
     connect(m_preset1xAction, SIGNAL(triggered()), this, SLOT(on1x()));
 
     // 2x preset
-    m_preset2xAction = new QAction(tr("Preset: 2x"), this);
+    m_preset2xAction = new QAction(m_2xIcon, tr("Fixed: 2x"), this);
     //m_preset2xAction->setToolTip(tr("Preset: 2x (Alt-2)"));
+    m_preset2xAction->setCheckable(true);
     QList<QKeySequence> preset2xKeysList;
     ADD_HOTKEY(preset2xKeysList, Qt::Key_2);
     //preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
     //preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
+    presetGroup->addAction(m_preset2xAction);
     m_preset2xAction->setShortcuts(preset2xKeysList);
     addAction(m_preset2xAction);
-    presetMenu->addAction(m_preset2xAction);
+    m_presetMenu->addAction(m_preset2xAction);
     connect(m_preset2xAction, SIGNAL(triggered()), this, SLOT(on2x()));
 
     // 3x preset
-    m_preset3xAction = new QAction(tr("Preset: 3x"), this);
+    m_preset3xAction = new QAction(m_3xIcon, tr("Fixed: 3x"), this);
     //m_preset3xAction->setToolTip(tr("Preset: 3x (Alt-3)"));
     QList<QKeySequence> preset3xKeysList;
     ADD_HOTKEY(preset3xKeysList, Qt::Key_3);
+    m_preset3xAction->setCheckable(true);
     //preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
     //preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
+    presetGroup->addAction(m_preset3xAction);
     m_preset3xAction->setShortcuts(preset3xKeysList);
     addAction(m_preset3xAction);
-    presetMenu->addAction(m_preset3xAction);
+    m_presetMenu->addAction(m_preset3xAction);
     connect(m_preset3xAction, SIGNAL(triggered()), this, SLOT(on3x()));
 
     // 4x preset
-    m_preset4xAction = new QAction(tr("Preset: 4x"), this);
+    m_preset4xAction = new QAction(m_4xIcon, tr("Fixed: 4x"), this);
     //m_preset4xAction->setToolTip(tr("Preset: 4x (Alt-4)"));
+    m_preset4xAction->setCheckable(true);
     QList<QKeySequence> preset4xKeysList;
     ADD_HOTKEY(preset4xKeysList, Qt::Key_4);
     //preset4xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_4));
     //preset4xKeysList.append(QKeySequence(Qt::META + Qt::Key_4));
+    presetGroup->addAction(m_preset4xAction);
     m_preset4xAction->setShortcuts(preset4xKeysList);
     addAction(m_preset4xAction);
-    presetMenu->addAction(m_preset4xAction);
+    m_presetMenu->addAction(m_preset4xAction);
     connect(m_preset4xAction, SIGNAL(triggered()), this, SLOT(on4x()));
 
     // 5x preset
-    m_preset5xAction = new QAction(tr("Preset: 5x"), this);
+    m_preset5xAction = new QAction(m_5xIcon, tr("Fixed: 5x"), this);
     //m_preset5xAction->setToolTip(tr("Preset: 5x (Alt-5)"));
+    m_preset5xAction->setCheckable(true);
     QList<QKeySequence> preset5xKeysList;
     ADD_HOTKEY(preset5xKeysList, Qt::Key_5);
     //preset5xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_5));
     //preset5xKeysList.append(QKeySequence(Qt::META + Qt::Key_5));
+    presetGroup->addAction(m_preset5xAction);
     m_preset5xAction->setShortcuts(preset5xKeysList);
     addAction(m_preset5xAction);
-    presetMenu->addAction(m_preset5xAction);
+    m_presetMenu->addAction(m_preset5xAction);
     connect(m_preset5xAction, SIGNAL(triggered()), this, SLOT(on5x()));
 
-    presetMenu->addSeparator();
+    m_presetMenu->addSeparator();
 
+    /*
     // 2x3 preset
     m_preset2x3Action = new QAction(tr("Preset: 2x3"), this);
     //m_preset2x3Action->setToolTip(tr("Preset: 2x3 (Alt-6)"));
@@ -1063,18 +1077,40 @@ void MainWindow::createActions()
     addAction(m_presetStretchAction);
     presetMenu->addAction(m_presetStretchAction);
     connect(m_presetStretchAction, SIGNAL(triggered()), this, SLOT(onStretch()));
+    */
 
     // Fit preset
-    m_presetFitAction = new QAction(tr("Preset: Fit"), this);
+    m_presetFitAction = new QAction(m_resizableIcon, tr("Resizable"), this);
     //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
+    m_presetFitAction->setCheckable(true);
     QList<QKeySequence> presetFitKeysList;
     ADD_HOTKEY(presetFitKeysList, Qt::Key_0);
     //presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
     //presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
+    presetGroup->addAction(m_presetFitAction);
     m_presetFitAction->setShortcuts(presetFitKeysList);
     addAction(m_presetFitAction);
-    presetMenu->addAction(m_presetFitAction);
+    m_presetMenu->addAction(m_presetFitAction);
     connect(m_presetFitAction, SIGNAL(triggered()), this, SLOT(onFit()));
+
+    m_presetAction = m_presetMenu->menuAction();
+    m_presetAction->setToolTip(tr("Window size"));
+    addAction(m_presetAction);
+    m_presetAction->setMenu(m_presetMenu);
+    m_toolBar->addAction(m_presetAction);
+    settingsMenu->addAction(m_presetAction);
+    /*QList<QKeySequence> presetKeyList;
+    ADD_HOTKEY(presetKeyList, Qt::Key_);
+    m_presetAction->setShortcuts(presetKeyList);*/
+    connect(m_presetAction, SIGNAL(triggered()), this, SLOT(onPreset()));
+
+    /*m_presetButton = new QToolButtonWA(this);
+    m_presetButton->setFocusPolicy(Qt::NoFocus);
+    m_presetButton->setIcon(QIcon(":/icons/preset.png"));
+    m_presetButton->setToolTip(tr("Window preset"));
+    m_presetButton->setMenu(presetMenu);
+    m_presetButton->setPopupMode(QToolButton::InstantPopup);
+    m_toolBar->addWidget(m_presetButton);*/
 
     viewMenu->addSeparator();
     viewMenu->addAction(m_screenshotAction);
@@ -1105,14 +1141,6 @@ void MainWindow::createActions()
     connect(m_fullwindowAction, SIGNAL(triggered()), this, SLOT(onFullwindow()));
     addAction(m_fullwindowAction);
     viewMenu->addAction(m_fullwindowAction);
-
-    m_presetButton = new QToolButtonWA(this);
-    m_presetButton->setFocusPolicy(Qt::NoFocus);
-    m_presetButton->setIcon(QIcon(":/icons/preset.png"));
-    m_presetButton->setToolTip(tr("Window preset"));
-    m_presetButton->setMenu(presetMenu);
-    m_presetButton->setPopupMode(QToolButton::InstantPopup);
-    m_toolBar->addWidget(m_presetButton);
 
     m_toolBar->addAction(m_fastResetAction);
     m_toolBar->addAction(m_muteAction);
@@ -1323,8 +1351,9 @@ void MainWindow::createDebugActions()
     //presetMenu->addAction(m_presetFitAction);
     connect(m_presetFitAction, SIGNAL(triggered()), this, SLOT(onFit()));
 
+    /*
     // Stretch preset
-    m_presetStretchAction = new QAction(tr("Preset: Stretch"), this /*m_menuBar*/);
+    m_presetStretchAction = new QAction(tr("Preset: Stretch"), this);
     //m_presetStretchAction->setToolTip(tr("Preset: Stretch (Alt-9)"));
     QList<QKeySequence> presetStretchKeysList;
     ADD_HOTKEY(presetStretchKeysList, Qt::Key_9);
@@ -1334,6 +1363,7 @@ void MainWindow::createDebugActions()
     addAction(m_presetStretchAction);
     //presetMenu->addAction(m_presetStretchAction);
     connect(m_presetStretchAction, SIGNAL(triggered()), this, SLOT(onStretch()));
+    */
 
     //viewMenu->addSeparator();
 
@@ -1866,6 +1896,22 @@ void MainWindow::onColorSelect()
 }
 
 
+void MainWindow::onPreset()
+{
+    std::string wnd = m_palWindow->getPlatformObjectName() + ".window";
+    std::string windowStyle = emuGetPropertyValue(wnd, "windowStyle");
+    if (windowStyle == "sizable") {
+        emuSetPropertyValue(wnd, "windowStyle", "autosize");
+        emuSetPropertyValue(wnd, "frameScale", "fixed");
+    } else if (windowStyle == "autosize") {
+        emuSetPropertyValue(wnd, "windowStyle", "sizable");
+        emuSetPropertyValue(wnd, "frameScale", "fit");
+    }
+    updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::on1x()
 {
     emuSysReq(m_palWindow, SR_1X);
@@ -1901,7 +1947,7 @@ void MainWindow::on5x()
 }
 
 
-void MainWindow::on2x3()
+/*void MainWindow::on2x3()
 {
     emuSysReq(m_palWindow, SR_2X3);
     saveConfig();
@@ -1926,7 +1972,7 @@ void MainWindow::onStretch()
 {
     emuSysReq(m_palWindow, SR_STRETCH);
     saveConfig();
-}
+}*/
 
 
 void MainWindow::onFit()
@@ -2373,6 +2419,9 @@ void MainWindow::updateActions()
     platform += ".";
     std::string val;
 
+
+    // Disks menu
+
     val = emuGetPropertyValue(platform + "diskA", "label");
     m_diskAMenuAction->setVisible(!val.empty());
     m_diskAAction->setVisible(!val.empty()); // turn off shortcut
@@ -2456,6 +2505,50 @@ void MainWindow::updateActions()
     m_diskDReadOnlyAction->setChecked(val == "yes");
     val = emuGetPropertyValue(platform + "diskD", "autoMount");
     m_diskDAutoMountAction->setChecked(val == "yes");
+
+
+    // Window size menu
+
+    std::string windowStyle = emuGetPropertyValue(platform + "window", "windowStyle");
+    std::string frameScale = emuGetPropertyValue(platform + "window", "frameScale");
+    bool noPreset = false;
+    if (windowStyle == "sizable") {
+        if (frameScale == "fit") {
+            m_presetFitAction->setChecked(true);
+            m_presetAction->setIcon(m_resizableIcon);
+        } else
+            noPreset = true;
+    } else if (windowStyle == "autosize") {
+        if (frameScale == "1x") {
+            m_preset1xAction->setChecked(true);
+            m_presetAction->setIcon(m_1xIcon);
+        } else if (frameScale == "2x") {
+            m_preset2xAction->setChecked(true);
+            m_presetAction->setIcon(m_2xIcon);
+        } else if (frameScale == "3x") {
+            m_preset3xAction->setChecked(true);
+            m_presetAction->setIcon(m_3xIcon);
+        } else if (frameScale == "4x") {
+            m_preset4xAction->setChecked(true);
+            m_presetAction->setIcon(m_4xIcon);
+        } else if (frameScale == "4x") {
+            m_preset5xAction->setChecked(true);
+            m_presetAction->setIcon(m_5xIcon);
+        } else
+            noPreset = true;
+    } else
+        noPreset = true;
+
+     if (noPreset) {
+        m_presetFitAction->setChecked(false);
+        m_preset1xAction->setChecked(false);
+        m_preset2xAction->setChecked(false);
+        m_preset3xAction->setChecked(false);
+        m_preset4xAction->setChecked(false);
+        m_preset5xAction->setChecked(false);
+        m_presetAction->setIcon(m_presetIcon);
+    }
+
 
     bool disksVisible = m_diskAMenuAction->isVisible() || m_diskBMenuAction->isVisible() || m_diskCMenuAction->isVisible() || m_diskDMenuAction->isVisible();
     m_menuDiskSeparator->setVisible(disksVisible);

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -106,15 +106,16 @@ private slots:
     void onDebug();
     void onColorMode();
     void onColorSelect();
+    void onPreset();
     void on1x();
     void on2x();
     void on3x();
     void on4x();
     void on5x();
-    void on2x3();
+    /*void on2x3();
     void on3x5();
     void on4x6();
-    void onStretch();
+    void onStretch();*/
     void onFit();
     void onFullscreen();
     void onFullwindow();
@@ -217,10 +218,18 @@ private:
     QIcon m_smoothingNearestIcon    = QIcon(":/icons/sm_nearest.png");
     QIcon m_smoothingBilinearIcon   = QIcon(":/icons/sm_bilinear.png");
     QIcon m_smoothingSharpIcon      = QIcon(":/icons/sm_sharp.png");
+    QIcon m_presetIcon              = QIcon(":/icons/preset.png");
+    QIcon m_1xIcon                  = QIcon(":/icons/1x.png");
+    QIcon m_2xIcon                  = QIcon(":/icons/2x.png");
+    QIcon m_3xIcon                  = QIcon(":/icons/3x.png");
+    QIcon m_4xIcon                  = QIcon(":/icons/4x.png");
+    QIcon m_5xIcon                  = QIcon(":/icons/5x.png");
+    QIcon m_resizableIcon           = QIcon(":/icons/resizable.png");
 
     QMenu* m_colorModeMenu = nullptr;
     QMenu* m_platformListMenu = nullptr;
     QMenu* m_smoothingMenu = nullptr;
+    QMenu* m_presetMenu = nullptr;
     QMenu* m_diskAMenu = nullptr;
     QMenu* m_diskBMenu = nullptr;
     QMenu* m_diskCMenu = nullptr;
@@ -291,15 +300,16 @@ private:
     QAction* m_smoothingNearestAction;
     QAction* m_smoothingBilinearAction;
     QAction* m_smoothingSharpAction;
+    QAction* m_presetAction;
     QAction* m_preset1xAction;
     QAction* m_preset2xAction;
     QAction* m_preset3xAction;
     QAction* m_preset4xAction;
     QAction* m_preset5xAction;
-    QAction* m_preset2x3Action;
+    /*QAction* m_preset2x3Action;
     QAction* m_preset3x5Action;
     QAction* m_preset4x6Action;
-    QAction* m_presetStretchAction;
+    QAction* m_presetStretchAction;*/
     QAction* m_presetFitAction;
     QAction* m_platformHelpAction;
     QAction* m_aboutAction;

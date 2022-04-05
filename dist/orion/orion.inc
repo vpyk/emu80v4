@@ -36,6 +36,9 @@ window.wideScreen = no
 # Screen format for window.wideScreen = custom
 window.customScreenFormat = 1.111
 
+# Square pixels mode when aspectCorrection = no
+window.squarePixels = yes
+
 
 	
 ######## Platform ########

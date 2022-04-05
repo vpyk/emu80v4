@@ -167,7 +167,8 @@ DebugWindow::DebugWindow(Platform* platform)
     inputInit();
 
     setWindowStyle(WS_AUTOSIZE);
-    setFrameScale(FS_1X);
+    setFrameScale(FS_FIXED);
+    setFixedYScale(1);
 }
 
 
