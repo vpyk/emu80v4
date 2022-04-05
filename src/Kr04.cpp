@@ -367,10 +367,8 @@ void Kr04FileLoader::afterReset()
 }
 
 
- //#include <iostream>
 void Kr04Keyboard::processKey(EmuKey key, bool isPressed)
 {
-    //cout << int(key) << "-" << isPressed << "\t";
     switch(key) {
     case EK_LF:
         key = EK_HELP;

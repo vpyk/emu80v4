@@ -128,7 +128,7 @@ class Ms7007Keyboard : public Keyboard
             {EK_SHIFT,       EK_LANG,      EK_FIX,       EK_CARET, EK_S,          EK_M,    EK_SPACE,  EK_T,     EK_X,      EK_LEFT,     EK_COMMA    },
             {EK_NP_7,        EK_NP_0,      EK_NP_1,      EK_NP_4,  EK_NP_PLUSMUL, EK_BSP,  EK_RIGHT,  EK_DOWN,  EK_PERIOD, EK_BKSLASH,  EK_V        },
             {EK_NP_8,        EK_NP_PERIOD, EK_NP_2,      EK_NP_5,  EK_EXEC,       EK_SET,  EK_CR,     EK_UP,    EK_UNDSCR, EK_H,        EK_Z        },
-            {EK_NP_9,        EK_NP_CR,     EK_NP_3,      EK_NP_6,  EK_CLEAR,      EK_HELP, EK_COLON,  EK_SLASH, EK_MINUS,  EK_0,        EK_9        }
+            {EK_NP_9,        EK_NP_CR,     EK_NP_3,      EK_NP_6,  EK_RESET,      EK_HELP, EK_COLON,  EK_SLASH, EK_MINUS,  EK_0,        EK_9        }
         };
 
         uint16_t m_keys[8];
