@@ -47,10 +47,10 @@ void Kr04Core::hrtc(bool isActive, int)
         Pit8253Counter* cnt1 = m_pit->getCounter(1);
         Pit8253Counter* cnt2 = m_pit->getCounter(2);
 
-        bool prev0 = cnt0->getOut();
+        /*bool prev0 = cnt0->getOut();
         cnt0->operateForTicks(1);
         if (!prev0 && cnt0->getOut())
-            m_cpu->intRst(7);
+            m_cpu->intRst(7);*/
 
         cnt1->operateForTicks(1);
 
@@ -313,7 +313,7 @@ uint32_t Kr04PpiColor8255Circuit::translateColor(int rgb)
 
 void Kr04Pit8253SoundSource::tuneupPit()
 {
-    m_pit->getCounter(0)->setExtClockMode(true);
+    //m_pit->getCounter(0)->setExtClockMode(true);
     m_pit->getCounter(1)->setExtClockMode(true);
 }
 
@@ -328,7 +328,7 @@ int Kr04Pit8253SoundSource::calcValue()
         res += MAX_SND_AMP - (cnt2->getAvgOut());
         cnt2->resetStats();
 
-        m_pit->getCounter(0)->resetStats();
+        //m_pit->getCounter(0)->resetStats();
         m_pit->getCounter(2)->resetStats();
     }
 
