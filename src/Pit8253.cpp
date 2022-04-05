@@ -62,9 +62,9 @@ void Pit8253Counter::operateForTicks(int ticks)
                         m_out = true;
                         ++m_sumOutTicks;
                     }
-                    m_counter = (m_counter - ticks) & 0xffff;
                 } else
                     m_tempSumOut += ticks;
+                m_counter = (m_counter - ticks) & 0xffff;
             }
             break;
         case 2:
