@@ -436,7 +436,7 @@
            </item>
            <item>
             <property name="text">
-             <string>Sizeable</string>
+             <string>Resizable</string>
             </property>
            </item>
           </widget>

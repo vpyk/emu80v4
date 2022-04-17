@@ -1104,7 +1104,8 @@
     </message>
     <message>
         <location filename="qtSettingsDialog.ui" line="439"/>
-        <source>Sizeable</source>
+        <source>Resizable</source>
+        <oldsource>Sizeable</oldsource>
         <translation>Изменяемый</translation>
     </message>
     <message>

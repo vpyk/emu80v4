@@ -67,7 +67,7 @@ void PalWindow::bringToFront()
 
 void PalWindow::maximize()
 {
-    if (m_params.style == PWS_SIZABLE)
+    if (m_params.style == PWS_RESIZABLE)
         SDL_MaximizeWindow(m_window);
 }
 
@@ -113,7 +113,7 @@ void PalWindow::recreateWindow()
     SDL_Rect displayBounds;
 
     if (m_window) {
-        if (m_params.style == PWS_SIZABLE)
+        if (m_params.style == PWS_RESIZABLE)
             SDL_GetWindowSize(m_window, &w, &h);
         if (m_prevParams.style != PWS_FULLSCREEN) {
             SDL_GetWindowPosition(m_window, &x, &y);
@@ -124,7 +124,7 @@ void PalWindow::recreateWindow()
         } else {
             x = m_lastX;
             y = m_lastY;
-            if (m_params.style == PWS_SIZABLE) {
+            if (m_params.style == PWS_RESIZABLE) {
                 w = m_lastWidth;
                 h = m_lastHeight;
             }
@@ -152,7 +152,7 @@ void PalWindow::recreateWindow()
 
     Uint32 flags = SDL_WINDOW_OPENGL;
 
-    if (m_params.style == PWS_SIZABLE)
+    if (m_params.style == PWS_RESIZABLE)
         flags |= SDL_WINDOW_RESIZABLE;
     else if (m_params.style == PWS_FULLSCREEN)
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;

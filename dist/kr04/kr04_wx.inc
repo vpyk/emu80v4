@@ -31,7 +31,7 @@ configTab.addControl = 1, &scaleSelector
 #window.windowStyle
 ConfigRadioSelector styleSelector = &window, windowStyle, "Размер окна"
 styleSelector.addItem = autosize, "Автоматически подстраивать"
-styleSelector.addItem = sizable, "Изменяемый пользователем"
+styleSelector.addItem = resizable, "Изменяемый пользователем"
 styleSelector.addItem = fixed, "Фиксированный"
 configTab.addControl = 1, &styleSelector
 

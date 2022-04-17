@@ -34,7 +34,7 @@ class PalWindow
 
     enum PalWindowStyle {
         PWS_FIXED,
-        PWS_SIZABLE,
+        PWS_RESIZABLE,
         PWS_FULLSCREEN
     };
 

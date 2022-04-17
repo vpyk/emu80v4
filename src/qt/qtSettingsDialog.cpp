@@ -285,7 +285,7 @@ void SettingsDialog::fillControlValues()
     // Window style
     val = m_options["window.windowStyle"];
     ui->autoSizeRadioButton->setChecked(val == "autosize");
-    ui->userSizeRadioButton->setChecked(val == "sizable");
+    ui->userSizeRadioButton->setChecked(val == "resizable");
     ui->fixedSizeRadioButton->setChecked(val == "fixed");
     bool fixed = ui->fixedSizeRadioButton->isChecked();
     ui->widthLineEdit->setEnabled(fixed);
@@ -766,7 +766,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     if (ui->autoSizeRadioButton->isChecked())
         val = "autosize";
     else if (ui->userSizeRadioButton->isChecked())
-        val = "sizable";
+        val = "resizable";
     else if (ui->fixedSizeRadioButton->isChecked())
         val = "fixed";
     m_options["window.windowStyle"] = val;

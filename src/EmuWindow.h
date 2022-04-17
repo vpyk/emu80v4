@@ -58,7 +58,7 @@ enum FieldsMixing {
 enum WindowStyle {
     WS_AUTOSIZE,
     WS_FIXED,
-    WS_SIZABLE
+    WS_RESIZABLE
 };
 
 

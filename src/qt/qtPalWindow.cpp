@@ -27,7 +27,7 @@ static MainWindow* qtWindow = nullptr;
 
 PalWindow::PalWindow()
 {
-    m_params.style = m_prevParams.style = PWS_SIZABLE;
+    m_params.style = m_prevParams.style = PWS_RESIZABLE;
     m_params.smoothing = m_prevParams.smoothing = ST_SHARP;
     m_params.width = m_prevParams.width = 0;
     m_params.height = m_prevParams.height = 0;
@@ -96,7 +96,7 @@ void PalWindow::applyParams()
 
     if (m_params.style != m_prevParams.style) {
         switch (m_params.style) {
-        case PWS_SIZABLE:
+        case PWS_RESIZABLE:
             m_qtWindow->setClientSize(0, 0);
             //m_qtWindow->adjustClientSize();
             break;

@@ -204,9 +204,9 @@ void MainWindow::setClientSize(int width, int height)
 
 void MainWindow::adjustClientSize()
 {
-    bool sizeable = m_clientWidth == 0 && m_clientHeight == 0;
+    bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
 
-    if (sizeable || m_fullscreenMode) {
+    if (resizable || m_fullscreenMode) {
         m_paintWidget->setFixedSize(m_paintWidget->width(), m_paintWidget->height());
         if (!m_fullscreenMode)
             adjustSize();
@@ -219,7 +219,7 @@ void MainWindow::adjustClientSize()
     }
 
     if (m_statusBar)
-        m_statusBar->setSizeGripEnabled(sizeable);
+        m_statusBar->setSizeGripEnabled(resizable);
 }
 
 
@@ -1900,11 +1900,11 @@ void MainWindow::onPreset()
 {
     std::string wnd = m_palWindow->getPlatformObjectName() + ".window";
     std::string windowStyle = emuGetPropertyValue(wnd, "windowStyle");
-    if (windowStyle == "sizable") {
+    if (windowStyle == "resizable") {
         emuSetPropertyValue(wnd, "windowStyle", "autosize");
         emuSetPropertyValue(wnd, "frameScale", "fixed");
     } else if (windowStyle == "autosize") {
-        emuSetPropertyValue(wnd, "windowStyle", "sizable");
+        emuSetPropertyValue(wnd, "windowStyle", "resizable");
         emuSetPropertyValue(wnd, "frameScale", "fit");
     }
     updateConfig();
@@ -2512,7 +2512,7 @@ void MainWindow::updateActions()
     std::string windowStyle = emuGetPropertyValue(platform + "window", "windowStyle");
     std::string frameScale = emuGetPropertyValue(platform + "window", "frameScale");
     bool noPreset = false;
-    if (windowStyle == "sizable") {
+    if (windowStyle == "resizable") {
         if (frameScale == "fit") {
             m_presetFitAction->setChecked(true);
             m_presetAction->setIcon(m_resizableIcon);

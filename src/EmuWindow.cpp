@@ -115,8 +115,8 @@ void EmuWindow::setWindowStyle(WindowStyle ws)
     m_isFullscreenMode = false;
     if (ws == WS_FIXED || ws == WS_AUTOSIZE)
         m_params.style = PWS_FIXED;
-    else // if (ws == WS_SIZABLE)
-        m_params.style = PWS_SIZABLE;
+    else // if (ws == WS_RESIZABLE)
+        m_params.style = PWS_RESIZABLE;
 
     if (ws == WS_FIXED) {
         m_params.width = m_defWindowWidth;
@@ -570,7 +570,7 @@ void EmuWindow::sysReq(SysReq sr)
             break;*/
         case SR_FIT:
             if (!m_isFullscreenMode)
-                setWindowStyle(WS_SIZABLE);
+                setWindowStyle(WS_RESIZABLE);
             //setFrameScale(FS_FIT_KEEP_AR);
             setFrameScale(FS_FIT);
             //setSmoothing(ST_SHARP);
@@ -580,7 +580,7 @@ void EmuWindow::sysReq(SysReq sr)
             break;
         /*case SR_STRETCH:
             if (!m_isFullscreenMode)
-                setWindowStyle(WS_SIZABLE);
+                setWindowStyle(WS_RESIZABLE);
             setFrameScale(FS_FIT);
             //setSmoothing(ST_SHARP);
             //m_aspectCorrection = true;
@@ -588,7 +588,7 @@ void EmuWindow::sysReq(SysReq sr)
                 g_emulation->getConfig()->updateConfig();
             break;*/
         case SR_MAXIMIZE:
-            setWindowStyle(WS_SIZABLE);
+            setWindowStyle(WS_RESIZABLE);
             setFrameScale(FS_FIT/*_KEEP_AR*/);
             //setSmoothing(ST_SHARP);
             maximize();
@@ -648,8 +648,8 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
         } else if (values[0].asString() == "fixed") {
             setWindowStyle(WS_FIXED);
             return true;
-        } else if (values[0].asString() == "sizable") {
-            setWindowStyle(WS_SIZABLE);
+        } else if (values[0].asString() == "resizable" || values[0].asString() == "sizable" /*for compatibility*/) {
+            setWindowStyle(WS_RESIZABLE);
             return true;
         } else
             return false;
@@ -811,8 +811,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
                 return "autosize";
             case WS_FIXED:
                 return "fixed";
-            case WS_SIZABLE:
-                return "sizable";
+            case WS_RESIZABLE:
+                return "resizable";
         }
     } else if (propertyName == "frameScale") {
         switch (m_frameScale) {
