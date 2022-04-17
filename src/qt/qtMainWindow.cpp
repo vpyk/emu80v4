@@ -1027,58 +1027,6 @@ void MainWindow::createActions()
 
     m_presetMenu->addSeparator();
 
-    /*
-    // 2x3 preset
-    m_preset2x3Action = new QAction(tr("Preset: 2x3"), this);
-    //m_preset2x3Action->setToolTip(tr("Preset: 2x3 (Alt-6)"));
-    QList<QKeySequence> preset2x3KeysList;
-    ADD_HOTKEY(preset2x3KeysList, Qt::Key_6);
-    //preset2x3KeysList.append(QKeySequence(Qt::ALT + Qt::Key_6));
-    //preset2x3KeysList.append(QKeySequence(Qt::META + Qt::Key_6));
-    m_preset2x3Action->setShortcuts(preset2x3KeysList);
-    addAction(m_preset2x3Action);
-    presetMenu->addAction(m_preset2x3Action);
-    connect(m_preset2x3Action, SIGNAL(triggered()), this, SLOT(on2x3()));
-
-    // 3x5 preset
-    m_preset3x5Action = new QAction(tr("Preset: 3x5"), this);
-    //m_preset3x5Action->setToolTip(tr("Preset: 3x5 (Alt-7)"));
-    QList<QKeySequence> preset3x5KeysList;
-    ADD_HOTKEY(preset3x5KeysList, Qt::Key_7);
-    //preset3x5KeysList.append(QKeySequence(Qt::ALT + Qt::Key_7));
-    //preset3x5KeysList.append(QKeySequence(Qt::META + Qt::Key_7));
-    m_preset3x5Action->setShortcuts(preset3x5KeysList);
-    addAction(m_preset3x5Action);
-    presetMenu->addAction(m_preset3x5Action);
-    connect(m_preset3x5Action, SIGNAL(triggered()), this, SLOT(on3x5()));
-
-    // 4x6 preset
-    m_preset4x6Action = new QAction(tr("Preset: 4x6"), this);
-    //m_preset4x6Action->setToolTip(tr("Preset: 4x6 (Alt-8)"));
-    QList<QKeySequence> preset4x6KeysList;
-    ADD_HOTKEY(preset4x6KeysList, Qt::Key_8);
-    //preset4x6KeysList.append(QKeySequence(Qt::ALT + Qt::Key_8));
-    //preset4x6KeysList.append(QKeySequence(Qt::META + Qt::Key_8));
-    m_preset4x6Action->setShortcuts(preset4x6KeysList);
-    addAction(m_preset4x6Action);
-    presetMenu->addAction(m_preset4x6Action);
-    connect(m_preset4x6Action, SIGNAL(triggered()), this, SLOT(on4x6()));
-
-    presetMenu->addSeparator();
-
-    // Stretch preset
-    m_presetStretchAction = new QAction(tr("Preset: Stretch"), this);
-    //m_presetStretcgAction->setToolTip(tr("Preset: Stretch (Alt-9)"));
-    QList<QKeySequence> presetStretchKeysList;
-    ADD_HOTKEY(presetStretchKeysList, Qt::Key_9);
-    //presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
-    //presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
-    m_presetStretchAction->setShortcuts(presetStretchKeysList);
-    addAction(m_presetStretchAction);
-    presetMenu->addAction(m_presetStretchAction);
-    connect(m_presetStretchAction, SIGNAL(triggered()), this, SLOT(onStretch()));
-    */
-
     // Fit preset
     m_presetFitAction = new QAction(m_resizableIcon, tr("Resizable"), this);
     //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
@@ -1103,14 +1051,6 @@ void MainWindow::createActions()
     ADD_HOTKEY(presetKeyList, Qt::Key_);
     m_presetAction->setShortcuts(presetKeyList);*/
     connect(m_presetAction, SIGNAL(triggered()), this, SLOT(onPreset()));
-
-    /*m_presetButton = new QToolButtonWA(this);
-    m_presetButton->setFocusPolicy(Qt::NoFocus);
-    m_presetButton->setIcon(QIcon(":/icons/preset.png"));
-    m_presetButton->setToolTip(tr("Window preset"));
-    m_presetButton->setMenu(presetMenu);
-    m_presetButton->setPopupMode(QToolButton::InstantPopup);
-    m_toolBar->addWidget(m_presetButton);*/
 
     viewMenu->addSeparator();
     viewMenu->addAction(m_screenshotAction);
@@ -1350,20 +1290,6 @@ void MainWindow::createDebugActions()
     addAction(m_presetFitAction);
     //presetMenu->addAction(m_presetFitAction);
     connect(m_presetFitAction, SIGNAL(triggered()), this, SLOT(onFit()));
-
-    /*
-    // Stretch preset
-    m_presetStretchAction = new QAction(tr("Preset: Stretch"), this);
-    //m_presetStretchAction->setToolTip(tr("Preset: Stretch (Alt-9)"));
-    QList<QKeySequence> presetStretchKeysList;
-    ADD_HOTKEY(presetStretchKeysList, Qt::Key_9);
-    //presetStretchKeysList.append(QKeySequence(Qt::ALT + Qt::Key_9));
-    //presetStretchKeysList.append(QKeySequence(Qt::META + Qt::Key_9));
-    m_presetStretchAction->setShortcuts(presetStretchKeysList);
-    addAction(m_presetStretchAction);
-    //presetMenu->addAction(m_presetStretchAction);
-    connect(m_presetStretchAction, SIGNAL(triggered()), this, SLOT(onStretch()));
-    */
 
     //viewMenu->addSeparator();
 

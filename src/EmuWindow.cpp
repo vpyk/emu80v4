@@ -251,76 +251,8 @@ void EmuWindow::calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio,
             dstX = (wndWidth - dstWidth) / 2;
             dstY = (wndHeight - dstHeight) / 2;
             break;
-        /*case FS_1X:
-            dstWidth = srcWidth * aspectRatio + .5;
-            dstHeight = srcHeight;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;
-        case FS_2X:
-            dstWidth = srcWidth * 2 * aspectRatio + .5;
-            dstHeight = srcHeight * 2;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;
-        case FS_3X:
-            dstWidth = srcWidth * 3 * aspectRatio + .5;
-            dstHeight = srcHeight * 3;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;
-        case FS_4X:
-            dstWidth = srcWidth * 4 * aspectRatio + .5;
-            dstHeight = srcHeight * 4;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;
-        case FS_5X:
-            dstWidth = srcWidth * 5 * aspectRatio + .5;
-            dstHeight = srcHeight * 5;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;*/
-        /*case FS_2X3:
-            dstWidth = srcWidth * (m_aspectCorrection ? 2 : 3) * aspectRatio + .5;
-            dstHeight = srcHeight * 2;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;
-        case FS_3X5:
-            dstWidth = srcWidth * (m_aspectCorrection ? 3 : 5) * aspectRatio + .5;
-            dstHeight = srcHeight * 3;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;
-        case FS_4X6:
-            dstWidth = srcWidth * (m_aspectCorrection ? 4 : 6) * aspectRatio + .5;
-            dstHeight = srcHeight * 4;
-            dstX = (wndWidth - dstWidth) / 2;
-            dstY = (wndHeight - dstHeight) / 2;
-            break;*/
         case FS_BEST_FIT: {
-            /*int scaleX = 1;
-            int scaleY = 1;
-            if (aspectRatio == 1. && (m_frameScale == FS_2X3 || m_frameScale == FS_4X6)) {
-                scaleX = 3;
-                scaleY = 2;
-            } else if (aspectRatio == 1. && m_frameScale == FS_3X5) {
-                scaleX = 5;
-                scaleY = 3;
-            }
-
-            int timesX = wndWidth / (srcWidth * scaleX * aspectRatio + .5);
-            int timesY = wndHeight / (srcHeight * scaleY);
-
-            timesX = timesX < timesY ? timesX * scaleX: timesY * scaleX;
-            timesY = timesX < timesY ? timesX * scaleY: timesY * scaleY;*/
-
-            //int timesX = wndWidth / (srcWidth * aspectRatio + .5);
             int timesY = wndHeight / (srcHeight);
-
-            /*timesX = timesX < timesY ? timesX : timesY;
-            timesY = timesX < timesY ? timesX : timesY;*/
 
             if (/*timesX == 0 ||*/ timesY == 0) {
                 dstWidth = wndWidth;
@@ -352,14 +284,7 @@ void EmuWindow::calcDstRect(int srcWidth, int srcHeight,  double srcAspectRatio,
                 dstX = 0;
                 dstY = 0;
             } else {
-            //break;
-        //case FS_FIT_KEEP_AR:
-            double ar = aspectRatio;
-            /*if (aspectRatio == 1. && (m_frameScale == FS_2X3 || m_frameScale == FS_4X6))
-                ar = ar * 3 / 2;
-            else if (aspectRatio == 1 && m_frameScale == FS_3X5)
-                ar = ar * 5 / 3;*/
-
+                double ar = aspectRatio;
                 int newW = wndHeight * srcWidth * ar / srcHeight + .5;
                 int newH = wndWidth * srcHeight / ar / srcWidth + .5;
                 if (newW <= wndWidth) {
@@ -506,7 +431,6 @@ void EmuWindow::sysReq(SysReq sr)
             break;
         case SR_1X:
             setWindowStyle(WS_AUTOSIZE);
-            //setFrameScale(FS_1X);
             setFrameScale(FS_FIXED);
             setFixedYScale(1);
             if (m_windowType == EWT_EMULATION)
@@ -514,7 +438,6 @@ void EmuWindow::sysReq(SysReq sr)
             break;
         case SR_2X:
             setWindowStyle(WS_AUTOSIZE);
-            //setFrameScale(FS_2X);
             setFrameScale(FS_FIXED);
             setFixedYScale(2);
             if (m_windowType == EWT_EMULATION)
@@ -522,7 +445,6 @@ void EmuWindow::sysReq(SysReq sr)
             break;
         case SR_3X:
             setWindowStyle(WS_AUTOSIZE);
-            //setFrameScale(FS_3X);
             setFrameScale(FS_FIXED);
             setFixedYScale(3);
             if (m_windowType == EWT_EMULATION)
@@ -530,7 +452,6 @@ void EmuWindow::sysReq(SysReq sr)
             break;
         case SR_4X:
             setWindowStyle(WS_AUTOSIZE);
-            //setFrameScale(FS_4X);
             setFrameScale(FS_FIXED);
             setFixedYScale(4);
             if (m_windowType == EWT_EMULATION)
@@ -538,59 +459,21 @@ void EmuWindow::sysReq(SysReq sr)
             break;
         case SR_5X:
             setWindowStyle(WS_AUTOSIZE);
-            //setFrameScale(FS_5X);
             setFrameScale(FS_FIXED);
             setFixedYScale(5);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             break;
-/*        case SR_2X3:
-            setWindowStyle(WS_AUTOSIZE);
-            setFrameScale(FS_2X3);
-            setSmoothing(ST_SHARP);
-            m_aspectCorrection = false;
-            if (m_windowType == EWT_EMULATION)
-                g_emulation->getConfig()->updateConfig();
-            break;
-        case SR_3X5:
-            setWindowStyle(WS_AUTOSIZE);
-            setFrameScale(FS_3X5);
-            setSmoothing(ST_SHARP);
-            m_aspectCorrection = false;
-            if (m_windowType == EWT_EMULATION)
-                g_emulation->getConfig()->updateConfig();
-            break;
-        case SR_4X6:
-            setWindowStyle(WS_AUTOSIZE);
-            setFrameScale(FS_4X6);
-            setSmoothing(ST_SHARP);
-            m_aspectCorrection = false;
-            if (m_windowType == EWT_EMULATION)
-                g_emulation->getConfig()->updateConfig();
-            break;*/
         case SR_FIT:
             if (!m_isFullscreenMode)
                 setWindowStyle(WS_RESIZABLE);
-            //setFrameScale(FS_FIT_KEEP_AR);
             setFrameScale(FS_FIT);
-            //setSmoothing(ST_SHARP);
-            //m_aspectCorrection = true;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             break;
-        /*case SR_STRETCH:
-            if (!m_isFullscreenMode)
-                setWindowStyle(WS_RESIZABLE);
-            setFrameScale(FS_FIT);
-            //setSmoothing(ST_SHARP);
-            //m_aspectCorrection = true;
-            if (m_windowType == EWT_EMULATION)
-                g_emulation->getConfig()->updateConfig();
-            break;*/
         case SR_MAXIMIZE:
             setWindowStyle(WS_RESIZABLE);
             setFrameScale(FS_FIT/*_KEEP_AR*/);
-            //setSmoothing(ST_SHARP);
             maximize();
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -658,42 +541,37 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             setFrameScale(FS_BEST_FIT);
             return true;
         } else if (values[0].asString() == "1x") {
-            //setFrameScale(FS_1X);
             setFrameScale(FS_FIXED);
             setFixedYScale(1);
             return true;
         } else if (values[0].asString() == "2x") {
-            //setFrameScale(FS_2X);
             setFrameScale(FS_FIXED);
             setFixedYScale(2);
             return true;
         } else if (values[0].asString() == "3x") {
-            //setFrameScale(FS_3X);
             setFrameScale(FS_FIXED);
             setFixedYScale(3);
             return true;
         } else if (values[0].asString() == "4x") {
-            //setFrameScale(FS_4X);
             setFrameScale(FS_FIXED);
             setFixedYScale(4);
             return true;
         } else if (values[0].asString() == "5x") {
-            //setFrameScale(FS_5X);
             setFrameScale(FS_FIXED);
             setFixedYScale(5);
             return true;
         } else if (values[0].asString() == "2x3") {
-            //setFrameScale(FS_2X3);
+            // compatibility
             setFrameScale(FS_FIXED);
             setFixedYScale(2);
             return true;
         } else if (values[0].asString() == "3x5") {
-            //setFrameScale(FS_3X5);
+            // compatibility
             setFrameScale(FS_FIXED);
             setFixedYScale(3);
             return true;
         } else if (values[0].asString() == "4x6") {
-            //setFrameScale(FS_4X6);
+            // compatibility
             setFrameScale(FS_FIXED);
             setFixedYScale(4);
             return true;
@@ -704,7 +582,8 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             setFrameScale(FS_FIT);
             return true;
         } else if (values[0].asString() == "fitKeepAR") {
-            setFrameScale(FS_FIT/*_KEEP_AR*/);
+            // compatibility
+            setFrameScale(FS_FIT);
             return true;
         }
     } else if (propertyName == "fieldsMixing") {
@@ -833,26 +712,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
                 }
             case FS_BEST_FIT:
                 return "bestFit";
-            /*case FS_1X:
-                return "1x";
-            case FS_2X:
-                return "2x";
-            case FS_3X:
-                return "3x";
-            case FS_4X:
-                return "4x";
-            case FS_5X:
-                return "5x";
-            case FS_2X3:
-                return "2x3";
-            case FS_3X5:
-                return "3x5";
-            case FS_4X6:
-                return "4x6";*/
             case FS_FIT:
                 return "fit";
-            /*case FS_FIT_KEEP_AR:
-                return "fitKeepAR";*/
         }
 
     } else if (propertyName == "fieldsMixing") {

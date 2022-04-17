@@ -72,7 +72,6 @@ enum SysReq
     SR_3X5,
     SR_4X6,
     SR_FIT,
-    //SR_STRETCH,
     SR_MAXIMIZE,
     SR_CROPTOVISIBLE,
     SR_ASPECTCORRECTION,
