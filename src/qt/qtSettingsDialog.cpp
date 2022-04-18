@@ -580,13 +580,6 @@ void SettingsDialog::on_stretchRadioButton_toggled(bool checked)
 }
 
 
-void SettingsDialog::on_stretchPropRadioButton_toggled(bool checked)
-{
-    if (checked)
-        adjustPresetComboBoxState();
-}
-
-
 void SettingsDialog::on_stretchPropIntRadioButton_toggled(bool checked)
 {
     if (checked)

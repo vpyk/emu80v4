@@ -68,8 +68,6 @@ private slots:
 
     void on_stretchRadioButton_toggled(bool checked);
 
-    void on_stretchPropRadioButton_toggled(bool checked);
-
     void on_stretchPropIntRadioButton_toggled(bool checked);
 
     void on_aspectCheckBox_toggled(bool checked);
