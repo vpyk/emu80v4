@@ -33,6 +33,7 @@ class Fdc1793;
 class GeneralSoundSource;
 class Cpu8080Compatible;
 class Covox;
+class AtaDrive;
 
 
 class VectorRenderer : public CrtRenderer, public IActive
@@ -390,6 +391,26 @@ class VectorFddControlRegister : public AddressableDevice
 
     private:
         Fdc1793* m_fdc = nullptr;
+};
+
+
+class VectorHddRegisters : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        void attachAtaDrive(AtaDrive* ataDrive) {m_ataDrive = ataDrive;}
+
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new VectorHddRegisters();}
+
+    private:
+        AtaDrive* m_ataDrive = nullptr;
+
+        uint8_t m_highR = 0;
+        uint8_t m_highW = 0;
 };
 
 

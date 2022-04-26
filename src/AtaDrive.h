@@ -49,13 +49,21 @@ class AtaDrive : public EmuObject
         std::string m_fileName = "";
 
         int m_dev = 0; // ignore for now
-        bool m_lba = false;
+        bool m_useLba = false;
+        bool m_lba = true;
+        int m_cylinders;
+        int m_heads;
+        int m_sectors;
+        int m_cylinder;
+        int m_head;
+        int m_sector;
         uint32_t m_lbaAddress = 0;
         int m_sectorCount = 0;
         uint8_t m_lastCommand = 0;
         int m_dataCounter;
         uint16_t* m_dataPtr;
         uint16_t m_sectorBuf[256];
+        bool m_prefilledData = false;
 
         void putWord(int wordOffset, uint16_t word);
         void putStr(int wordOffset, const char* str);
@@ -65,6 +73,11 @@ class AtaDrive : public EmuObject
         void writeSectors();
 
         void setReadOnly(bool ro);
+
+        void seek();
+
+        bool m_vectorGeometry = false;
+        void setVectorGeometry();
 };
 
 

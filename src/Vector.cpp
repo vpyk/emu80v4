@@ -30,6 +30,7 @@
 #include "WavReader.h"
 #include "Covox.h"
 #include "PrnWriter.h"
+#include "AtaDrive.h"
 
 using namespace std;
 
@@ -977,4 +978,54 @@ void VectorPpi8255Circuit2::setPortC(uint8_t value)
         g_emulation->getPrnWriter()->printByte(m_printerData);
     }
     m_printerStrobe = newStrobe;
+}
+
+
+bool VectorHddRegisters::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "ataDrive") {
+        attachAtaDrive(static_cast<AtaDrive*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    }
+
+    return false;
+}
+
+
+void VectorHddRegisters::writeByte(int addr, uint8_t value)
+{
+    if (!m_ataDrive)
+        return;
+
+    if (addr == 8) {
+        m_highW = value;
+        return;
+    }
+
+    addr &= 7;
+
+    if (addr == 0)
+        m_ataDrive->writeReg(addr, value | m_highW << 8);
+    else
+        m_ataDrive->writeReg(addr, value);
+}
+
+
+uint8_t VectorHddRegisters::readByte(int addr)
+{
+    if (!m_ataDrive)
+        return 0xFF;
+
+    if (addr == 8)
+        return m_highR;
+
+    addr &= 7;
+
+    uint16_t read = m_ataDrive->readReg(addr);
+    if (addr == 0)
+        m_highR = read >> 8;
+    return read & 0x00FF;
 }
