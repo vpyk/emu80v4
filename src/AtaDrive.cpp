@@ -229,7 +229,7 @@ void AtaDrive::writeSectors()
 
 void AtaDrive::putWord(int wordOffset, uint16_t word)
 {
-    m_sectorBuf[wordOffset] = ((word & 0xFF) << 8) | (word >> 8);
+    m_sectorBuf[wordOffset] = word;
 }
 
 
