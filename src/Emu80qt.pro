@@ -34,6 +34,7 @@ DEFINES += PAL_QT
 
 SOURCES += \
     Covox.cpp \
+    DiskImage.cpp \
     Korvet.cpp \
     Kr04.cpp \
     Main.cpp \
@@ -60,7 +61,6 @@ SOURCES += \
     EmuWindow.cpp \
     Eureka.cpp \
     Fdc1793.cpp \
-    FdImage.cpp \
     FileLoader.cpp \
     GenericModules.cpp \
     KbdLayout.cpp \
@@ -136,6 +136,7 @@ HEADERS  += \
     Crt8275Renderer.h \
     CrtRenderer.h \
     Debugger.h \
+    DiskImage.h \
     Dma8257.h \
     EmuCalls.h \
     EmuConfig.h \
@@ -145,7 +146,6 @@ HEADERS  += \
     EmuWindow.h \
     Eureka.h \
     Fdc1793.h \
-    FdImage.h \
     FileLoader.h \
     GenericModules.h \
     Globals.h \

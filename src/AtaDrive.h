@@ -27,6 +27,7 @@
 #include "PalFile.h"
 #include "EmuObjects.h"
 
+class DiskImage;
 
 class AtaDrive : public EmuObject
 {
@@ -39,14 +40,15 @@ class AtaDrive : public EmuObject
         void writeReg(int addr, uint16_t value);
         uint16_t readReg(int addr);
 
-        bool assignFileName(std::string fileName);
+        void assignDiskImage(DiskImage* image);
 
         static EmuObject* create(const EmuValuesList&) {return new AtaDrive();}
 
     private:
-        PalFile m_file;
-        bool m_readOnly = false;
-        std::string m_fileName = "";
+        //PalFile m_file;
+        //bool m_readOnly = false;
+        //std::string m_fileName = "";
+        DiskImage* m_image = nullptr;
 
         int m_dev = 0; // ignore for now
         bool m_useLba = false;
@@ -61,8 +63,8 @@ class AtaDrive : public EmuObject
         int m_sectorCount = 0;
         uint8_t m_lastCommand = 0;
         int m_dataCounter;
-        uint16_t* m_dataPtr;
-        uint16_t m_sectorBuf[256];
+        uint8_t* m_dataPtr;
+        uint8_t m_sectorBuf[512];
         bool m_prefilledData = false;
 
         void putWord(int wordOffset, uint16_t word);

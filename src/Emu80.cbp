@@ -140,8 +140,8 @@
 		<Unit filename="Emulation.h" />
 		<Unit filename="Eureka.cpp" />
 		<Unit filename="Eureka.h" />
-		<Unit filename="FdImage.cpp" />
-		<Unit filename="FdImage.h" />
+		<Unit filename="DiskImage.cpp" />
+		<Unit filename="DiskImage.h" />
 		<Unit filename="Fdc1793.cpp" />
 		<Unit filename="Fdc1793.h" />
 		<Unit filename="FileLoader.cpp" />

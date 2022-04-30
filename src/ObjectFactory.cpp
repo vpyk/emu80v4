@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@
 #include "RkFdd.h"
 #include "FileLoader.h"
 #include "TapeRedirector.h"
-#include "FdImage.h"
+#include "DiskImage.h"
 #include "RkTapeHooks.h"
 #include "MsxTapeHooks.h"
 #include "RfsTapeHooks.h"
@@ -155,6 +155,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(RkFddController);
     REG_EMU_CLASS(RkFileLoader);
     REG_EMU_CLASS(TapeRedirector);
+    REG_EMU_CLASS(DiskImage);
     REG_EMU_CLASS(FdImage);
     REG_EMU_CLASS(RkTapeOutHook);
     REG_EMU_CLASS(RkTapeInHook);

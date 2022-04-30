@@ -22,7 +22,7 @@
 #include <sstream>
 
 #include "Fdc1793.h"
-#include "FdImage.h"
+#include "DiskImage.h"
 #include "Emulation.h"
 #include "Dma8257.h"
 
