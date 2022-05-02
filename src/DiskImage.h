@@ -24,6 +24,8 @@
 #include "EmuObjects.h"
 
 
+const int DISKIMAGE_NOTIFY_FILEOPENED = 1;
+
 class DiskImage : public EmuObject
 {
 public:
@@ -49,6 +51,8 @@ public:
     bool write(uint8_t* buf, int len);
     uint8_t read8();
 
+    void setOwner(EmuObject* owner) {m_owner = owner;}
+
     static EmuObject* create(const EmuValuesList&) {return new DiskImage();}
 
 protected:
@@ -59,6 +63,9 @@ protected:
     std::string m_filter;
     PalFile m_file;
     std::string m_label;
+
+private:
+    EmuObject* m_owner = nullptr;
 };
 
 

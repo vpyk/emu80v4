@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class PlatformCore;
 class KbdLayout;
 class CrtRenderer;
 class Keyboard;
-class FdImage;
+class DiskImage;
 class DebugWindow;
 
 
@@ -85,10 +85,11 @@ class Platform : public ParentObject
         EmuWindow* m_window = nullptr;
         KbdLayout* m_kbdLayout = nullptr;
         CrtRenderer* m_renderer = nullptr;
-        FdImage* m_diskA = nullptr;
-        FdImage* m_diskB = nullptr;
-        FdImage* m_diskC = nullptr;
-        FdImage* m_diskD = nullptr;
+        DiskImage* m_diskA = nullptr;
+        DiskImage* m_diskB = nullptr;
+        DiskImage* m_diskC = nullptr;
+        DiskImage* m_diskD = nullptr;
+        DiskImage* m_hdd = nullptr;
         FileLoader* m_loader = nullptr;
         Keyboard* m_keyboard = nullptr;
         RamDisk* m_ramDisk = nullptr;

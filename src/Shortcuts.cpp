@@ -97,7 +97,7 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
             case PK_P:
                 return isShiftPressed ? SR_PRNCAPTURE : SR_PAUSE;
             case PK_H:
-                return SR_SCREENSHOT;
+                return isShiftPressed ? SR_HDD : SR_SCREENSHOT;
             case PK_U:
                 return SR_FASTRESET;
             case PK_INS:

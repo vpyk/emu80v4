@@ -86,7 +86,7 @@ Platform::Platform(string configFileName, string name)
 
     // ищем объекты - образы дисков A и B
     for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
-        FdImage* img = dynamic_cast<FdImage*>(*it);
+        DiskImage* img = dynamic_cast<DiskImage*>(*it);
         if (img) {
             if (img->getLabel() == "A")
                 m_diskA = img;
@@ -96,6 +96,8 @@ Platform::Platform(string configFileName, string name)
                 m_diskC = img;
             else if (img->getLabel() == "D")
                 m_diskD = img;
+            else if (img->getLabel() == "HDD")
+                m_hdd = img;
         }
 
     // ищем объект - загрузчик, должен быть единственным
@@ -249,6 +251,11 @@ void Platform::sysReq(SysReq sr)
             if (m_diskD)
                 m_diskD->chooseFile();
             break;
+        case SR_HDD:
+            // open HDD/CF image
+            if (m_hdd)
+                m_hdd->chooseFile();
+        break;
         case SR_LOAD:
             if (m_loader) {
                 m_loader->chooseAndLoadFile();

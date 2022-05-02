@@ -61,6 +61,7 @@ enum SysReq
     SR_DISKB,
     SR_DISKC,
     SR_DISKD,
+    SR_HDD,
     SR_FONT,
     SR_COLOR,
     SR_1X,

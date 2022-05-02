@@ -103,7 +103,8 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-B\t– выбор диска B\n"
         "Alt-Shift-C\t– выбор диска 3(C)\n"
         "Alt-Shift-D\t– выбор диска 4(D)\n"
-        "Alt-E\t– выбор электронного диска"
+        "Alt-E\t– выбор электронного диска\n"
+        "Alt-Shift-H\t– выбор жесткого диска"
         ;
 
 	wxString helpString2 =

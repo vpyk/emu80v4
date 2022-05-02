@@ -165,14 +165,17 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("diskB.readOnly");
     loadRunningConfigValue("diskC.readOnly");
     loadRunningConfigValue("diskD.readOnly");
+    loadRunningConfigValue("hdd.readOnly");
     loadRunningConfigValue("diskA.autoMount");
     loadRunningConfigValue("diskB.autoMount");
     loadRunningConfigValue("diskC.autoMount");
     loadRunningConfigValue("diskD.autoMount");
+    loadRunningConfigValue("hdd.autoMount");
     loadRunningConfigValue("diskA.permanentFileName", m_options.contains("diskA.autoMount"));
     loadRunningConfigValue("diskB.permanentFileName", m_options.contains("diskB.autoMount"));
     loadRunningConfigValue("diskC.permanentFileName", m_options.contains("diskC.autoMount"));
     loadRunningConfigValue("diskD.permanentFileName", m_options.contains("diskD.autoMount"));
+    loadRunningConfigValue("hdd.permanentFileName", m_options.contains("hdd.autoMount"));
 }
 
 

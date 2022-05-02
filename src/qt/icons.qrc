@@ -44,5 +44,7 @@
         <file>icons/5x.png</file>
         <file>icons/resizable.png</file>
         <file>icons/preset.png</file>
+        <file>icons/hdd.png</file>
+        <file>icons/hdd_on.png</file>
     </qresource>
 </RCC>

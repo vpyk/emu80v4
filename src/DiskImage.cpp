@@ -54,7 +54,10 @@ bool DiskImage::assignFileName(string fileName)
 
     reset();
 
-    return (m_file.isOpen());
+    if (m_file.isOpen() && m_owner)
+        m_owner->notify(this, DISKIMAGE_NOTIFY_FILEOPENED);
+
+    return m_file.isOpen();
 }
 
 
@@ -62,14 +65,8 @@ void DiskImage::chooseFile()
 {
     string fileName = palOpenFileDialog("Open floppy disk image file", m_filter, false, m_platform->getWindow());
     g_emulation->restoreFocus();
-    if (fileName != "") {
-        m_fileName = fileName;
-        if (m_file.isOpen())
-            m_file.close();
-        m_file.open(m_fileName.c_str(), m_isWriteProtected ? "r" : "r+");
-
-    reset();
-    }
+    if (fileName != "")
+        assignFileName(fileName);
 }
 
 

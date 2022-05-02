@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ class EmuObject
         virtual std::string getPropertyStringValue(const std::string& propertyName);
 
         virtual std::string getDebugInfo() {return "";}
+        virtual void notify(EmuObject* /*sender*/, int /*data*/) {}
 
     protected:
         int m_kDiv = 1;

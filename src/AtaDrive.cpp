@@ -40,15 +40,8 @@ void AtaDrive::assignDiskImage(DiskImage* image)
 {
     m_image = image;
 
-    if (image->getImagePresent()) {
-        int64_t size = m_image->getSize();
-        size /= 512;
-        if (size / 512 > 0xFFFFFFFF) {
-            m_image->close();
-        }
-        if (m_vectorGeometry)
-            setVectorGeometry();
-    }
+    if (image)
+        image->setOwner(this);
 }
 
 
@@ -279,4 +272,20 @@ void AtaDrive::setVectorGeometry()
     uint8_t cylHi = m_image->read8();
     m_cylinders = cylHi << 8 | cylLo;
     m_image->setCurOffset(0);
+}
+
+
+void AtaDrive::notify(EmuObject* sender, int data)
+{
+    if (sender == m_image && data == DISKIMAGE_NOTIFY_FILEOPENED) {
+        if (m_image->getImagePresent()) {
+            int64_t size = m_image->getSize();
+            size /= 512;
+            if (size / 512 > 0xFFFFFFFF) {
+                m_image->close();
+            }
+            if (m_vectorGeometry)
+                setVectorGeometry();
+        }
+    }
 }

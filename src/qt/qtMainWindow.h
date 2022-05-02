@@ -112,10 +112,6 @@ private slots:
     void on3x();
     void on4x();
     void on5x();
-    /*void on2x3();
-    void on3x5();
-    void on4x6();
-    void onStretch();*/
     void onFit();
     void onFullscreen();
     void onFullwindow();
@@ -140,6 +136,11 @@ private slots:
     void onReadOnlyDiskD();
     void onDiskDLastFiles();
     void onAutoMountDiskD();
+    void onHdd();
+    void onUnmountHdd();
+    void onReadOnlyHdd();
+    void onHddLastFiles();
+    void onAutoMountHdd();
     void onCrop();
     void onAspect();
     void onWideScreen();
@@ -191,6 +192,7 @@ private:
     void updateLastFiles();
 
     LastFileList m_fddLastFiles = LastFileList("fdd");
+    LastFileList m_hddLastFiles = LastFileList("hdd");
 
     QTimer m_fpsTimer;
     int m_frameCount = 0;
@@ -215,6 +217,8 @@ private:
     QIcon m_diskCOffIcon            = QIcon(":/icons/disk_c_off.png");
     QIcon m_diskDOnIcon             = QIcon(":/icons/disk_d.png");
     QIcon m_diskDOffIcon            = QIcon(":/icons/disk_d_off.png");
+    QIcon m_hddOnIcon               = QIcon(":/icons/hdd_on.png");
+    QIcon m_hddOffIcon              = QIcon(":/icons/hdd.png");
     QIcon m_smoothingNearestIcon    = QIcon(":/icons/sm_nearest.png");
     QIcon m_smoothingBilinearIcon   = QIcon(":/icons/sm_bilinear.png");
     QIcon m_smoothingSharpIcon      = QIcon(":/icons/sm_sharp.png");
@@ -234,6 +238,7 @@ private:
     QMenu* m_diskBMenu = nullptr;
     QMenu* m_diskCMenu = nullptr;
     QMenu* m_diskDMenu = nullptr;
+    QMenu* m_hddMenu = nullptr;
 
     QMenuBar* m_menuBar = nullptr;
     QToolBar* m_toolBar = nullptr;
@@ -265,9 +270,15 @@ private:
     QAction* m_diskDUnmountAction;
     QAction* m_diskDReadOnlyAction;
     QAction* m_diskDAutoMountAction;
+    QAction* m_hddAction;
+    QAction* m_hddMenuAction;
+    QAction* m_hddUnmountAction;
+    QAction* m_hddReadOnlyAction;
+    QAction* m_hddAutoMountAction;
     QAction* m_loadRamDiskAction;
     QAction* m_saveRamDiskAction;
     QAction* m_menuDiskSeparator;
+    QAction* m_menuHddSeparator;
     QAction* m_toolbarDiskSeparator;
     QAction* m_ramDiskSeparator;
     QAction* m_exitAction;
@@ -306,10 +317,6 @@ private:
     QAction* m_preset3xAction;
     QAction* m_preset4xAction;
     QAction* m_preset5xAction;
-    /*QAction* m_preset2x3Action;
-    QAction* m_preset3x5Action;
-    QAction* m_preset4x6Action;
-    QAction* m_presetStretchAction;*/
     QAction* m_presetFitAction;
     QAction* m_platformHelpAction;
     QAction* m_aboutAction;
@@ -325,6 +332,7 @@ private:
     QAction* m_fddBLastFilesActions[LAST_FILES_QTY];
     QAction* m_fddCLastFilesActions[LAST_FILES_QTY];
     QAction* m_fddDLastFilesActions[LAST_FILES_QTY];
+    QAction* m_hddLastFilesActions[LAST_FILES_QTY];
 };
 
 

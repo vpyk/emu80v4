@@ -140,6 +140,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         {
             QString groupName = QString::fromUtf8(getPlatformGroupName().c_str());
             m_fddLastFiles.setPlatformName(groupName);
+            m_hddLastFiles.setPlatformName(groupName);
         }
 
         tuneMenu();
@@ -513,6 +514,46 @@ void MainWindow::createActions()
     fileMenu->addMenu(m_diskDMenu);
 
     m_menuDiskSeparator = fileMenu->addSeparator();
+
+    // Select HDD image
+    m_hddMenu = new QMenu(tr("HDD/CF"));
+    m_hddMenu->setIcon(m_hddOffIcon);
+
+    m_hddAction = new QAction(tr("Select HDD/CF image..."), this);
+    m_hddMenuAction = m_hddMenu->menuAction();
+    m_hddMenuAction->setToolTip(tr("Load HDD/CF image (Shift-Alt-H)"));
+    QList<QKeySequence> hddKeyList;
+    ADD_HOTKEY(hddKeyList, Qt::Key_Shift + Qt::Key_H);
+    m_hddAction->setShortcuts(hddKeyList);
+    addAction(m_hddAction);
+    m_hddMenu->addAction(m_hddAction);
+    m_toolBar->addAction(m_hddMenuAction);
+    connect(m_hddAction, SIGNAL(triggered()), this, SLOT(onHdd()));
+    connect(m_hddMenuAction, SIGNAL(triggered()), this, SLOT(onHdd()));
+
+    m_hddUnmountAction = new QAction(tr("Unmount"), this);
+    m_hddMenu->addAction(m_hddUnmountAction);
+    m_hddMenu->addSeparator();
+    m_hddReadOnlyAction = new QAction(tr("Read only"), this);
+    m_hddReadOnlyAction->setCheckable(true);
+    m_hddMenu->addAction(m_hddReadOnlyAction);
+    m_hddAutoMountAction = new QAction(tr("Auto mount on startup"), this);
+    m_hddAutoMountAction->setCheckable(true);
+    m_hddMenu->addAction(m_hddAutoMountAction);
+    connect(m_hddUnmountAction, SIGNAL(triggered()), this, SLOT(onUnmountHdd()));
+    connect(m_hddReadOnlyAction, SIGNAL(triggered()), this, SLOT(onReadOnlyHdd()));
+    connect(m_hddAutoMountAction, SIGNAL(triggered()), this, SLOT(onAutoMountHdd()));
+
+    m_hddMenu->addSeparator();
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_hddLastFilesActions[i] = new QAction(this);
+        m_hddMenu->addAction(m_hddLastFilesActions[i]);
+        connect(m_hddLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onHddLastFiles()));
+    }
+
+    fileMenu->addMenu(m_hddMenu);
+
+    m_menuHddSeparator = fileMenu->addSeparator();
 
     // Load RAM disk
     m_loadRamDiskAction = new QAction(QIcon(":/icons/edd.png"), tr("Load RAM Disk..."), this);
@@ -2129,6 +2170,50 @@ void MainWindow::onAutoMountDiskD()
 }
 
 
+void MainWindow::onHdd()
+{
+    emuSysReq(m_palWindow, SR_HDD);
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".hdd", "fileName").c_str());
+    m_hddLastFiles.addToLastFiles(lastFileName);
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onUnmountHdd()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".hdd", "fileName", "");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onReadOnlyHdd()
+{
+    bool readOnly = m_hddReadOnlyAction->isChecked();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".hdd", "readOnly", readOnly ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onHddLastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".hdd", "fileName", action->text().toStdString());
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onAutoMountHdd()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".hdd", "autoMount", m_hddAutoMountAction->isChecked() ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onCrop()
 {
     emuSysReq(m_palWindow, SR_CROPTOVISIBLE);
@@ -2432,6 +2517,35 @@ void MainWindow::updateActions()
     val = emuGetPropertyValue(platform + "diskD", "autoMount");
     m_diskDAutoMountAction->setChecked(val == "yes");
 
+    val = emuGetPropertyValue(platform + "hdd", "label");
+    m_hddMenuAction->setVisible(!val.empty());
+    m_hddAction->setVisible(!val.empty()); // turn off shortcut
+    m_menuHddSeparator->setVisible(!val.empty());
+    if (!val.empty()) {
+        QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "hdd", "fileName").c_str());
+        if (qFileName.isEmpty()) {
+            m_hddUnmountAction->setEnabled(false);
+            m_hddUnmountAction->setText(tr("Unmount"));
+            m_hddMenuAction->setIcon(m_hddOffIcon);
+        } else {
+            m_hddUnmountAction->setEnabled(true);
+
+            if (m_hddLastFiles.getSize() == 0) {
+                // add files from cfg if any
+                m_hddLastFiles.addToLastFiles(qFileName);
+                m_hddLastFiles.tuneActions(m_hddLastFilesActions);
+            }
+
+            qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+            m_hddUnmountAction->setText(tr("Unmount ") + " " + qFileName);
+            m_hddMenuAction->setIcon(m_hddOnIcon);
+        }
+    }
+    val = emuGetPropertyValue(platform + "hdd", "readOnly");
+    m_hddReadOnlyAction->setChecked(val == "yes");
+    val = emuGetPropertyValue(platform + "hdd", "autoMount");
+    m_hddAutoMountAction->setChecked(val == "yes");
+
 
     // Window size menu
 
@@ -2591,6 +2705,7 @@ void MainWindow::updateLastFiles()
     m_fddLastFiles.tuneActions(m_fddBLastFilesActions);
     m_fddLastFiles.tuneActions(m_fddCLastFilesActions);
     m_fddLastFiles.tuneActions(m_fddDLastFilesActions);
+    m_hddLastFiles.tuneActions(m_hddLastFilesActions);
 }
 
 // LastFileList implementation
