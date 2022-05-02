@@ -444,7 +444,7 @@ void MainWindow::createActions()
     m_diskCMenuAction = m_diskCMenu->menuAction();
     m_diskCMenuAction->setToolTip(tr("Load disk C image (Shift-Alt-C)"));
     QList<QKeySequence> diskCKeysList;
-    ADD_HOTKEY(diskCKeysList, Qt::Key_Shift + Qt::Key_C);
+    ADD_HOTKEY(diskCKeysList, Qt::SHIFT + Qt::Key_C);
     m_diskCAction->setShortcuts(diskCKeysList);
     addAction(m_diskCAction);
     m_diskCMenu->addAction(m_diskCAction);
@@ -480,7 +480,7 @@ void MainWindow::createActions()
     m_diskDMenuAction = m_diskDMenu->menuAction();
     m_diskDMenuAction->setToolTip(tr("Load disk D image (Shift-Alt-D)"));
     QList<QKeySequence> diskDKeysList;
-    ADD_HOTKEY(diskDKeysList, Qt::Key_Shift + Qt::Key_D);
+    ADD_HOTKEY(diskDKeysList, Qt::SHIFT + Qt::Key_D);
     m_diskDAction->setShortcuts(diskDKeysList);
     addAction(m_diskDAction);
     m_diskDMenu->addAction(m_diskDAction);
@@ -523,7 +523,7 @@ void MainWindow::createActions()
     m_hddMenuAction = m_hddMenu->menuAction();
     m_hddMenuAction->setToolTip(tr("Load HDD/CF image (Shift-Alt-H)"));
     QList<QKeySequence> hddKeyList;
-    ADD_HOTKEY(hddKeyList, Qt::Key_Shift + Qt::Key_H);
+    ADD_HOTKEY(hddKeyList, Qt::SHIFT + Qt::Key_H);
     m_hddAction->setShortcuts(hddKeyList);
     addAction(m_hddAction);
     m_hddMenu->addAction(m_hddAction);
