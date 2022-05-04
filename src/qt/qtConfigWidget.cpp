@@ -22,6 +22,7 @@
 
 #include "qtConfigWidget.h"
 #include "ui_qtApogeyConfig.h"
+#include "ui_qtKorvetConfig.h"
 
 #include "../Pal.h"
 
@@ -38,7 +39,11 @@ ConfigWidget::ConfigWidget(QWidget* parent) : QWidget(parent)
 ConfigWidget* ConfigWidget::create(QString platformName)
 {
     ConfigWidget* widget;
+    if (platformName == "korvet")
+        widget = new KorvetConfigWidget();
+    else // if (platformName == "apogey" || platformName == "rk86")
     widget = new ApogeyConfigWidget();
+
     widget->m_platform = platformName;
     widget->tune();
     return widget;
@@ -187,3 +192,36 @@ void ApogeyConfigWidget::onSelectSdImg()
 {
     selectFile(ui->sdLabel, true, tr("Select SD Card Image File"));
 }
+
+
+// ######## Korvet config widget ########
+
+KorvetConfigWidget::KorvetConfigWidget(QWidget *parent) :
+    ConfigWidget(parent),
+    ui(new Ui::KorvetConfigWidget)
+{
+    ui->setupUi(this);
+}
+
+
+void KorvetConfigWidget::loadConfig()
+{
+    m_defValues["CFG_PPI3"] = "AY";
+
+    optBegin();
+    ui->psgCheckBox->setChecked(optLoad("CFG_PPI3").toString() == "AY");
+    optEnd();
+}
+
+void KorvetConfigWidget::saveConfig()
+{
+    optBegin();
+    optSave("CFG_PPI3", ui->psgCheckBox->isChecked() ? "AY" : "NONE");
+    optEnd();
+}
+
+void KorvetConfigWidget::setDefaults()
+{
+    ui->psgCheckBox->setChecked(m_defValues["CFG_PPI3"] == "AY");
+}
+

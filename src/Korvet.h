@@ -443,4 +443,26 @@ public:
 };
 
 
+class Psg3910;
+
+class KorvetPpiPsgAdapter : public Ppi8255Circuit
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        // derived from Ppi8255Circuit
+        uint8_t getPortA() override;
+        void setPortA(uint8_t value) override;
+        void setPortB(uint8_t value) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new KorvetPpiPsgAdapter();}
+
+    private:
+        Psg3910* m_psg = nullptr;
+        bool m_strobe = false;
+        uint8_t m_read = 0;
+        uint8_t m_write = 0;
+};
+
+
 #endif // KORVET_H

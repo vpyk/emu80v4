@@ -58,6 +58,7 @@ protected:
 
 namespace Ui {
     class ApogeyConfigWidget;
+    class KorvetConfigWidget;
 }
 
 class ApogeyConfigWidget : public ConfigWidget
@@ -81,6 +82,23 @@ private slots:
 
 private:
     Ui::ApogeyConfigWidget *ui;
+};
+
+
+class KorvetConfigWidget : public ConfigWidget
+{
+    Q_OBJECT
+
+public:
+    explicit KorvetConfigWidget(QWidget *parent = nullptr);
+    //~ApogeyConfigWidget();
+
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private:
+    Ui::KorvetConfigWidget *ui;
 };
 
 

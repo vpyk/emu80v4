@@ -221,6 +221,7 @@ TRANSLATIONS += qt/emu80_ru.ts
 CODECFORSRC = UTF-8
 
 FORMS += \
+    qt/qtKorvetConfig.ui \
     qt/qtPlatformConfig.ui \
     qt/qtSettingsDialog.ui \
     qt/qtChoosePlatformDialog.ui \

@@ -251,6 +251,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(KorvetFddMotor);
     REG_EMU_CLASS(KorvetPit8253SoundSource);
     REG_EMU_CLASS(KorvetCpuCycleWaits);
+    REG_EMU_CLASS(KorvetPpiPsgAdapter);
 
 
     reg("ConfigTab", &EmuConfigTab::create);

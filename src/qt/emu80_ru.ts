@@ -43,22 +43,22 @@
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="176"/>
+        <location filename="qtConfigWidget.cpp" line="181"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="176"/>
+        <location filename="qtConfigWidget.cpp" line="181"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="182"/>
+        <location filename="qtConfigWidget.cpp" line="187"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="188"/>
+        <location filename="qtConfigWidget.cpp" line="193"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -89,7 +89,7 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="qtConfigWidget.cpp" line="76"/>
+        <location filename="qtConfigWidget.cpp" line="81"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -115,6 +115,14 @@
         <location filename="qtHelpDialog.ui" line="59"/>
         <source>Close</source>
         <translation>Закрыть</translation>
+    </message>
+</context>
+<context>
+    <name>KorvetConfigWidget</name>
+    <message>
+        <location filename="qtKorvetConfig.ui" line="32"/>
+        <source>3d PPI</source>
+        <translation>ППА №3</translation>
     </message>
 </context>
 <context>
@@ -876,8 +884,12 @@
     </message>
     <message>
         <location filename="qtPlatformConfig.ui" line="71"/>
+        <source>Ok / Reset</source>
+        <translation>Ок / сброс</translation>
+    </message>
+    <message>
         <source>Ok</source>
-        <translation>Ок</translation>
+        <translation type="vanished">Ок</translation>
     </message>
     <message>
         <location filename="qtPlatformConfig.ui" line="81"/>

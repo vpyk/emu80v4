@@ -68,7 +68,7 @@
      <item>
       <widget class="QPushButton" name="okButton">
        <property name="text">
-        <string>Ok</string>
+        <string>Ok / Reset</string>
        </property>
        <property name="default">
         <bool>true</bool>

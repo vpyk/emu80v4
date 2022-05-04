@@ -32,6 +32,7 @@
 #include "Pic8259.h"
 #include "WavReader.h"
 #include "PrnWriter.h"
+#include "Psg3910.h"
 
 // Korvet implementation
 
@@ -1015,4 +1016,48 @@ string KorvetKbdLayout::getPropertyStringValue(const string& propertyName)
         return m_downAsNumpad5 ? "yes" : "no";
 
     return "";
+}
+
+
+bool KorvetPpiPsgAdapter::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (Ppi8255Circuit::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "psg") {
+        m_psg = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+
+    return false;
+}
+
+
+uint8_t KorvetPpiPsgAdapter::getPortA()
+{
+    return m_read;
+}
+
+
+void KorvetPpiPsgAdapter::setPortA(uint8_t value)
+{
+    m_write = value;
+}
+
+
+void KorvetPpiPsgAdapter::setPortB(uint8_t value)
+{
+    bool bdir = value & 0x80;
+    bool bc1 = value & 0x40;
+
+    if (!m_strobe && (bdir || bc1)) {
+        m_strobe = true;
+        if (!bdir && bc1)
+            m_read = m_psg->readByte(0);
+        else if (bdir && !bc1)
+            m_psg->writeByte(0, m_write);
+        else // if (bdir && bc1)
+            m_psg->writeByte(1, m_write & 15);
+    } else
+        m_strobe = false;
 }
