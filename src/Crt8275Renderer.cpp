@@ -396,6 +396,9 @@ bool Crt8275Renderer::setProperty(const string& propertyName, const EmuValuesLis
             setCropping(values[0].asString() == "yes");
             return true;
         }
+    } else if (propertyName == "visibleOffsetX") {
+        m_visibleOffsetX = values[0].asInt();
+        return true;
     }
 
     return false;

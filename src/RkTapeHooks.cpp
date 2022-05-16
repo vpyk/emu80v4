@@ -27,8 +27,20 @@
 using namespace std;
 
 
+void RkTapeOutHook::reset()
+{
+    if (m_suspendPeriod)
+        m_suspendEndTime = g_emulation->getCurClock() + g_emulation->getFrequency() * m_suspendPeriod / 1000;
+    else
+        m_suspendEndTime = 0;
+}
+
+
 bool RkTapeOutHook::hookProc()
 {
+    if (g_emulation->getCurClock() < m_suspendEndTime)
+        return false;
+
     if (!m_isEnabled || (m_hasSignature && !checkSignature()))
         return false;
 
@@ -70,6 +82,7 @@ void RkTapeInHook::reset()
     else
         m_suspendEndTime = 0;
 }
+
 
 bool RkTapeInHook::hookProc()
 {
@@ -124,6 +137,9 @@ bool RkTapeOutHook::setProperty(const string& propertyName, const EmuValuesList&
             m_regA = values[0].asString() == "A";
             return true;
         }
+    } else if (propertyName == "suspendAfterResetForMs" && values[0].isInt()) {
+        m_suspendPeriod = values[0].asInt();
+        return true;
     }
 
     return false;

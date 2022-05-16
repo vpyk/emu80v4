@@ -28,6 +28,7 @@ class RkTapeOutHook : public CpuHook
         virtual ~RkTapeOutHook() {}
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
+        void reset() override;
         bool hookProc() override;
 
         static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new RkTapeOutHook(parameters[0].asInt()) : nullptr;}
@@ -35,6 +36,9 @@ class RkTapeOutHook : public CpuHook
     private:
         bool m_isSbFound = false;
         bool m_regA = false;
+
+        unsigned m_suspendPeriod = 0;
+        uint64_t m_suspendEndTime = 0;
 };
 
 
