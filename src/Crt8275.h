@@ -102,6 +102,7 @@ class Crt8275 : public AddressableDevice, public IActive
     enum CrtCommand
     {
         CC_LOADCURSOR,
+        CC_READLPEN,
         CC_RESET
     };
 
@@ -137,6 +138,8 @@ class Crt8275 : public AddressableDevice, public IActive
         bool getRasterPresent() {return m_isRasterStarted;}
         double getFrameRate();
 
+        void setLpenPosition(int x, int y);
+
         static EmuObject* create(const EmuValuesList&) {return new Crt8275();}
 
         friend Crt8275Raster;
@@ -152,18 +155,21 @@ class Crt8275 : public AddressableDevice, public IActive
         int  m_nLines;               // line count
         bool m_isSpacedRows;         // spaced row count
         int  m_nCharsPerRow;         // characters per row
-        int  m_undLine;             // undderline placement
+        int  m_undLine;              // undderline placement
         bool m_isOffsetLine;         // offset line couner mode
         bool m_isTransparentAttr;    // transparent attribute mode
         int  m_nVrRows;              // vertical retrace rows
         int  m_nHrChars;             // horisontal retrace characters
-        int  m_burstCount;          // DMA cycles per burst
+        int  m_burstCount;           // DMA cycles per burst
         int  m_burstSpaceCount;      // burst space count
         int  m_cursorPos;            // cursor char position
         int  m_cursorRow;            // cursor row position
         bool m_isIntsEnabled;        // enable interrupts flag
         bool m_cursorBlinking;
         bool m_cursorUnderline;
+        int m_lpenX;                 // light pen X position
+        int m_lpenY;                 // light pen Y position
+        int m_lpenCorrection = 0;    // light pen position correction
         //CursorFormat m_cursorFormat; // cursor format
 
         uint8_t m_statusReg;

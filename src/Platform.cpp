@@ -319,6 +319,13 @@ void Platform::resetKeys()
 }
 
 
+void Platform::mouseDrag(int x, int y)
+{
+    if (m_renderer)
+        m_renderer->mouseDrag(x, y);
+}
+
+
 void Platform::loadFile(string fileName)
 {
     if (m_loader)

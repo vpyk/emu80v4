@@ -387,6 +387,12 @@ void Crt8275::writeByte(int addr, uint8_t value)
                     m_isDisplayStarted = false;
                     startRasterIfNotStarted();
                     break;
+                case 3:
+                    // Read Light Pen
+                    m_crtCmd = CC_READLPEN;
+                    m_parameterNum = 0;
+                    startRasterIfNotStarted();
+                    break;
                 case 4:
                     // Load Cursor Position
                     m_crtCmd = CC_LOADCURSOR;
@@ -414,8 +420,6 @@ void Crt8275::writeByte(int addr, uint8_t value)
                     m_raster->stopRaster();
                     break;
                 default:
-                    // 3 - Read Light Pen - not implemented
-                    startRasterIfNotStarted();
                     break;
             }
             break;
@@ -424,7 +428,6 @@ void Crt8275::writeByte(int addr, uint8_t value)
             break;
     }
 }
-
 
 uint8_t Crt8275::readByte(int nAddr)
 {
@@ -455,6 +458,21 @@ uint8_t Crt8275::readByte(int nAddr)
                             m_parameterNum = 0;
                             m_isCompleteCommand = false;
                             m_statusReg |= 0x08; // set IC flag
+                            break;
+                    }
+                    break;
+                case CC_READLPEN:
+                    switch (m_parameterNum) {
+                        case 0:
+                            // Char number
+                            value = m_lpenX;
+                            m_parameterNum = 1;
+                            break;
+                        default: //case 1:
+                            // Row number
+                            value = m_lpenY;
+                            m_parameterNum = 0;
+                            m_isCompleteCommand = false;
                             break;
                     }
                     break;
@@ -661,6 +679,13 @@ double Crt8275::getFrameRate()
 }
 
 
+void Crt8275::setLpenPosition(int x, int y)
+{
+    m_lpenX = x + m_lpenCorrection;
+    m_lpenY = y;
+    m_statusReg |= 0x10;
+}
+
 
 //////////////////////////////////
 // Crt8275Raster Implementation //
@@ -762,6 +787,9 @@ bool Crt8275::setProperty(const string& propertyName, const EmuValuesList& value
         }
     } else if (propertyName == "core") {
         attachCore(static_cast<PlatformCore*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "lpenCorrection") {
+        m_lpenCorrection = values[0].asInt();
         return true;
     }
 

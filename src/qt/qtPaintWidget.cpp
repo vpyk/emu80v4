@@ -255,8 +255,21 @@ void PaintWidget::resizeGL(int w, int h)
 }*/
 
 
-void PaintWidget::mouseMoveEvent(QMouseEvent*)
+void PaintWidget::mouseDrag(int x, int y)
 {
+    x -= m_dstRect.x();
+    y -= m_dstRect.y();
+    x = x * m_image->width() / m_dstRect.width();
+    y = y * m_image->height() / m_dstRect.height();
+    static_cast<MainWindow*>(parent())->mouseDrag(x, y);
+}
+
+
+void PaintWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (event->buttons() & Qt::LeftButton)
+        mouseDrag(event->x(), event->y());
+
     if (!m_hideCursor)
         return;
 
@@ -272,6 +285,8 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() & Qt::LeftButton)
         static_cast<MainWindow*>(parent())->mouseClick(event->x(), event->y(), PM_LEFT_CLICK);
+
+    mouseDrag(event->x(), event->y());
 }
 
 

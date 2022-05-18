@@ -74,6 +74,7 @@ public:
     PalWindow* getPalWindow() {return m_palWindow;}
     void showWindow();
     void mouseClick(int x, int y, PalMouseKey key);
+    void mouseDrag(int x, int y);
 
     void setClientSize(int width, int height);
     void adjustClientSize();

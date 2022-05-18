@@ -35,6 +35,8 @@ class Crt8275Renderer : public TextCrtRenderer
 
         const char* getTextScreen() override;
 
+        void mouseDrag(int x, int y) override;
+
         void attachCrt(Crt8275* crt);
 
         void setFontSetNum(int fontNum) {m_fontNumber = fontNum;}
@@ -81,6 +83,9 @@ class Crt8275Renderer : public TextCrtRenderer
         double m_freqMHz;
         double m_frameRate;
         bool m_cropping = false;
+
+        int m_cropX = 0;
+        int m_cropY = 0;
 
         std::string getCrtMode();
         void calcAspectRatio(int charWidth);

@@ -45,6 +45,8 @@ class CrtRenderer : public EmuObject
 
         virtual const char* getTextScreen() {return nullptr;}
 
+        virtual void mouseDrag(int /*x*/, int /*y*/) {}
+
         void attachSecondaryRenderer(CrtRenderer* renderer);
 
     protected:

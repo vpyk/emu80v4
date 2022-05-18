@@ -65,6 +65,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
     private:
         void paintImageGL(QImage* img, double aspectRatio);
 
+        void mouseDrag(int x, int y);
+
         QImage* m_image = nullptr;
         QImage* m_image2 = nullptr;
         uchar* m_imageData;

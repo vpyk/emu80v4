@@ -139,6 +139,23 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
     m_dataSize = visibleWidth * visibleHeight;
     m_bufSize = m_dataSize;
     m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
+
+    m_cropX = visibleX;
+    m_cropY = visibleY;
+}
+
+
+void Crt8275Renderer::mouseDrag(int x, int y)
+{
+    if (m_cropping) {
+        x += m_cropX;
+        y += m_cropY;
+    }
+
+    x /= m_fntCharWidth;
+    y /= m_crt->getFrame()->nLines;
+
+    m_crt->setLpenPosition(x, y);
 }
 
 

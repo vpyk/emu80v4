@@ -56,6 +56,7 @@ class Platform : public ParentObject
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys();
         /*virtual */void loadFile(std::string fileName);
+        void mouseDrag(int x, int y);
 
         const std::string& getBaseDir() {return m_baseDir;}
 

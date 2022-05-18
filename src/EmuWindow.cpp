@@ -516,6 +516,15 @@ void EmuWindow::sysReq(SysReq sr)
 }
 
 
+void EmuWindow::mouseDrag(int x, int y)
+{
+    if (m_fieldsMixing == FM_INTERLACE || m_fieldsMixing == FM_SCANLINE)
+        y /= 2;
+
+    m_platform->mouseDrag(x, y);
+}
+
+
 bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))

@@ -19,7 +19,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VER_STR "4.0.408"
+#define VER_STR "4.0.409"
 #define VER_COMMA_SEP 4,0,408,0
 
 #define VI_FILE_DESCR "Emu80 main executable"
