@@ -136,6 +136,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(MikroshaPpi8255Circuit);
     REG_EMU_CLASS(MikroshaPpi2Circuit);
     REG_EMU_CLASS(MikroshaRenderer);
+    REG_EMU_CLASS(KristaKbdLayout);
     REG_EMU_CLASS(PartnerAddrSpace);
     REG_EMU_CLASS(PartnerAddrSpaceSelector);
     REG_EMU_CLASS(PartnerModuleSelector);

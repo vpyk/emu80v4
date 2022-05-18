@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -225,4 +225,28 @@ void MikroshaPit8253SoundSource::setGate(bool gate)
 {
     updateStats();
     m_gate = gate;
+}
+
+
+EmuKey KristaKbdLayout::translateKey(PalKeyCode keyCode)
+{
+    switch (keyCode) {
+    case PK_F1:
+        return EK_NONE;
+    case PK_F2:
+        return EK_F1;
+    case PK_F3:
+        return EK_F2;
+    case PK_F4:
+        return EK_F3;
+    case PK_F5:
+        return EK_F4;
+    case PK_F6:
+        return EK_F5;
+    default:
+        break;
+    }
+
+    EmuKey key = RkKbdLayout::translateKey(keyCode);
+    return key;
 }

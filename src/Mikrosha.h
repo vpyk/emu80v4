@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "Pit8253Sound.h"
 #include "RkPpi8255Circuit.h"
 #include "Crt8275Renderer.h"
+#include "KbdLayout.h"
 
 class MikroshaCore : public PlatformCore
 {
@@ -130,5 +131,14 @@ class MikroshaRenderer : public Crt8275Renderer
             u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
 };
 
+
+class KristaKbdLayout : public RkKbdLayout
+{
+    public:
+        static EmuObject* create(const EmuValuesList&) {return new KristaKbdLayout();}
+
+    protected:
+        EmuKey translateKey(PalKeyCode keyCode) override;
+};
 
 #endif // MIKROSHA_H
