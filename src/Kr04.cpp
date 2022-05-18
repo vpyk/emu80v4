@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -466,4 +466,14 @@ EmuKey Kr04KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCod
         return EK_UNDSCR;
 
     return RkKbdLayout::translateUnicodeKey(unicodeKey, keyCode, shift, lang);
+}
+
+
+int Kr04CpuWaits::getCpuWaitStates(int memTag, int, int normalClocks)
+{
+    static const int waits[19] = {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 3, 0, 3, 0, 0, 4, 5, 4};
+    int w = waits[normalClocks];
+    if (memTag != 1 && normalClocks > 4)
+        w--;
+    return w;
 }

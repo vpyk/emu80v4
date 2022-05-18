@@ -26,6 +26,7 @@
 #include "Pit8253Sound.h"
 #include "FileLoader.h"
 #include "RkKeyboard.h"
+#include "CpuWaits.h"
 
 class GeneralSoundSource;
 class AddrSpaceMapper;
@@ -194,6 +195,15 @@ class Kr04FileLoader : public RkFileLoader
     private:
         void afterReset() override;
 
+};
+
+
+class Kr04CpuWaits : public CpuWaits
+{
+public:
+    int getCpuWaitStates(int memTag, int, int normalClocks) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new Kr04CpuWaits();}
 };
 
 
