@@ -71,6 +71,8 @@ class EmuWindow : public EmuObject, public PalWindow
         virtual void processKey(PalKeyCode, bool) {}
         virtual void closeRequest() {}
 
+        virtual bool translateCoords(int& x, int& y);
+
         void sysReq(SysReq sr);
 
         void show();
@@ -93,8 +95,6 @@ class EmuWindow : public EmuObject, public PalWindow
         void drawFrame(EmuPixelData frame);
         void drawOverlay(EmuPixelData frame);
         void endDraw();
-
-        bool translateCoords(int& x, int& y);
 
         std::string getCaption();
 

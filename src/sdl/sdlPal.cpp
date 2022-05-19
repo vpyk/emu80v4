@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -496,9 +496,17 @@ static bool palProcessEvents()
             case SDL_MOUSEBUTTONDOWN:
                     if (!SDL_GetWindowFromID(event.button.windowID))
                         break; // могут остаться события, относящиеся к уже уделенному окну
-                    if (event.button.button == SDL_BUTTON_LEFT)
+                    if (event.button.button == SDL_BUTTON_LEFT) {
                         PalWindow::windowById(event.button.windowID)->mouseClick(event.button.x, event.button.y,
-                                                                                event.button.clicks < 2 ? PM_LEFT_CLICK : PM_LEFT_DBLCLICK);
+                                                                                 event.button.clicks < 2 ? PM_LEFT_CLICK : PM_LEFT_DBLCLICK);
+                        PalWindow::windowById(event.button.windowID)->mouseDrag(event.button.x, event.button.y);
+                    }
+                    break;
+            case SDL_MOUSEMOTION:
+                    if (!SDL_GetWindowFromID(event.button.windowID))
+                        break; // могут остаться события, относящиеся к уже уделенному окну
+                    if (event.motion.state & SDL_BUTTON_LMASK)
+                        PalWindow::windowById(event.button.windowID)->mouseDrag(event.motion.x, event.motion.y);
                     break;
             case SDL_MOUSEWHEEL:
                     if (!SDL_GetWindowFromID(event.wheel.windowID))

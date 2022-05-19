@@ -58,7 +58,7 @@ class PalWindow
         void focusChanged(bool isFocused);
 
         virtual void mouseClick(int x, int y, PalMouseKey key) {}
-        virtual void mouseDrag(int x, int y) {}
+        virtual void mouseDrag(int x, int y) = 0;
 
         virtual std::string getPlatformObjectName() = 0;
         EmuWindowType getWindowType() {return m_windowType;}
@@ -92,10 +92,10 @@ class PalWindow
         int m_lastWidth;
         int m_lastHeight;
 
-        int m_dstWidth;
-        int m_dstHeight;
-        int m_dstX;
-        int m_dstY;
+        int m_dstWidth = 0;
+        int m_dstHeight = 0;
+        int m_dstX = 0;
+        int m_dstY = 0;
 
         SDL_Surface* m_ssSurface = nullptr;
         SDL_Renderer* m_ssRenderer = nullptr;

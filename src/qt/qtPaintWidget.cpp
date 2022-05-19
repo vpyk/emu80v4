@@ -257,10 +257,6 @@ void PaintWidget::resizeGL(int w, int h)
 
 void PaintWidget::mouseDrag(int x, int y)
 {
-    x -= m_dstRect.x();
-    y -= m_dstRect.y();
-    x = x * m_image->width() / m_dstRect.width();
-    y = y * m_image->height() / m_dstRect.height();
     static_cast<MainWindow*>(parent())->mouseDrag(x, y);
 }
 
