@@ -43,7 +43,7 @@ void Kr04Core::vrtc(bool isActive)
 void Kr04Core::hrtc(bool isActive, int)
 {
     if (isActive) {
-        Pit8253Counter* cnt0 = m_pit->getCounter(0);
+        //Pit8253Counter* cnt0 = m_pit->getCounter(0);
         Pit8253Counter* cnt1 = m_pit->getCounter(1);
         Pit8253Counter* cnt2 = m_pit->getCounter(2);
 

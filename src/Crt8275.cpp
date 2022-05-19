@@ -349,6 +349,8 @@ void Crt8275::writeByte(int addr, uint8_t value)
                             break;
                     }
                     break;
+                default:
+                    break;
             }
             break;
         case 1:
