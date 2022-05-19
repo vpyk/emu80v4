@@ -6,37 +6,24 @@
     <title></title>
   </head>
   <body>
-    <h2>Микроша. Краткая справка</h2>
-    <h3>Загрузка файлов с помощью встроенного загрузчика</h3>
-    <p>Двоичные файлы образов ленты «.rkm» можно загружать с помощью пункта меню
-      «Файл -&gt; Загрузить и выполнить», комбинации клавиш Alt-F3 (Meta-F3),
-      либо соответствующей кнопки на панели инструментов. Можно также перетащить
-      нужный файл в окно эмулятора.</p>
-    <h3>Загрузка с использованием перехватов магнитофонных операций</h3>
-    <p>В ответ на приглашение Монитора «-&gt;» нужно набрать «I&lt;Enter&gt;» и
-      выбрать файл. В случае успешной загрузки Монитор отображает столбец из 3
-      цифр - начального адреса, конечного и контрольной суммы. После загрузки
-      запуск обычно осуществляется с помощью директивы G Монитора
-      («G&lt;Enter&gt;»). В случае запуска не с нулевого адреса в директиве G
-      можно указать адрес запуска, например: «G100&lt;Enter&gt;». Этим способом
-      можно также загружать .wav и .csw-файлы.</p>
-    <h3>Работа с образами дисков</h3>
-    <p>Файлы образов дисков (.rkd, .rkdisk) подключаются с помощью горячих
-      клавиш Alt-A (Meta-A) для диска «A» и Alt-B (Meta-B) для диска «B». Можно
-      также использовать соответствующие пункты меню или кнопки на панели
-      инструментов. Для загрузки RK-DOS нужно набрать «GE000». Для отображения
-      перечня файлов на диске служит команда «DIR», для запуска файла нужно
-      набрать его имя.</p>
-    <h3>Внешнее ПЗУ</h3>
-    <p>По умолчанию для Микроши эмулируется наличие штатного внешнего модуля
-      ПЗУ, подключаемого к разъему расширения. Данное ПЗУ содержит текстовый
-      редактор, интерпретатор языка Бейсик-плюс и ассемблер. Для выхода в меню
-      модуля необходимо набрать «G8000».</p>
-    <h3>Соответствие клавиш и раскладки клавиатуры</h3>
-    <p>По умолчанию для Микроши (Кристы) установлена «Умная» раскладка
-      клавиатуры, ввод буквенно-цифровых символов при этом производится как
-      обычно, раскладка переключается средствами ОС, в которой запущен эмулятор.
+    <h2>Криста. Краткая справка</h2>
+    <p> ПК Криста очень похож на Микрошу, для общих сведений предлагаю
+      ознакомиться со <a href="mikrosha.html">справкой по ПК Микроша</a>.</p>
+    <p>Ниже описаны отличия от Микроши.
     </p>
+    <h3>Совместимость Микроши и Кристы</h3>
+    <p>Несмотря на большое сходство, ПК Микроша и Криста не полностью
+      совместимы. Для Кристы не предусмотрено отдельное расширение файлов, и
+      используется тот же формат «.rkm», многие программы от Микроши будут
+      работать без проблем, часть — с артефактами отображения, некоторые не
+      будет работать вообще. То же относится и к запуску программ Кристы на
+      Микроше.</p>
+    <h3>Соответствие клавиш и раскладки клавиатуры</h3>
+    <p>По умолчанию для Кристы установлена «Умная» раскладка клавиатуры, ввод
+      буквенно-цифровых символов при этом производится как обычно, раскладка
+      переключается средствами ОС, в которой запущен эмулятор. По сравнению с
+      Микрошей изменено сответствие функциональных клавиш, клавиши F1-F5 на
+      Микроше соответствуют клавишам F2-F6 на Кристе. </p>
     <p> Раскладки клавиатуры в различных режимах:</p>
     <h4>«Умная» раскладка:</h4>
     <table class="kbd">
@@ -118,14 +105,14 @@
           <td colspan="6">АР2</td>
           <td colspan="6" class="blank">&nbsp;<br>
             &nbsp;</td>
-          <td colspan="6">F1</td>
+          <td colspan="6" class="unused">F1</td>
           <td colspan="6">F2</td>
           <td colspan="6">F3</td>
           <td colspan="6">F4</td>
           <td colspan="3" class="blank"><br>
           </td>
           <td colspan="6">F5</td>
-          <td colspan="6" class="unused">F6</td>
+          <td colspan="6">F6</td>
           <td colspan="6" class="unused">F7</td>
           <td colspan="6" class="unused">F8</td>
           <td colspan="3" class="blank"><br>
@@ -141,7 +128,7 @@
           <td colspan="6" class="special">Ps</td>
           <td colspan="8" class="blank"><br>
           </td>
-          <td colspan="18" class="title"> <b>Микроша</b><br>
+          <td colspan="18" class="title"> <b>Криста</b><br>
             (smart) </td>
         </tr>
         <tr>
@@ -361,7 +348,7 @@
         </tr>
         <tr>
           <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="14">НР</td>
+          <td colspan="14">РЕГ</td>
           <td colspan="6">
             <div align="right">Я&nbsp;</div>
             <div align="left">&nbsp;Z</div>
@@ -402,7 +389,7 @@
             <div align="right">.&nbsp;,&nbsp;</div>
             <div align="left">&nbsp;?&nbsp;/</div>
           </td>
-          <td colspan="16">НР</td>
+          <td colspan="16">РЕГ</td>
           <td colspan="8" class="blank">&nbsp;<br>
             &nbsp;</td>
           <td colspan="6">↑</td>
@@ -536,14 +523,14 @@
           <td colspan="6">АР2</td>
           <td colspan="6" class="blank">&nbsp;<br>
             &nbsp;</td>
-          <td colspan="6">F1</td>
+          <td colspan="6" class="unused">F1</td>
           <td colspan="6">F2</td>
           <td colspan="6">F3</td>
           <td colspan="6">F4</td>
           <td colspan="3" class="blank"><br>
           </td>
           <td colspan="6">F5</td>
-          <td colspan="6" class="unused">F6</td>
+          <td colspan="6">F6</td>
           <td colspan="6" class="unused">F7</td>
           <td colspan="6" class="unused">F8</td>
           <td colspan="3" class="blank"><br>
@@ -559,7 +546,7 @@
           <td colspan="6" class="special">Ps</td>
           <td colspan="8" class="blank"><br>
           </td>
-          <td colspan="18" class="title"> <b>Микроша</b><br>
+          <td colspan="18" class="title"> <b>Криста</b><br>
             (qwerty) </td>
         </tr>
         <tr>
@@ -779,7 +766,7 @@
         </tr>
         <tr>
           <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="14">НР</td>
+          <td colspan="14">РЕГ</td>
           <td colspan="6">
             <div align="right">З&nbsp;</div>
             <div align="left">&nbsp;Z</div>
@@ -820,7 +807,7 @@
             <div align="right">?&nbsp;</div>
             <div align="left">&nbsp;/</div>
           </td>
-          <td colspan="16">НР</td>
+          <td colspan="16">РЕГ</td>
           <td colspan="8" class="blank">&nbsp;<br>
             &nbsp;</td>
           <td colspan="6">↑</td>
@@ -954,14 +941,14 @@
           <td colspan="6">АР2</td>
           <td colspan="6" class="blank">&nbsp;<br>
             &nbsp;</td>
-          <td colspan="6">F1</td>
+          <td colspan="6" class="unused">F1</td>
           <td colspan="6">F2</td>
           <td colspan="6">F3</td>
           <td colspan="6">F4</td>
           <td colspan="3" class="blank"><br>
           </td>
           <td colspan="6">F5</td>
-          <td colspan="6" class="unused">F6</td>
+          <td colspan="6">F6</td>
           <td colspan="6" class="unused">F7</td>
           <td colspan="6" class="unused">F8</td>
           <td colspan="3" class="blank"><br>
@@ -977,7 +964,7 @@
           <td colspan="6" class="special">Ps</td>
           <td colspan="8" class="blank"><br>
           </td>
-          <td colspan="18" class="title"> <b>Микроша</b><br>
+          <td colspan="18" class="title"> <b>Криста</b><br>
             (йцукен) </td>
         </tr>
         <tr>
@@ -1197,7 +1184,7 @@
         </tr>
         <tr>
           <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="14">НР</td>
+          <td colspan="14">РЕГ</td>
           <td colspan="6">
             <div align="right">Я&nbsp;</div>
             <div align="left">&nbsp;Q</div>
@@ -1238,7 +1225,7 @@
             <div align="right">?&nbsp;</div>
             <div align="left">&nbsp;/</div>
           </td>
-          <td colspan="16">НР</td>
+          <td colspan="16">РЕГ</td>
           <td colspan="8" class="blank">&nbsp;<br>
             &nbsp;</td>
           <td colspan="6">↑</td>
