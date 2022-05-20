@@ -137,6 +137,13 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         return false;
     }
 
+    if (run) {
+        m_platform->reset();
+        Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+        cpu->disableHooks();
+        g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+    }
+
     for (unsigned addr = begAddr; addr <= endAddr; addr++)
         m_as->writeByte(addr, *ptr++);
 
@@ -168,8 +175,8 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu) {
-            cpu->disableHooks();
-            g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+            //cpu->disableHooks();
+            //g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
 
             afterReset();
 
