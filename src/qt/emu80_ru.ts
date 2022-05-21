@@ -32,33 +32,38 @@
         <translation>SD-адаптер (схема vinxru)</translation>
     </message>
     <message>
-        <location filename="qtApogeyConfig.ui" line="86"/>
-        <location filename="qtApogeyConfig.ui" line="118"/>
+        <location filename="qtApogeyConfig.ui" line="73"/>
+        <source>Enable</source>
+        <translation>Разрешить</translation>
+    </message>
+    <message>
+        <location filename="qtApogeyConfig.ui" line="93"/>
+        <location filename="qtApogeyConfig.ui" line="125"/>
         <source>Select folder</source>
         <translation>Выбрать папку</translation>
     </message>
     <message>
-        <location filename="qtApogeyConfig.ui" line="99"/>
+        <location filename="qtApogeyConfig.ui" line="106"/>
         <source>SD Adapter (SDOS)</source>
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="181"/>
+        <location filename="qtConfigWidget.cpp" line="193"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="181"/>
+        <location filename="qtConfigWidget.cpp" line="193"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="187"/>
+        <location filename="qtConfigWidget.cpp" line="199"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="193"/>
+        <location filename="qtConfigWidget.cpp" line="205"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -486,11 +491,11 @@
         <location filename="qtMainWindow.cpp" line="455"/>
         <location filename="qtMainWindow.cpp" line="491"/>
         <location filename="qtMainWindow.cpp" line="534"/>
-        <location filename="qtMainWindow.cpp" line="2443"/>
-        <location filename="qtMainWindow.cpp" line="2464"/>
-        <location filename="qtMainWindow.cpp" line="2485"/>
-        <location filename="qtMainWindow.cpp" line="2506"/>
-        <location filename="qtMainWindow.cpp" line="2528"/>
+        <location filename="qtMainWindow.cpp" line="2452"/>
+        <location filename="qtMainWindow.cpp" line="2473"/>
+        <location filename="qtMainWindow.cpp" line="2494"/>
+        <location filename="qtMainWindow.cpp" line="2515"/>
+        <location filename="qtMainWindow.cpp" line="2537"/>
         <source>Unmount</source>
         <translation>Извлечь диск</translation>
     </message>
@@ -750,92 +755,92 @@
         <translation>все настройки...</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1404"/>
+        <location filename="qtMainWindow.cpp" line="1413"/>
         <source>Paused</source>
         <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1427"/>
+        <location filename="qtMainWindow.cpp" line="1436"/>
         <source>Reading RK file:</source>
         <translation>Чтение RK-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1431"/>
+        <location filename="qtMainWindow.cpp" line="1440"/>
         <source>Writing RK file:</source>
         <translation>Запись RK-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1435"/>
+        <location filename="qtMainWindow.cpp" line="1444"/>
         <source>Reading MSX file:</source>
         <translation>Чтение MSX-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1439"/>
+        <location filename="qtMainWindow.cpp" line="1448"/>
         <source>Writing MSX file:</source>
         <translation>Запись MSX-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1443"/>
+        <location filename="qtMainWindow.cpp" line="1452"/>
         <source>Writing RFS file:</source>
         <translation>Запись RFS-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1447"/>
+        <location filename="qtMainWindow.cpp" line="1456"/>
         <source>Reading RFS file:</source>
         <translation>Чтение RFS-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1464"/>
+        <location filename="qtMainWindow.cpp" line="1473"/>
         <source>Printing to:</source>
         <translation>Печать в файл:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1472"/>
+        <location filename="qtMainWindow.cpp" line="1481"/>
         <source>Writing wave file:</source>
         <translation>Запись wave-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1476"/>
+        <location filename="qtMainWindow.cpp" line="1485"/>
         <source>Playing wave file:</source>
         <translation>Проигрывание wave-файла:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="2355"/>
+        <location filename="qtMainWindow.cpp" line="2364"/>
         <source>Emu80: warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="2369"/>
+        <location filename="qtMainWindow.cpp" line="2378"/>
         <source>Emu80 Warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="2356"/>
+        <location filename="qtMainWindow.cpp" line="2365"/>
         <source>Reset current platform and common settings?</source>
         <oldsource>Reset current platform settings?</oldsource>
         <translation>Сбросить настройки для текущей платформы и общие?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="2370"/>
+        <location filename="qtMainWindow.cpp" line="2379"/>
         <source>Reset all settings?</source>
         <translation>Сбросить все настройки?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="2448"/>
-        <location filename="qtMainWindow.cpp" line="2469"/>
-        <location filename="qtMainWindow.cpp" line="2490"/>
-        <location filename="qtMainWindow.cpp" line="2511"/>
-        <location filename="qtMainWindow.cpp" line="2540"/>
+        <location filename="qtMainWindow.cpp" line="2457"/>
+        <location filename="qtMainWindow.cpp" line="2478"/>
+        <location filename="qtMainWindow.cpp" line="2499"/>
+        <location filename="qtMainWindow.cpp" line="2520"/>
+        <location filename="qtMainWindow.cpp" line="2549"/>
         <source>Unmount </source>
         <translation>Извлечь</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="2675"/>
+        <location filename="qtMainWindow.cpp" line="2684"/>
         <source>JCUKEN</source>
         <translation>ЙЦУКЕН</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="2678"/>
+        <location filename="qtMainWindow.cpp" line="2687"/>
         <source>&quot;Smart&quot;</source>
         <translation>«Умная»</translation>
     </message>

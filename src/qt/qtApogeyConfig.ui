@@ -68,6 +68,13 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
+       <widget class="QCheckBox" name="sdEnableCheckBox">
+        <property name="text">
+         <string>Enable</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="sdLabel">
         <property name="maximumSize">
          <size>
