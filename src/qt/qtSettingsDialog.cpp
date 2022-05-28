@@ -176,6 +176,9 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("diskC.permanentFileName", m_options.contains("diskC.autoMount"));
     loadRunningConfigValue("diskD.permanentFileName", m_options.contains("diskD.autoMount"));
     loadRunningConfigValue("hdd.permanentFileName", m_options.contains("hdd.autoMount"));
+    loadRunningConfigValue("ramDisk.autoLoad");
+    loadRunningConfigValue("ramDisk.autoSave");
+    loadRunningConfigValue("ramDisk.permanentFileName", m_options.contains("ramDisk.autoLoad"));
 }
 
 

@@ -153,6 +153,13 @@ void Platform::init()
 }
 
 
+void Platform::shutdown()
+{
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++)
+        (*it)->shutdown();
+}
+
+
 void Platform::reset()
 {
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
@@ -162,6 +169,8 @@ void Platform::reset()
 
 Platform::~Platform()
 {
+    shutdown();
+
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
         delete *it;
 
@@ -273,11 +282,19 @@ void Platform::sysReq(SysReq sr)
             break;
         case SR_LOADRAMDISK:
             if (m_ramDisk)
-            m_ramDisk->loadFromFile();
+                m_ramDisk->loadFromFile();
             break;
         case SR_SAVERAMDISK:
             if (m_ramDisk)
-            m_ramDisk->saveToFile();
+                m_ramDisk->saveToFile();
+            break;
+        case SR_OPENRAMDISK:
+            if (m_ramDisk)
+                m_ramDisk->openFile();
+            break;
+        case SR_SAVERAMDISKAS:
+            if (m_ramDisk)
+                m_ramDisk->saveFileAs();
             break;
         case SR_FASTRESET:
             if (m_fastResetCpuTicks) {

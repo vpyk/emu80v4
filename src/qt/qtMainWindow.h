@@ -167,8 +167,13 @@ private slots:
     void onResetAll();
     void onMute();
     void onFastReset();
-    void onLoadRamDisk();
-    void onSaveRamDisk();
+    void onEdd();
+    void onEddSave();
+    void onEddSaveAs();
+    void onEddUnassign();
+    void onEddAutoLoad();
+    void onEddAutoSave();
+    void onEddLastFiles();
 
 private:
     PaintWidget* m_paintWidget;
@@ -194,6 +199,7 @@ private:
 
     LastFileList m_fddLastFiles = LastFileList("fdd");
     LastFileList m_hddLastFiles = LastFileList("hdd");
+    LastFileList m_eddLastFiles = LastFileList("edd");
 
     QTimer m_fpsTimer;
     int m_frameCount = 0;
@@ -220,6 +226,8 @@ private:
     QIcon m_diskDOffIcon            = QIcon(":/icons/disk_d_off.png");
     QIcon m_hddOnIcon               = QIcon(":/icons/hdd_on.png");
     QIcon m_hddOffIcon              = QIcon(":/icons/hdd.png");
+    QIcon m_eddOnIcon               = QIcon(":/icons/edd_on.png");
+    QIcon m_eddOffIcon              = QIcon(":/icons/edd.png");
     QIcon m_smoothingNearestIcon    = QIcon(":/icons/sm_nearest.png");
     QIcon m_smoothingBilinearIcon   = QIcon(":/icons/sm_bilinear.png");
     QIcon m_smoothingSharpIcon      = QIcon(":/icons/sm_sharp.png");
@@ -240,6 +248,7 @@ private:
     QMenu* m_diskCMenu = nullptr;
     QMenu* m_diskDMenu = nullptr;
     QMenu* m_hddMenu = nullptr;
+    QMenu* m_eddMenu = nullptr;
 
     QMenuBar* m_menuBar = nullptr;
     QToolBar* m_toolBar = nullptr;
@@ -276,12 +285,17 @@ private:
     QAction* m_hddUnmountAction;
     QAction* m_hddReadOnlyAction;
     QAction* m_hddAutoMountAction;
-    QAction* m_loadRamDiskAction;
-    QAction* m_saveRamDiskAction;
+    QAction* m_eddAction;
+    QAction* m_eddMenuAction;
+    QAction* m_eddUnassignAction;
+    QAction* m_eddAutoLoadAction;
+    QAction* m_eddAutoSaveAction;
+    QAction* m_eddSaveAction;
+    QAction* m_eddSaveAsAction;
     QAction* m_menuDiskSeparator;
     QAction* m_menuHddSeparator;
     QAction* m_toolbarDiskSeparator;
-    QAction* m_ramDiskSeparator;
+    QAction* m_menuEddSeparator;
     QAction* m_exitAction;
     QAction* m_platformSelectAction;
     QAction* m_platformConfigAction;
@@ -334,6 +348,8 @@ private:
     QAction* m_fddCLastFilesActions[LAST_FILES_QTY];
     QAction* m_fddDLastFilesActions[LAST_FILES_QTY];
     QAction* m_hddLastFilesActions[LAST_FILES_QTY];
+    QAction* m_eddLastFilesActions[LAST_FILES_QTY];
+    //QAction* m_edd2LastFilesActions[LAST_FILES_QTY];
 };
 
 

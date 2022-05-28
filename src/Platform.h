@@ -49,6 +49,7 @@ class Platform : public ParentObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
         void init() override;
+        void shutdown() override;
         void reset() override;
 
         void sysReq(SysReq sr);

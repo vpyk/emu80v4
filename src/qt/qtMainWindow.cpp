@@ -141,6 +141,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             QString groupName = QString::fromUtf8(getPlatformGroupName().c_str());
             m_fddLastFiles.setPlatformName(groupName);
             m_hddLastFiles.setPlatformName(groupName);
+            m_eddLastFiles.setPlatformName(groupName);
         }
 
         tuneMenu();
@@ -555,28 +556,64 @@ void MainWindow::createActions()
 
     m_menuHddSeparator = fileMenu->addSeparator();
 
-    // Load RAM disk
-    m_loadRamDiskAction = new QAction(QIcon(":/icons/edd.png"), tr("Load RAM Disk..."), this);
-    m_loadRamDiskAction->setToolTip(tr("Load RAM Disk image"));
-    QList<QKeySequence> loadRamDiskKeysList;
-    ADD_HOTKEY(loadRamDiskKeysList, Qt::Key_E);
-    //loadRamDiskKeysList.append(QKeySequence(Qt::ALT + Qt::Key_E));
-    //loadRamDiskKeysList.append(QKeySequence(Qt::META + Qt::Key_E));
-    m_loadRamDiskAction->setShortcuts(loadRamDiskKeysList);
-    addAction(m_loadRamDiskAction);
-    fileMenu->addAction(m_loadRamDiskAction);
-    m_toolBar->addAction(m_loadRamDiskAction);
-    connect(m_loadRamDiskAction, SIGNAL(triggered()), this, SLOT(onLoadRamDisk()));
+    // EDD menu
+    m_eddMenu = new QMenu(tr("RAM Disk (EDD)"));
+    m_eddMenu->setIcon(m_eddOffIcon);
+
+    m_eddAction = new QAction(tr("Load and assign RAM Disk image..."), this);
+    m_eddMenuAction = m_eddMenu->menuAction();
+    m_eddMenuAction->setToolTip(tr("Load and assign RAM Disk image (Alt-E)"));
+    QList<QKeySequence> eddKeyList;
+    ADD_HOTKEY(eddKeyList, Qt::Key_E);
+    m_eddAction->setShortcuts(eddKeyList);
+    addAction(m_eddAction);
+    m_eddMenu->addAction(m_eddAction);
+    m_toolBar->addAction(m_eddMenuAction);
+    connect(m_eddAction, SIGNAL(triggered()), this, SLOT(onEdd()));
+    connect(m_eddMenuAction, SIGNAL(triggered()), this, SLOT(onEdd()));
+
+    m_eddSaveAsAction = new QAction(tr("Save as..."), this);
+    m_eddMenu->addAction(m_eddSaveAsAction);
+    connect(m_eddSaveAsAction, SIGNAL(triggered()), this, SLOT(onEddSaveAs()));
+    m_eddMenu->addSeparator();
+
+    m_eddSaveAction = new QAction(tr("Save"), this);
+    QList<QKeySequence> eddSaveKeyList;
+    ADD_HOTKEY(eddSaveKeyList, Qt::Key_O);
+    m_eddSaveAction->setShortcuts(eddSaveKeyList);
+    m_eddMenu->addAction(m_eddSaveAction);
+    connect(m_eddSaveAction, SIGNAL(triggered()), this, SLOT(onEddSave()));
+    m_eddMenu->addSeparator();
+
+    m_eddAutoLoadAction = new QAction(tr("Auto load on startup"), this);
+    m_eddAutoLoadAction->setCheckable(true);
+    m_eddMenu->addAction(m_eddAutoLoadAction);
+
+    m_eddAutoSaveAction = new QAction(tr("Auto save on exit"), this);
+    m_eddAutoSaveAction->setCheckable(true);
+    m_eddMenu->addAction(m_eddAutoSaveAction);
+    m_eddMenu->addSeparator();
+
+    m_eddUnassignAction = new QAction(tr("Unassign"), this);
+    m_eddMenu->addAction(m_eddUnassignAction);
+    m_eddMenu->addSeparator();
+
+    connect(m_eddUnassignAction, SIGNAL(triggered()), this, SLOT(onEddUnassign()));
+    connect(m_eddAutoLoadAction, SIGNAL(triggered()), this, SLOT(onEddAutoLoad()));
+    connect(m_eddAutoSaveAction, SIGNAL(triggered()), this, SLOT(onEddAutoSave()));
+
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_eddLastFilesActions[i] = new QAction(this);
+        m_eddMenu->addAction(m_eddLastFilesActions[i]);
+        connect(m_eddLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onEddLastFiles()));
+    }
+
+    fileMenu->addMenu(m_eddMenu);
+
+    m_menuEddSeparator = fileMenu->addSeparator();
 
     m_toolbarDiskSeparator = m_toolBar->addSeparator();
 
-    // Save RAM disk
-    m_saveRamDiskAction = new QAction(tr("Save RAM Disk..."), this);
-    //m_saveRamDiskAction->setToolTip(tr("Save RAM Disk image"));
-    fileMenu->addAction(m_saveRamDiskAction);
-    connect(m_saveRamDiskAction, SIGNAL(triggered()), this, SLOT(onSaveRamDisk()));
-
-    m_ramDiskSeparator = fileMenu->addSeparator();
 
     // Exit
     m_exitAction = new QAction(tr("Exit"), this);
@@ -2386,15 +2423,77 @@ void MainWindow::onResetAll()
 }
 
 
-void MainWindow::onLoadRamDisk()
+void MainWindow::onEdd()
 {
-    emuSysReq(m_palWindow, SR_LOADRAMDISK);
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk";
+
+    emuSysReq(m_palWindow, SR_OPENRAMDISK);
+
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk", "fileName").c_str());
+    if (!lastFileName.isEmpty())
+        m_eddLastFiles.addToLastFiles(lastFileName);
+
+    updateActions();
+    updateLastFiles();
 }
 
 
-void MainWindow::onSaveRamDisk()
+void MainWindow::onEddSaveAs()
 {
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk";
+
+    emuSysReq(m_palWindow, SR_SAVERAMDISKAS);
+
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(ramDisk, "fileName").c_str());
+    if (!lastFileName.isEmpty())
+        m_eddLastFiles.addToLastFiles(lastFileName);
+
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onEddSave()
+{
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk";
     emuSysReq(m_palWindow, SR_SAVERAMDISK);
+}
+
+
+void MainWindow::onEddUnassign()
+{
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk";
+    emuSetPropertyValue(ramDisk, "fileName", "");
+
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onEddAutoLoad()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk", "autoLoad", m_eddAutoLoadAction->isChecked() ? "yes" : "no");
+
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onEddAutoSave()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk", "autoSave", m_eddAutoSaveAction->isChecked() ? "yes" : "no");
+
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onEddLastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk", "fileName", action->text().toStdString());
+    updateConfig();
+    saveConfig();
 }
 
 
@@ -2556,6 +2655,50 @@ void MainWindow::updateActions()
     m_hddAutoMountAction->setChecked(val == "yes");
 
 
+    val = emuGetPropertyValue(platform + "ramDisk", "name");
+    m_eddMenuAction->setVisible(!val.empty());
+    m_eddAction->setVisible(!val.empty()); // turn off shortcut
+    m_menuEddSeparator->setVisible(!val.empty());
+    if (!val.empty()) {
+        QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "ramDisk", "fileName").c_str());
+        if (qFileName.isEmpty()) {
+            m_eddUnassignAction->setEnabled(false);
+            m_eddSaveAction->setEnabled(false);
+            m_eddSaveAction->setText(tr("Save"));
+            m_eddAutoLoadAction->setEnabled(false);
+            m_eddAutoSaveAction->setEnabled(false);
+            m_eddMenuAction->setIcon(m_eddOffIcon);
+
+            /*QFont font = m_eddSaveAction->font();
+            font.setBold(false);
+            m_eddSaveAction->setFont(font);*/
+        } else {
+            m_eddUnassignAction->setEnabled(true);
+            m_eddSaveAction->setEnabled(true);
+
+            if (m_eddLastFiles.getSize() == 0) {
+                // add files from cfg if any
+                m_eddLastFiles.addToLastFiles(qFileName);
+                m_eddLastFiles.tuneActions(m_eddLastFilesActions);
+            }
+
+            qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+            m_eddSaveAction->setText(tr("Save ") + " " + qFileName);
+            m_eddAutoLoadAction->setEnabled(true);
+            m_eddAutoSaveAction->setEnabled(true);
+            m_eddMenuAction->setIcon(m_eddOnIcon);
+
+            /*QFont font = m_eddSaveAction->font();
+            font.setBold(true);
+            m_eddSaveAction->setFont(font);*/
+        }
+    }
+    val = emuGetPropertyValue(platform + "ramDisk", "autoLoad");
+    m_eddAutoLoadAction->setChecked(val == "yes");
+    val = emuGetPropertyValue(platform + "ramDisk", "autoSave");
+    m_eddAutoSaveAction->setChecked(val == "yes");
+
+
     // Window size menu
 
     std::string windowStyle = emuGetPropertyValue(platform + "window", "windowStyle");
@@ -2603,10 +2746,9 @@ void MainWindow::updateActions()
     m_menuDiskSeparator->setVisible(disksVisible);
     m_toolbarDiskSeparator->setVisible(disksVisible);
 
-    bool ramDiskPresent = emuGetPropertyValue(platform + "ramDisk", "name") != "";
-    m_loadRamDiskAction->setVisible(ramDiskPresent);
-    m_saveRamDiskAction->setVisible(ramDiskPresent);
-    m_ramDiskSeparator->setVisible(ramDiskPresent);
+    bool eddPresent = emuGetPropertyValue(platform + "ramDisk", "name") != "";
+    m_eddMenuAction->setVisible(eddPresent);
+    m_menuEddSeparator->setVisible(eddPresent);
 
     val = emuGetPropertyValue(platform + "crtRenderer", "altRenderer");
     if (val == "")
@@ -2715,6 +2857,8 @@ void MainWindow::updateLastFiles()
     m_fddLastFiles.tuneActions(m_fddCLastFilesActions);
     m_fddLastFiles.tuneActions(m_fddDLastFilesActions);
     m_hddLastFiles.tuneActions(m_hddLastFilesActions);
+    m_eddLastFiles.tuneActions(m_eddLastFilesActions);
+    //m_eddLastFiles.tuneActions(m_edd2LastFilesActions);
 }
 
 // LastFileList implementation

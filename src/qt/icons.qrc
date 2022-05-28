@@ -46,5 +46,6 @@
         <file>icons/preset.png</file>
         <file>icons/hdd.png</file>
         <file>icons/hdd_on.png</file>
+        <file>icons/edd_on.png</file>
     </qresource>
 </RCC>

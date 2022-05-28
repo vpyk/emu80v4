@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -61,23 +61,71 @@ bool RamDisk::setProperty(const std::string& propertyName, const EmuValuesList& 
     } else if (propertyName == "filter") {
         m_filter = values[0].asString();
         return true;
+    } else if (propertyName == "fileName" || propertyName == "permanentFileName") {
+        m_fileName = values[0].asString();
+        if (!m_fileName.empty() && propertyName == "fileName")
+            loadFromFile();
+        return true;
+    } else if (propertyName == "autoLoad") {
+        if (values[0].asString() == "yes")
+            m_autoLoad = true;
+        else if (values[0].asString() == "no")
+            m_autoLoad = false;
+    } else if (propertyName == "autoSave") {
+        if (values[0].asString() == "yes")
+            m_autoSave = true;
+        else if (values[0].asString() == "no")
+            m_autoSave = false;
     }
 
     return false;
 }
 
 
-bool RamDisk::saveToFile()
+string RamDisk::getPropertyStringValue(const string& propertyName)
 {
-    string fileName = palOpenFileDialog("Open RAM disk file", m_filter, true, m_platform->getWindow());
-    g_emulation->restoreFocus();
-    if (fileName == "")
-        return false;
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "fileName")
+        return m_fileName;
+    else if (propertyName == "permanentFileName")
+        return m_autoLoad ? m_fileName : "";
+    else if (propertyName == "autoLoad")
+        return m_autoLoad ? "yes" : "no";
+    else if (propertyName == "autoSave")
+        return m_autoSave ? "yes" : "no";
+
+    return "";
+}
+
+
+void RamDisk::saveFileAs()
+{
+    string oldFileName = m_fileName;
+    m_fileName = "";
+    saveToFile();
+    if (m_fileName.empty())
+        m_fileName = oldFileName;
+}
+
+
+void RamDisk::saveToFile()
+{
+    if (m_fileName.empty()) {
+        m_fileName = palOpenFileDialog("Save RAM disk file", m_filter, true, m_platform->getWindow());
+        g_emulation->restoreFocus();
+        if (m_fileName == "")
+            return;
+    }
 
     PalFile file;
-    file.open(fileName, "w");
+    file.open(m_fileName, "w");
     if (!file.isOpen())
-        return false;
+        return;
 
     for (unsigned i = 0; i < m_nPages; i++) {
         unsigned pageSize = m_defPageSize;
@@ -94,21 +142,32 @@ bool RamDisk::saveToFile()
     }
 
     file.close();
-    return true;
 }
 
 
-bool RamDisk::loadFromFile()
+void RamDisk::openFile()
 {
-    string fileName = palOpenFileDialog("Save RAM disk file", m_filter, false, m_platform->getWindow());
-    g_emulation->restoreFocus();
-    if (fileName == "")
-        return false;
+    string oldFileName = m_fileName;
+    m_fileName = "";
+    loadFromFile();
+    if (m_fileName.empty())
+        m_fileName = oldFileName;
+}
+
+
+void RamDisk::loadFromFile()
+{
+    if (m_fileName.empty()) {
+        m_fileName = palOpenFileDialog("Load RAM disk file", m_filter, false, m_platform->getWindow());
+        g_emulation->restoreFocus();
+        if (m_fileName == "")
+            return;
+    }
 
     PalFile file;
-    file.open(fileName, "r");
+    file.open(m_fileName, "r");
     if (!file.isOpen())
-        return false;
+        return;
 
     unsigned expectedSize = 0;
     for (unsigned i = 0; i < m_nPages; i++) {
@@ -141,10 +200,22 @@ bool RamDisk::loadFromFile()
                     file.read8();
         }
     } else {
-        emuLog << "Invalid file size: " << fileName << "\n";
+        emuLog << "Invalid file size: " << m_fileName << "\n";
     }
 
-
     file.close();
-    return true;
+}
+
+
+void RamDisk::init()
+{
+    if (m_autoLoad && !m_fileName.empty())
+        loadFromFile();
+}
+
+
+void RamDisk::shutdown()
+{
+    if (m_autoSave && !m_fileName.empty())
+        saveToFile();
 }
