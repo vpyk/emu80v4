@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,6 +41,10 @@ void VectorAddrSpace::reset() {
     m_stackDiskEnabled = false;
     m_inRamDiskPage = 0;
     m_stackDiskPage = 0;
+    m_inRamPagesMask2 = 0;
+    m_stackDiskEnabled2 = false;
+    m_inRamDiskPage2 = 0;
+    m_stackDiskPage2 = 0;
     m_eramSegment = 0;
     m_eramPageStartAddr = 0xA000;
     m_eramPageEndAddr = 0xDFFF;
@@ -66,8 +70,12 @@ void VectorAddrSpace::writeByte(int addr, uint8_t value)
     // Barkar
     if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         m_ramDisk->writeByte(m_stackDiskPage * 0x10000 + addr, value);
+    else if (m_stackDiskEnabled2 && m_cpu->checkForStackOperation())
+        m_ramDisk2->writeByte(m_stackDiskPage2 * 0x10000 + addr, value);
     else if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
         m_ramDisk->writeByte(m_inRamDiskPage * 0x10000 + addr, value);
+    else if (m_inRamPagesMask2 && (addr >= 0x8000) && m_inRamPagesMask2 & (1 << ((addr & 0x6000) >> 13)))
+        m_ramDisk2->writeByte(m_inRamDiskPage2 * 0x10000 + addr, value);
     else {
         if (addr >= 0x8000 && m_crtRenderer)
             m_crtRenderer->vidMemWriteNotify();
@@ -93,8 +101,12 @@ uint8_t VectorAddrSpace::readByte(int addr)
     // Barkar
     if (m_stackDiskEnabled && m_cpu->checkForStackOperation())
         return m_ramDisk->readByte(m_stackDiskPage * 0x10000 + addr);
+    if (m_stackDiskEnabled2 && m_cpu->checkForStackOperation())
+        return m_ramDisk2->readByte(m_stackDiskPage2 * 0x10000 + addr);
     if (m_inRamPagesMask && (addr >= 0x8000) && m_inRamPagesMask & (1 << ((addr & 0x6000) >> 13)))
         return m_ramDisk->readByte(m_inRamDiskPage * 0x10000 + addr);
+    if (m_inRamPagesMask2 && (addr >= 0x8000) && m_inRamPagesMask2 & (1 << ((addr & 0x6000) >> 13)))
+        return m_ramDisk2->readByte(m_inRamDiskPage2 * 0x10000 + addr);
     if (m_romEnabled && addr < 0x8000)
         return m_rom->readByte(addr); // add rom check
     else
@@ -102,12 +114,27 @@ uint8_t VectorAddrSpace::readByte(int addr)
 }
 
 
-void VectorAddrSpace::ramDiskControl(int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage)
+void VectorAddrSpace::attachRamDisk(int diskNum, AddressableDevice* ramDisk)
 {
-    m_inRamPagesMask = inRamPagesMask;
-    m_stackDiskEnabled = stackEnabled;
-    m_inRamDiskPage = inRamPage;
-    m_stackDiskPage = stackPage;
+    if (diskNum == 0)
+        m_ramDisk = ramDisk;
+    else // if (diskNum == 1)
+        m_ramDisk2 = ramDisk;
+}
+
+void VectorAddrSpace::ramDiskControl(int diskNum, int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage)
+{
+    if (diskNum == 0) {
+        m_inRamPagesMask = inRamPagesMask;
+        m_stackDiskEnabled = stackEnabled;
+        m_inRamDiskPage = inRamPage;
+        m_stackDiskPage = stackPage;
+    } else { // if (diskNum == 1)
+        m_inRamPagesMask2 = inRamPagesMask;
+        m_stackDiskEnabled2 = stackEnabled;
+        m_inRamDiskPage2 = inRamPage;
+        m_stackDiskPage2 = stackPage;
+    }
 }
 
 
@@ -131,8 +158,12 @@ bool VectorAddrSpace::setProperty(const std::string& propertyName, const EmuValu
         attachRom(static_cast<Rom*>(g_emulation->findObject(values[0].asString())));
         return true;
     } else if (propertyName == "ramDisk") {
-        attachRamDisk(static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())));
-        return true;
+        int diskNum = values[1].asInt();
+        if (diskNum == 0 || diskNum == 1) {
+            attachRamDisk(diskNum, static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())));
+            return true;
+        }
+        return false;
     } else  if (propertyName == "cpu") {
         m_cpu = static_cast<Cpu8080Compatible*>(g_emulation->findObject(values[0].asString()));
         return m_cpu;
@@ -870,6 +901,12 @@ bool VectorRamDiskSelector::setProperty(const string& propertyName, const EmuVal
     if (propertyName == "addrSpace") {
         attachVectorAddrSpace(static_cast<VectorAddrSpace*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "diskNum") {
+        int diskNum = values[0].asInt();
+        if (diskNum == 0 || diskNum == 1) {
+            m_diskNum = diskNum;
+            return true;
+        }
     }
 
     return false;
@@ -879,7 +916,7 @@ bool VectorRamDiskSelector::setProperty(const string& propertyName, const EmuVal
 void VectorRamDiskSelector::writeByte(int, uint8_t value)
 {
     if (m_vectorAddrSpace)
-        m_vectorAddrSpace->ramDiskControl(((value & 0x40) >> 6) | ((value & 0x20) >> 4) | ((value & 0x20) >> 3) | ((value & 0x80) >> 4), value & 0x10, value & 0x3, (value >> 2) & 0x3);
+        m_vectorAddrSpace->ramDiskControl(m_diskNum, ((value & 0x40) >> 6) | ((value & 0x20) >> 4) | ((value & 0x20) >> 3) | ((value & 0x80) >> 4), value & 0x10, value & 0x3, (value >> 2) & 0x3);
 }
 
 

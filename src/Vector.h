@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -173,11 +173,11 @@ class VectorAddrSpace : public AddressableDevice
 
         void attachRam(AddressableDevice* mem) {m_mainMemory = mem;}
         void attachRom(Rom* rom) {m_rom = rom;}
-        void attachRamDisk(AddressableDevice* ramDisk) {m_ramDisk = ramDisk;}
+        void attachRamDisk(int diskNum, AddressableDevice* ramDisk);
         void attachCrtRenderer(VectorRenderer* crtRenderer) {m_crtRenderer = crtRenderer;};
         void enableRom() {m_romEnabled = true;}
         void disableRom() {m_romEnabled = false;}
-        void ramDiskControl(int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage);
+        void ramDiskControl(int diskNum, int inRamPagesMask, bool stackEnabled, int inRamPage, int stackPage);
         void eramControl(int eramSegment, int eramPageStartAddr, int eramPageEndAddr);
 
         static EmuObject* create(const EmuValuesList&) {return new VectorAddrSpace();}
@@ -186,14 +186,22 @@ class VectorAddrSpace : public AddressableDevice
         AddressableDevice* m_mainMemory = nullptr;
         Rom* m_rom = nullptr;
         AddressableDevice* m_ramDisk = nullptr;
+        AddressableDevice* m_ramDisk2 = nullptr;
         Cpu8080Compatible* m_cpu = nullptr;
         VectorRenderer* m_crtRenderer = nullptr;
 
         bool m_romEnabled = true;
+
         int m_inRamPagesMask = 0;
         bool m_stackDiskEnabled = false;
         int m_inRamDiskPage = 0;
         int m_stackDiskPage = 0;
+
+        int m_inRamPagesMask2 = 0;
+        bool m_stackDiskEnabled2 = false;
+        int m_inRamDiskPage2 = 0;
+        int m_stackDiskPage2 = 0;
+
         int m_eramSegment = 0;
         uint16_t m_eramPageStartAddr = 0xA000;
         uint16_t m_eramPageEndAddr = 0xDFFF;
@@ -357,6 +365,7 @@ class VectorRamDiskSelector : public AddressableDevice
 
     private:
         VectorAddrSpace* m_vectorAddrSpace = nullptr;
+        int m_diskNum = 0;
 };
 
 
