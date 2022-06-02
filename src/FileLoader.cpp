@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -137,7 +137,9 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         return false;
     }
 
-    if (run) {
+    Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+
+    if (run && cpu) {
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         cpu->disableHooks();
@@ -171,23 +173,16 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
 
     delete[] buf;
 
-    if (run) {
-        m_platform->reset();
-        Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
-        if (cpu) {
-            //cpu->disableHooks();
-            //g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+    if (run && cpu) {
+        afterReset();
 
-            afterReset();
-
-            cpu->enableHooks();
-            cpu->setPC(begAddr);
-            if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
-                m_tapeRedirector->assignFile(fileName, "r");
-                m_tapeRedirector->openFile();
-                m_tapeRedirector->assignFile("", "r");
-                m_tapeRedirector->setFilePos(fullSize - fileSize);
-            }
+        cpu->enableHooks();
+        cpu->setPC(begAddr);
+        if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
+            m_tapeRedirector->assignFile(fileName, "r");
+            m_tapeRedirector->openFile();
+            m_tapeRedirector->assignFile("", "r");
+            m_tapeRedirector->setFilePos(fullSize - fileSize);
         }
     }
 
