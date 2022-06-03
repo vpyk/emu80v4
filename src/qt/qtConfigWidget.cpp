@@ -23,6 +23,7 @@
 #include "qtConfigWidget.h"
 #include "ui_qtApogeyConfig.h"
 #include "ui_qtKorvetConfig.h"
+#include "ui_qtVectorConfig.h"
 
 #include "../Pal.h"
 
@@ -41,6 +42,8 @@ ConfigWidget* ConfigWidget::create(QString platformName)
     ConfigWidget* widget;
     if (platformName == "korvet")
         widget = new KorvetConfigWidget();
+    else if (platformName == "vector")
+        widget = new VectorConfigWidget();
     else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04")
     widget = new ApogeyConfigWidget();
 
@@ -235,5 +238,56 @@ void KorvetConfigWidget::saveConfig()
 void KorvetConfigWidget::setDefaults()
 {
     ui->psgCheckBox->setChecked(m_defValues["CFG_PPI3"] == "AY");
+}
+
+
+// ######## Vector config widget ########
+
+VectorConfigWidget::VectorConfigWidget(QWidget *parent) :
+    ConfigWidget(parent),
+    ui(new Ui::VectorConfigWidget)
+{
+    ui->setupUi(this);
+}
+
+
+void VectorConfigWidget::loadConfig()
+{
+    m_defValues["CFG_EDD"] = "EDD";
+
+    optBegin();
+    QString val = optLoad("CFG_EDD").toString();
+    optEnd();
+
+    if (val == "NONE")
+        ui->noneRadioButton->setChecked(true);
+    else if (val == "EDD")
+        ui->edd1RadioButton->setChecked(true);
+    else if (val == "EDDx2")
+        ui->edd2RadioButton->setChecked(true);
+    else if (val == "ERAM")
+        ui->eramRadioButton->setChecked(true);
+}
+
+void VectorConfigWidget::saveConfig()
+{
+    QString val;
+    if (ui->noneRadioButton->isChecked())
+        val = "NONE";
+    else if (ui->edd1RadioButton->isChecked())
+        val = "EDD";
+    else if (ui->edd2RadioButton->isChecked())
+        val = "EDDx2";
+    else if (ui->eramRadioButton->isChecked())
+        val = "ERAM";
+
+    optBegin();
+    optSave("CFG_EDD", val);
+    optEnd();
+}
+
+void VectorConfigWidget::setDefaults()
+{
+    ui->edd1RadioButton->setChecked(m_defValues["CFG_EDD"] == "EDD");
 }
 

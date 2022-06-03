@@ -59,6 +59,7 @@ protected:
 namespace Ui {
     class ApogeyConfigWidget;
     class KorvetConfigWidget;
+    class VectorConfigWidget;
 }
 
 class ApogeyConfigWidget : public ConfigWidget
@@ -99,6 +100,23 @@ public:
 
 private:
     Ui::KorvetConfigWidget *ui;
+};
+
+
+class VectorConfigWidget : public ConfigWidget
+{
+    Q_OBJECT
+
+public:
+    explicit VectorConfigWidget(QWidget *parent = nullptr);
+    //~ApogeyConfigWidget();
+
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private:
+    Ui::VectorConfigWidget *ui;
 };
 
 

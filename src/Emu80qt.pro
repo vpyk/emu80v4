@@ -227,7 +227,8 @@ FORMS += \
     qt/qtChoosePlatformDialog.ui \
     qt/qtAboutDialog.ui \
     qt/qtHelpDialog.ui \
-    qt/qtApogeyConfig.ui
+    qt/qtApogeyConfig.ui \
+    qt/qtVectorConfig.ui
 
 win32:RC_FILE = qt/emu80.rc
 

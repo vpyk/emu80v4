@@ -617,7 +617,7 @@ void MainWindow::createActions()
 
     m_edd2Action = new QAction(tr("Load and assign RAM Disk 2 image..."), this);
     m_edd2MenuAction = m_edd2Menu->menuAction();
-    m_edd2MenuAction->setToolTip(tr("Load and assign RAM Disk 2 image"));
+    m_edd2MenuAction->setToolTip(tr("Load and assign RAM Disk 2 image (Shift-Alt-E)"));
     QList<QKeySequence> edd2KeyList;
     ADD_HOTKEY(edd2KeyList, Qt::SHIFT + Qt::Key_E);
     m_edd2Action->setShortcuts(edd2KeyList);
