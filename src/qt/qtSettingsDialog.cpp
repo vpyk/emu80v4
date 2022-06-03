@@ -179,6 +179,9 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("ramDisk.autoLoad");
     loadRunningConfigValue("ramDisk.autoSave");
     loadRunningConfigValue("ramDisk.permanentFileName", m_options.contains("ramDisk.autoLoad"));
+    loadRunningConfigValue("ramDisk2.autoLoad");
+    loadRunningConfigValue("ramDisk2.autoSave");
+    loadRunningConfigValue("ramDisk2.permanentFileName", m_options.contains("ramDisk2.autoLoad"));
 }
 
 

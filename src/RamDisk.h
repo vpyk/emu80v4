@@ -46,6 +46,8 @@ class RamDisk : public EmuObject
         void openFile();
         void saveFileAs();
 
+        inline std::string getLabel() {return m_label;}
+
         static EmuObject* create(const EmuValuesList& parameters) {return new RamDisk(parameters[0].asInt(), parameters[1].asInt());} // add checks !
 
     private:
@@ -55,6 +57,7 @@ class RamDisk : public EmuObject
         AddressableDevice** m_pages = nullptr;
 
         std::string m_filter;
+        std::string m_label;
 
         std::string m_fileName;
         bool m_autoLoad = false;

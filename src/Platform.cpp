@@ -106,10 +106,16 @@ Platform::Platform(string configFileName, string name)
             break;
     }
 
-    // ищем объект - RAM-диск, должен быть единственным
-    for (auto it = m_objList.begin(); it != m_objList.end(); it++)
-        if ((m_ramDisk = dynamic_cast<RamDisk*>(*it)))
-            break;
+    // ищем объекты - RAM-диски
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
+        RamDisk* ramDisk;
+        if ((ramDisk = dynamic_cast<RamDisk*>(*it))) {
+            if (ramDisk->getLabel() != "EDD2")
+                m_ramDisk = ramDisk;
+            else
+                m_ramDisk2 = ramDisk;
+        }
+    }
 
     // ищем объект - закладку в окне конфигурации, должен быть единственным
     for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
@@ -295,6 +301,22 @@ void Platform::sysReq(SysReq sr)
         case SR_SAVERAMDISKAS:
             if (m_ramDisk)
                 m_ramDisk->saveFileAs();
+            break;
+        case SR_LOADRAMDISK2:
+            if (m_ramDisk2)
+                m_ramDisk2->loadFromFile();
+            break;
+        case SR_SAVERAMDISK2:
+            if (m_ramDisk2)
+                m_ramDisk2->saveToFile();
+            break;
+        case SR_OPENRAMDISK2:
+            if (m_ramDisk2)
+                m_ramDisk2->openFile();
+            break;
+        case SR_SAVERAMDISK2AS:
+            if (m_ramDisk2)
+                m_ramDisk2->saveFileAs();
             break;
         case SR_FASTRESET:
             if (m_fastResetCpuTicks) {

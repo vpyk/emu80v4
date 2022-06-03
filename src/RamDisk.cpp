@@ -61,6 +61,9 @@ bool RamDisk::setProperty(const std::string& propertyName, const EmuValuesList& 
     } else if (propertyName == "filter") {
         m_filter = values[0].asString();
         return true;
+    } else if (propertyName == "label") {
+        m_label = values[0].asString();
+        return true;
     } else if (propertyName == "fileName" || propertyName == "permanentFileName") {
         m_fileName = values[0].asString();
         if (!m_fileName.empty() && propertyName == "fileName")
@@ -94,6 +97,8 @@ string RamDisk::getPropertyStringValue(const string& propertyName)
         return m_fileName;
     else if (propertyName == "permanentFileName")
         return m_autoLoad ? m_fileName : "";
+    else if (propertyName == "label")
+        return m_label;
     else if (propertyName == "autoLoad")
         return m_autoLoad ? "yes" : "no";
     else if (propertyName == "autoSave")

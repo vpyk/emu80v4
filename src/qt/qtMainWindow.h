@@ -174,6 +174,13 @@ private slots:
     void onEddAutoLoad();
     void onEddAutoSave();
     void onEddLastFiles();
+    void onEdd2();
+    void onEdd2Save();
+    void onEdd2SaveAs();
+    void onEdd2Unassign();
+    void onEdd2AutoLoad();
+    void onEdd2AutoSave();
+    void onEdd2LastFiles();
 
 private:
     PaintWidget* m_paintWidget;
@@ -228,6 +235,8 @@ private:
     QIcon m_hddOffIcon              = QIcon(":/icons/hdd.png");
     QIcon m_eddOnIcon               = QIcon(":/icons/edd_on.png");
     QIcon m_eddOffIcon              = QIcon(":/icons/edd.png");
+    QIcon m_edd2OnIcon              = QIcon(":/icons/edd2_on.png");
+    QIcon m_edd2OffIcon             = QIcon(":/icons/edd2.png");
     QIcon m_smoothingNearestIcon    = QIcon(":/icons/sm_nearest.png");
     QIcon m_smoothingBilinearIcon   = QIcon(":/icons/sm_bilinear.png");
     QIcon m_smoothingSharpIcon      = QIcon(":/icons/sm_sharp.png");
@@ -249,6 +258,7 @@ private:
     QMenu* m_diskDMenu = nullptr;
     QMenu* m_hddMenu = nullptr;
     QMenu* m_eddMenu = nullptr;
+    QMenu* m_edd2Menu = nullptr;
 
     QMenuBar* m_menuBar = nullptr;
     QToolBar* m_toolBar = nullptr;
@@ -292,6 +302,13 @@ private:
     QAction* m_eddAutoSaveAction;
     QAction* m_eddSaveAction;
     QAction* m_eddSaveAsAction;
+    QAction* m_edd2Action;
+    QAction* m_edd2MenuAction;
+    QAction* m_edd2UnassignAction;
+    QAction* m_edd2AutoLoadAction;
+    QAction* m_edd2AutoSaveAction;
+    QAction* m_edd2SaveAction;
+    QAction* m_edd2SaveAsAction;
     QAction* m_menuDiskSeparator;
     QAction* m_menuHddSeparator;
     QAction* m_toolbarDiskSeparator;
@@ -349,7 +366,7 @@ private:
     QAction* m_fddDLastFilesActions[LAST_FILES_QTY];
     QAction* m_hddLastFilesActions[LAST_FILES_QTY];
     QAction* m_eddLastFilesActions[LAST_FILES_QTY];
-    //QAction* m_edd2LastFilesActions[LAST_FILES_QTY];
+    QAction* m_edd2LastFilesActions[LAST_FILES_QTY];
 };
 
 

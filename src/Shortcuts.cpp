@@ -65,9 +65,9 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
             case PK_B:
                 return SR_DISKB;
             case PK_E:
-                return SR_OPENRAMDISK;
+                return isShiftPressed ? SR_OPENRAMDISK2 : SR_OPENRAMDISK;
             case PK_O:
-                return SR_SAVERAMDISKAS;
+                return isShiftPressed ? SR_SAVERAMDISK2AS : SR_SAVERAMDISKAS;
             case PK_1:
                 return SR_1X;
             case PK_2:

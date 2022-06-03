@@ -610,8 +610,63 @@ void MainWindow::createActions()
 
     fileMenu->addMenu(m_eddMenu);
 
-    m_menuEddSeparator = fileMenu->addSeparator();
 
+    // EDD2 menu
+    m_edd2Menu = new QMenu(tr("RAM Disk 2 (EDD2)"));
+    m_edd2Menu->setIcon(m_edd2OffIcon);
+
+    m_edd2Action = new QAction(tr("Load and assign RAM Disk 2 image..."), this);
+    m_edd2MenuAction = m_edd2Menu->menuAction();
+    m_edd2MenuAction->setToolTip(tr("Load and assign RAM Disk 2 image"));
+    QList<QKeySequence> edd2KeyList;
+    ADD_HOTKEY(edd2KeyList, Qt::SHIFT + Qt::Key_E);
+    m_edd2Action->setShortcuts(edd2KeyList);
+    addAction(m_edd2Action);
+    m_edd2Menu->addAction(m_edd2Action);
+    m_toolBar->addAction(m_edd2MenuAction);
+    connect(m_edd2Action, SIGNAL(triggered()), this, SLOT(onEdd2()));
+    connect(m_edd2MenuAction, SIGNAL(triggered()), this, SLOT(onEdd2()));
+
+    m_edd2SaveAsAction = new QAction(tr("Save as..."), this);
+    m_edd2Menu->addAction(m_edd2SaveAsAction);
+    connect(m_edd2SaveAsAction, SIGNAL(triggered()), this, SLOT(onEdd2SaveAs()));
+    m_edd2Menu->addSeparator();
+
+    m_edd2SaveAction = new QAction(tr("Save"), this);
+    QList<QKeySequence> edd2SaveKeyList;
+    ADD_HOTKEY(edd2SaveKeyList, Qt::SHIFT + Qt::Key_O);
+    m_edd2SaveAction->setShortcuts(edd2SaveKeyList);
+    m_edd2Menu->addAction(m_edd2SaveAction);
+    connect(m_edd2SaveAction, SIGNAL(triggered()), this, SLOT(onEdd2Save()));
+    m_edd2Menu->addSeparator();
+
+    m_edd2AutoLoadAction = new QAction(tr("Auto load on startup"), this);
+    m_edd2AutoLoadAction->setCheckable(true);
+    m_edd2Menu->addAction(m_edd2AutoLoadAction);
+
+    m_edd2AutoSaveAction = new QAction(tr("Auto save on exit"), this);
+    m_edd2AutoSaveAction->setCheckable(true);
+    m_edd2Menu->addAction(m_edd2AutoSaveAction);
+    m_edd2Menu->addSeparator();
+
+    m_edd2UnassignAction = new QAction(tr("Unassign"), this);
+    m_edd2Menu->addAction(m_edd2UnassignAction);
+    m_edd2Menu->addSeparator();
+
+    connect(m_edd2UnassignAction, SIGNAL(triggered()), this, SLOT(onEdd2Unassign()));
+    connect(m_edd2AutoLoadAction, SIGNAL(triggered()), this, SLOT(onEdd2AutoLoad()));
+    connect(m_edd2AutoSaveAction, SIGNAL(triggered()), this, SLOT(onEdd2AutoSave()));
+
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_edd2LastFilesActions[i] = new QAction(this);
+        m_edd2Menu->addAction(m_edd2LastFilesActions[i]);
+        connect(m_edd2LastFilesActions[i], SIGNAL(triggered()), this, SLOT(onEdd2LastFiles()));
+    }
+
+    fileMenu->addMenu(m_edd2Menu);
+
+
+    m_menuEddSeparator = fileMenu->addSeparator();
     m_toolbarDiskSeparator = m_toolBar->addSeparator();
 
 
@@ -2497,6 +2552,80 @@ void MainWindow::onEddLastFiles()
 }
 
 
+void MainWindow::onEdd2()
+{
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk2";
+
+    emuSysReq(m_palWindow, SR_OPENRAMDISK2);
+
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(ramDisk, "fileName").c_str());
+    if (!lastFileName.isEmpty())
+        m_eddLastFiles.addToLastFiles(lastFileName);
+
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onEdd2SaveAs()
+{
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk2";
+
+    emuSysReq(m_palWindow, SR_SAVERAMDISK2AS);
+
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(ramDisk, "fileName").c_str());
+    if (!lastFileName.isEmpty())
+        m_eddLastFiles.addToLastFiles(lastFileName);
+
+    updateActions();
+    updateLastFiles();
+}
+
+
+void MainWindow::onEdd2Save()
+{
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk2";
+    emuSysReq(m_palWindow, SR_SAVERAMDISK2);
+}
+
+
+void MainWindow::onEdd2Unassign()
+{
+    std::string ramDisk = m_palWindow->getPlatformObjectName() + ".ramDisk2";
+    emuSetPropertyValue(ramDisk, "fileName", "");
+
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onEdd2AutoLoad()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk2", "autoLoad", m_edd2AutoLoadAction->isChecked() ? "yes" : "no");
+
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onEdd2AutoSave()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk2", "autoSave", m_edd2AutoSaveAction->isChecked() ? "yes" : "no");
+
+    updateConfig();
+    saveConfig();
+}
+
+
+void MainWindow::onEdd2LastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk2", "fileName", action->text().toStdString());
+    updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onPrinterCapture()
 {
     QAction* action = (QAction*)sender();
@@ -2658,7 +2787,7 @@ void MainWindow::updateActions()
     val = emuGetPropertyValue(platform + "ramDisk", "name");
     m_eddMenuAction->setVisible(!val.empty());
     m_eddAction->setVisible(!val.empty()); // turn off shortcut
-    m_menuEddSeparator->setVisible(!val.empty());
+    //m_menuEddSeparator->setVisible(!val.empty());
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "ramDisk", "fileName").c_str());
         if (qFileName.isEmpty()) {
@@ -2697,6 +2826,50 @@ void MainWindow::updateActions()
     m_eddAutoLoadAction->setChecked(val == "yes");
     val = emuGetPropertyValue(platform + "ramDisk", "autoSave");
     m_eddAutoSaveAction->setChecked(val == "yes");
+
+
+    val = emuGetPropertyValue(platform + "ramDisk2", "name");
+    m_edd2MenuAction->setVisible(!val.empty());
+    m_edd2Action->setVisible(!val.empty()); // turn off shortcut
+    //m_menuEddSeparator->setVisible(!val.empty());
+    if (!val.empty()) {
+        QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "ramDisk2", "fileName").c_str());
+        if (qFileName.isEmpty()) {
+            m_edd2UnassignAction->setEnabled(false);
+            m_edd2SaveAction->setEnabled(false);
+            m_edd2SaveAction->setText(tr("Save"));
+            m_edd2AutoLoadAction->setEnabled(false);
+            m_edd2AutoSaveAction->setEnabled(false);
+            m_edd2MenuAction->setIcon(m_edd2OffIcon);
+
+            /*QFont font = m_edd2SaveAction->font();
+            font.setBold(false);
+            m_edd2SaveAction->setFont(font);*/
+        } else {
+            m_edd2UnassignAction->setEnabled(true);
+            m_edd2SaveAction->setEnabled(true);
+
+            if (m_eddLastFiles.getSize() == 0) {
+                // add files from cfg if any
+                m_eddLastFiles.addToLastFiles(qFileName);
+                m_eddLastFiles.tuneActions(m_edd2LastFilesActions);
+            }
+
+            qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
+            m_edd2SaveAction->setText(tr("Save ") + " " + qFileName);
+            m_edd2AutoLoadAction->setEnabled(true);
+            m_edd2AutoSaveAction->setEnabled(true);
+            m_edd2MenuAction->setIcon(m_edd2OnIcon);
+
+            /*QFont font = m_edd2SaveAction->font();
+            font.setBold(true);
+            m_edd2SaveAction->setFont(font);*/
+        }
+    }
+    val = emuGetPropertyValue(platform + "ramDisk2", "autoLoad");
+    m_edd2AutoLoadAction->setChecked(val == "yes");
+    val = emuGetPropertyValue(platform + "ramDisk2", "autoSave");
+    m_edd2AutoSaveAction->setChecked(val == "yes");
 
 
     // Window size menu
@@ -2746,8 +2919,7 @@ void MainWindow::updateActions()
     m_menuDiskSeparator->setVisible(disksVisible);
     m_toolbarDiskSeparator->setVisible(disksVisible);
 
-    bool eddPresent = emuGetPropertyValue(platform + "ramDisk", "name") != "";
-    m_eddMenuAction->setVisible(eddPresent);
+    bool eddPresent = !emuGetPropertyValue(platform + "ramDisk", "name").empty() || !emuGetPropertyValue(platform + "ramDisk2", "name").empty();
     m_menuEddSeparator->setVisible(eddPresent);
 
     val = emuGetPropertyValue(platform + "crtRenderer", "altRenderer");
@@ -2858,7 +3030,7 @@ void MainWindow::updateLastFiles()
     m_fddLastFiles.tuneActions(m_fddDLastFilesActions);
     m_hddLastFiles.tuneActions(m_hddLastFilesActions);
     m_eddLastFiles.tuneActions(m_eddLastFilesActions);
-    //m_eddLastFiles.tuneActions(m_edd2LastFilesActions);
+    m_eddLastFiles.tuneActions(m_edd2LastFilesActions);
 }
 
 // LastFileList implementation
