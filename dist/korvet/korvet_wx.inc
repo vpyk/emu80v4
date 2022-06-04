@@ -18,10 +18,7 @@ scaleSelector.addItem = 2x, "2x"
 scaleSelector.addItem = 3x, "3x"
 scaleSelector.addItem = 4x, "4x"
 scaleSelector.addItem = 5x, "5x"
-scaleSelector.addItem = 2x3, "2x3"
-scaleSelector.addItem = 3x5, "3x5"
 scaleSelector.addItem = fit, "Растянуть во все окно"
-scaleSelector.addItem = fitKeepAR, "Растянуть с сохранением пропорций"
 scaleSelector.addItem = bestFit, "Растянуть с целым коэффициентом"
 configTab.addControl = 1, &scaleSelector
 
