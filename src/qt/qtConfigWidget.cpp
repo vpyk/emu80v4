@@ -44,7 +44,7 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new KorvetConfigWidget();
     else if (platformName == "vector")
         widget = new VectorConfigWidget();
-    else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04")
+    else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha")
     widget = new ApogeyConfigWidget();
 
     widget->m_platform = platformName;
@@ -133,8 +133,10 @@ ApogeyConfigWidget::ApogeyConfigWidget(QWidget *parent) :
 void ApogeyConfigWidget::tune()
 {
     ui->sdEnableCheckBox->setVisible(m_platform == "kr04");
-    ui->sdosGroupBox->setVisible(m_platform != "apogey" && m_platform != "kr04");
+    ui->romDiskEnableCheckBox->setVisible(m_platform == "mikrosha");
+    ui->sdosGroupBox->setVisible(m_platform == "rk86");
     ui->romDiskGroupBox->setVisible(m_platform != "kr04");
+    ui->sdGroupBox->setVisible(m_platform != "mikrosha");
 }
 
 
@@ -147,9 +149,12 @@ void ApogeyConfigWidget::loadConfig()
         m_defValues["CFG_ROMDISK_FILE"] = "rk86/romdisk.bin";
         m_defValues["CFG_SD_DIR"] = "rk86/sdcard";
         m_defValues["CFG_SD_IMG"] = "rk86/sd_rk86.img";
-    } else { // if (m_platform == "kr04") {
+    } else if (m_platform == "kr04") {
         m_defValues["CFG_SD_DIR"] = "kr04/sdcard";
         m_defValues["CFG_EXT_STORAGE"] = "SD";
+    } else { // if (m_platform == "mikrosha") {
+        m_defValues["CFG_ROMDISK_FILE"] = "mikrosha/extrom.bin";
+        m_defValues["CFG_EXT_STORAGE"] = "NONE";
     }
 
     optBegin();
@@ -160,6 +165,7 @@ void ApogeyConfigWidget::loadConfig()
     ui->sdLabel->setText(optLoad("CFG_SD_DIR").toString());
     ui->sdosLabel->setText(optLoad("CFG_SD_IMG").toString());
     ui->sdEnableCheckBox->setChecked(optLoad("CFG_EXT_STORAGE").toString() == "SD");
+    ui->romDiskEnableCheckBox->setChecked(optLoad("CFG_EXT_STORAGE").toString() == "ROMDISK");
     optEnd();
 }
 
@@ -168,15 +174,17 @@ void ApogeyConfigWidget::saveConfig()
     optBegin();
     //QString extStorage = ui->sdRadioButton->isChecked() ? "SD" : "ROMDISK";
     //optSave("CFG_EXT_STORAGE", extStorage);
-    if (m_platform != "kr04") {
+    if (m_platform == "mikrosha") {
+        optSave("CFG_EXT_STORAGE", ui->romDiskEnableCheckBox->isChecked() ? "ROMDISK" : "NONE");
         optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
-        optSave("CFG_SD_DIR", ui->sdLabel->text());
-    }
-    if (m_platform != "apogey" && m_platform != "kr04")
-        optSave("CFG_SD_IMG", ui->sdosLabel->text());
-    if (m_platform == "kr04") {
+    } else if (m_platform == "kr04") {
         optSave("CFG_EXT_STORAGE", ui->sdEnableCheckBox->isChecked() ? "SD" : "NONE");
         optSave("CFG_SD_DIR", ui->sdLabel->text());
+    } else {
+        optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
+        optSave("CFG_SD_DIR", ui->sdLabel->text());
+        if (m_platform != "apogey")
+            optSave("CFG_SD_IMG", ui->sdosLabel->text());
     }
     optEnd();
 }
@@ -188,6 +196,7 @@ void ApogeyConfigWidget::setDefaults()
     ui->sdLabel->setText(m_defValues["CFG_SD_DIR"]);
     ui->sdosLabel->setText(m_defValues["CFG_SD_IMG"]);
     ui->sdEnableCheckBox->setChecked(m_defValues["CFG_EXT_STORAGE"] == "SD");
+    ui->romDiskEnableCheckBox->setChecked(m_defValues["CFG_EXT_STORAGE"] == "ROMDISK");
 }
 
 
