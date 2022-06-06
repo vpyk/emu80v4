@@ -287,11 +287,56 @@ void MainWindow::setFullScreen(bool fullscreen)
 void MainWindow::fillPlatformListMenu()
 {
     const std::vector<PlatformInfo>* platforms = emuGetPlatforms();
+
+    QMap<QString, int> groups;
+
     for (auto it = platforms->begin(); it != platforms->end(); it++) {
-        QAction* action = new QAction(QString::fromUtf8((*it).platformName.c_str()), m_platformListMenu);
-        action->setData(QString::fromUtf8((*it).objName.c_str()));
-        m_platformListMenu->addAction(action);
-        connect(action, SIGNAL(triggered()), this, SLOT(onPlatformSelect()));
+        std::string platform = (*it).objName;
+        std::string::size_type dotPos = platform.find(".",0);
+        QString group = QString::fromUtf8(platform.substr(0, dotPos).c_str());
+        groups[group]++;
+    }
+
+    QMap<QString, QMenu*> groupMenus;
+
+    for (auto it = platforms->begin(); it != platforms->end(); it++) {
+        std::string sPlatform = (*it).objName;
+        std::string::size_type dotPos = sPlatform.find(".",0);
+        QString group = QString::fromUtf8(sPlatform.substr(0, dotPos).c_str());
+        QString platform = QString::fromUtf8(sPlatform.c_str());
+        QString platformName = QString::fromUtf8((*it).platformName.c_str());
+        if (groups[group] == 1) {
+            // single platform
+            QAction* action = new QAction(platformName, m_platformListMenu);
+            action->setData(platform);
+            /*QFont font = action->font();
+            font.setBold(true);
+            action->setFont(font);*/
+            m_platformListMenu->addAction(action);
+            connect(action, SIGNAL(triggered()), this, SLOT(onPlatformSelect()));
+        } else { // if (groups[group] > 1) {
+            QMenu* menu = groupMenus[group];
+            if (!menu) {
+                // first platforn in group
+                menu = new QMenu(/*platformName,*/ m_platformListMenu);
+                groupMenus[group] = menu;
+                m_platformListMenu->addMenu(menu);
+            }
+
+            QAction* action = new QAction(platformName, m_platformListMenu);
+            action->setData(platform);
+            if (!platform.contains(".") || platform == "orion.2") { // todo: replace with "orion"
+                if (platform != "orion.2")
+                    menu->setTitle(platformName);
+                else
+                    menu->setTitle("Орион-128");
+                QFont font = action->font();
+                font.setBold(true);
+                action->setFont(font);
+            }
+            menu->addAction(action);
+            connect(action, SIGNAL(triggered()), this, SLOT(onPlatformSelect()));
+        }
     }
 }
 
@@ -2368,6 +2413,11 @@ void MainWindow::onPlatformSelect()
 {
     QAction* action = (QAction*)sender();
     std::string platform(action->data().toString().toUtf8().constData());
+
+    // Set as default
+    QSettings settings;
+    settings.beginGroup("system");
+    settings.setValue("platform", action->data().toString().toUtf8().constData());
 
     emuSelectPlatform(platform);
 }
