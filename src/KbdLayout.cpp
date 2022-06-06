@@ -31,6 +31,8 @@ void KbdLayout::resetKeys()
     m_shiftPressed = false;
     m_lastNonUnicodeKey = EK_NONE;
     m_lastPalKeyPressedCode = PK_NONE;
+    m_shiftSet.clear();
+    m_langSet.clear();
 }
 
 
@@ -71,8 +73,28 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
                 m_lastNonUnicodeKey = EK_NONE;
                 m_lastPalKeyPressedCode = PK_NONE;
 
-                if (shift != m_shiftPressed)
-                    kbd->processKey(EK_SHIFT, shift == isPressed);
+                int s1 = m_shiftSet.size();
+                if (shift && isPressed)
+                    m_shiftSet.insert(emuKey);
+                else if (shift && !isPressed)
+                    m_shiftSet.erase(emuKey);
+                int s2 = m_shiftSet.size();
+
+                if (m_shiftPressed && !shift)
+                    kbd->processKey(EK_SHIFT, !isPressed);
+                else if (s1 == 0 && s2 > 0)
+                    kbd->processKey(EK_SHIFT, true);
+                else if (s1 > 0 && s2 == 0)
+                    kbd->processKey(EK_SHIFT, false);
+
+                s1 = m_langSet.size();
+                if (lang && isPressed)
+                    m_langSet.insert(emuKey);
+                else if (lang && !isPressed)
+                    m_langSet.erase(emuKey);
+                lang = !m_langSet.empty();
+                s2 = m_langSet.size();
+
                 if (m_separateRusLat) {
                     // Lvov etc.
                     kbd->processKey(EK_RUS, lang && isPressed);
@@ -82,8 +104,10 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
                         m_prevLang = lang;
                 } else {
                     // Pk8000 etc.
-                    if (lang != m_langPressed)
-                        kbd->processKey(EK_LANG, lang == isPressed);
+                    if (s1 == 0 && s2 > 0)
+                        kbd->processKey(EK_LANG, true);
+                    else if (s1 > 0 && s2 == 0)
+                        kbd->processKey(EK_LANG, false);
                 }
                 if (!m_helper || !isPressed)
                     kbd->processKey(emuKey, isPressed);
