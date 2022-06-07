@@ -23,6 +23,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QToolButton>
+#include <QMap>
 
 #include "../PalKeys.h"
 #include "../EmuTypes.h"
@@ -33,6 +34,7 @@ class SettingsDialog;
 
 
 const int LAST_FILES_QTY = 7;
+const int LAST_PLATFORMS_QTY = 5;
 
 class LastFileList
 {
@@ -203,11 +205,13 @@ private:
     PalKeyCode translateKey(QKeyEvent* evt);
     void saveConfig();
     void updateLastFiles();
+    void updateLastPlatforms(QString platform);
 
     LastFileList m_fddLastFiles = LastFileList("fdd");
     LastFileList m_hddLastFiles = LastFileList("hdd");
     LastFileList m_eddLastFiles = LastFileList("edd");
 
+    QMap<QString, QString> m_platformNames;
     QTimer m_fpsTimer;
     int m_frameCount = 0;
     uint64_t m_firstFpsCoutnerFrameTime = 0;
@@ -367,6 +371,8 @@ private:
     QAction* m_hddLastFilesActions[LAST_FILES_QTY];
     QAction* m_eddLastFilesActions[LAST_FILES_QTY];
     QAction* m_edd2LastFilesActions[LAST_FILES_QTY];
+
+    QAction* m_lastPlatformsActions[LAST_PLATFORMS_QTY];
 };
 
 

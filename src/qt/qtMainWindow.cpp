@@ -286,11 +286,26 @@ void MainWindow::setFullScreen(bool fullscreen)
 
 void MainWindow::fillPlatformListMenu()
 {
-    const std::vector<PlatformInfo>* platforms = emuGetPlatforms();
+    QMenu* recentPlatformsMenu = new QMenu(tr("Recent"), m_platformListMenu);
+    m_platformListMenu->addMenu(recentPlatformsMenu);
+    m_platformListMenu->addSeparator();
+
+    for (int i = LAST_PLATFORMS_QTY - 1; i >= 0 ; i--) {
+        QAction* action = new QAction(m_platformListMenu);
+        action->setVisible(false);
+        /*QFont font = action->font();
+        font.setItalic(true);
+        action->setFont(font);*/
+        m_lastPlatformsActions[i] = action;
+        recentPlatformsMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(onPlatformSelect()));
+    }
+
+    const std::vector<PlatformInfo>* platformList = emuGetPlatforms();
 
     QMap<QString, int> groups;
 
-    for (auto it = platforms->begin(); it != platforms->end(); it++) {
+    for (auto it = platformList->begin(); it != platformList->end(); it++) {
         std::string platform = (*it).objName;
         std::string::size_type dotPos = platform.find(".",0);
         QString group = QString::fromUtf8(platform.substr(0, dotPos).c_str());
@@ -299,12 +314,13 @@ void MainWindow::fillPlatformListMenu()
 
     QMap<QString, QMenu*> groupMenus;
 
-    for (auto it = platforms->begin(); it != platforms->end(); it++) {
+    for (auto it = platformList->begin(); it != platformList->end(); it++) {
         std::string sPlatform = (*it).objName;
         std::string::size_type dotPos = sPlatform.find(".",0);
         QString group = QString::fromUtf8(sPlatform.substr(0, dotPos).c_str());
         QString platform = QString::fromUtf8(sPlatform.c_str());
         QString platformName = QString::fromUtf8((*it).platformName.c_str());
+        m_platformNames[platform] = platformName;
         if (groups[group] == 1) {
             // single platform
             QAction* action = new QAction(platformName, m_platformListMenu);
@@ -338,6 +354,19 @@ void MainWindow::fillPlatformListMenu()
             connect(action, SIGNAL(triggered()), this, SLOT(onPlatformSelect()));
         }
     }
+
+    QSettings settings;
+    settings.beginGroup("Last_platforms");
+
+    for (int i = 0; i <= LAST_PLATFORMS_QTY; i++) {
+        QString value = settings.value(QString::number(i)).toString();
+        if (!value.isEmpty()) {
+            m_lastPlatformsActions[i]->setVisible(true);
+            m_lastPlatformsActions[i]->setData(value);
+            m_lastPlatformsActions[i]->setText(m_platformNames[value]);
+        }
+    }
+    settings.endGroup();
 }
 
 
@@ -1406,6 +1435,9 @@ void MainWindow::tuneMenu()
     m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 
     updateLastFiles();
+
+    QString platformName = QString::fromUtf8(getPlatformObjectName().c_str());
+    updateLastPlatforms(platformName);
 }
 
 
@@ -3082,6 +3114,47 @@ void MainWindow::updateLastFiles()
     m_eddLastFiles.tuneActions(m_eddLastFilesActions);
     m_eddLastFiles.tuneActions(m_edd2LastFilesActions);
 }
+
+void MainWindow::updateLastPlatforms(QString platform)
+{
+    for (int i = 0; i < LAST_PLATFORMS_QTY; i++)
+        if (platform == m_lastPlatformsActions[i]->data())
+            return;
+
+    QString platformName = m_platformNames[platform];
+
+    bool success = false;
+    for (int i = 0; i < LAST_PLATFORMS_QTY; i++) {
+        if (!m_lastPlatformsActions[i]->isVisible()) {
+            m_lastPlatformsActions[i]->setData(platform);
+            m_lastPlatformsActions[i]->setText(platformName);
+            m_lastPlatformsActions[i]->setVisible(true);
+            success = true;
+            break;
+        }
+    }
+
+    if (!success) {
+        for (int i = 0; i <= LAST_PLATFORMS_QTY - 2; i++) {
+            m_lastPlatformsActions[i]->setData(m_lastPlatformsActions[i + 1]->data().toString());
+            m_lastPlatformsActions[i]->setText(m_lastPlatformsActions[i + 1]->text());
+        }
+        m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setData(platform);
+        m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setText(platformName);
+        m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setVisible(true);
+    }
+
+    QSettings settings;
+    settings.beginGroup("Last_platforms");
+
+    int i = 1;
+    for (int i = 0; i < LAST_PLATFORMS_QTY; i++)
+        settings.setValue(QString::number(i), m_lastPlatformsActions[i]->data().toString());
+
+    settings.endGroup();
+}
+
+
 
 // LastFileList implementation
 
