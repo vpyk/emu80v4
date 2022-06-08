@@ -287,6 +287,8 @@ class DebugWindow : private EmuWindow
         void run();
         void breakpoint();
 
+        void saveDump();
+
         bool m_isRunning = true;
         CodeBreakpoint* m_tempBp = nullptr;
         std::list<BreakpointInfo> m_bpList;

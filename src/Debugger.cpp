@@ -26,6 +26,7 @@
 #include "Emulation.h"
 #include "Platform.h"
 #include "Pal.h"
+#include "PalFile.h"
 
 #include "CpuZ80.h"
 #include "Cpu8080dasm.h"
@@ -951,6 +952,9 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                     } else if (m_mode == AM_CODE)
                         codeKbdProc(keyCode);
                     break;
+                case PK_F2:
+                    saveDump();
+                    break;
                 default:
                     switch (m_mode) {
                         case AM_CODE:
@@ -1318,6 +1322,26 @@ void DebugWindow::inputDigit(char digit)
         m_inputCurValue[m_inputCurPos] = digit;
     if (m_inputCurPos < m_inputNDigits - 1)
         ++m_inputCurPos;
+}
+
+
+// сохранение дампа в файл
+void DebugWindow::saveDump()
+{
+    string fileName = palOpenFileDialog("Save memory dump", "Binary files (*.bin)|*.bin", true, m_platform->getWindow());
+    //g_emulation->restoreFocus();
+    if (fileName.empty())
+        return;
+
+    PalFile file;
+    file.open(fileName, "w");
+    if (!file.isOpen())
+        return;
+
+    for (unsigned i = 0; i <= 0xFFFF; i++)
+        file.write8(memWord(i));
+
+    file.close();
 }
 
 
