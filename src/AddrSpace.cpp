@@ -244,3 +244,16 @@ void AddrSpaceInverter::writeByte(int addr, uint8_t value)
 {
     m_as->writeByte(~addr, value);
 }
+
+
+void AddrSpaceWriteSplitter::writeByte(int addr, uint8_t value)
+{
+    m_as1->writeByte(addr, value);
+    m_as2->writeByte(addr, value);
+}
+
+
+uint8_t AddrSpaceWriteSplitter::readByte(int addr)
+{
+    return m_as1->readByte(addr);
+}

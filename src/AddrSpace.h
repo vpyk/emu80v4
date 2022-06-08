@@ -129,4 +129,21 @@ private:
 };
 
 
+class AddrSpaceWriteSplitter : public AddressableDevice
+{
+    public:
+        AddrSpaceWriteSplitter(AddressableDevice* as1, AddressableDevice* as2) : m_as1(as1), m_as2(as2) {}
+
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int addr) override;
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new AddrSpaceWriteSplitter(static_cast<AddressableDevice*>(findObj(parameters[0].asString())),
+                                                                                                     static_cast<AddressableDevice*>(findObj(parameters[1].asString())));}
+
+private:
+        AddressableDevice* m_as1;
+        AddressableDevice* m_as2;
+};
+
+
 #endif // ADDRSPACE_H
