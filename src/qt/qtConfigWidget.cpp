@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
-*  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -214,7 +214,7 @@ void ApogeyConfigWidget::onSelectSdDir()
 
 void ApogeyConfigWidget::onSelectSdImg()
 {
-    selectFile(ui->sdLabel, true, tr("Select SD Card Image File"));
+    selectFile(ui->sdosLabel, false, tr("Select SD Card Image File"));
 }
 
 

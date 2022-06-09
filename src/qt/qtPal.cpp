@@ -521,8 +521,9 @@ bool palChooseConfiguration(std::string platformName, PalWindow* wnd)
 
 void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
 {
+    string platformGroupName = platformName.substr(0, platformName.find(".",0));
     QSettings settings;
-    settings.beginGroup(QString::fromUtf8(platformName.c_str()) + "-config");
+    settings.beginGroup(QString::fromUtf8(platformGroupName.c_str()) + "-config");
     QStringList keys = settings.allKeys();
     for (const auto& key: keys) {
         QString value = settings.value(key).toString();
