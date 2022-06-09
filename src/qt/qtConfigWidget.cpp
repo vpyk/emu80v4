@@ -149,6 +149,7 @@ void ApogeyConfigWidget::loadConfig()
         m_defValues["CFG_ROMDISK_FILE"] = "rk86/romdisk.bin";
         m_defValues["CFG_SD_DIR"] = "rk86/sdcard";
         m_defValues["CFG_SD_IMG"] = "rk86/sd_rk86.img";
+        m_defValues["CFG_SD_TYPE"] = "HWMPVV";
     } else if (m_platform == "kr04") {
         m_defValues["CFG_SD_DIR"] = "kr04/sdcard";
         m_defValues["CFG_EXT_STORAGE"] = "SD";
@@ -166,6 +167,12 @@ void ApogeyConfigWidget::loadConfig()
     ui->sdosLabel->setText(optLoad("CFG_SD_IMG").toString());
     ui->sdEnableCheckBox->setChecked(optLoad("CFG_EXT_STORAGE").toString() == "SD");
     ui->romDiskEnableCheckBox->setChecked(optLoad("CFG_EXT_STORAGE").toString() == "ROMDISK");
+
+    ui->hwmPvvRadioButton->setChecked(optLoad("CFG_SD_TYPE").toString() == "HWMPVV");
+    ui->hwmPvvVv55RadioButton->setChecked(optLoad("CFG_SD_TYPE").toString() == "HWMPVV_VV55");
+    ui->n8vemRadioButton->setChecked(optLoad("CFG_SD_TYPE").toString() == "N8VEM");
+    ui->n8vemVv55RadioButton->setChecked(optLoad("CFG_SD_TYPE").toString() == "N8VEM_VV55");
+    ui->msxRadioButton->setChecked(optLoad("CFG_SD_TYPE").toString() == "MSX");
     optEnd();
 }
 
@@ -183,8 +190,21 @@ void ApogeyConfigWidget::saveConfig()
     } else {
         optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
         optSave("CFG_SD_DIR", ui->sdLabel->text());
-        if (m_platform != "apogey")
+        if (m_platform != "apogey") {
             optSave("CFG_SD_IMG", ui->sdosLabel->text());
+            QString sdType;
+            if (ui->hwmPvvVv55RadioButton->isChecked())
+                sdType = "HWMPVV_VV55";
+            else if (ui->n8vemRadioButton->isChecked())
+                sdType = "N8VEM";
+            else if (ui->n8vemVv55RadioButton->isChecked())
+                sdType = "N8VEM_VV55";
+            else if (ui->msxRadioButton->isChecked())
+                sdType = "MSX";
+            else //if (ui->hwmPvvRadioButton->isChecked())
+                sdType = "HWMPVV";
+            optSave("CFG_SD_TYPE", sdType);
+        }
     }
     optEnd();
 }
@@ -197,6 +217,7 @@ void ApogeyConfigWidget::setDefaults()
     ui->sdosLabel->setText(m_defValues["CFG_SD_IMG"]);
     ui->sdEnableCheckBox->setChecked(m_defValues["CFG_EXT_STORAGE"] == "SD");
     ui->romDiskEnableCheckBox->setChecked(m_defValues["CFG_EXT_STORAGE"] == "ROMDISK");
+    ui->hwmPvvRadioButton->setChecked(m_defValues["CFG_SD_TYPE"] == "HWMPVV");
 }
 
 

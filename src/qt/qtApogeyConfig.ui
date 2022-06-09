@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>366</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -114,6 +114,45 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <widget class="QRadioButton" name="hwmPvvVv55RadioButton">
+          <property name="text">
+           <string>HWM_PVV на ВВ55</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QRadioButton" name="n8vemRadioButton">
+          <property name="text">
+           <string>n8vem</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QRadioButton" name="n8vemVv55RadioButton">
+          <property name="text">
+           <string>n8vem на ВВ55</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QRadioButton" name="hwmPvvRadioButton">
+          <property name="text">
+           <string>HWM_PVV</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QRadioButton" name="msxRadioButton">
+          <property name="text">
+           <string>MSX</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QLabel" name="sdosLabel">
         <property name="maximumSize">
          <size>
@@ -154,6 +193,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>romDiskEnableCheckBox</tabstop>
+  <tabstop>romDiskToolButton</tabstop>
+  <tabstop>sdEnableCheckBox</tabstop>
+  <tabstop>sdToolButton</tabstop>
+  <tabstop>hwmPvvRadioButton</tabstop>
+  <tabstop>hwmPvvVv55RadioButton</tabstop>
+  <tabstop>n8vemRadioButton</tabstop>
+  <tabstop>n8vemVv55RadioButton</tabstop>
+  <tabstop>msxRadioButton</tabstop>
+  <tabstop>sdosToolButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
