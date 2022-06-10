@@ -3147,7 +3147,6 @@ void MainWindow::updateLastPlatforms(QString platform)
     QSettings settings;
     settings.beginGroup("Last_platforms");
 
-    int i = 1;
     for (int i = 0; i < LAST_PLATFORMS_QTY; i++)
         settings.setValue(QString::number(i), m_lastPlatformsActions[i]->data().toString());
 

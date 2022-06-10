@@ -68,7 +68,7 @@ void PaintWidget::colorFill(QColor color)
     m_fillColor = color;
     if (m_image) {
         delete m_image;
-        delete m_imageData;
+        delete[] m_imageData;
         m_image = nullptr;
     }
     //update();
@@ -86,7 +86,7 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
     if (m_image2) {
         delete m_image2;
         m_image2 = nullptr;
-        delete m_imageData2;
+        delete[] m_imageData2;
     }
 
     if (useAlpha || blend) {

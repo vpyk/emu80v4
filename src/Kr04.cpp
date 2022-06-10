@@ -139,6 +139,7 @@ void Kr04Renderer::customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int l
         case KCM_COLORMODULE:
             color = m_colorCircuit->translateColor(vidOut & 7);
             break;
+        default:
         case KCM_MONO:
             uint8_t amp = c_bwPalette[vidOut >> 4 & 7];
             color = amp | (amp << 8) | (amp << 16);
