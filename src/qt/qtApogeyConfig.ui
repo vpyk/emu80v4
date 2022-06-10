@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>366</height>
+    <height>470</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -118,35 +118,35 @@
         <item row="0" column="1">
          <widget class="QRadioButton" name="hwmPvvVv55RadioButton">
           <property name="text">
-           <string>HWM_PVV на ВВ55</string>
+           <string>HWM_PVV on i8255</string>
           </property>
          </widget>
         </item>
         <item row="2" column="0">
          <widget class="QRadioButton" name="n8vemRadioButton">
           <property name="text">
-           <string>n8vem</string>
+           <string notr="true">n8vem</string>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
          <widget class="QRadioButton" name="n8vemVv55RadioButton">
           <property name="text">
-           <string>n8vem на ВВ55</string>
+           <string>n8vem on i8255</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QRadioButton" name="hwmPvvRadioButton">
           <property name="text">
-           <string>HWM_PVV</string>
+           <string notr="true">HWM_PVV</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
          <widget class="QRadioButton" name="msxRadioButton">
           <property name="text">
-           <string>MSX</string>
+           <string notr="true">MSX</string>
           </property>
          </widget>
         </item>
