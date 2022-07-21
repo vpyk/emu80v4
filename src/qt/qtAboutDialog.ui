@@ -102,7 +102,7 @@
           <string notr="true"/>
          </property>
          <property name="text">
-          <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://emu80.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://emu80.org&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;a href=&quot;http://zx-pk.ru/threads/27488-emu80-v-4.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://zx-pk.ru/threads/27488-emu80-v-4.html&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;a href=&quot;http://www.nedopc.org/forum/viewtopic.php?f=43&amp;amp;t=17234&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.nedopc.org/forum/viewtopic.php?f=43&amp;amp;t=17234&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://emu80.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://emu80.org&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;a href=&quot;https://zx-pk.ru/threads/27488-emu80-v-4.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://zx-pk.ru/threads/27488-emu80-v-4.html&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;a href=&quot;http://www.nedopc.org/forum/viewtopic.php?f=43&amp;amp;t=17234&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.nedopc.org/forum/viewtopic.php?f=43&amp;amp;t=17234&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>false</bool>
