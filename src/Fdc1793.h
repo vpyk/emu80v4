@@ -82,6 +82,8 @@ class Fdc1793 : public AddressableDevice
         uint8_t m_status;   // регистр статуса
         bool m_directionIn; // направление движения true=in, false=out
 
+        uint64_t m_cmdTime; // cmd timestamp
+
         bool m_irq = false;
         int m_lastCommand = 0;
         //bool m_busy = false;

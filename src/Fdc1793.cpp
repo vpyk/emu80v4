@@ -184,8 +184,9 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     m_addressId[5] = 0;
                     m_addressIdCnt = 6;
                     m_accessMode = FAM_READING;
-                    m_status = 0x02;
-                    break;
+                    m_status = 0x03;
+                    m_cmdTime = g_emulation->getCurClock();
+                break;
                 case 0xD:
                     // force interrupt
                     m_accessMode = FAM_WAITING;
@@ -245,6 +246,12 @@ uint8_t Fdc1793::readByte(int addr)
                     m_status |= 0x02;
                 else
                     m_status &= ~0x02;
+            }
+
+            if (m_lastCommand == 0x0C) {
+                // read address
+                if ((g_emulation->getCurClock() - m_cmdTime)  * 1000000 / g_emulation->getFrequency() > 300000)
+                    m_status &= ~0x01;
             }
 
             uint8_t res = m_status;
