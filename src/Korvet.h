@@ -102,8 +102,6 @@ class KorvetCore : public PlatformCore
         KorvetPpi8255Circuit* m_ppiCircuit = nullptr;
         Pit8253* m_pit = nullptr;
         Pic8259* m_pic = nullptr;
-        bool m_intReq = false;
-        bool m_intsEnabled = false;
         bool m_curVrtc = true;
 };
 
