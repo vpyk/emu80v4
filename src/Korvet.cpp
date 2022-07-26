@@ -572,8 +572,8 @@ void KorvetLutRegister::writeByte(int, uint8_t value)
 KorvetGraphicsAdapter::KorvetGraphicsAdapter()
 {
     for (int i = 0; i < 3; i++) {
-        m_planes[i] = new uint8_t[0x4000];
-        memset(m_planes[i], 0, 0x4000);
+        m_planes[i] = new uint8_t[0x10000];
+        memset(m_planes[i], 0, 0x10000);
     }
 }
 
