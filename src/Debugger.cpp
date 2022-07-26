@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1145,6 +1145,11 @@ void DebugWindow::here()
 
     m_isRunning = true;
     checkForCurBreakpoint();
+
+    if (pc == m_states[m_stateNum].pc) {
+        m_tempBp->setSkipCount(1);
+    }
+
     m_resetCpuClockFlag = true;
     g_emulation->debugRun();
     hide();
