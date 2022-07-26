@@ -228,6 +228,13 @@ void DebugWindow::startDebug()
 }
 
 
+void DebugWindow::update()
+{
+    fillCpuStatus();
+    codeGotoPc();
+}
+
+
 void DebugWindow::putString(int x, int y, string s, int fgColor, int bgColor)
 {
     m_curX = x;
@@ -1376,6 +1383,13 @@ void DebugWindow::codeGotoPc()
 }
 
 
+// обновление листинга кода после изменения содержимого памяти
+void DebugWindow::codeUpdate()
+{
+    codeFillLayout(m_codeCurPcLine);
+}
+
+
 // заполнение адресов строк относительно строки lineNum, у которой уже корректно выставлен адрес
 void DebugWindow::codeFillLayout(int lineNum)
 {
@@ -1679,6 +1693,7 @@ void DebugWindow::dumpProcessInput()
         m_dumpCurAddr = m_inputReturnValue;
     } else {
         writeByte(m_dumpCurAddr, m_inputReturnValue);
+        codeUpdate();
         dumpKbdProc(PK_RIGHT); // переходим к редактированию следующего байта
         m_inputFromMode = AM_DUMP;
         dumpKbdProc(PK_F2);

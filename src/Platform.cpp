@@ -202,6 +202,7 @@ void Platform::sysReq(SysReq sr)
                 g_emulation->exec((int64_t)cpu->getKDiv() * m_fastResetCpuTicks);
                 cpu->enableHooks();
             }
+            updateDebugger();
             break;
         case SR_QUERTY:
             if (m_kbdLayout) {
@@ -392,6 +393,13 @@ void Platform::showDebugger()
         }
         m_dbgWindow->startDebug();
     }
+}
+
+
+void Platform::updateDebugger()
+{
+    if (m_dbgWindow)
+        m_dbgWindow->update();
 }
 
 

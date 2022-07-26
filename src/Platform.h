@@ -70,6 +70,7 @@ class Platform : public ParentObject
         Keyboard* getKeyboard() {return m_keyboard;}
 
         void showDebugger();
+        void updateDebugger();
         std::string getAllDebugInfo();
         CodePage getCodePage() {return m_codePage;}
         bool getMuteTapeFlag() {return m_muteTape;}

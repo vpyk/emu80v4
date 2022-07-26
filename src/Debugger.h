@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -101,6 +101,7 @@ class DebugWindow : private EmuWindow
         void setCaption(std::string caption) {EmuWindow::setCaption(caption);}
 
         void startDebug();
+        void update();
         void draw();
 
     private:
@@ -302,6 +303,7 @@ class DebugWindow : private EmuWindow
         uint16_t m_codeLayout[28];              // распределение адресов по строкам листинга
         void codeInit();                        // инициализация секции кода
         void codeGotoPc();                      // переход на текущий PC в листинге
+        void codeUpdate();                      // обновление листинга после изменения памяти
         void codeFillLayout(int lineNum);       // подготовка соответствия строк листинга и PC для отрисовки
         void codeDraw();                        // отрисовка кода
         void codeKbdProc(PalKeyCode keyCode);   // клавиатурный обработчик секции кода

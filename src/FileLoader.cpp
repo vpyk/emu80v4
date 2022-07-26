@@ -56,6 +56,7 @@ bool FileLoader::chooseAndLoadFile(bool run)
         emuLog << "Error loading file: " << fileName << "\n";
         return false;
     }
+    m_platform->updateDebugger();
     return true;
 }
 
