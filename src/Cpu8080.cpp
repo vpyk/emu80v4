@@ -214,6 +214,7 @@ using namespace std;
 #define CALL \
 {                                               \
     PUSH(PC + 2);                               \
+    m_statusWord = 0x80;                        \
     PC = RD_WORD(PC);                           \
 }
 
