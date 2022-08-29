@@ -1184,8 +1184,8 @@ void DebugWindow::breakpoint()
         m_bpList.erase(it);
     } else {
         // не нашли
-        if (m_bpList.size() >=6) // ограничение на количество точек останова
-            return;
+        /*if (m_bpList.size() >= 6) // ограничение на количество точек останова
+            return;*/
         // ставим
         CodeBreakpoint* cbp = new CodeBreakpoint(pc);
         m_cpu->addHook(cbp);
@@ -2042,17 +2042,23 @@ void DebugWindow::bpointsDraw()
         putString(m_curLayout->bpts.left + 1, m_curLayout->bpts.top + 1, "Emu80");
         putString(m_curLayout->bpts.left + 2, m_curLayout->bpts.top + 2, "v.4");
     } else {
-        int i = 0;
-        for (auto it = m_bpList.begin(); it != m_bpList.end(); it++, i++) {
+        if (m_firstVisibleBpoint > m_bpList.size() - m_curLayout->bpts.height)
+            m_firstVisibleBpoint = m_bpList.size() - m_curLayout->bpts.height;
+        if (m_curBpointLine >= m_bpList.size() - m_firstVisibleBpoint)
+            m_curBpointLine = m_bpList.size() - m_firstVisibleBpoint - 1;
+        auto it = m_bpList.begin();
+        advance(it, m_firstVisibleBpoint);
+        for (int i = 0; i < m_curLayout->bpts.height && i < m_bpList.size() + m_firstVisibleBpoint; i++) {
             setColors(12, 1);
             putString(m_curLayout->bpts.left + 2 , i + m_curLayout->bpts.top, int2Hex((*it).addr, 4));
             setColors(7, 1);
             putString(m_curLayout->bpts.left + 1, i + m_curLayout->bpts.top, "x");
+            it++;
         }
     }
 
     if (m_mode == AM_BPOINTS)
-        highlight(m_curLayout->bpts.left, m_curLayout->bpts.top + m_curBpoint, 3, 7);
+        highlight(m_curLayout->bpts.left, m_curLayout->bpts.top + m_curBpointLine, 3, 7);
 }
 
 
@@ -2061,23 +2067,33 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
 {
     switch (keyCode) {
         case PK_UP:
-            if (m_curBpoint > 0)
-                --m_curBpoint;
+            if (m_curBpointLine > 0)
+                --m_curBpointLine;
+            else if (m_firstVisibleBpoint > 0)
+                --m_firstVisibleBpoint;
             break;
         case PK_DOWN:
-            if (m_curBpoint < m_bpList.size() - 1)
-                ++m_curBpoint;
+            if (m_curBpointLine < m_bpList.size() - 1 && m_curBpointLine < m_curLayout->bpts.height - 1)
+                ++m_curBpointLine;
+            else if (m_curBpointLine == m_curLayout->bpts.height - 1 && m_curBpointLine < m_bpList.size() - 1)
+                ++m_firstVisibleBpoint;
             break;
         case PK_PGUP:
-            m_curBpoint = 0;
+            m_curBpointLine = 0;
+            m_firstVisibleBpoint = 0;
             break;
         case PK_PGDN:
-            m_curBpoint = m_bpList.size() - 1;
+            if (m_bpList.size() < m_curLayout->bpts.height)
+                m_curBpointLine = m_bpList.size() - 1;
+            else {
+                m_curBpointLine = m_curLayout->bpts.height - 1;
+                m_firstVisibleBpoint = m_bpList.size() - m_curLayout->bpts.height;
+            }
             break;
         case PK_ENTER:
         case PK_KP_ENTER: {
             auto it = m_bpList.begin();
-            advance(it, m_curBpoint);
+            advance(it, m_curBpointLine + m_firstVisibleBpoint);
             codeGotoAddr((*it).addr);
             codeGotoAddr((*it).addr);
             m_mode = AM_CODE;
@@ -2096,7 +2112,7 @@ void DebugWindow::bpointsClick(int /*x*/, int y, PalMouseKey key)
 
     switch (key) {
     case PM_LEFT_CLICK:
-        m_curBpoint = y;
+        m_curBpointLine = y;
         break;
     case PM_LEFT_DBLCLICK:
         bpointsKbdProc(PK_ENTER);
