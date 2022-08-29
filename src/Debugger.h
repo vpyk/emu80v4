@@ -355,7 +355,8 @@ class DebugWindow : private EmuWindow
         void flagsClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
 
         // breakpoints section fields and methods
-        unsigned m_curBpoint = 0;                    // номер текущей точки останова
+        unsigned m_curBpointLine = 0;            // номер строки текущей точки останова
+        unsigned m_firstVisibleBpoint = 0;       // первая отображаемая точка останова (с учетом скроллинга)
         void bpointsDraw();
         void bpointsKbdProc(PalKeyCode keyCode);// клавиатурный обработчик секции точек останова
         void bpointsClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
