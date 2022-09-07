@@ -166,6 +166,7 @@ class VectorAddrSpace : public AddressableDevice
         //~VectorAddrSpace() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getDebugInfo() override;
         void reset() override;
 
         void writeByte(int addr, uint8_t value) override;
