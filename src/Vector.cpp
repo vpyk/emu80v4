@@ -189,7 +189,7 @@ string VectorAddrSpace::getDebugInfo()
         if (m_stackDiskEnabled || m_inRamPagesMask != 0) {
             ss << "ED1:";
             for (int i = 0; i < 4; i++)
-                ss << ((m_inRamPagesMask & (1 << i)) ? "1" : "0");
+                ss << ((m_inRamPagesMask & (1 << i)) ? "+" : "-");
             ss << "/" << m_inRamDiskPage;
             ss << " S";
             if (m_stackDiskEnabled)
@@ -202,7 +202,7 @@ string VectorAddrSpace::getDebugInfo()
         if (m_stackDiskEnabled2 || m_inRamPagesMask2 != 0) {
             ss << "ED2:";
             for (int i = 0; i < 4; i++)
-                ss << ((m_inRamPagesMask2 & (1 << i)) ? "1" : "0");
+                ss << ((m_inRamPagesMask2 & (1 << i)) ? "+" : "-");
             ss << "/" << m_inRamDiskPage2;
             ss << " S";
             if (m_stackDiskEnabled2)
