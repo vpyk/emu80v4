@@ -73,7 +73,7 @@ public:
     void incFrameCount();
 
     void setPalWindow(PalWindow* palWindow);
-    PalWindow* getPalWindow() {return m_palWindow;}
+    PalWindow* getPalWindow() {return m_windowType != EWT_UNDEFINED ? m_palWindow : nullptr;}
     void showWindow();
     void mouseClick(int x, int y, PalMouseKey key);
     void mouseDrag(int x, int y);

@@ -195,7 +195,12 @@ void PaintWidget::initializeGL()
 void PaintWidget::paintImageGL(QImage* img, double aspectRatio)
 {
     int dstWidth, dstHeight, dstX, dstY;
-    static_cast<MainWindow*>(parent())->getPalWindow()->calcDstRect(img->width(), img->height(), aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
+    PalWindow* palWindow = static_cast<MainWindow*>(parent())->getPalWindow();
+
+    if (!palWindow)
+        return;
+
+    palWindow->calcDstRect(img->width(), img->height(), aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
 
     m_program->setUniformValue("sharp", m_smoothing == ST_SHARP);
     m_program->setUniformValue("textureSize", img->size());
