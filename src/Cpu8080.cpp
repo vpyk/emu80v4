@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  Based on i8080 core object model code by:
  *  Alexander Demin <alexander@demin.ws> (https://github.com/begoon/i8080-core)
@@ -23,7 +23,6 @@
 #include "Cpu8080.h"
 #include "CpuHook.h"
 #include "CpuWaits.h"
-#include "Platform.h"
 #include "PlatformCore.h"
 #include "Emulation.h"
 
@@ -619,7 +618,7 @@ int Cpu8080::i8080_execute(int opcode) {
             break;
 
         case 0x40:            /* mov b, b */
-            cpu_cycles = 4;
+            cpu_cycles = 5;
             break;
 
         case 0x41:            /* mov b, c */
