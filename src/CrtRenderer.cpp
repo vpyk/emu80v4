@@ -142,6 +142,7 @@ const char* CrtRenderer::generateTextScreen(char16_t* wTextArray, int w, int h)
     }
 
     delete[] wTextArray;
+    delete[] rowLengths;
 
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> conversion;
     m_textScreen = conversion.to_bytes(wTextScreen.c_str());

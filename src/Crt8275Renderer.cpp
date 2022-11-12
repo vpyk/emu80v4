@@ -389,8 +389,6 @@ const char* Crt8275Renderer::getTextScreen()
             bool vsp = symbol.symbolLineAttributes[1].vsp;
 
             char16_t wchr = getUnicodeSymbol(chr, gpa0, gpa1, hglt);
-            if (wchr == 0)
-                wchr = u' ';
 
             wTextArray[y * w + x] = wchr && !vsp ? wchr : u' ';
         }
