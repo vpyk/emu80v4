@@ -2529,6 +2529,7 @@ void MainWindow::onAbout()
 {
     AboutDialog* dialog = new AboutDialog(this);
     dialog->execute();
+    delete dialog;
 }
 
 

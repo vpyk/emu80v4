@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -514,6 +514,7 @@ bool palChooseConfiguration(std::string platformName, PalWindow* wnd)
     PlatformConfigDialog* dialog = new PlatformConfigDialog(parent);
     g_renderHelper->pause();
     bool res = dialog->configure(QString::fromUtf8(platformName.c_str()));
+    delete dialog;
     g_renderHelper->resume();
     return res;
 }
