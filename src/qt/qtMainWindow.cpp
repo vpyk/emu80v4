@@ -358,7 +358,7 @@ void MainWindow::fillPlatformListMenu()
     QSettings settings;
     settings.beginGroup("Last_platforms");
 
-    for (int i = 0; i <= LAST_PLATFORMS_QTY; i++) {
+    for (int i = 0; i < LAST_PLATFORMS_QTY; i++) {
         QString value = settings.value(QString::number(i)).toString();
         if (!value.isEmpty()) {
             m_lastPlatformsActions[i]->setVisible(true);
@@ -1157,8 +1157,7 @@ void MainWindow::createActions()
 
     QMenu* viewMenu = m_menuBar->addMenu(tr("View"));
 
-    //QMenu* presetMenu = viewMenu->addMenu(tr("Presets"));
-    QMenu* m_presetMenu = new QMenu (tr("Window size"), this);
+    m_presetMenu = new QMenu (tr("Window size"), this);
     QActionGroup* presetGroup = new QActionGroup(m_presetMenu);
     m_presetMenu->setIcon(m_presetIcon);
 
@@ -2979,7 +2978,7 @@ void MainWindow::updateActions()
         } else if (frameScale == "4x") {
             m_preset4xAction->setChecked(true);
             m_presetAction->setIcon(m_4xIcon);
-        } else if (frameScale == "4x") {
+        } else if (frameScale == "5x") {
             m_preset5xAction->setChecked(true);
             m_presetAction->setIcon(m_5xIcon);
         } else
