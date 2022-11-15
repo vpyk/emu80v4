@@ -51,7 +51,7 @@ string EmuObject::getName()
 
 void EmuObject::setFrequency(int64_t freq)
 {
-    m_kDiv = g_emulation->getFrequency() / freq;
+    m_kDiv = (g_emulation->getFrequency() + freq / 2) / freq;
 }
 
 
