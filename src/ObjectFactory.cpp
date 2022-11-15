@@ -66,6 +66,7 @@
 #include "Lvov.h"
 #include "Kr04.h"
 #include "Korvet.h"
+#include "Palmira.h"
 
 #include "EmuConfig.h"
 
@@ -157,6 +158,9 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(RkFddRegister);
     REG_EMU_CLASS(RkFddController);
     REG_EMU_CLASS(RkFileLoader);
+    REG_EMU_CLASS(PalmiraCore);
+    REG_EMU_CLASS(PalmiraRenderer);
+    REG_EMU_CLASS(PalmiraConfigRegister);
     REG_EMU_CLASS(TapeRedirector);
     REG_EMU_CLASS(DiskImage);
     REG_EMU_CLASS(FdImage);

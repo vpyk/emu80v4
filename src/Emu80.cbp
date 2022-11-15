@@ -173,6 +173,8 @@
 		<Unit filename="Orion.h" />
 		<Unit filename="Pal.cpp" />
 		<Unit filename="Pal.h" />
+		<Unit filename="Palmira.cpp" />
+		<Unit filename="Palmira.h" />
 		<Unit filename="PalFile.h" />
 		<Unit filename="PalKeys.h" />
 		<Unit filename="PalWindow.h" />

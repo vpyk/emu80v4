@@ -72,6 +72,7 @@ SOURCES += \
     ObjectFactory.cpp \
     Orion.cpp \
     Pal.cpp \
+    Palmira.cpp \
     Parameters.cpp \
     Partner.cpp \
     Pic8259.cpp \
@@ -161,6 +162,7 @@ HEADERS  += \
     ObjectFactory.h \
     Orion.h \
     Pal.h \
+    Palmira.h \
     PalFile.h \
     PalKeys.h \
     PalWindow.h \
