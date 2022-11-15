@@ -96,6 +96,8 @@ bool Kr04Core::setProperty(const string& propertyName, const EmuValuesList& valu
 
 Kr04Renderer::Kr04Renderer()
 {
+    m_useAltFont = false;
+
     m_fntCharWidth = 8;
     m_visibleOffsetX = -4;
 

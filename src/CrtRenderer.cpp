@@ -189,13 +189,15 @@ void TextCrtRenderer::setAltFontFile(string fontFileName)
 
 void TextCrtRenderer::setAltRender(bool isAltRender)
 {
-    m_isAltRender = isAltRender;
+    if (m_useAltFont)
+        m_isAltRender = isAltRender;
 }
 
 
 void TextCrtRenderer::toggleRenderingMethod()
 {
-    setAltRender(!m_isAltRender);
+    if (m_useAltFont)
+        setAltRender(!m_isAltRender);
 }
 
 
@@ -203,7 +205,7 @@ void TextCrtRenderer::renderFrame()
 {
     swapBuffers();
 
-    if (m_isAltRender)
+    if (m_useAltFont && m_isAltRender && m_altFont)
         altRenderFrame();
     else
         primaryRenderFrame();

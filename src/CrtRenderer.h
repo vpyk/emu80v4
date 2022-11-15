@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -94,6 +94,7 @@ class TextCrtRenderer : public CrtRenderer
     protected:
         uint8_t* m_font = nullptr;
         uint8_t* m_altFont = nullptr;
+        bool m_useAltFont = false;
         bool m_isAltRender = false;
         int m_fontSize;
         int m_altFontSize;

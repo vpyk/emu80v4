@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,12 @@
 #include "Crt8275.h"
 
 using namespace std;
+
+
+Crt8275Renderer::Crt8275Renderer()
+{
+    m_useAltFont = true;
+}
 
 
 void Crt8275Renderer::attachCrt(Crt8275* crt)
