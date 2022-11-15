@@ -61,13 +61,19 @@ void Crt8275Renderer::toggleCropping()
 void Crt8275Renderer::calcAspectRatio(int charWidth)
 {
     m_frameRate = m_crt->getFrameRate();
-    m_freqMHz = g_emulation->getFrequency() / m_crt->getKDiv() / 1000000.0;
+    m_freqMHz = g_emulation->getFrequency() / 1000000.0 / m_crt->getKDiv();
+
+    int scanLines = m_crt->getNLines() * (m_crt->getNRows() + m_crt->getVrRows());
+
     if (m_frameRate == 0.0)
         m_aspectRatio = 1.0;
-    else if (m_frameRate < 55.0) {
+    else if (scanLines >= 360) {
+        // VGA
+        m_aspectRatio = 25.175 / m_fntCharWidth / m_freqMHz; // 480.0 * 25.175 * 4 / 640 / m_fntCharWidth / m_freqMHz / 3;
+    } else if (m_frameRate < 55.0) {
         // PAL
         m_aspectRatio = 576.0 * 9 / 704 / charWidth / m_freqMHz; // 576 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
-    } else {
+    } else if (scanLines < 360) {
         // NTSC
         m_aspectRatio = 480.0 * 9 / 704 / charWidth / m_freqMHz; // 480 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
     }
@@ -86,10 +92,20 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
 
     //double effectiveFreq = m_freqMHz * m_freqMHz * 64 / (m_crt->getNCharsPerRow() + m_crt->getHrChars());
 
+    int scanLines = m_crt->getNLines() * (m_crt->getNRows() + m_crt->getVrRows());
+
     if (m_frameRate == 0.0)
         return;
-    else if (m_frameRate < 55.0) {
-        // 576i
+    else if (scanLines >= 360) {
+        // 480p (VGA)
+        double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / (800 / 25.175);
+        visibleX = (144 * effectiveFreq / 25.175 - m_crt->getHrChars() - 1) * charWidth + m_visibleOffsetX;
+        //visibleY = 19 - charHeight * m_crt->getVrRows();
+        visibleY = (35 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
+        visibleWidth = (640 * effectiveFreq * charWidth) / 25.175;
+        visibleHeight = 480 * charHeight / m_crt->getNLines();
+    } else if (m_frameRate < 55.0) {
+        // 576i (PAL)
         double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / 64.;
         visibleX = (140 * effectiveFreq / 13.5 - m_crt->getHrChars() - 1) * charWidth + m_visibleOffsetX; //31 //48;
         //visibleY = 23 - charHeight * m_crt->getVrRows(); //30;
@@ -97,7 +113,7 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
         visibleWidth = (704 * effectiveFreq * charWidth) / 13.5; // 384;
         visibleHeight = 288 * charHeight / m_crt->getNLines(); //288; //250;
     } else {
-        //480i
+        //480i (NTSC)
         double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / 63.556; //(572. / 9. /*63.(5)*/);
         visibleX = (130 * effectiveFreq / 13.5 - m_crt->getHrChars() - 1) * charWidth + m_visibleOffsetX;
         //visibleY = 19 - charHeight * m_crt->getVrRows();
