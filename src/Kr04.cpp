@@ -341,7 +341,7 @@ int Kr04Pit8253SoundSource::calcValue()
 
 Kr04FileLoader::Kr04FileLoader()
 {
-    m_skipTicks = 1000000;
+    m_skipTicks = 1200000;
 }
 
 

@@ -145,6 +145,7 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         cpu->disableHooks();
         g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+        afterReset();
     }
 
     for (unsigned addr = begAddr; addr <= endAddr; addr++)
@@ -175,8 +176,6 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
     delete[] buf;
 
     if (run && cpu) {
-        afterReset();
-
         cpu->enableHooks();
         cpu->setPC(begAddr);
         if (m_allowMultiblock && m_tapeRedirector && fileSize > 0) {
