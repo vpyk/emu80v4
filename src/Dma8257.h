@@ -42,7 +42,7 @@ class Dma8257 : public AddressableDevice
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
-        void reset() override;
+        void reset() override {performReset();};
         std::string getDebugInfo() override;
 
         void attachCpu(Cpu* cpu);
@@ -82,6 +82,7 @@ class Dma8257 : public AddressableDevice
         float m_dmaPercentage = 0.0;
         int m_calcCnt = 0;
         void calcDmaPercentage();
+        void performReset();
 };
 
 #endif // DMA8257_H

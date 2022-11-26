@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ EmuAudioIoDevice::EmuAudioIoDevice(int sampleRate, int frameRate) : QIODevice(nu
         frameRate = 60;
     m_minSamples = sampleRate / (frameRate - 6);
     m_maxSamples = (sampleRate / (frameRate - 2)) * 5;
+
+    memset(m_buf, 0, sizeof(m_buf));
 }
 
 

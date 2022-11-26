@@ -1223,7 +1223,7 @@ void DebugWindow::inputStart(ActiveMode fromMode, int x, int y, int nDigits, boo
         //m_inputCurPos = nDigits - 1;
         m_inputCurValue = int2Hex(initialNumber, nDigits);
     } else {
-        m_inputCurPos = 0;
+        //m_inputCurPos = 0;
         m_inputCurValue = "";
     }
     m_inputCurPos = 0;

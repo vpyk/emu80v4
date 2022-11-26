@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class RkRomDisk : public Ppi8255Circuit
         static EmuObject* create(const EmuValuesList& parameters) {return new RkRomDisk(parameters[0].asString());}
 
     protected:
-        uint8_t* m_romDisk;
+        uint8_t* m_romDisk = nullptr;
         unsigned m_curAddr = 0;
 };
 

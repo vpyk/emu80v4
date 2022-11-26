@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -119,11 +119,11 @@ class Translator : public AddressableDevice
         uint8_t m_readSubValue  = 0x00;
         unsigned m_addrLShift   = 0;
         unsigned m_addrRShift   = 0;
-        uint16_t m_addrAndMask   = 0xFFFF;
-        uint16_t m_addrOrMask    = 0x0000;
-        uint16_t m_addrXorMask   = 0x0000;
-        uint16_t m_addrAddValue  = 0x0000;
-        uint16_t m_addrSubValue  = 0x0000;
+        unsigned m_addrAndMask   = ~0x0000;
+        unsigned m_addrOrMask    = 0x0000;
+        unsigned m_addrXorMask   = 0x0000;
+        unsigned m_addrAddValue  = 0x0000;
+        unsigned m_addrSubValue  = 0x0000;
 };
 
 #endif // GENERICMODULES_H

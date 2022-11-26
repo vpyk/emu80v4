@@ -56,7 +56,7 @@ public:
     static EmuObject* create(const EmuValuesList&) {return new DiskImage();}
 
 protected:
-    bool m_isWriteProtected;
+    bool m_isWriteProtected = false;
     std::string m_fileName;
     std::string m_permanentFileName;
     bool m_autoMount = false;

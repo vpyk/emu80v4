@@ -51,7 +51,7 @@ class CpuHook : public EmuObject
         void setSignature(std::string signature);
 
     protected:
-        Cpu* m_cpu;
+        Cpu* m_cpu = nullptr;
         bool m_isEnabled = true;
         TapeRedirector* m_file = nullptr;
         bool m_hasSignature = false;

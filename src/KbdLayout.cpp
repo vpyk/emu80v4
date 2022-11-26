@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -911,7 +911,7 @@ EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& s
 KbdLayoutHelper::KbdLayoutHelper()
 {
     pause();
-    setFrequency(1000000); // 1 µs
+    ActiveDevice::setFrequency(1000000); // 1 µs
 }
 
 

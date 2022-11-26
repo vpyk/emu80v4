@@ -35,12 +35,12 @@ using namespace std;
 
 Dma8257::Dma8257()
 {
-    reset();
+    performReset();
 }
 
 
 
-void Dma8257::reset()
+void Dma8257::performReset()
 {
     for (int ch=0; ch<4; ch++) {
         m_addr[ch] = 0;

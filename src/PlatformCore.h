@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class PlatformCore : public EmuObject
         EmuWindow* m_window = nullptr;
 
     private:
-        bool m_tapeOut;
+        bool m_tapeOut = false;
 };
 
 

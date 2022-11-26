@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class Ut88AddrSpaceMapper : public AddrSpaceMapper
         static EmuObject* create(const EmuValuesList&) {return new Ut88AddrSpaceMapper();}
 
     private:
-        Cpu8080* m_cpu;
+        Cpu8080* m_cpu = nullptr;
 };
 
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -77,13 +77,13 @@ class RkFddController : public Ppi8255Circuit
         int m_drive;
         int m_track;
         int m_side;
-        int m_pos;
+        int m_pos = 0;
         bool m_write = false;
 
-        uint64_t m_prevClock;
+        uint64_t m_prevClock = 0;
 
-        bool m_nextByteReady;
-        bool m_index;
+        bool m_nextByteReady = false;
+        bool m_index = false;
         bool m_ready;
         bool m_dirFwd;
 
