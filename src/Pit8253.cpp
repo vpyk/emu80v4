@@ -361,7 +361,7 @@ Pit8253::Pit8253()
         m_counters[i] = new Pit8253Counter(this, i);
         m_counters[i]->m_kDiv = m_kDiv;
     }
-    reset();
+    Pit8253::reset(); // virtual
 }
 
 

@@ -539,7 +539,7 @@ void VectorRenderer::attachMemory(Ram* memory)
 
 bool VectorRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (CrtRenderer::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "memory") {
@@ -808,7 +808,7 @@ bool VectorColorRegister::setProperty(const std::string& propertyName, const Emu
 
 VectorKeyboard::VectorKeyboard()
 {
-    resetKeys();
+    VectorKeyboard::resetKeys();
 }
 
 
@@ -1009,7 +1009,7 @@ void VectorFddControlRegister::writeByte(int, uint8_t value)
 
 bool VectorFddControlRegister::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "fdc") {
@@ -1056,7 +1056,7 @@ void VectorPpi8255Circuit2::setPortC(uint8_t value)
 
 bool VectorHddRegisters::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "ataDrive") {

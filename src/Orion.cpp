@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ void OrionRenderer::toggleCropping()
 
 bool OrionRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (CrtRenderer::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "screenMemory") {
@@ -241,7 +241,7 @@ void OrionMemPageSelector::writeByte(int, uint8_t value)
 
 bool OrionMemPageSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "mapper") {
@@ -262,7 +262,7 @@ void OrionScreenSelector::writeByte(int, uint8_t value)
 
 bool OrionScreenSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
@@ -283,7 +283,7 @@ void OrionColorModeSelector::writeByte(int, uint8_t value)
 
 bool OrionColorModeSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
@@ -307,7 +307,7 @@ void OrionFddControlRegister::writeByte(int, uint8_t value)
 
 bool OrionFddControlRegister::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "type") {
@@ -335,7 +335,7 @@ uint8_t OrionFddQueryRegister::readByte(int)
 
 bool OrionFddQueryRegister::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "fdc") {

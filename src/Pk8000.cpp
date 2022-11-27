@@ -438,7 +438,7 @@ void Pk8000Renderer::toggleCropping()
 
 bool Pk8000Renderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (CrtRenderer::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "screenMemoryBank") {
@@ -642,7 +642,7 @@ uint8_t Pk8000Mode1ColorMem::readByte(int addr)
 
 bool Pk8000Mode1ColorMem::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
@@ -690,7 +690,7 @@ void Pk8000TxtBufSelector::writeByte(int, uint8_t value)
 
 bool Pk8000TxtBufSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
@@ -714,7 +714,7 @@ void Pk8000SymGenBufSelector::writeByte(int, uint8_t value)
 
 bool Pk8000SymGenBufSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
@@ -738,7 +738,7 @@ void Pk8000GrBufSelector::writeByte(int, uint8_t value)
 
 bool Pk8000GrBufSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
@@ -762,7 +762,7 @@ void Pk8000ColBufSelector::writeByte(int, uint8_t value)
 
 bool Pk8000ColBufSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
@@ -981,7 +981,7 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
 
 Pk8000Keyboard::Pk8000Keyboard()
 {
-    resetKeys();
+    Pk8000Keyboard::resetKeys();
 }
 
 
@@ -1084,7 +1084,7 @@ uint8_t Pk8000InputRegister::readByte(int)
 
 bool Pk8000InputRegister::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "keyboard") {
@@ -1217,7 +1217,7 @@ void Pk8000FddControlRegister::writeByte(int, uint8_t value)
 
 bool Pk8000FddControlRegister::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "fdc") {
@@ -1238,7 +1238,7 @@ uint8_t Pk8000FdcStatusRegisters::readByte(int)
 
 bool Pk8000FdcStatusRegisters::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "fdc") {

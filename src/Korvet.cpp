@@ -699,7 +699,7 @@ uint8_t KorvetTextAdapter::readByte(int addr)
 
 KorvetKeyboard::KorvetKeyboard()
 {
-    resetKeys();
+    KorvetKeyboard::resetKeys();
 }
 
 
@@ -913,7 +913,7 @@ uint8_t KorvetKeyboardRegisters::readByte(int addr)
 KorvetFddMotor::KorvetFddMotor()
 {
     pause();
-    setFrequency(1); // 1 s
+    EmuObject::setFrequency(1); // 1 s
 }
 
 

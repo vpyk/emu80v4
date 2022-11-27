@@ -304,7 +304,7 @@ bool LvovPpi8255Circuit2::setProperty(const string& propertyName, const EmuValue
 
 LvovKeyboard::LvovKeyboard()
 {
-    resetKeys();
+    LvovKeyboard::resetKeys();
 }
 
 

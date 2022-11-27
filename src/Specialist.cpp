@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ void SpecRenderer::toggleCropping()
 
 bool SpecRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (CrtRenderer::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "screenMemory") {
@@ -258,7 +258,7 @@ void SpecMxMemPageSelector::writeByte(int addr, uint8_t value)
 
 bool SpecMxMemPageSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "mapper") {
@@ -287,7 +287,7 @@ void SpecMxColorRegister::writeByte(int, uint8_t value)
 
 bool SpecMxColorRegister::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "videoRam") {
@@ -301,7 +301,7 @@ bool SpecMxColorRegister::setProperty(const string& propertyName, const EmuValue
 
 bool SpecMxFddControlRegisters::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "fdc") {
@@ -459,7 +459,7 @@ bool SpecPpi8255Circuit::setProperty(const string& propertyName, const EmuValues
 
 SpecKeyboard::SpecKeyboard()
 {
-    resetKeys();
+    SpecKeyboard::resetKeys();
 }
 
 
