@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ int Covox::calcValue()
 
     uint64_t ticks = g_emulation->getCurClock() - m_initClock;
     if (ticks)
-        res = int64_t(m_sumVal) * MAX_SND_AMP / ticks >> (m_bits - 1);
+        res = int64_t(m_sumVal) * MAX_SND_AMP / ticks >> m_bits;
     m_sumVal = 0;
     m_initClock = g_emulation->getCurClock();
 
