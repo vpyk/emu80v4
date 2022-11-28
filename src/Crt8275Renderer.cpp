@@ -21,6 +21,7 @@
 #include <sstream>
 #include <cstring>
 
+#include "Globals.h"
 #include "Crt8275Renderer.h"
 #include "Emulation.h"
 #include "Crt8275.h"

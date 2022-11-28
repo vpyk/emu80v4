@@ -19,6 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "Cpu.h"
 #include "Cpu8080.h"
 #include "CpuHook.h"

@@ -16,9 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "Pal.h"
 #include "PalFile.h"
-#include "AddrSpace.h"
 #include "Memory.h"
 #include "EmuWindow.h"
 #include "Emulation.h"

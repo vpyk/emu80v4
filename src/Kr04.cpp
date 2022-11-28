@@ -16,12 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "AddrSpace.h"
 #include "Kr04.h"
 #include "Emulation.h"
 #include "Platform.h"
 #include "PlatformCore.h"
-//#include "Globals.h"
 #include "EmuWindow.h"
 #include "SoundMixer.h"
 #include "WavReader.h"

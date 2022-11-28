@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,9 +17,8 @@
  */
 
 #include "Pal.h"
-
+#include "Globals.h"
 #include "Emulation.h"
-#include "PlatformCore.h"
 #include "WavReader.h"
 #include "Platform.h"
 #include "EmuWindow.h"

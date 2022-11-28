@@ -19,6 +19,7 @@
 
 #include <string.h>
 
+#include "Globals.h"
 #include "Ut88.h"
 #include "Emulation.h"
 #include "EmuWindow.h"

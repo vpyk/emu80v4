@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 // Ppi8255CircuitRk.cpp
 // Реализация класса обвязки основного КР580ВВ55 на РК86 и Апогее
 
+#include "Globals.h"
 #include "Emulation.h"
 #include "Platform.h"
 #include "PlatformCore.h"
 #include "SoundMixer.h"
 #include "RkKeyboard.h"
-#include "Ppi8255Circuit.h"
 #include "RkPpi8255Circuit.h"
 #include "WavReader.h"
 

@@ -21,7 +21,6 @@
 
 #include "qtRenderHelper.h"
 #include "qtPaintWidget.h"
-#include "qtPalWindow.h"
 #include "qtMainWindow.h"
 
 #include "../Pal.h"

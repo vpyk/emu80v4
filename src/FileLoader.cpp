@@ -17,6 +17,7 @@
  */
 
 #include "Pal.h"
+#include "Globals.h"
 #include "Emulation.h"
 #include "Platform.h"
 #include "Cpu.h"

@@ -19,6 +19,7 @@
 
 #include <string.h>
 
+#include "Globals.h"
 #include "Mikro80.h"
 #include "Emulation.h"
 #include "Platform.h"

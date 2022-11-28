@@ -20,8 +20,7 @@
 #define GENERICMODULES_H
 
 #include "EmuObjects.h"
-
-class Cpu8080Compatible;
+#include "Cpu.h"
 
 class PeriodicInt8080 : public AddressableDevice, public IActive
 {

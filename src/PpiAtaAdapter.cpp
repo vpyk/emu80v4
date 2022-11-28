@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "Emulation.h"
 #include "PpiAtaAdapter.h"
 #include "AtaDrive.h"

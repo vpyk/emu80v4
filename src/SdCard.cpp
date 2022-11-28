@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include "SdCard.h"
-#include "Emulation.h"
 
 using namespace std;
 

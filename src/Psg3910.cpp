@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #include <string>
 
+#include "Globals.h"
 #include "Emulation.h"
 #include "Psg3910.h"
 
@@ -34,7 +35,7 @@ Psg3910::Psg3910()
 {
     m_prevClock = g_emulation->getCurClock();
     m_discreteClock = m_prevClock - m_prevClock % (m_kDiv * 8);
-    reset();
+    Psg3910::reset();
 }
 
 

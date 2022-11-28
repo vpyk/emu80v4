@@ -23,6 +23,7 @@
 
 #include <string.h>
 
+#include "Globals.h"
 #include "AtaDrive.h"
 #include "DiskImage.h"
 #include "Emulation.h"

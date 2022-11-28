@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "KbdLayout.h"
 #include "Keyboard.h"
 #include "Platform.h"

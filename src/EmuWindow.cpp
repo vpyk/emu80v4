@@ -21,6 +21,7 @@
 #include <string.h>
 #include <cmath>
 
+#include "Globals.h"
 #include "EmuWindow.h"
 #include "Emulation.h"
 #include "EmuConfig.h"

@@ -20,8 +20,9 @@
 
 // Реализация контроллера прерываний КР580ВН59
 
+#include "Globals.h"
 #include "Pic8259.h"
-#include "Cpu8080.h"
+#include "Cpu.h"
 #include "Emulation.h"
 
 using namespace std;

@@ -18,6 +18,7 @@
 
 #include <string.h>
 
+#include "Globals.h"
 #include "Eureka.h"
 #include "Emulation.h"
 #include "SoundMixer.h"

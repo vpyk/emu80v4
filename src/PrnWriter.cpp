@@ -19,6 +19,7 @@
 //#include <sstream>
 
 #include "Pal.h"
+#include "Globals.h"
 #include "Emulation.h"
 #include "PrnWriter.h"
 

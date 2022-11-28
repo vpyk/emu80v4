@@ -23,7 +23,6 @@
 #include <list>
 #include <string>
 
-#include "Globals.h"
 #include "Parameters.h"
 
 

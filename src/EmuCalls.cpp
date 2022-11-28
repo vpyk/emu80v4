@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 // Emulation core rouninues to be called from platform abstraction layer (PAL)
 
 
+#include "Globals.h"
 #include "Emulation.h"
 #include "EmuWindow.h"
 #include "EmuConfig.h"

@@ -21,6 +21,7 @@
 
 #include <string>
 
+#include "EmuObjects.h"
 #include "PalFile.h"
 
 class PlatformCore;

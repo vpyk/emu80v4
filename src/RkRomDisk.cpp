@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #include <string.h>
 
 #include "Pal.h"
-#include "Ppi8255Circuit.h"
 #include "RkRomDisk.h"
 
 using namespace std;

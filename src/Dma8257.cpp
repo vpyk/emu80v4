@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "Globals.h"
 #include "Dma8257.h"
 #include "Cpu.h"
 #include "Emulation.h"

@@ -42,7 +42,6 @@
 #include "qtAudioDevice.h"
 
 #include "../Pal.h"
-#include "../PalKeys.h"
 #include "../EmuTypes.h"
 #include "../EmuCalls.h"
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  Based on original code by:
  *  Frank D. Cringle (YAZE project, GPL v.2 licence)
@@ -20,6 +20,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "CpuZ80.h"
 #include "CpuHook.h"
 #include "CpuWaits.h"

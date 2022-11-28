@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "Emulation.h"
 #include "WavReader.h"
 #include "RfsTapeHooks.h"
-#include "Cpu8080.h"
 #include "TapeRedirector.h"
 
 using namespace std;

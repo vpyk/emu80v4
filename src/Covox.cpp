@@ -20,7 +20,7 @@
 
 #include "Emulation.h"
 
-//#include "Pal.h"
+#include "Globals.h"
 #include "Covox.h"
 
 using namespace std;

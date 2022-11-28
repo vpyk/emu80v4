@@ -16,10 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "Emulation.h"
-#include "Ppi8255Circuit.h"
 #include "RkFdd.h"
-#include "Rk86.h"
 #include "DiskImage.h"
 
 using namespace std;

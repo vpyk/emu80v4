@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Globals.h"
 #include "Mikrosha.h"
 #include "Emulation.h"
 #include "Platform.h"

@@ -22,6 +22,7 @@
 
 #include <string.h>
 
+#include "Globals.h"
 #include "Debugger.h"
 #include "Emulation.h"
 #include "Platform.h"

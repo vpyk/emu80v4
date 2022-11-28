@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 
 #ifndef CPU8080DASM_H
 #define CPU8080DASM_H
+
+#include <string>
 
 extern std::string i8080GetInstructionMnemonic(uint8_t* mem);
 extern int i8080GetInstructionLength(uint8_t* mem);

@@ -17,6 +17,7 @@
  */
 
 #include "Pal.h"
+#include "Globals.h"
 #include "DiskImage.h"
 #include "Emulation.h"
 #include "Platform.h"

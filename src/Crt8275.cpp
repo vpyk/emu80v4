@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "Globals.h"
 #include "Crt8275.h"
 #include "Cpu.h"
 #include "Dma8257.h"

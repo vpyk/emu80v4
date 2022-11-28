@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 // GenericModules.cpp
 // Реализация модулей общего назначения для быстрого прототипирования раздичных конфигураций
 
+#include "Globals.h"
 #include "Cpu.h"
 #include "Emulation.h"
 #include "AddrSpace.h"
@@ -51,7 +52,7 @@ void PeriodicInt8080::operate()
 
 bool PeriodicInt8080::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "active") {
@@ -86,7 +87,7 @@ uint8_t PageSelector::readByte(int)
 
 bool PageSelector::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "mapper") {
@@ -125,7 +126,7 @@ uint8_t Splitter::readByte(int)
 
 bool Splitter::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "device") {
@@ -197,7 +198,7 @@ uint8_t Translator::readByte(int addr)
 
 bool Translator::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "addrRShift") {

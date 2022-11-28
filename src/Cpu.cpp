@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  */
 
 #include <algorithm>
-//#include <sstream>
-#include "string.h"
+#include <cstring>
 
+#include "Globals.h"
 #include "Cpu.h"
 #include "CpuHook.h"
 #include "CpuWaits.h"

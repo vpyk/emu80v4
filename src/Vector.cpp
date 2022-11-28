@@ -19,6 +19,7 @@
 #include <sstream>
 #include <string.h>
 
+#include "Globals.h"
 #include "Vector.h"
 #include "EmuWindow.h"
 #include "Cpu.h"

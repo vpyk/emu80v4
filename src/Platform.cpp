@@ -18,6 +18,7 @@
 
 #include <sstream>
 
+#include "Globals.h"
 #include "Platform.h"
 #include "Emulation.h"
 #include "EmuObjects.h"

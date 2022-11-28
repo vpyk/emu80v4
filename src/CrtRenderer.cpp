@@ -20,9 +20,9 @@
 #include <codecvt>
 
 #include "Pal.h"
-
+#include "Globals.h"
 #include "Emulation.h"
-#include "Crt8275Renderer.h"
+#include "CrtRenderer.h"
 
 using namespace std;
 

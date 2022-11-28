@@ -21,6 +21,7 @@
 
 #include <sstream>
 
+#include "Globals.h"
 #include "Fdc1793.h"
 #include "DiskImage.h"
 #include "Emulation.h"
@@ -361,7 +362,7 @@ bool Fdc1793::getDrq()
 
 bool Fdc1793::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "fdImage" && values[0].isInt()) {

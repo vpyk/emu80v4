@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,19 +20,17 @@
 
 // Реализация контроллера программируемого перефирийного интерфейса КР580ВВ55
 
+#include "Globals.h"
 #include "Ppi8255.h"
 #include "Ppi8255Circuit.h"
 #include "Emulation.h"
-#include "RkKeyboard.h"
-#include "SoundMixer.h"
 
 using namespace std;
 
 Ppi8255::Ppi8255()
 {
-    reset();
+    Ppi8255::reset();
 }
-
 
 
 void Ppi8255::reset()
@@ -166,7 +164,7 @@ void Ppi8255::attachPpi8255Circuit(Ppi8255Circuit* circuit)
 
 bool Ppi8255::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "circuit") {

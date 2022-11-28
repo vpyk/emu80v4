@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <cstring>
 
+#include "Globals.h"
 #include "Lvov.h"
 #include "Emulation.h"
 #include "EmuWindow.h"

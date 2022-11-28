@@ -19,8 +19,6 @@
 #ifndef KORVET_H
 #define KORVET_H
 
-#include "Memory.h"
-#include "AddrSpace.h"
 #include "PlatformCore.h"
 #include "CrtRenderer.h"
 #include "Ppi8255Circuit.h"

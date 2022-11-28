@@ -22,6 +22,10 @@
 #ifndef EMUCALLS_H
 #define EMUCALLS_H
 
+#include <vector>
+
+#include "PalWindow.h"
+
 void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed, unsigned unicodeKey = 0);
 void emuResetKeys(PalWindow* wnd);
 void emuSysReq(PalWindow* wnd, SysReq sr);
