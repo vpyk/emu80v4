@@ -1431,7 +1431,7 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("Color (Akimenko)"));
         m_colorColor2Action->setData("color2");
-    } else if (platformGroup == "apogey" || platformGroup == "orion" || platformGroup == "lvov" ||
+    } else if (platformGroup == "apogey" || platformGroup == "bashkiria" || platformGroup == "orion" || platformGroup == "lvov" ||
                platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "korvet") {
         hasColor = true;
 

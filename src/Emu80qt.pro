@@ -47,6 +47,7 @@ SOURCES += \
     AddrSpace.cpp \
     Apogey.cpp \
     AtaDrive.cpp \
+    Bashkiria.cpp \
     CloseFileHook.cpp \
     ConfigReader.cpp \
     Cpu.cpp \
@@ -130,6 +131,7 @@ HEADERS  += \
     AddrSpace.h \
     Apogey.h \
     AtaDrive.h \
+    Bashkiria.h \
     CloseFileHook.h \
     CmdLine.h \
     ConfigReader.h \
