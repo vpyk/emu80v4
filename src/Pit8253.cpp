@@ -294,7 +294,7 @@ void Pit8253Counter::setCounter(uint16_t counter)
         case 0:
             m_counter = m_counterInitValue;
             m_isCounting = true;
-            m_out = false;
+            m_out = counter==1;
             break;
         case 2:
         case 3:

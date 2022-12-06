@@ -128,6 +128,7 @@ void Pic8259::irq(int vect, bool state)
                 setInt(vect);
             }
         }
+        m_irr |= mask;
         m_irs |= mask;
     } else {
         m_irs &= ~mask;
@@ -208,6 +209,6 @@ void Pic8259::eoi(int level)
         return;
     m_irr &= ~(1 << level);
     updateCurLevel();
-    if (m_curLevel >= 0)
+    if (m_curLevel >= 0 && m_curLevel<8)
         setInt(m_curLevel);
 }
