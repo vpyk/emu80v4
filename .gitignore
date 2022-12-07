@@ -9,3 +9,4 @@
 /build
 .qmake.stash
 Makefile
+.vscode
