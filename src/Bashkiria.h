@@ -183,7 +183,7 @@ class Bashkiria_2M_Keyboard : public Keyboard
             { EK_8,        EK_7,         EK_6,     EK_5,   EK_4,   EK_3,       EK_2,     EK_MINUS    },
             { EK_COMMA,    EK_SEMICOLON, EK_COLON, EK_AT,  EK_1,   EK_BKSLASH, EK_0,     EK_9        },
             { EK_SPACE,    EK_TAB,       EK_BSP,   EK_DEL, EK_INS, EK_STOP,    EK_CLEAR, EK_CR       },
-            { EK_SHIFT,    EK_FIX,       EK_CTRL,  EK_SEL, EK_ESC, EK_MENU,    EK_LAT,   EK_LF       },
+            { EK_SHIFT,    EK_FIX,       EK_CTRL,  EK_SEL, EK_ESC, EK_MENU,    EK_LANG,  EK_LF       },
 
             { EK_NP_7,   EK_NP_6,       EK_NP_5,    EK_NP_4,   EK_NP_3,  EK_NP_2,  EK_NP_1,  EK_NP_0 },
             { EK_SLASH,  EK_NP_PERIOD,  EK_CARET,   EK_PERIOD, EK_NONE,  EK_NONE,  EK_NP_9,  EK_NP_8 },

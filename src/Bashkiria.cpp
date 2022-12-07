@@ -424,9 +424,13 @@ EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
     case PK_DEL:   return EK_LF;
     case PK_LALT:  return EK_FIX;
     case PK_PGUP:  return EK_SEL;
-    case PK_PGDN:  return EK_LAT;
+    case PK_PGDN:  return EK_LANG;
     case PK_MENU:  return EK_MENU;
     case PK_F12:   return EK_STOP;
+    case PK_F6:    return EK_F6;
+    case PK_F7:    return EK_F7;
+    case PK_F8:    return EK_F8;
+    case PK_F9:    return EK_F9;
     default:
         break;
     }
