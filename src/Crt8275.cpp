@@ -742,7 +742,8 @@ void Crt8275Raster::operate()
         m_isHrtcActive = false;
         //_crt->_wasVsync = true;
         m_core->hrtc(false, m_curScanLine);
-        ++m_curScanLine %= m_crt->m_nLines;
+        ++m_curScanLine;
+        m_curScanLine %= m_crt->m_nLines;
         if (m_curScanLine == 0) {
             // next row
             m_curScanRow++;

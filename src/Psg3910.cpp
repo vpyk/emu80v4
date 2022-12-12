@@ -49,9 +49,15 @@ void Psg3910::reset()
     m_envFreq = 0;
     m_envCounter = 0;
     m_envCounter2 = 0;
+    m_envValue = 0;
 
     m_noiseCounter = 0;
     m_noise = 1;
+
+    m_noiseValue = false;
+    m_att = false;
+    m_alt = false;
+    m_hold = false;
 
     for (int i = 0; i < 3; i++) {
         m_counters[i].freq = 0;

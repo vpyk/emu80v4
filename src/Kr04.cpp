@@ -128,7 +128,7 @@ void Kr04Renderer::customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int l
     int offset = 0x8000 | (rvv ? 0x4000 : 0) | (hglt ? 0x2000 : 0) | (gpa1 ? 0x1000 : 0) | (gpa0 ? 0x0800 : 0) | ((symbol & 0x40) << 4) | (line << 6) | (symbol & 0x3F);
     uint8_t bt = vsp ? 0 : m_memory->readByte(offset);
 
-    bool p2 = true; // jumper
+    const bool p2 = true; // jumper
 
     for (int pt = 0; pt < (m_hiRes ? 8 : 4); pt++) {
         int idx = (bt & 1) | (bt >> 3 & 2) | (lten ? 4 : 0) | (!m_hiRes ? 8 : 0) | (p2 ? 0x10 : 0);
@@ -347,7 +347,7 @@ Kr04FileLoader::Kr04FileLoader()
 
 void Kr04FileLoader::afterReset()
 {
-    Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
 
     // Send Spc/Spc/Cr
     Keyboard* kbd = m_platform->getKeyboard();

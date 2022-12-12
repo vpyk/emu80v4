@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -236,10 +236,10 @@ class SpecKeyboard : public Keyboard
         SpecKeyboardType m_kbdType = SKT_ORIGINAL;
 
         uint8_t m_vKeys[12];
-        uint16_t m_vMask;
+        uint16_t m_vMask = 0;
 
         uint16_t m_hKeys[6];
-        uint8_t m_hMask;
+        uint8_t m_hMask = 0;
 
         bool m_shift;
 };

@@ -38,7 +38,6 @@ void Ppi8255::reset()
     m_portA = 0;
     m_portB = 0;
     m_portC = 0;
-    m_portC = 0;
     m_chAMode = PCM_IN;
     m_chBMode = PCM_IN;
     m_chCHiMode = PCM_IN;

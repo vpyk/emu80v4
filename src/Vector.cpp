@@ -304,7 +304,6 @@ VectorRenderer::VectorRenderer()
 
     m_ticksPerPixel = g_emulation->getFrequency() / 12000000;
     m_curScanlineClock = m_curClock;
-    m_curScanlineClock = m_curClock;
 
     m_curFramePixel = 0;
     m_curFrameClock = m_curClock;
@@ -368,7 +367,7 @@ void VectorRenderer::advanceTo(uint64_t clock)
     for (int line = firstLine + 1; line < lastLine; line++)
         renderLine(line, 0, 768);
     if (firstLine != lastLine)
-        renderLine(lastLine, firstLine == lastLine ? firstPixel : 0, lastPixel);
+        renderLine(lastLine, 0, lastPixel);
 }
 
 
@@ -432,14 +431,14 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
         if (firstPx < 124) firstPx = 124;
         ptr = linePtr + firstPx - 124;
         m_lastColor = m_borderColor;
-        for (int px = firstPx; px < lastPx && px >= 124 && px < 750; px++) {
+        for (int px = firstPx; px < lastPx && px < 750; px++) {
             *ptr++ = m_palette[m_borderColor];
         }
     } else {
         // left border
         if (firstPx < 124) firstPx = 124;
         ptr = linePtr + firstPx - 124;
-        for (int px = firstPx; px < lastPx && px >= 124 && px < 181; px++)
+        for (int px = firstPx; px < lastPx && px < 181; px++)
             *ptr++ = m_palette[m_borderColor];
 
         // active area
@@ -466,7 +465,7 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
         // right border
         if (firstPx < 693) firstPx = 693;
         ptr = linePtr + firstPx - 124;
-        for (int px = firstPx; px < lastPx && px >= 693 && px < 750; px++)
+        for (int px = firstPx; px < lastPx && px < 750; px++)
             *ptr++ = m_palette[m_borderColor];
 
         if (lastPx < 182 || lastPx >= 694)
@@ -633,7 +632,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
             basFile = true;
     }
 
-    Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
     VectorAddrSpace* as = static_cast<VectorAddrSpace*>(cpu->getAddrSpace());
     m_platform->reset();
     as->enableRom();

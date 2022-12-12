@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ class EmuValue {
         //bool isString() const;
     private:
         std::string m_sValue;
-        int64_t m_nValue;
-        double m_fValue;
+        int64_t m_nValue = 0;
+        double m_fValue = 0.0;
         bool m_isInt = false;
         bool m_isFloat = false;
 };

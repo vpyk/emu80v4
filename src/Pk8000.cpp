@@ -259,7 +259,7 @@ void Pk8000Renderer::setColorReg(unsigned addr, uint8_t value)
         int curPixel = (g_emulation->getCurClock() - m_curScanlineClock) / m_ticksPerPixel;
 
         for (int i = m_curBlankingPixel; i < curPixel - 8; i++)
-            m_blankingPixels[(i + m_pixelsPerOutInstruction) % 320] = m_blanking ? BS_BLANK : BS_NORMAL;
+            m_blankingPixels[(i + m_pixelsPerOutInstruction) % 320] = BS_BLANK;
 
         for (int i = curPixel - 8; i < curPixel; i++)
             m_blankingPixels[(i + m_pixelsPerOutInstruction) % 320] = BS_WRITE;
@@ -803,7 +803,7 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
     if (*ptr == 0xD0) {
         // Binary file
         for (int i = 0; i < 10; i++)
-            if (*ptr != 0xD0) {
+            if (ptr[i] != 0xD0) {
                 delete[] buf;
                 return false;
             }
@@ -888,7 +888,7 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
     } else if (*ptr == 0xD3) {
         // Basic file
         for (int i = 0; i < 10; i++)
-            if (*ptr != 0xD3) {
+            if (ptr[i] != 0xD3) {
                 delete[] buf;
                 return false;
             }

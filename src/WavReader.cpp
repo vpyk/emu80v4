@@ -227,8 +227,6 @@ bool WavReader::tryCswFormat()
     m_file.read16(); //reserved
     m_file.read8();  //reserved
 
-    len -= 32;
-
     m_rleCounter = 0;
     m_cswFormat = true;
 

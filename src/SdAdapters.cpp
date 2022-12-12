@@ -63,10 +63,10 @@ void SdAdapter::writeByte(int addr, uint8_t value)
     if (!m_sdCard)
         return;
 
-    if (m_type != SDA_MSX)
-        addr == 0 ? writeDataPort(value) :  writeConfPort(value);
+    if (addr == 0)
+        writeDataPort(value);
     else
-        addr == 0 ? writeDataPort(value) :  writeConfPort(value);
+        writeConfPort(value);
 };
 
 
@@ -75,30 +75,17 @@ uint8_t SdAdapter::readByte(int addr)
     if (!m_sdCard)
         return 0xFF;
 
-    switch (addr) {
-    case 0:
-        // data port
+    if (addr == 0)
         return readDataPort();
-    case 1:
-    default:
-        // conf port
+    else
         return 0xFF;
-    }
 }
 
 
 void SdAdapter::writeConfPort(uint8_t value)
 {
-    switch (m_type) {
-    case SDA_HWMPVV:
+    if (m_type == SDA_HWMPVV)
         m_sdCard->setCs(value & 1);
-        break;
-    case SDA_MSX:
-        break;
-    default:
-        break;
-    }
-
 }
 
 
@@ -142,18 +129,10 @@ void SdAdapter::writeDataPort(uint8_t value)
 
 uint8_t SdAdapter::readDataPort()
 {
-    switch (m_type) {
-    case SDA_HWMPVV:
-        return m_readValue;
-    case SDA_N8VEM:
+    if (m_type == SDA_N8VEM)
         return m_readValue & (0x80 >> m_bitCnt) ? 0x80 : 0;
-        break;
-    case SDA_MSX:
+    else // SDA_HWMPVV, SDA_MSX
         return m_readValue;
-    default:
-        return 0;
-        break;
-    }
 }
 
 
