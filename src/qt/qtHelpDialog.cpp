@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ HelpDialog::~HelpDialog()
 void HelpDialog::closeEvent(QCloseEvent *event)
 {
     if (!m_instance->ui->showNextTimeCheckBox->isChecked())
-        resetShowHelp();
+        emit resetShowHelp();
     m_instance = nullptr;
     event->accept();
 }

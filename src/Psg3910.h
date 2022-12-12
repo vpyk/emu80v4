@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,18 +25,6 @@
 
 #include "EmuObjects.h"
 #include "SoundMixer.h"
-
-class Psg3910;
-
-/*class Psg3910Counter
-{
-public:
-    void setFreq(unsigned freq);
-    void setAmp(unsigned amp);
-
-    friend class Psg3910;
-};*/
-
 
 
 class Psg3910 : public AddressableDevice
@@ -86,7 +74,7 @@ class Psg3910 : public AddressableDevice
         int m_noise;
         bool m_noiseValue;
         unsigned m_noiseCounter;
-        unsigned m_envValue = 0;
+        unsigned m_envValue;
 
         unsigned m_curReg;
         uint8_t m_regs[16];

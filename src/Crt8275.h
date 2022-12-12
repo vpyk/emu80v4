@@ -257,10 +257,10 @@ class Crt8275Raster : public ActiveDevice
         Crt8275* m_crt;              // Master CRT device
         PlatformCore* m_core;        // Linked platform core
         //bool _isStarted;
-        bool m_isHrtcActive;
-        bool m_isVrtcActive;
-        int m_curScanRow;
-        int m_curScanLine;
+        bool m_isHrtcActive = false;
+        bool m_isVrtcActive = false;
+        int m_curScanRow = 0;
+        int m_curScanLine = 0;
 
         void startRaster();
         void stopRaster();

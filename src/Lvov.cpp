@@ -152,7 +152,7 @@ void LvovRenderer::toggleCropping()
 
 bool LvovRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (CrtRenderer::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "screenMemory") {
@@ -573,7 +573,7 @@ bool LvovFileLoader::loadFile(const std::string& fileName, bool run)
         }
 
         for (int i = 0; i < 10; i++)
-            if (*m_ptr != type) {
+            if (m_ptr[i] != type) {
                 delete[] m_buf;
                 return false;
             }
@@ -596,7 +596,7 @@ bool LvovFileLoader::loadFile(const std::string& fileName, bool run)
 
         if (type == 0xD0)
             return loadBinary(run);
-        else if (type == 0xD3)
+        else // if (type == 0xD3)
             return loadBasic(run);
     } else {
         delete[] m_buf;
@@ -667,14 +667,13 @@ bool LvovFileLoader::loadBasic(bool run)
         return false;
     }
 
-    Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
 
     m_platform->reset();
-    if (cpu) {
-        cpu->disableHooks();
-        g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
-        cpu->enableHooks();
-    }
+
+    cpu->disableHooks();
+    g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+    cpu->enableHooks();
 
     unsigned addr;
     for (addr = m_as->readByte(0x0243) | m_as->readByte(0x0244) << 8; m_fileSize; addr++, m_fileSize--)
