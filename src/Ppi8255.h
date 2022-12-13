@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -79,6 +79,8 @@ class Ppi8255 : public AddressableDevice
         PpiChMode m_chBMode;
         PpiChMode m_chCHiMode;
         PpiChMode m_chCLoMode;
+
+        bool m_noReset = false; // true if RESET input is not used
 };
 
 #endif // PPI8255_H
