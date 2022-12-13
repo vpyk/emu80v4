@@ -358,7 +358,12 @@ Pit8253::Pit8253()
         m_counters[i] = new Pit8253Counter(this, i);
         m_counters[i]->m_kDiv = m_kDiv;
     }
-    Pit8253::reset(); // virtual
+    //Pit8253::reset(); // virtual
+
+    for (int i = 0; i < 3; i++) {
+        m_latches[i] = 0;
+    }
+
 }
 
 
@@ -379,9 +384,7 @@ void Pit8253::setFrequency(int64_t freq)
 
 void Pit8253::reset()
 {
-    for (int i = 0; i < 3; i++) {
-        m_latches[i] = 0;
-    }
+    // 8253 does not have reset input
 }
 
 
