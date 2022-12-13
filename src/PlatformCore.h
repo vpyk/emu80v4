@@ -44,6 +44,7 @@ class PlatformCore : public EmuObject
         virtual void hrtc(bool, int) {}
         virtual void vrtc(bool) {}
         virtual void inte(bool) {}
+        virtual void timer(int /*id*/, bool /*isActive*/) {}
         virtual void tapeOut(bool isActive) {m_tapeOut = isActive;}
 
         virtual bool getTapeOut() {return m_tapeOut;}

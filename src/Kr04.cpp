@@ -59,6 +59,27 @@ void Kr04Core::hrtc(bool isActive, int)
 }
 
 
+void Kr04Core::inte(bool isActive)
+{
+    if (isActive && m_intReq && m_cpu->getInte()) {
+        m_intReq = false; // comment out this when cpu interrupt code will be ready
+        m_cpu->intRst(7);
+    }
+}
+
+
+void Kr04Core::timer(int /*id*/, bool isActive)
+{
+    m_intReq = isActive;
+    if (isActive) {
+        if (m_cpu->getInte()) {
+            //m_intReq = false;
+            m_cpu->intRst(7);
+        }
+    }
+}
+
+
 void Kr04Core::draw()
 {
     m_window->drawFrame(m_crtRenderer->getPixelData());

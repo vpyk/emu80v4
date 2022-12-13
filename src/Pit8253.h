@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Dma8257.h
+// Pit8253.h
 
 #ifndef PIT8253_H
 #define PIT8253_H
@@ -30,24 +30,10 @@
 //#define LESS_64BIT_DIVS
 
 class Pit8253;
-
-
-//struct Pit8253Stats
-//{
-//    int sumVal;
-//    int
-//    uint64_t initClock = 0;
-//};
+class Pit8253Helper;
 
 class Pit8253Counter : public EmuObject //PassiveDevice
 {
-    enum CounterState
-    {
-        CS_COMMANDLOADED,
-        CS_FIRSTBYTELOADED,
-        CS_COUNTING
-    };
-
     public:
         Pit8253Counter(Pit8253* pit, int number);
         //~Pit8253Counter();
@@ -67,11 +53,12 @@ class Pit8253Counter : public EmuObject //PassiveDevice
         inline bool getExtClockMode() {return m_extClockMode;}
 
         friend class Pit8253;
+        friend class Pit8253Helper;
 
     private:
         int m_number; // номер счетчика
         Pit8253* m_pit;
-        //CounterState m_state = CS_COUNTING;
+        Pit8253Helper* m_helper = nullptr;
         bool m_extClockMode = false;
 
         uint64_t m_prevClock = 0;
@@ -99,6 +86,8 @@ class Pit8253Counter : public EmuObject //PassiveDevice
 
         void startCount();
         void stopCount();
+
+        void planIrq();
 };
 
 class Pit8253 : public AddressableDevice
@@ -119,6 +108,7 @@ class Pit8253 : public AddressableDevice
 
         void setFrequency(int64_t freq) override;
         void reset() override;
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         //std::string getDebugInfo() override;
 
         // derived from AddressableDevice
@@ -139,6 +129,31 @@ class Pit8253 : public AddressableDevice
         bool m_latched[3];
         PitReadLoadMode m_rlModes[3];
         bool m_waitingHi[3];
+};
+
+
+class PlatformCore;
+
+class Pit8253Helper : public ActiveDevice
+{
+public:
+    Pit8253Helper();
+    void operate() override;
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    void setCounter(Pit8253Counter* cnt) {m_counter = cnt;}
+
+    void updateAndScheduleNext(uint64_t time);
+
+    static EmuObject* create(const EmuValuesList&) {return new Pit8253Helper();}
+
+private:
+    Pit8253Counter* m_counter = nullptr;
+    PlatformCore* m_core = nullptr;
+    int m_id = 0;
+    bool m_request = false;
+
+    void checkForInt();
 };
 
 #endif // PIT8253_H

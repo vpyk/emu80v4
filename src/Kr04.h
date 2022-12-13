@@ -41,8 +41,10 @@ class Kr04Core : public PlatformCore
 
         void draw() override;
 
+        void inte(bool isActive) override;
         void vrtc(bool isActive) override;
         void hrtc(bool isActive, int lc) override;
+        void timer(int id, bool isActive) override;
 
         void attachCrtRenderer(Crt8275Renderer* crtRenderer);
 
@@ -53,6 +55,8 @@ class Kr04Core : public PlatformCore
         Crt8275Renderer* m_crtRenderer = nullptr;
         Pit8253* m_pit = nullptr;
         Kr04Pit8253SoundSource* m_kr04PitSoundSource = nullptr;
+
+        bool m_intReq = false;
 };
 
 

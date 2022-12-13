@@ -22,6 +22,7 @@
 
 #include "Globals.h"
 #include "Emulation.h"
+#include "PlatformCore.h"
 #include "Pit8253.h"
 
 using namespace std;
@@ -39,6 +40,27 @@ Pit8253Counter::Pit8253Counter(Pit8253* pit, int number)
     m_counterInitValue = 0xffff;
     m_counter = 0xffff;
     m_mode = 0;
+}
+
+
+void Pit8253Counter::planIrq()
+{
+    if (!m_helper)
+        return;
+
+    int ticksToUpdate = 0;
+
+    if (m_mode == 3)
+        ticksToUpdate = (m_counter + 1) / 2;
+    else if (m_mode == 2)
+        ticksToUpdate = !m_out ? 1 : m_counter - 1;
+    else if (m_mode == 0 && !m_out)
+        ticksToUpdate = m_counter;
+
+    if (ticksToUpdate)
+        m_helper->updateAndScheduleNext((g_emulation->getCurClock() / m_kDiv + ticksToUpdate) * m_kDiv);
+    else
+        m_helper->updateAndScheduleNext(0); // don't schedule, just update and generate int if necessary
 }
 
 
@@ -82,10 +104,11 @@ void Pit8253Counter::operateForTicks(int ticks)
                 if (m_counter <= 0) {
                     m_tempSumOut--;
                     m_sumOutTicks++;
-                    m_counter += 65536;
+                    m_counter += m_counterInitValue;
                 }
+                m_out = m_counter != 1;
             }
-            break;
+        break;
         case 3:
             {
                 if (!m_isCounting) {
@@ -258,6 +281,7 @@ void Pit8253Counter::setMode(int mode)
         default:
             break;
     }
+    planIrq();
 }
 
 
@@ -277,6 +301,7 @@ void Pit8253Counter::setHalfOfCounter()
             // not implemented yet
             break;
     }
+    planIrq();
 }
 
 
@@ -309,6 +334,7 @@ void Pit8253Counter::setCounter(uint16_t counter)
             // not implemented yet
             break;
     }
+    planIrq();
 }
 
 
@@ -335,6 +361,7 @@ void Pit8253Counter::setGate(bool gate)
         default:
             break;
     }
+    planIrq();
 }
 
 
@@ -363,7 +390,6 @@ Pit8253::Pit8253()
     for (int i = 0; i < 3; i++) {
         m_latches[i] = 0;
     }
-
 }
 
 
@@ -474,9 +500,28 @@ uint8_t Pit8253::readByte(int addr)
 }
 
 
-/*string Pit8253::getDebugInfo()
+bool Pit8253::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
 
+    if (propertyName == "helper") {
+        int cnt = values[0].asInt();
+        if (cnt >=0 && cnt <= 3) {
+            m_counters[cnt]->m_helper = static_cast<Pit8253Helper*>(g_emulation->findObject(values[1].asString()));
+            m_counters[cnt]->m_helper->setCounter(m_counters[cnt]);
+        } else
+            return false;
+        return true;
+    }
+    return false;
+}
+
+
+/*#include <sstream>
+#include <iomanip>
+string Pit8253::getDebugInfo()
+{
     stringstream ss;
     ss << "PIT i8253:" << "\n";
     for (int ch = 0; ch <= 2; ch++) {
@@ -495,3 +540,50 @@ uint8_t Pit8253::readByte(int addr)
     }
     return ss.str();
 }*/
+
+
+Pit8253Helper::Pit8253Helper()
+{
+    pause();
+}
+
+
+void Pit8253Helper::updateAndScheduleNext(uint64_t time)
+{
+    bool isActive = m_counter->getOut();
+    if (isActive != m_request) {
+        m_core->timer(0, isActive);
+    }
+    m_request = isActive;
+
+    if (time) {
+        m_curClock = time;
+        resume();
+    } else
+        pause();
+}
+
+
+void Pit8253Helper::operate()
+{
+    m_counter->updateState();
+    m_counter->planIrq();
+}
+
+
+bool Pit8253Helper::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "core") {
+        m_core = static_cast<PlatformCore*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "id") {
+        if (values[0].isInt()) {
+            m_id = values[0].asInt();
+            return true;
+        }
+    }
+    return false;
+}
