@@ -199,7 +199,7 @@ int Pit8253Counter::getAvgOut()
     m_avgOut = 0;
     if (curClock != m_sampleClock) {
 #ifndef LESS_64BIT_DIVS
-        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * MAX_SND_AMP / (curClock - m_sampleClock);
+        m_avgOut = uint64_t(m_tempSumOut * m_kDiv + m_tempAddOutClocks) * MAX_SND_AMP / (curClock - m_sampleClock);
 #else
         uint32_t dt = curClock - m_sampleClock;
         m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * 4096 / dt;
