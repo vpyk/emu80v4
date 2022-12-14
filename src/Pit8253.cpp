@@ -199,7 +199,7 @@ int Pit8253Counter::getAvgOut()
     m_avgOut = 0;
     if (curClock != m_sampleClock) {
 #ifndef LESS_64BIT_DIVS
-        m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * MAX_SND_AMP / (curClock - m_sampleClock);
+        m_avgOut = uint64_t(m_tempSumOut * m_kDiv + m_tempAddOutClocks) * MAX_SND_AMP / (curClock - m_sampleClock);
 #else
         uint32_t dt = curClock - m_sampleClock;
         m_avgOut = (m_tempSumOut * m_kDiv + m_tempAddOutClocks) * 4096 / dt;
@@ -358,7 +358,12 @@ Pit8253::Pit8253()
         m_counters[i] = new Pit8253Counter(this, i);
         m_counters[i]->m_kDiv = m_kDiv;
     }
-    Pit8253::reset(); // virtual
+    //Pit8253::reset(); // virtual
+
+    for (int i = 0; i < 3; i++) {
+        m_latches[i] = 0;
+    }
+
 }
 
 
@@ -379,9 +384,7 @@ void Pit8253::setFrequency(int64_t freq)
 
 void Pit8253::reset()
 {
-    for (int i = 0; i < 3; i++) {
-        m_latches[i] = 0;
-    }
+    // 8253 does not have reset input
 }
 
 

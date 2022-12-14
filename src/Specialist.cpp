@@ -832,7 +832,6 @@ bool SpecMxFileLoader::loadFile(const std::string& fileName, bool run)
         if (addr != 0)
             m_ramDisk->writeByte(addr++, 0x0);
     }
-    //delete[] buf;
 
     if (monFileName != "") {
         monFileName = m_platform->getBaseDir() + monFileName;
@@ -896,8 +895,7 @@ bool SpecMxFileLoader::loadFile(const std::string& fileName, bool run)
         cpu->setPC(runAddr);
     }
 
-    if (buf)
-        delete[] buf;
+    delete[] buf;
 
     return true;
 }

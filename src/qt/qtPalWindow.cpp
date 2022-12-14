@@ -38,7 +38,7 @@ PalWindow::PalWindow()
 
 PalWindow::~PalWindow()
 {
-    if (getWindowType() == EWT_DEBUG)
+    if (PalWindow::getWindowType() == EWT_DEBUG)
         delete m_qtWindow;
     else
         m_qtWindow->setPalWindow(nullptr);

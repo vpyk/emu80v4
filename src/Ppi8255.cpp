@@ -35,9 +35,11 @@ Ppi8255::Ppi8255()
 
 void Ppi8255::reset()
 {
+    if (m_noReset)
+        return;
+
     m_portA = 0;
     m_portB = 0;
-    m_portC = 0;
     m_portC = 0;
     m_chAMode = PCM_IN;
     m_chBMode = PCM_IN;
@@ -170,6 +172,15 @@ bool Ppi8255::setProperty(const string& propertyName, const EmuValuesList& value
     if (propertyName == "circuit") {
         attachPpi8255Circuit(static_cast<Ppi8255Circuit*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "noReset") {
+        if (values[0].asString() == "yes") {
+            m_noReset = true;
+            return true;
+        } else if (values[0].asString() == "no") {
+            m_noReset = false;
+            return true;
+        }
+        return false;
     }
 
     return false;

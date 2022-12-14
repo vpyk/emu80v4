@@ -113,7 +113,7 @@ class Kr04Renderer : public Crt8275Renderer
         void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt) override;
         char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt) override;
 
-        AddrSpace* m_memory;
+        AddrSpace* m_memory = nullptr   ;
         Kr04PpiColor8255Circuit* m_colorCircuit = nullptr;
 
         Kr04ColorMode m_colorMode = KCM_COLORMODULE;

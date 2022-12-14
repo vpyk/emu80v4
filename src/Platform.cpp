@@ -144,12 +144,12 @@ Platform::Platform(string configFileName, string name)
         }
     }
 
-    init();
+    Platform::init();
 
     if (m_window)
         m_window->show();
 
-    reset();
+    Platform::reset();
 }
 
 
@@ -176,7 +176,7 @@ void Platform::reset()
 
 Platform::~Platform()
 {
-    shutdown();
+    Platform::shutdown();
 
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
         delete *it;

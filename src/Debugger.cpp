@@ -2049,7 +2049,7 @@ void DebugWindow::bpointsDraw()
             m_curBpointLine = m_bpList.size() - m_firstVisibleBpoint - 1;
         auto it = m_bpList.begin();
         advance(it, m_firstVisibleBpoint);
-        for (int i = 0; i < m_curLayout->bpts.height && i < m_bpList.size() + m_firstVisibleBpoint; i++) {
+        for (int i = 0; i < m_curLayout->bpts.height && unsigned(i) < m_bpList.size() + m_firstVisibleBpoint; i++) {
             setColors(12, 1);
             putString(m_curLayout->bpts.left + 2 , i + m_curLayout->bpts.top, int2Hex((*it).addr, 4));
             setColors(7, 1);
@@ -2074,9 +2074,9 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
                 --m_firstVisibleBpoint;
             break;
         case PK_DOWN:
-            if (m_curBpointLine < m_bpList.size() - 1 && m_curBpointLine < m_curLayout->bpts.height - 1)
+            if (m_curBpointLine < m_bpList.size() - 1 && m_curBpointLine < unsigned(m_curLayout->bpts.height) - 1)
                 ++m_curBpointLine;
-            else if (m_curBpointLine == m_curLayout->bpts.height - 1 && m_curBpointLine < m_bpList.size() - 1)
+            else if (m_curBpointLine == unsigned(m_curLayout->bpts.height) - 1 && m_curBpointLine < m_bpList.size() - 1)
                 ++m_firstVisibleBpoint;
             break;
         case PK_PGUP:
@@ -2084,7 +2084,7 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
             m_firstVisibleBpoint = 0;
             break;
         case PK_PGDN:
-            if (m_bpList.size() < m_curLayout->bpts.height)
+            if (m_bpList.size() < unsigned(m_curLayout->bpts.height))
                 m_curBpointLine = m_bpList.size() - 1;
             else {
                 m_curBpointLine = m_curLayout->bpts.height - 1;
