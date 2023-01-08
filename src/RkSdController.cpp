@@ -388,7 +388,7 @@ bool RkSdController::cmdFind()
             break;
     }
 
-    m_outBuffer[pos++] = ERR_OK_CMD;
+    m_outBuffer[pos++] = n == maxItems ? ERR_MAX_FILES : ERR_OK_CMD;
     m_outBufferSize = pos;
     return true;
 }
@@ -404,7 +404,7 @@ bool RkSdController::cmdOpen()
     switch (mode) {
     case O_OPEN: {
         m_curFileName = m_sdDir + (char*)(m_inBuffer + 2);
-        m_curFileMode = m_readOnly ? "r" : "rw";
+        m_curFileMode = m_readOnly ? "r" : "r+";
         m_curFileSize = 0;
         bool res = m_file.open(m_curFileName, m_curFileMode);
         if (res) {
@@ -425,7 +425,7 @@ bool RkSdController::cmdOpen()
         m_curFileSize = 0;
         bool res = PalFile::create(m_curFileName);
         m_fileIsOpen = res;
-        createErrorAnswer(res ? ERR_OK_CMD : ERR_FILE_EXISTS); }
+        createErrorAnswer(res ? ERR_OK_CMD : ERR_FILE_EXISTS); } // todo: distinguish from ERR_NOT_OPENED
         m_filePos = 0;
         break;
     case O_MKDIR: {
