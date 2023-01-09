@@ -94,7 +94,7 @@ void CrtRenderer::swapBuffers()
 }
 
 
-const char* CrtRenderer::generateTextScreen(char16_t* wTextArray, int w, int h)
+const char* CrtRenderer::generateTextScreen(wchar_t* wTextArray, int w, int h)
 {
     // calculate row lengths for every row without trailing spaces
     int* rowLengths = new int[h];
@@ -132,20 +132,20 @@ const char* CrtRenderer::generateTextScreen(char16_t* wTextArray, int w, int h)
     if (firstPos >= w)
         firstPos = 0;
 
-    u16string wTextScreen;
+    wstring wTextScreen;
     for (int y = firstRow; y <= lastRow; y++) {
         for (int x = firstPos; x < rowLengths[y]; x++) {
-            char16_t wchr = wTextArray[y * w + x];
+            wchar_t wchr = wTextArray[y * w + x];
             wTextScreen.append(1, wchr);
         }
-        wTextScreen.append(u"\n");
+        wTextScreen.append(L"\n");
     }
 
     delete[] wTextArray;
     delete[] rowLengths;
 
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> conversion;
-    m_textScreen = conversion.to_bytes(wTextScreen.c_str());
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conversion;
+    m_textScreen = conversion.to_bytes(wTextScreen);
 
     return m_textScreen.c_str();
 }

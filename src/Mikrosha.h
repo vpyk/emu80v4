@@ -117,18 +117,18 @@ class MikroshaRenderer : public Crt8275Renderer
         const uint8_t* getAltFontPtr(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt) override;
-        char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt) override;
+        wchar_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt) override;
 
     private:
-        const char16_t* c_mikroshaSymbols =
-            u" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢● "
-            u" !\"#¤%&'()*+,-./0123456789:;<=>?"
-            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-            u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧЪ"
-            u" ┛┏┓┣┫┳┻┃━ ╋┗ ↑↓→←♥♠♣♦★⚐··☉··✿··"
-            u" !\"#$%&'()*+,-./0123456789:;<=>?"
-            u"юабцдефгхийклмнопярстужвьызшэщч█"
-            u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
+        const wchar_t* c_mikroshaSymbols =
+            L" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢● "
+            L" !\"#¤%&'()*+,-./0123456789:;<=>?"
+            L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧЪ"
+            L" ┛┏┓┣┫┳┻┃━ ╋┗ ↑↓→←♥♠♣♦★⚐··☉··✿··"
+            L" !\"#$%&'()*+,-./0123456789:;<=>?"
+            L"юабцдефгхийклмнопярстужвьызшэщч█"
+            L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
 };
 
 

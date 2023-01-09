@@ -387,7 +387,7 @@ void Crt8275Renderer::altRenderFrame()
 }
 
 
-char16_t Crt8275Renderer::getUnicodeSymbol(uint8_t, bool, bool, bool)
+wchar_t Crt8275Renderer::getUnicodeSymbol(uint8_t, bool, bool, bool)
 {
     return 0;
 }
@@ -400,7 +400,7 @@ const char* Crt8275Renderer::getTextScreen()
     int h = frame->nRows;
     int w = frame->nCharsPerRow;
 
-    char16_t* wTextArray = new char16_t[h * w];
+    wchar_t* wTextArray = new wchar_t[h * w];
 
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
@@ -411,7 +411,7 @@ const char* Crt8275Renderer::getTextScreen()
             bool hglt = symbol.symbolAttributes.hglt;
             bool vsp = symbol.symbolLineAttributes[1].vsp;
 
-            char16_t wchr = getUnicodeSymbol(chr, gpa0, gpa1, hglt);
+            wchar_t wchr = getUnicodeSymbol(chr, gpa0, gpa1, hglt);
 
             wTextArray[y * w + x] = wchr && !vsp ? wchr : u' ';
         }

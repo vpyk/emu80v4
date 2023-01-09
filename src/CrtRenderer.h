@@ -67,7 +67,7 @@ class CrtRenderer : public EmuObject
         virtual bool isRasterPresent() {return true;}
         void swapBuffers();
 
-        const char* generateTextScreen(char16_t* wTextArray, int w, int h);
+        const char* generateTextScreen(wchar_t* wTextArray, int w, int h);
 
     private:
         unsigned m_frameNo = 0;
@@ -102,17 +102,17 @@ class TextCrtRenderer : public CrtRenderer
         virtual void primaryRenderFrame() = 0;
         virtual void altRenderFrame() = 0;
 
-        const char16_t* c_rkSymbols =
-            u" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢✿ "
-            u" !\"#¤%&'()*+,-./0123456789:;<=>?"
-            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-            u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
+        const wchar_t* c_rkSymbols =
+            L" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢✿ "
+            L" !\"#¤%&'()*+,-./0123456789:;<=>?"
+            L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
 
-        const char16_t* c_mikroSymbols =
-            u" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢· "
-            u" !\"#$%&'()*+,-./0123456789:;<=>?"
-            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-            u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
+        const wchar_t* c_mikroSymbols =
+            L" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢· "
+            L" !\"#$%&'()*+,-./0123456789:;<=>?"
+            L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
 };
 
 #endif // CRTRENDERER_H

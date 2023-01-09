@@ -122,12 +122,12 @@ const uint8_t* ApogeyRenderer::getAltFontPtr(bool, bool, bool)
 }
 
 
-char16_t ApogeyRenderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
+wchar_t ApogeyRenderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
 {
     if (m_fontNumber == 0)
         return c_apogeySymbols[chr];
     else
-        return chr ? u'·' : u' ';
+        return chr ? L'·' : L' ';
 }
 
 

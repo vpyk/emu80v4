@@ -52,7 +52,7 @@ class Crt8275Renderer : public TextCrtRenderer
         virtual uint32_t getCurFgColor(bool, bool, bool) {return 0xFFFFFF;}
         virtual uint32_t getCurBgColor(bool, bool, bool) {return 0x000000;}
         virtual void customDrawSymbolLine(uint32_t*, uint8_t, int, bool, bool, bool, bool, bool, bool) {}
-        virtual char16_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt);
+        virtual wchar_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt);
 
         Crt8275* m_crt = nullptr;
 

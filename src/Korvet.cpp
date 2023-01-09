@@ -369,12 +369,12 @@ const char* KorvetRenderer::getTextScreen()
     int step = m_wideChr ? 2 : 1;
     int w = m_wideChr ? 32 : 64;
 
-    char16_t* wTextArray = new char16_t[16 * w];
+    wchar_t* wTextArray = new wchar_t[16 * w];
 
     for (int y = 0; y < 16; y++) {
         for (int x = 0; x < 64; x += step) {
             uint8_t chr = m_textAdapter->m_symbols[y * 64 + x];
-            char16_t wchr = c_korvetSymbols[m_fontNo * 256 + chr];
+            wchar_t wchr = c_korvetSymbols[m_fontNo * 256 + chr];
             wTextArray[y * w + x / step] = wchr;
         }
     }

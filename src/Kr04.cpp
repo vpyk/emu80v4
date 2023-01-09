@@ -176,7 +176,7 @@ void Kr04Renderer::customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int l
 }
 
 
-char16_t Kr04Renderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
+wchar_t Kr04Renderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
 {
     return c_rkSymbols[chr];
 }

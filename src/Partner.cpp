@@ -393,7 +393,7 @@ const uint8_t* PartnerRenderer::getAltFontPtr(bool gpa0, bool gpa1, bool hglt)
 }
 
 
-char16_t PartnerRenderer::getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt)
+wchar_t PartnerRenderer::getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt)
 {
     int font = (gpa0 ? 1 : 0) + (gpa1 ? 2 : 0) + (hglt ? 4 : 0);
 

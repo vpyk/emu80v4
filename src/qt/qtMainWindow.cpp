@@ -345,7 +345,7 @@ void MainWindow::fillPlatformListMenu()
                 if (platform != "orion.2")
                     menu->setTitle(platformName);
                 else
-                    menu->setTitle("Орион-128");
+                    menu->setTitle(u8"Орион-128");
                 QFont font = action->font();
                 font.setBold(true);
                 action->setFont(font);

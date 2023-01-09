@@ -129,12 +129,12 @@ void Ut88Renderer::altRenderFrame()
 
 const char* Ut88Renderer::getTextScreen()
 {
-    char16_t* wTextArray = new char16_t[32 * 64];
+    wchar_t* wTextArray = new wchar_t[32 * 64];
 
     for (int y = 0; y < 32; y++) {
         for (int x = 0; x < 64; x++) {
             uint8_t chr = m_screenMemory[y * 64 + x] & 0x7f;
-            char16_t wchr = c_mikroSymbols[chr];
+            wchar_t wchr = c_mikroSymbols[chr];
             wTextArray[y * 64 + x] = wchr;
         }
     }

@@ -123,7 +123,7 @@ const uint8_t* Rk86Renderer::getAltFontPtr(bool, bool, bool)
 }
 
 
-char16_t Rk86Renderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
+wchar_t Rk86Renderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
 {
     return c_rkSymbols[chr];
 }

@@ -202,25 +202,25 @@ class KorvetRenderer : public CrtRenderer, public IActive
             0xCCCCCC, 0xDDDDDD, 0xEEEEEE, 0xFFFFFF
         };
 
-        const char16_t* c_korvetSymbols =
-            u" ☺☻█████◘█PpLl♫☼►◄↕‼¶§■↨↑↓→←    "
-            u" !\"#$%&'()*+,-./0123456789:;<=>?"
-            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-            u"`abcdefghijklmnopqrstuvwxyz{|}~"
-            u"································"
-            u"································"
-            u"юабцдефгхийклмнопярстужвьызшэщчъ"
-            u"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧЪ"
-            u" ☺☻█████◘█PpLl♫☼►◄↕‼¶§■↨↑↓→←    "
-            u" !\"#$%&'()*+,-./0123456789:;<=>?"
-            u"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-            u"`abcdefghijklmnopqrstuvwxyz{|}~"
-            u"░▒▓│┤╡╢╖╕╣║╗╝╜╛┐"
-            u"└┴┬├─┼╞╟╚╔╩╦╠═╬╧"
-            u"╨Ё╥╙╘╒╓╫╪┘┌█▄▌▐▀"
-            u"АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-            u"абвгдежзийклмнопрстуфхцчшщъыьэюя"
-            u"≡ё≥≤⌠⌡÷≈°•·√ⁿ²■ ";
+        const wchar_t* c_korvetSymbols =
+            L" ☺☻█████◘█PpLl♫☼►◄↕‼¶§■↨↑↓→←    "
+            L" !\"#$%&'()*+,-./0123456789:;<=>?"
+            L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            L"`abcdefghijklmnopqrstuvwxyz{|}~"
+            L"································"
+            L"································"
+            L"юабцдефгхийклмнопярстужвьызшэщчъ"
+            L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧЪ"
+            L" ☺☻█████◘█PpLl♫☼►◄↕‼¶§■↨↑↓→←    "
+            L" !\"#$%&'()*+,-./0123456789:;<=>?"
+            L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+            L"`abcdefghijklmnopqrstuvwxyz{|}~"
+            L"░▒▓│┤╡╢╖╕╣║╗╝╜╛┐"
+            L"└┴┬├─┼╞╟╚╔╩╦╠═╬╧"
+            L"╨Ё╥╙╘╒╓╫╪┘┌█▄▌▐▀"
+            L"АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+            L"абвгдежзийклмнопрстуфхцчшщъыьэюя"
+            L"≡ё≥≤⌠⌡÷≈°•·√ⁿ²■ ";
 
         uint8_t* m_font = nullptr;
         int m_fontNo = 0;
