@@ -28,6 +28,7 @@
 #include "RkKeyboard.h"
 #include "Pit8253.h"
 #include "Cpu.h"
+#include "Crt8275.h"
 
 using namespace std;
 
@@ -178,7 +179,8 @@ void Kr04Renderer::customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int l
 
 wchar_t Kr04Renderer::getUnicodeSymbol(uint8_t chr, bool, bool, bool)
 {
-    return c_rkSymbols[chr];
+    ;
+    return m_crt->getFrame()->nLines <= 10 ? c_rkSymbols[chr] : 0;
 }
 
 

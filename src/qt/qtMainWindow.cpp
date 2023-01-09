@@ -1424,7 +1424,8 @@ void MainWindow::tuneMenu()
     m_copyTextAction->setVisible(platformGroup == "apogey" || platformGroup == "rk86" ||
                                  platformGroup == "partner" || platformGroup == "mikrosha" ||
                                  platformGroup == "mikro80" || platformGroup == "ut88" ||
-                                 platformGroup == "korvet" || platformGroup == "palmira");
+                                 platformGroup == "korvet" || platformGroup == "palmira" ||
+                                 platformGroup == "kr04");
 
     m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "lvov");
 
