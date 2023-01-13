@@ -119,7 +119,7 @@ void PalWindow::applyParams()
         m_qtWindow->getPaintWidget()->setVsync(m_params.vsync);*/
 
     if (m_params.visible != m_prevParams.visible)
-        m_params.visible ? m_qtWindow->showWindow() : m_qtWindow->hide();
+        m_params.visible ? m_qtWindow->showWindow() : m_qtWindow->hideWindow();
 
     m_prevParams.style = m_params.style;
     m_prevParams.title = m_params.title;

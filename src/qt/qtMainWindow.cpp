@@ -227,43 +227,69 @@ void MainWindow::adjustClientSize()
 
 void MainWindow::showWindow()
 {
-    // workaround for miximize button
-    if (!isVisible()) {
-        setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-        setWindowFlags(windowFlags() |= Qt::WindowMaximizeButtonHint);
-        adjustClientSize();
+    if (isVisible())
+        return;
+
+    if (m_showFirstTime) {
+        m_showFirstTime = false;
+
         show();
 
-        if (m_showFirstTime) {
-            m_showFirstTime = false;
-            if (m_windowType == EWT_EMULATION) {
-                // center main window, not debug one
-                QRect rec = QGuiApplication::primaryScreen()->availableGeometry();
-                move((rec.width() - frameGeometry().width()) / 3, (rec.height() - frameGeometry().height()) / 3);
+        if (m_windowType == EWT_EMULATION) {
+            // center main window, not debug one
+            QRect screenRec = QGuiApplication::primaryScreen()->availableGeometry();
+            QRect frameRec = frameGeometry();
+            move(screenRec.left() + (screenRec.width() - frameRec.width()) / 3, screenRec.top() + (screenRec.height() - frameRec.height()) / 3);
 
-                HelpDialog::activate();
-            }
-            else { //if (m_windowType == EWT_DEBUG) {
-                // place debug window within current screen rect
-                int sn = QApplication::desktop()->screenNumber(this);
-                QRect rec = QGuiApplication::screens()[sn]->availableGeometry();
+            HelpDialog::activate();
+        }
+        else { //if (m_windowType == EWT_DEBUG) {
+            // place debug window within current screen rect
+            int sn = QApplication::desktop()->screenNumber(this);
+            QRect rec = QGuiApplication::screens()[sn]->availableGeometry();
 
-                int top = frameGeometry().top();
-                int left = frameGeometry().left();
-                if (frameGeometry().bottom() > rec.bottom())
-                    top = top + rec.bottom() - frameGeometry().bottom();
-                if (frameGeometry().right() > rec.right())
-                    left = left + rec.right() - frameGeometry().right();
+            int top = frameGeometry().top();
+            int left = frameGeometry().left();
 
+            int prevLeft = left;
+            int prevTop = top;
+
+            if (frameGeometry().bottom() > rec.bottom())
+                top = top + rec.bottom() - frameGeometry().bottom();
+            if (frameGeometry().right() > rec.right())
+                left = left + rec.right() - frameGeometry().right();
+
+            if (top != prevTop && left != prevLeft) {
+#ifdef Q_OS_UNIX
+                move(-1000, -1000); // workaround for X Window
+#endif
                 move(left, top);
             }
         }
-
+    } else {
+        //int top = frameGeometry().top();
+        //int left = frameGeometry().left();
+#ifdef Q_OS_UNIX
+        move(-1000, -1000); // workaround for X Window
+#endif
+        show();
+        //move(left, top);
+        move(m_hiddenWindowPos);
     }
 }
 
 
-void MainWindow::setFullScreen(bool fullscreen)
+void MainWindow::MainWindow::hideWindow()
+{
+    if (!isVisible())
+        return;
+
+    m_hiddenWindowPos = pos();
+    hide();
+}
+
+
+ void MainWindow::setFullScreen(bool fullscreen)
 {
     bool visible = !(m_fullwindowAction->isChecked() || fullscreen);
 

@@ -75,6 +75,7 @@ public:
     void setPalWindow(PalWindow* palWindow);
     PalWindow* getPalWindow() {return m_windowType != EWT_UNDEFINED ? m_palWindow : nullptr;}
     void showWindow();
+    void hideWindow();
     void mouseClick(int x, int y, PalMouseKey key);
     void mouseDrag(int x, int y);
 
@@ -218,12 +219,12 @@ private:
     uint64_t m_lastFpsCoutnerFrameTime = 0;
     bool m_controlsCreated = false;
     bool m_fullscreenMode = false;
-    bool m_sizable = true;
 
     int m_clientWidth = 1;
     int m_clientHeight = 1;
 
     bool m_showFirstTime = true;
+    QPoint m_hiddenWindowPos = {0, 0};
 
     SettingsDialog* m_settingsDialog = nullptr;
 
