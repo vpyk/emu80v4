@@ -359,6 +359,11 @@ void EmuWindow::prepareScanline(EmuPixelData frame)
 
 void EmuWindow::drawFrame(EmuPixelData frame)
 {
+    if (frame.frameNo == m_curFrameNo)
+        return;
+    m_curFrameNo = frame.frameNo;
+    m_frameDrawn = true;
+
     if (frame.width == 0 || frame.height == 0 || !frame.pixelData) {
         drawFill(0x303050);
         return;
@@ -407,6 +412,9 @@ void EmuWindow::drawFrame(EmuPixelData frame)
 
 void EmuWindow::drawOverlay(EmuPixelData frame)
 {
+    if (!m_frameDrawn)
+        return;
+
     if (frame.width == 0 || frame.height == 0 || !frame.pixelData)
         return;
 
@@ -420,6 +428,11 @@ void EmuWindow::drawOverlay(EmuPixelData frame)
 
 void EmuWindow::endDraw()
 {
+    if (!m_frameDrawn)
+        return;
+
+    m_frameDrawn = false;
+
     drawEnd();
 }
 

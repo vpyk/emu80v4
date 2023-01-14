@@ -96,6 +96,8 @@ class EmuWindow : public EmuObject, public PalWindow
         void drawOverlay(EmuPixelData frame);
         void endDraw();
 
+        bool isVisible() {return m_params.visible;}
+
         std::string getCaption();
 
         std::string getPlatformObjectName() override;
@@ -137,6 +139,9 @@ class EmuWindow : public EmuObject, public PalWindow
 
         uint32_t* m_interlacedImage = nullptr;
         int m_interlacedImageSize = 0;
+
+        unsigned m_curFrameNo = unsigned(-1);
+        bool m_frameDrawn = false;
 
         double calcBestAspectRatio(double srcAspectRatio, int scaleY);
 };

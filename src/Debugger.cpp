@@ -225,6 +225,7 @@ void DebugWindow::startDebug()
     fillCpuStatus();
     codeGotoPc();
     show();
+    invalidate();
     draw();
 }
 
@@ -277,23 +278,16 @@ void DebugWindow::putString(string s)
     }
 }
 
-void DebugWindow::draw()
+
+void DebugWindow::preparePixelBuffer()
 {
-    const DebuggerOptions& debOpt = g_emulation->getDebuggerOptions();
-    m_mnemo8080UpperCase = debOpt.mnemo8080UpperCase;
-    m_mnemoZ80UpperCase = debOpt.mnemoZ80UpperCase;
-    m_forceZ80Mnemonics = debOpt.forceZ80Mnemonics;
-    m_swapF5F9 = debOpt.swapF5F9;
-
-    m_codePage = m_platform->getCodePage();
-
-    checkForInput();
-
     drawDbgFrame();
     displayCpuStatus();
     displayObjectDbgInfo();
 
     drawHintBar();
+
+    //m_screen[0][0].chr = m_cursorCounter; // check repaints
 
     for (int col = 0; col < m_curLayout->cols; col++)
         for (int row = 0; row < m_curLayout->rows; row++) {
@@ -320,10 +314,36 @@ void DebugWindow::draw()
             pos += m_curLayout->cols * m_chrW;
         }
     }
+}
+
+
+void DebugWindow::draw()
+{
     m_cursorCounter = (m_cursorCounter + 1) % 30;
 
-    drawFrame(m_pixelData);
-    endDraw();
+    if (!isVisible())
+        return;
+
+    if (m_cursorVisible && m_cursorCounter % 15 == 0)
+        invalidate();
+
+    const DebuggerOptions& debOpt = g_emulation->getDebuggerOptions();
+    m_mnemo8080UpperCase = debOpt.mnemo8080UpperCase;
+    m_mnemoZ80UpperCase = debOpt.mnemoZ80UpperCase;
+    m_forceZ80Mnemonics = debOpt.forceZ80Mnemonics;
+    m_swapF5F9 = debOpt.swapF5F9;
+
+    m_codePage = m_platform->getCodePage();
+
+    checkForInput();
+
+    if (m_needRepaint) {
+        preparePixelBuffer();
+        m_pixelData.frameNo++;
+        m_needRepaint = false;
+        drawFrame(m_pixelData);
+        endDraw();
+    }
 }
 
 
@@ -410,6 +430,10 @@ void DebugWindow::clearBlock(int x1, int y1, int x2, int y2, int bgColor)
 void DebugWindow::drawDbgFrame()
 {
     clearBlock(0, 0, 95, 47, 1);
+
+    m_curFgColor = 7;
+    m_curBgColor = 1;
+
     putChars(1, 0, 0xcd, m_curLayout->cols - 2);
     putChars(1, m_curLayout->rows - 2, 0xcd, m_curLayout->cols - 2);
     putChars(0, 1, 0xba, m_curLayout->rows - 2, true);
@@ -911,9 +935,10 @@ void DebugWindow::drawHintBar()
 void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
 {
     if (isPressed) {
+        m_needRepaint = true;
         if (m_mode == AM_INPUT)
             inputKbdProc(keyCode);
-        else
+        else {
             switch (keyCode) {
                 case PK_C:
                 case PK_ESC:
@@ -984,6 +1009,7 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                             break;
                     }
             }
+        }
     }
 }
 
@@ -1003,6 +1029,8 @@ void DebugWindow::mouseClick(int x, int y, PalMouseKey key)
 
     if (m_mode == AM_INPUT)
         return;
+
+    m_needRepaint = true;
 
     if (key == PM_WHEEL_UP || key == PM_WHEEL_DOWN) {
         switch (m_mode) {
@@ -1322,6 +1350,7 @@ void DebugWindow::inputKbdProc(PalKeyCode keyCode)
             m_inputReturnValue = hex2Int(m_inputCurValue);
             break;
         default:
+            m_needRepaint = false;
             break;
     }
 }
@@ -1562,6 +1591,7 @@ void DebugWindow::codeKbdProc(PalKeyCode keyCode)
             m_z80Mnemonics = !m_z80Mnemonics;
             break;
         default:
+            m_needRepaint = false;
             break;
     }
 }
@@ -1677,6 +1707,7 @@ void DebugWindow::dumpKbdProc(PalKeyCode keyCode)
             break;
         }
         default:
+            m_needRepaint = false;
             break;
     }
     if (uint16_t(m_dumpCurAddr - m_dumpCurStartAddr) & 0x8000)
@@ -1894,6 +1925,7 @@ void DebugWindow::regsKbdProc(PalKeyCode keyCode)
             inputStart(m_mode, m_curLayout->regs.left + (m_z80Mode && m_regsCurReg > 5 ? 17 : 5) + 1, 1 + m_regsCurReg % 6, 4, true, regsGetCurRegValue());
             break;
         default:
+            m_needRepaint = false;
             break;
     }
 }
@@ -2002,6 +2034,7 @@ void DebugWindow::flagsKbdProc(PalKeyCode keyCode)
             fillCpuStatus();
             break;
         default:
+            m_needRepaint = false;
             break;
     }
 }
@@ -2100,6 +2133,7 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
             m_mode = AM_CODE;
             break; }
         default:
+            m_needRepaint = false;
             break;
     }
 }

@@ -226,6 +226,8 @@ class DebugWindow : private EmuWindow
 
         EmuPixelData m_pixelData;
         uint32_t* m_pixels = nullptr;
+        bool m_needRepaint = true;
+        void invalidate() {m_needRepaint = true;}
 
         uint8_t* m_font = nullptr;
 
@@ -266,6 +268,8 @@ class DebugWindow : private EmuWindow
         void drawHintBar();
         void displayCpuStatus();
         void displayObjectDbgInfo();
+
+        void preparePixelBuffer();
 
         // cursor related variables
         bool m_cursorVisible;                   // признак видимости курсора
