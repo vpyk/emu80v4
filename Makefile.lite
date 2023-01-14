@@ -5,7 +5,7 @@ INSTALLDIR= ~/emu80
 
 CC = c++
 CFLAGS = -c -Wall -std=c++11 `sdl2-config --cflags` -DPAL_SDL -DPAL_LITE
-LDFLAGS = `sdl2-config --libs`
+LDFLAGS = `sdl2-config --libs` -lGL
 
 SRC = $(SRCDIR)/*.cpp
 SRCSDL = $(SRCDIR)/sdl/*.cpp
