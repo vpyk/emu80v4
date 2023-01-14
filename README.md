@@ -32,6 +32,8 @@ For license info, see the file "COPYING.txt"
     make
     make install
 
+В зависимости от дистрибутива Linux, необходимая версия qmake может содержаться в нем под именем qmake-qt5.
+
 #### Порядок компиляции и установки SDL/wx-версии:
     git clone https://github.com/vpyk/emu80v4.git
     cd emu80v4    
