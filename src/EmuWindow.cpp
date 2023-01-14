@@ -518,10 +518,10 @@ void EmuWindow::sysReq(SysReq sr)
             break;
         case SR_SCREENSHOT:
             screenshotRequest(palOpenFileDialog("Save screenshot",
-                "BMP files (*.bmp)|*.bmp"
 #ifdef PAL_QT
-                "|PNG files (*.png)|*.png"
+                "PNG files (*.png)|*.png|"
 #endif
+                "BMP files (*.bmp)|*.bmp"
                 , true, this));
             break;
         default:
