@@ -351,18 +351,7 @@ uint64_t palGetCounterFreq()
 
 void palDelay(uint64_t time)
 {
-    while (time > 20000) { // 20 ms
-        uint64_t t1 = timer.nsecsElapsed();
-        QThread::currentThread()->usleep(15);
-        getApplication()->processEvents();
-        uint64_t delta = timer.nsecsElapsed() - t1;
-        if (time > delta)
-            time -= delta;
-        else
-            time = 0;
-    }
-    if (time > 0)
-        QThread::currentThread()->usleep(time / 1000);
+    QThread::currentThread()->usleep(time / 1000);
 }
 
 
