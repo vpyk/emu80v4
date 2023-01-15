@@ -35,9 +35,6 @@ void Rk86Core::vrtc(bool isActive)
 
 void Rk86Core::draw()
 {
-    if (g_emulation->isDebuggerActive())
-        m_crtRenderer->prepareDebugScreen();
-
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }

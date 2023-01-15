@@ -71,6 +71,7 @@ class Platform : public ParentObject
 
         void showDebugger();
         void updateDebugger();
+        void reqScreenUpdateForDebug();
         std::string getAllDebugInfo();
         CodePage getCodePage() {return m_codePage;}
         bool getMuteTapeFlag() {return m_muteTape;}
@@ -88,6 +89,7 @@ class Platform : public ParentObject
         EmuWindow* m_window = nullptr;
         KbdLayout* m_kbdLayout = nullptr;
         CrtRenderer* m_renderer = nullptr;
+        CrtRenderer* m_renderer2 = nullptr;
         DiskImage* m_diskA = nullptr;
         DiskImage* m_diskB = nullptr;
         DiskImage* m_diskC = nullptr;

@@ -48,9 +48,6 @@ void ApogeyCore::vrtc(bool isActive)
 
 void ApogeyCore::draw()
 {
-    if (g_emulation->isDebuggerActive())
-        m_crtRenderer->prepareDebugScreen();
-
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }

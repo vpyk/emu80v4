@@ -233,9 +233,6 @@ void VectorCore::reset()
 
 void VectorCore::draw()
 {
-    if (g_emulation->isDebuggerActive())
-        m_crtRenderer->prepareDebugScreen();
-
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -508,6 +505,7 @@ void VectorRenderer::prepareFrame()
 void VectorRenderer::prepareDebugScreen()
 {
     advanceTo(g_emulation->getCurClock());
+    enableSwapBuffersOnce();
     renderFrame();
 }
 

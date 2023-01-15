@@ -230,6 +230,13 @@ void DebugWindow::startDebug()
 }
 
 
+void DebugWindow::invalidate()
+{
+    m_needRepaint = true;
+    m_platform->reqScreenUpdateForDebug();
+}
+
+
 void DebugWindow::update()
 {
     fillCpuStatus();

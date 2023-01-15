@@ -71,6 +71,11 @@ EmuPixelData CrtRenderer::getPixelData()
 
 void CrtRenderer::swapBuffers()
 {
+    // don't update if in debug or paused mode
+    if (!reqForSwapBuffers && (g_emulation->getPausedState() || g_emulation->isDebuggerActive()))
+        return;
+    reqForSwapBuffers = false;
+
     int w,h, bs;
     uint32_t* buf;
 

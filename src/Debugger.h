@@ -227,7 +227,7 @@ class DebugWindow : private EmuWindow
         EmuPixelData m_pixelData;
         uint32_t* m_pixels = nullptr;
         bool m_needRepaint = true;
-        void invalidate() {m_needRepaint = true;}
+        void invalidate();
 
         uint8_t* m_font = nullptr;
 

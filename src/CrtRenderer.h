@@ -67,11 +67,13 @@ class CrtRenderer : public EmuObject
         virtual bool isRasterPresent() {return true;}
         void swapBuffers();
 
+        bool reqForSwapBuffers = false;
+        void enableSwapBuffersOnce() {reqForSwapBuffers = true;}
+
         const char* generateTextScreen(wchar_t* wTextArray, int w, int h);
 
     private:
         unsigned m_frameNo = 0;
-
         std::string m_textScreen;
 };
 

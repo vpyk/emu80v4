@@ -389,6 +389,7 @@ void Crt8275Renderer::altRenderFrame()
 
 void Crt8275Renderer::prepareDebugScreen()
 {
+    enableSwapBuffersOnce();
     renderFrame();
 }
 

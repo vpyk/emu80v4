@@ -80,10 +80,18 @@ Platform::Platform(string configFileName, string name)
         if ((m_kbdLayout = dynamic_cast<KbdLayout*>(*it)))
             break;
 
-    // ищем объект - рендерер, только первый
-    for (auto it = m_objList.begin(); it != m_objList.end(); it++)
-        if ((m_renderer = dynamic_cast<CrtRenderer*>(*it)))
-            break;
+    // ищем объекты - рендереры, может быть два
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
+        auto renderer = dynamic_cast<CrtRenderer*>(*it);
+        if (renderer) {
+            if (!m_renderer)
+                m_renderer = renderer;
+            else {
+                m_renderer2 = renderer;
+                break;
+            }
+        }
+    }
 
     // ищем объекты - образы дисков A и B
     for (auto it = m_objList.begin(); it != m_objList.end(); it++) {
@@ -401,6 +409,15 @@ void Platform::updateDebugger()
 {
     if (m_dbgWindow)
         m_dbgWindow->update();
+}
+
+
+void Platform::reqScreenUpdateForDebug()
+{
+    if (m_renderer)
+        m_renderer->prepareDebugScreen();
+    if (m_renderer2)
+        m_renderer2->prepareDebugScreen();
 }
 
 
