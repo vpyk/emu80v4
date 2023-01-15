@@ -234,6 +234,7 @@ void DebugWindow::update()
 {
     fillCpuStatus();
     codeGotoPc();
+    invalidate();
 }
 
 
