@@ -94,6 +94,11 @@ void PartnerCore::vrtc(bool isActive)
 
 void PartnerCore::draw()
 {
+    if (g_emulation->isDebuggerActive())
+        m_crtRenderer->prepareDebugScreen();
+    if (m_mcpgSelector->getMcpgEnabled())
+        m_crtMcpgRenderer->prepareDebugScreen();
+
     m_window->drawFrame(m_crtRenderer->getPixelData());
     if (m_mcpgSelector->getMcpgEnabled())
         m_window->drawOverlay(m_crtMcpgRenderer->getPixelData());

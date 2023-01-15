@@ -36,6 +36,7 @@ class Crt8275Renderer : public TextCrtRenderer
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
         const char* getTextScreen() override;
+        void prepareDebugScreen() override;
 
         void mouseDrag(int x, int y) override;
 

@@ -83,6 +83,9 @@ void Kr04Core::timer(int /*id*/, bool isActive)
 
 void Kr04Core::draw()
 {
+    if (g_emulation->isDebuggerActive())
+        m_crtRenderer->prepareDebugScreen();
+
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }

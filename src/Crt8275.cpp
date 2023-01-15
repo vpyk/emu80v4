@@ -820,5 +820,11 @@ string Crt8275::getDebugInfo()
     ss << "Cur:" << (m_cursorUnderline ? "Ul" : "Bl");
     ss << (m_cursorBlinking ? "Bln" : "") << " ";
     ss << "R" << (m_isRasterStarted ? "+" : "-") << "\n";
+    ss << "CurRow: ";
+    if (m_curRow < m_nRows)
+          ss << m_curRow;
+    else
+          ss << "VRTC";
+    ss << "\n";
     return ss.str();
 }

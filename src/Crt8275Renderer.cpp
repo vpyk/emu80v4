@@ -387,6 +387,12 @@ void Crt8275Renderer::altRenderFrame()
 }
 
 
+void Crt8275Renderer::prepareDebugScreen()
+{
+    renderFrame();
+}
+
+
 wchar_t Crt8275Renderer::getUnicodeSymbol(uint8_t, bool, bool, bool)
 {
     return 0;
