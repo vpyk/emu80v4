@@ -1592,14 +1592,14 @@ void MainWindow::mouseDrag(int x, int y)
 
 void MainWindow::onFpsTimer()
 {
+    if (m_windowType != EWT_EMULATION)
+        return;
+
     ++m_fpsTimerCnt %= 4;
 
     if (!m_fpsTimerCnt) {
         // every 4th call (1 s)
         uint64_t delta = m_lastFpsCoutnerFrameTime - m_firstFpsCoutnerFrameTime;
-
-        if (m_windowType != EWT_EMULATION)
-            return;
 
         QString s;
         if (delta != 0) {
