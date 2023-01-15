@@ -86,8 +86,8 @@ public:
     void updateConfig();
     void updateActions();
 
-    std::string getPlatformObjectName();
-    std::string getPlatformGroupName();
+    std::string getPlatformObjectName() {return m_platformName;}
+    std::string getPlatformGroupName() {return m_platformGroupName;}
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -99,6 +99,7 @@ protected:
 
 private slots:
     void onFpsTimer();
+    void onQuit();
 
     void onLoad();
     void onLoadRun();
@@ -205,6 +206,7 @@ private:
     void createDebugActions();
     PalKeyCode translateKey(QKeyEvent* evt);
     void saveConfig();
+    void savePosition();
     void updateLastFiles();
     void updateLastPlatforms(QString platform);
 
@@ -219,6 +221,9 @@ private:
     uint64_t m_lastFpsCoutnerFrameTime = 0;
     bool m_controlsCreated = false;
     bool m_fullscreenMode = false;
+
+    std::string m_platformName;
+    std::string m_platformGroupName;
 
     int m_clientWidth = 1;
     int m_clientHeight = 1;

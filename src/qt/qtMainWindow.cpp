@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_fpsTimer, SIGNAL(timeout()), this, SLOT(onFpsTimer()));
     m_fpsTimer.start();
 
+    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(onQuit()));
+
     //setWindowFlags(windowFlags() |= Qt::WindowMaximizeButtonHint);
 }
 
@@ -80,6 +82,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
 {
     if (!palWindow) {
         m_windowType = EWT_UNDEFINED;
+        m_platformName = "";
+        m_platformGroupName = "";
         return;
     }
 
@@ -91,6 +95,11 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         fillPlatformListMenu();
     }
     m_palWindow = palWindow;
+
+    m_platformName = m_palWindow->getPlatformObjectName();
+    std::string::size_type dotPos = m_platformName.find(".",0);
+    m_platformGroupName = m_platformName.substr(0, dotPos);
+
     switch (m_windowType) {
     case EWT_EMULATION:
         if (!m_settingsDialog) {
@@ -174,23 +183,6 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
 }
 
 
-std::string MainWindow::getPlatformObjectName()
-{
-    if (m_palWindow)
-        return m_palWindow->getPlatformObjectName();
-    else
-        return "";
-}
-
-
-std::string MainWindow::getPlatformGroupName()
-{
-    std::string platform = getPlatformObjectName();
-    std::string::size_type dotPos = platform.find(".",0);
-    return platform.substr(0, dotPos);
-}
-
-
 void MainWindow::setClientSize(int width, int height)
 {
     // minimum window size
@@ -234,12 +226,27 @@ void MainWindow::showWindow()
         m_showFirstTime = false;
 
         show();
+#ifdef Q_OS_UNIX
+        // workaround for X Window
+        // wait for window to show
+        for (int i = 0 ; i < 10 ; i++)
+            qApp->processEvents();
+#endif
 
         if (m_windowType == EWT_EMULATION) {
-            // center main window, not debug one
-            QRect screenRec = QGuiApplication::primaryScreen()->availableGeometry();
-            QRect frameRec = frameGeometry();
-            move(screenRec.left() + (screenRec.width() - frameRec.width()) / 3, screenRec.top() + (screenRec.height() - frameRec.height()) / 3);
+            // place main window, not debug one
+            QSettings settings;
+            settings.beginGroup("window");
+            if (settings.contains("left") && settings.contains("top")) {
+                int left = settings.value("left").toInt();
+                int top = settings.value("top").toInt();
+                move(left, top);
+            } else {
+                QRect screenRec = QGuiApplication::primaryScreen()->availableGeometry();
+                QRect frameRec = frameGeometry();
+                move(screenRec.left() + (screenRec.width() - frameRec.width()) / 3, screenRec.top() + (screenRec.height() - frameRec.height()) / 3);
+            }
+            settings.endGroup();
 
             HelpDialog::activate();
         }
@@ -1961,8 +1968,16 @@ void MainWindow::keyReleaseEvent(QKeyEvent* evt)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    savePosition();
+
     event->ignore();
     emuSysReq(m_palWindow, SR_CLOSE);
+}
+
+
+void MainWindow::onQuit()
+{
+    savePosition();
 }
 
 
@@ -3128,6 +3143,19 @@ void MainWindow::updateActions()
     m_wideScreenAction->setEnabled(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".window", "wideScreen") != "custom");
 
     m_printerCaptureAction->setChecked(!emuGetPropertyValue("prnWriter", "fileName").empty());
+}
+
+
+void MainWindow::savePosition()
+{
+    if (!m_palWindow || m_windowType != EWT_EMULATION || !isVisible() || m_fullscreenMode)
+        return;
+
+    QSettings settings;
+    settings.beginGroup("window");
+    settings.setValue("left", x());
+    settings.setValue("top", y());
+    settings.endGroup();
 }
 
 
