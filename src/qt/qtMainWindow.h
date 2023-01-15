@@ -217,6 +217,7 @@ private:
     QMap<QString, QString> m_platformNames;
     QTimer m_fpsTimer;
     int m_frameCount = 0;
+    int m_fpsTimerCnt = 0;
     uint64_t m_firstFpsCoutnerFrameTime = 0;
     uint64_t m_lastFpsCoutnerFrameTime = 0;
     bool m_controlsCreated = false;

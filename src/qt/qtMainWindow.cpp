@@ -1592,23 +1592,27 @@ void MainWindow::mouseDrag(int x, int y)
 
 void MainWindow::onFpsTimer()
 {
-    uint64_t delta = m_lastFpsCoutnerFrameTime - m_firstFpsCoutnerFrameTime;
+    ++m_fpsTimerCnt %= 4;
 
-    if (m_windowType != EWT_EMULATION)
-        return;
+    if (!m_fpsTimerCnt) {
+        // every 4th call (1 s)
+        uint64_t delta = m_lastFpsCoutnerFrameTime - m_firstFpsCoutnerFrameTime;
 
-    QString s;
-    if (delta != 0) {
-        unsigned fps = ((uint64_t)(m_frameCount - 1) * 1000000000 + delta / 2) / delta;
-        if (fps < 1000) {
-            s.setNum(fps);
-            s += " fps";
+        if (m_windowType != EWT_EMULATION)
+            return;
+
+        QString s;
+        if (delta != 0) {
+            unsigned fps = ((uint64_t)(m_frameCount - 1) * 1000000000 + delta / 2) / delta;
+            if (fps < 1000) {
+                s.setNum(fps);
+                s += " fps";
+            }
         }
+
+        m_fpsLabel->setText(s);
+        m_frameCount = 0;
     }
-
-    m_fpsLabel->setText(s);
-    m_frameCount = 0;
-
 
     unsigned speed = emuGetEmulationSpeedFactor();
     m_speedLabel->setVisible(speed != 1);
