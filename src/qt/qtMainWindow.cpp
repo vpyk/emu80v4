@@ -148,6 +148,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
 
         {
             QString groupName = QString::fromUtf8(getPlatformGroupName().c_str());
+            m_loaderLastFiles.setPlatformName(groupName);
             m_fddLastFiles.setPlatformName(groupName);
             m_hddLastFiles.setPlatformName(groupName);
             m_eddLastFiles.setPlatformName(groupName);
@@ -429,30 +430,58 @@ void MainWindow::createActions()
     QMenu* fileMenu = m_menuBar->addMenu(tr("File"));
 
     // Load and run
-    m_loadRunAction = new QAction(QIcon(":/icons/open_run.png"), tr("Load && Run..."), this);
-    m_loadRunAction->setToolTip(tr("Load file and run (Alt-F3)"));
+    m_loadRunMenu = new QMenu(tr("Load && Run"));
+    m_loadRunMenu->setIcon(QIcon(":/icons/open_run.png"));
+
+    m_loadRunAction = new QAction(tr("Open file..."), this);
+    m_loadRunMenuAction = m_loadRunMenu->menuAction();
+    m_loadRunMenuAction->setToolTip(tr("Load file and run (Alt-F3)"));
     QList<QKeySequence> loadRunKeysList;
     ADD_HOTKEY(loadRunKeysList, Qt::Key_F3);
-    //loadRunKeysList.append(QKeySequence(Qt::ALT + Qt::Key_F3));
-    //loadRunKeysList.append(QKeySequence(Qt::META + Qt::Key_F3));
     m_loadRunAction->setShortcuts(loadRunKeysList);
     addAction(m_loadRunAction);
-    fileMenu->addAction(m_loadRunAction);
-    m_toolBar->addAction(m_loadRunAction);
+    m_loadRunMenu->addAction(m_loadRunAction);
+    m_toolBar->addAction(m_loadRunMenuAction);
     connect(m_loadRunAction, SIGNAL(triggered()), this, SLOT(onLoadRun()));
+    connect(m_loadRunMenuAction, SIGNAL(triggered()), this, SLOT(onLoadRun()));
+
+    m_loadRunMenu->addSeparator();
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_loadRunLastFilesActions[i] = new QAction(this);
+        m_loadRunMenu->addAction(m_loadRunLastFilesActions[i]);
+        connect(m_loadRunLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onLoadRunLastFiles()));
+    }
+
+    //fileMenu->addAction(m_loadRunAction);
+    fileMenu->addMenu(m_loadRunMenu);
+
 
     // Load
-    m_loadAction = new QAction(QIcon(":/icons/open.png"), tr("Load..."), this);
-    m_loadAction->setToolTip(tr("Load file (Alt-L)"));
+    m_loadMenu = new QMenu(tr("Load"));
+    m_loadMenu->setIcon(QIcon(":/icons/open.png"));
+
+    m_loadAction = new QAction(tr("Open file..."), this);
+    m_loadMenuAction = m_loadMenu->menuAction();
+    m_loadMenuAction->setToolTip(tr("Load file (Alt-L)"));
     QList<QKeySequence> loadKeysList;
     ADD_HOTKEY(loadKeysList, Qt::Key_L);
-    //loadKeysList.append(QKeySequence(Qt::ALT + Qt::Key_L));
-    //loadKeysList.append(QKeySequence(Qt::META + Qt::Key_L));
     m_loadAction->setShortcuts(loadKeysList);
     addAction(m_loadAction);
-    fileMenu->addAction(m_loadAction);
-    m_toolBar->addAction(m_loadAction);
+    m_loadMenu->addAction(m_loadAction);
+    m_toolBar->addAction(m_loadMenuAction);
     connect(m_loadAction, SIGNAL(triggered()), this, SLOT(onLoad()));
+    connect(m_loadMenuAction, SIGNAL(triggered()), this, SLOT(onLoad()));
+
+    m_loadMenu->addSeparator();
+    for (int i = 0; i < LAST_FILES_QTY; i++) {
+        m_loadLastFilesActions[i] = new QAction(this);
+        m_loadMenu->addAction(m_loadLastFilesActions[i]);
+        connect(m_loadLastFilesActions[i], SIGNAL(triggered()), this, SLOT(onLoadLastFiles()));
+    }
+
+    //fileMenu->addAction(m_loadAction);
+    fileMenu->addMenu(m_loadMenu);
+
 
     // Load WAV
     m_loadWavAction = new QAction(QIcon(":/icons/open_wav.png"), tr("Load WAV..."), this);
@@ -2196,12 +2225,40 @@ void MainWindow::onFullwindow()
 void MainWindow::onLoad()
 {
     emuSysReq(m_palWindow, SR_LOAD);
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".loader", "lastFile").c_str());
+    if (!lastFileName.isEmpty()) {
+        m_loaderLastFiles.addToLastFiles(lastFileName);
+        updateLastFiles();
+    }
+}
+
+
+void MainWindow::onLoadLastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".loader", "loadFile", action->text().toStdString());
+    m_loaderLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
 }
 
 
 void MainWindow::onLoadRun()
 {
     emuSysReq(m_palWindow, SR_LOADRUN);
+    QString lastFileName = QString::fromUtf8(emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".loader", "lastFile").c_str());
+    if (!lastFileName.isEmpty()) {
+        m_loaderLastFiles.addToLastFiles(lastFileName);
+        updateLastFiles();
+    }
+}
+
+
+void MainWindow::onLoadRunLastFiles()
+{
+    QAction* action = (QAction*)sender();
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".loader", "loadRunFile", action->text().toStdString());
+    m_loaderLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
 }
 
 
@@ -3186,6 +3243,8 @@ void MainWindow::updateLastFiles()
     m_hddLastFiles.tuneActions(m_hddLastFilesActions);
     m_eddLastFiles.tuneActions(m_eddLastFilesActions);
     m_eddLastFiles.tuneActions(m_edd2LastFilesActions);
+    m_loaderLastFiles.tuneActions(m_loadLastFilesActions);
+    m_loaderLastFiles.tuneActions(m_loadRunLastFilesActions);
 }
 
 void MainWindow::updateLastPlatforms(QString platform)

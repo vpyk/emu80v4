@@ -47,6 +47,9 @@ class FileLoader : public EmuObject
         int m_skipTicks = 2000000;
         bool m_multiblockAvailable = false;
         bool m_allowMultiblock = false;
+
+    private:
+        std::string m_lastFile;
 };
 
 

@@ -57,6 +57,7 @@ bool FileLoader::chooseAndLoadFile(bool run)
         emuLog << "Error loading file: " << fileName << "\n";
         return false;
     }
+    m_lastFile = fileName;
     m_platform->updateDebugger();
     return true;
 }
@@ -84,6 +85,18 @@ bool FileLoader::setProperty(const std::string& propertyName, const EmuValuesLis
             m_allowMultiblock = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "loadFile") {
+        string fileName = values[0].asString();
+        if (!fileName.empty()) {
+            m_lastFile = fileName;
+            return loadFile(fileName);
+        }
+    } else if (propertyName == "loadRunFile") {
+        string fileName = values[0].asString();
+        if (!fileName.empty()) {
+            m_lastFile = fileName;
+            return loadFile(fileName, true);
+        }
     }
     return false;
 }
@@ -97,9 +110,10 @@ string FileLoader::getPropertyStringValue(const string& propertyName)
     if (res != "")
         return res;
 
-    else if (propertyName == "allowMultiblock") {
+    else if (propertyName == "allowMultiblock")
         return m_multiblockAvailable ? m_allowMultiblock ? "yes" : "no" : "";
-    }
+    else if (propertyName == "lastFile")
+        return m_lastFile;
 
     return "";
 }

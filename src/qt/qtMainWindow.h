@@ -185,6 +185,8 @@ private slots:
     void onEdd2AutoLoad();
     void onEdd2AutoSave();
     void onEdd2LastFiles();
+    void onLoadRunLastFiles();
+    void onLoadLastFiles();
 
 private:
     PaintWidget* m_paintWidget;
@@ -210,6 +212,7 @@ private:
     void updateLastFiles();
     void updateLastPlatforms(QString platform);
 
+    LastFileList m_loaderLastFiles = LastFileList("loader");
     LastFileList m_fddLastFiles = LastFileList("fdd");
     LastFileList m_hddLastFiles = LastFileList("hdd");
     LastFileList m_eddLastFiles = LastFileList("edd");
@@ -259,6 +262,8 @@ private:
     QIcon m_5xIcon                  = QIcon(":/icons/5x.png");
     QIcon m_resizableIcon           = QIcon(":/icons/resizable.png");
 
+    QMenu* m_loadRunMenu = nullptr;
+    QMenu* m_loadMenu = nullptr;
     QMenu* m_colorModeMenu = nullptr;
     QMenu* m_platformListMenu = nullptr;
     QMenu* m_smoothingMenu = nullptr;
@@ -279,7 +284,9 @@ private:
     QToolButton* m_presetButton;
 
     QAction* m_loadAction;
+    QAction* m_loadMenuAction;
     QAction* m_loadRunAction;
+    QAction* m_loadRunMenuAction;
     QAction* m_loadWavAction;
     QAction* m_diskAAction;
     QAction* m_diskAMenuAction;
@@ -371,6 +378,8 @@ private:
     QAction* m_fastResetAction;
     QAction* m_printerCaptureAction;
 
+    QAction* m_loadLastFilesActions[LAST_FILES_QTY];
+    QAction* m_loadRunLastFilesActions[LAST_FILES_QTY];
     QAction* m_fddALastFilesActions[LAST_FILES_QTY];
     QAction* m_fddBLastFilesActions[LAST_FILES_QTY];
     QAction* m_fddCLastFilesActions[LAST_FILES_QTY];
