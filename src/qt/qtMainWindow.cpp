@@ -323,7 +323,7 @@ void MainWindow::fillPlatformListMenu()
     m_platformListMenu->addMenu(recentPlatformsMenu);
     m_platformListMenu->addSeparator();
 
-    for (int i = LAST_PLATFORMS_QTY - 1; i >= 0 ; i--) {
+    for (int i = 0; i < LAST_PLATFORMS_QTY; i++) {
         QAction* action = new QAction(m_platformListMenu);
         action->setVisible(false);
         /*QFont font = action->font();
@@ -2248,6 +2248,8 @@ void MainWindow::onDiskALastFiles()
 {
     QAction* action = (QAction*)sender();
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskA", "fileName", action->text().toStdString());
+    m_fddLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
     updateConfig();
     saveConfig();
 }
@@ -2292,6 +2294,8 @@ void MainWindow::onDiskBLastFiles()
 {
     QAction* action = (QAction*)sender();
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskB", "fileName", action->text().toStdString());
+    m_fddLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
     updateConfig();
     saveConfig();
 }
@@ -2336,6 +2340,8 @@ void MainWindow::onDiskCLastFiles()
 {
     QAction* action = (QAction*)sender();
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskC", "fileName", action->text().toStdString());
+    m_fddLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
     updateConfig();
     saveConfig();
 }
@@ -2380,6 +2386,8 @@ void MainWindow::onDiskDLastFiles()
 {
     QAction* action = (QAction*)sender();
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".diskD", "fileName", action->text().toStdString());
+    m_fddLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
     updateConfig();
     saveConfig();
 }
@@ -2424,6 +2432,8 @@ void MainWindow::onHddLastFiles()
 {
     QAction* action = (QAction*)sender();
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".hdd", "fileName", action->text().toStdString());
+    m_hddLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
     updateConfig();
     saveConfig();
 }
@@ -2675,6 +2685,8 @@ void MainWindow::onEddLastFiles()
 {
     QAction* action = (QAction*)sender();
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk", "fileName", action->text().toStdString());
+    m_eddLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
     updateConfig();
     saveConfig();
 }
@@ -2749,6 +2761,8 @@ void MainWindow::onEdd2LastFiles()
 {
     QAction* action = (QAction*)sender();
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".ramDisk2", "fileName", action->text().toStdString());
+    m_eddLastFiles.addToLastFiles(action->text());
+    updateLastFiles();
     updateConfig();
     saveConfig();
 }
@@ -3176,32 +3190,31 @@ void MainWindow::updateLastFiles()
 
 void MainWindow::updateLastPlatforms(QString platform)
 {
+    if (m_lastPlatformsActions[0]->isVisible() && m_lastPlatformsActions[0]->data().toString() == platform)
+        return;
+
     for (int i = 0; i < LAST_PLATFORMS_QTY; i++)
-        if (platform == m_lastPlatformsActions[i]->data())
-            return;
-
-    QString platformName = m_platformNames[platform];
-
-    bool success = false;
-    for (int i = 0; i < LAST_PLATFORMS_QTY; i++) {
-        if (!m_lastPlatformsActions[i]->isVisible()) {
-            m_lastPlatformsActions[i]->setData(platform);
-            m_lastPlatformsActions[i]->setText(platformName);
-            m_lastPlatformsActions[i]->setVisible(true);
-            success = true;
+        if (platform == m_lastPlatformsActions[i]->data()) {
+            for (int j = i; j < LAST_PLATFORMS_QTY - 1; j++) {
+                m_lastPlatformsActions[j]->setData(m_lastPlatformsActions[j + 1]->data().toString());
+                m_lastPlatformsActions[j]->setText(m_lastPlatformsActions[j + 1]->text());
+                m_lastPlatformsActions[j]->setVisible(m_lastPlatformsActions[j + 1]->isVisible());
+            }
+            m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setData("");
+            m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setText("");
+            m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setVisible(false);
             break;
         }
+
+    for (int i = LAST_PLATFORMS_QTY - 1; i >= 0; i--) {
+        m_lastPlatformsActions[i]->setData(m_lastPlatformsActions[i - 1]->data().toString());
+        m_lastPlatformsActions[i]->setText(m_lastPlatformsActions[i - 1]->text());
+        m_lastPlatformsActions[i]->setVisible(m_lastPlatformsActions[i - 1]->isVisible());
     }
 
-    if (!success) {
-        for (int i = 0; i <= LAST_PLATFORMS_QTY - 2; i++) {
-            m_lastPlatformsActions[i]->setData(m_lastPlatformsActions[i + 1]->data().toString());
-            m_lastPlatformsActions[i]->setText(m_lastPlatformsActions[i + 1]->text());
-        }
-        m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setData(platform);
-        m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setText(platformName);
-        m_lastPlatformsActions[LAST_PLATFORMS_QTY - 1]->setVisible(true);
-    }
+    m_lastPlatformsActions[0]->setData(platform);
+    m_lastPlatformsActions[0]->setText(m_platformNames[platform]);
+    m_lastPlatformsActions[0]->setVisible(true);
 
     QSettings settings;
     settings.beginGroup("Last_platforms");
@@ -3257,6 +3270,7 @@ void LastFileList::addToLastFiles(const QString& fileName)
         if (fileName == *it) {
             // if item is already in list, move it to the top
             m_list.move(i, 0);
+            saveLastFiles();
             return;
         }
 
