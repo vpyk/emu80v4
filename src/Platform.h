@@ -58,6 +58,7 @@ class Platform : public ParentObject
         void resetKeys();
         /*virtual */void loadFile(std::string fileName);
         void mouseDrag(int x, int y);
+        void updateScreenOnce();
 
         const std::string& getBaseDir() {return m_baseDir;}
 

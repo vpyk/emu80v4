@@ -449,6 +449,7 @@ void EmuWindow::sysReq(SysReq sr)
             setFixedYScale(1);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_2X:
             setWindowStyle(WS_AUTOSIZE);
@@ -456,6 +457,7 @@ void EmuWindow::sysReq(SysReq sr)
             setFixedYScale(2);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_3X:
             setWindowStyle(WS_AUTOSIZE);
@@ -463,6 +465,7 @@ void EmuWindow::sysReq(SysReq sr)
             setFixedYScale(3);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_4X:
             setWindowStyle(WS_AUTOSIZE);
@@ -470,6 +473,7 @@ void EmuWindow::sysReq(SysReq sr)
             setFixedYScale(4);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_5X:
             setWindowStyle(WS_AUTOSIZE);
@@ -477,6 +481,7 @@ void EmuWindow::sysReq(SysReq sr)
             setFixedYScale(5);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_FIT:
             if (!m_isFullscreenMode)
@@ -484,6 +489,7 @@ void EmuWindow::sysReq(SysReq sr)
             setFrameScale(FS_FIT);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_MAXIMIZE:
             setWindowStyle(WS_RESIZABLE);
@@ -491,16 +497,19 @@ void EmuWindow::sysReq(SysReq sr)
             maximize();
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_ASPECTCORRECTION:
             m_aspectCorrection = !m_aspectCorrection;
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_WIDESCREEN:
             setWideScreen(!m_wideScreen);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
             break;
         case SR_SMOOTHING:
             switch (m_smoothing) {

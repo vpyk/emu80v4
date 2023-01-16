@@ -489,3 +489,13 @@ string Platform::getAllDebugInfo()
     }
     return res;
 }
+
+
+void Platform::updateScreenOnce()
+{
+    if (m_renderer)
+        m_renderer->updateScreenOnce();
+//    if (m_renderer2)
+//        m_renderer2->updateScreenOnce();
+    updateDebugger();
+}

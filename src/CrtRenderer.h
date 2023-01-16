@@ -47,6 +47,8 @@ class CrtRenderer : public EmuObject
 
         virtual void mouseDrag(int /*x*/, int /*y*/) {}
 
+        void updateScreenOnce();
+
         void attachSecondaryRenderer(CrtRenderer* renderer);
 
     protected:

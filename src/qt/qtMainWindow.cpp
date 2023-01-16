@@ -1593,11 +1593,13 @@ void MainWindow::createDebugActions()
 
 void MainWindow::incFrameCount()
 {
-    if (m_frameCount == 0)
+    if (m_frameCount == 0) {
         m_firstFpsCoutnerFrameTime = palGetCounter();
-    else
+        m_lastFpsCoutnerFrameTime = m_firstFpsCoutnerFrameTime;
+    } else
         m_lastFpsCoutnerFrameTime = palGetCounter();
     ++m_frameCount;
+    //static int n = 0; setWindowTitle(QString::number(n++)); // debug - show frame No in the window title
 };
 
 

@@ -99,6 +99,15 @@ void CrtRenderer::swapBuffers()
 }
 
 
+void CrtRenderer::updateScreenOnce()
+{
+    if (!g_emulation->getPausedState() && !g_emulation->isDebuggerActive())
+        return;
+
+       ++m_frameNo;
+}
+
+
 const char* CrtRenderer::generateTextScreen(wchar_t* wTextArray, int w, int h)
 {
     // calculate row lengths for every row without trailing spaces
