@@ -1491,8 +1491,8 @@ void MainWindow::tuneMenu()
 
     m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "lvov");
 
-    m_loadAction->setVisible(platformGroup != "korvet");
-    m_loadRunAction->setVisible(platformGroup != "korvet");
+    m_loadMenuAction->setVisible(platformGroup != "korvet");
+    m_loadRunMenuAction->setVisible(platformGroup != "korvet");
 
     m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 
