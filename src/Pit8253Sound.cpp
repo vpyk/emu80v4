@@ -62,6 +62,12 @@ bool Pit8253SoundSource::setProperty(const string& propertyName, const EmuValues
 }
 
 
+void RkPit8253SoundSource::tuneupPit()
+{
+    m_pit->getCounter(2)->setExtClockMode(true);
+}
+
+
 int RkPit8253SoundSource::calcValue()
 {
     int res = 0;
