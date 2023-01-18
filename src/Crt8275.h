@@ -76,6 +76,10 @@ struct Frame {
     bool cursorBlinking;
     bool cursorUnderline;
     //CursorFormat cursorFormat;
+
+    // data for format change check
+    int nHrChars;
+    int nVrRows;
 };
 
 

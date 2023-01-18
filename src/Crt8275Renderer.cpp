@@ -389,6 +389,14 @@ void Crt8275Renderer::altRenderFrame()
 
 void Crt8275Renderer::prepareDebugScreen()
 {
+    // check if frame geometry was changed
+    if (m_crt->getFrame()->nCharsPerRow != m_crt->getNCharsPerRow() ||
+        m_crt->getFrame()->nRows != m_crt->getNRows() ||
+        m_crt->getFrame()->nLines != m_crt->getNLines() ||
+        m_crt->getFrame()->nHrChars != m_crt->getHrChars() ||
+        m_crt->getFrame()->nVrRows != m_crt->getVrRows())
+        return;
+
     enableSwapBuffersOnce();
     renderFrame();
 }

@@ -148,6 +148,10 @@ void Crt8275::displayBuffer()
     m_frame.nCharsPerRow = m_nCharsPerRow;
     m_frame.isOffsetLineMode = m_isOffsetLine;
 
+    // ffame format check fields
+    m_frame.nHrChars = m_nHrChars;
+    m_frame.nVrRows = m_nVrRows;
+
     bool isBlankedToTheEndOfRow = false;
 
     int fifoPos = 0;
