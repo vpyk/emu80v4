@@ -188,6 +188,23 @@ private slots:
     void onLoadRunLastFiles();
     void onLoadLastFiles();
 
+    void onDbgRun();
+    void onDbgStep();
+    void onDbgOver();
+    void onDbgHere();
+    void onDbgSkip();
+    void onDbgBreakpoint();
+    void onDbgSaveMem();
+    void onDbgMnemo();
+    void onDbgMini();
+
+    void onDbgCode();
+    void onDbgData();
+    void onDbgRegs();
+    void onDbgFlags();
+    void onDbgAddr();
+    void onDbgEdit();
+
 private:
     PaintWidget* m_paintWidget;
     PalWindow* m_palWindow = nullptr;
@@ -391,5 +408,14 @@ private:
     QAction* m_lastPlatformsActions[LAST_PLATFORMS_QTY];
 };
 
+
+#ifndef __APPLE__
+    #define ADD_HOTKEY(keyList, key) \
+    keyList.append(QKeySequence(Qt::ALT + key)); \
+    keyList.append(QKeySequence(Qt::META + key))
+#else
+    #define ADD_HOTKEY(keyList, key) \
+    keyList.append(QKeySequence(Qt::ALT + key))
+#endif
 
 #endif // QTMAINWINDOW_H

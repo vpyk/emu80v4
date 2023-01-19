@@ -34,6 +34,7 @@ DEFINES += PAL_QT
 
 SOURCES += \
     Covox.cpp \
+    DbgCalls.cpp \
     DiskImage.cpp \
     Korvet.cpp \
     Kr04.cpp \
@@ -108,6 +109,7 @@ SOURCES += \
     qt/qtAudioDevice.cpp \
     qt/qtChoosePlatformDialog.cpp \
     qt/qtConfigWidget.cpp \
+    qt/qtDebug.cpp \
     qt/qtMainWindow.cpp \
     qt/qtPaintWidget.cpp \
     qt/qtPal.cpp \
@@ -136,6 +138,7 @@ HEADERS  += \
     Crt8275.h \
     Crt8275Renderer.h \
     CrtRenderer.h \
+    DbgCalls.h \
     Debugger.h \
     DiskImage.h \
     Dma8257.h \

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,6 +40,25 @@ class CodeBreakpoint : public CpuHook
 
     private:
         int m_skipCount = 0;
+};
+
+
+enum DebugCommand {
+    DCMD_HERE,
+    DCMD_RUN,
+    DCMD_STEP,
+    DCMD_OVER,
+    DCMD_BPOINT,
+    DCMD_SKIP,
+    DCMD_SAVEMEM,
+    DCMD_MNEMO,
+    DCMD_MINI,
+    DCMD_CODE,
+    DCMD_DATA,
+    DCMD_REGS,
+    DCMD_FLAGS,
+    DCMD_ADDR,
+    DCMD_EDIT
 };
 
 
@@ -99,6 +118,7 @@ class DebugWindow : private EmuWindow
 
         void initDbgWindow() {EmuWindow::init();}
         void setCaption(std::string caption) {EmuWindow::setCaption(caption);}
+        void sendCmd(DebugCommand cmd);
 
         void startDebug();
         void update();

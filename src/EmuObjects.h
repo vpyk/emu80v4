@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ class EmuObject
         virtual void reset() {}
 
         virtual void setPlatform(Platform* platform) {m_platform = platform;}
+        Platform* getPlatform() {return m_platform;}
 
         virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
         virtual std::string getPropertyStringValue(const std::string& propertyName);

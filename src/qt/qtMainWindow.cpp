@@ -404,16 +404,6 @@ void MainWindow::fillPlatformListMenu()
 }
 
 
-#ifndef __APPLE__
-    #define ADD_HOTKEY(keyList, key) \
-    keyList.append(QKeySequence(Qt::ALT + key)); \
-    keyList.append(QKeySequence(Qt::META + key))
-#else
-    #define ADD_HOTKEY(keyList, key) \
-    keyList.append(QKeySequence(Qt::ALT + key))
-#endif
-
-
 void MainWindow::createActions()
 {
     m_menuBar = menuBar();
@@ -1500,94 +1490,6 @@ void MainWindow::tuneMenu()
 
     QString platformName = QString::fromUtf8(getPlatformObjectName().c_str());
     updateLastPlatforms(platformName);
-}
-
-
-void MainWindow::createDebugActions()
-{
-    /*m_menuBar = menuBar();
-    m_menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
-    m_toolBar = new QToolBar(this);
-    m_toolBar->setFloatable(false);
-    //m_toolBar->setMovable(false);
-    m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-    m_toolBar->setIconSize(QSize(16, 16));
-    addToolBar(m_toolBar);
-    m_toolBar->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);*/
-
-    // 1x preset
-    m_preset1xAction = new QAction(tr("Preset: 1x"), this /*m_menuBar*/);
-    //m_preset1xAction->setToolTip(tr("Preset: 1x (Alt-1)"));
-    QList<QKeySequence> preset1xKeysList;
-    ADD_HOTKEY(preset1xKeysList, Qt::Key_1);
-    //preset1xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_1));
-    //preset1xKeysList.append(QKeySequence(Qt::META + Qt::Key_1));
-    m_preset1xAction->setShortcuts(preset1xKeysList);
-    addAction(m_preset1xAction);
-    //presetMenu->addAction(m_preset1xAction);
-    connect(m_preset1xAction, SIGNAL(triggered()), this, SLOT(on1x()));
-
-    // 2x preset
-    m_preset2xAction = new QAction(tr("Preset: 2x"), this /*m_menuBar*/);
-    //m_preset2xAction->setToolTip(tr("Preset: 2x (Alt-2)"));
-    QList<QKeySequence> preset2xKeysList;
-    ADD_HOTKEY(preset2xKeysList, Qt::Key_2);
-    //preset2xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_2));
-    //preset2xKeysList.append(QKeySequence(Qt::META + Qt::Key_2));
-    m_preset2xAction->setShortcuts(preset2xKeysList);
-    addAction(m_preset2xAction);
-    //presetMenu->addAction(m_preset2xAction);
-    connect(m_preset2xAction, SIGNAL(triggered()), this, SLOT(on2x()));
-
-    // 3x preset
-    m_preset3xAction = new QAction(tr("Preset: 3x"), this /*m_menuBar*/);
-    //m_preset3xAction->setToolTip(tr("Preset: 3x (Alt-3)"));
-    QList<QKeySequence> preset3xKeysList;
-    ADD_HOTKEY(preset3xKeysList, Qt::Key_3);
-    //preset3xKeysList.append(QKeySequence(Qt::ALT + Qt::Key_3));
-    //preset3xKeysList.append(QKeySequence(Qt::META + Qt::Key_3));
-    m_preset3xAction->setShortcuts(preset3xKeysList);
-    addAction(m_preset3xAction);
-    //presetMenu->addAction(m_preset3xAction);
-    connect(m_preset3xAction, SIGNAL(triggered()), this, SLOT(on3x()));
-
-    // Fit preset
-    m_presetFitAction = new QAction(tr("Preset: Fit"), this /*m_menuBar*/);
-    //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
-    QList<QKeySequence> presetFitKeysList;
-    ADD_HOTKEY(presetFitKeysList, Qt::Key_0);
-    //presetFitKeysList.append(QKeySequence(Qt::ALT + Qt::Key_0));
-    //presetFitKeysList.append(QKeySequence(Qt::META + Qt::Key_0));
-    m_presetFitAction->setShortcuts(presetFitKeysList);
-    addAction(m_presetFitAction);
-    //presetMenu->addAction(m_presetFitAction);
-    connect(m_presetFitAction, SIGNAL(triggered()), this, SLOT(onFit()));
-
-    //viewMenu->addSeparator();
-
-    m_fullscreenAction = new QAction(tr("Fullscreen mode"), this /*m_menuBar*/);
-    //m_fullscreenAction->setCheckable(true);
-    //setToolTip(tr("Fullscreen mode (Alt-Enter)"));
-    QList<QKeySequence> fullscreenKeysList;
-    ADD_HOTKEY(fullscreenKeysList, Qt::Key_Return);
-    //fullscreenKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Return));
-    //fullscreenKeysList.append(QKeySequence(Qt::META + Qt::Key_Return));
-    m_fullscreenAction->setShortcuts(fullscreenKeysList);
-    connect(m_fullscreenAction, SIGNAL(triggered()), this, SLOT(onFullscreen()));
-    addAction(m_fullscreenAction);
-    //viewMenu->addAction(m_fullscreenAction);
-
-    m_fullwindowAction = new QAction(tr("Hide menu and buttons"), this /*m_menuBar*/);
-    //m_fullwindowAction->setCheckable(true);
-    //setToolTip(tr("Hide menu and buttons (Alt-\)"));
-    QList<QKeySequence> fullwindowKeysList;
-    ADD_HOTKEY(fullwindowKeysList, Qt::Key_Backslash);
-    //fullwindowKeysList.append(QKeySequence(Qt::ALT + Qt::Key_Backslash));
-    //fullwindowKeysList.append(QKeySequence(Qt::META + Qt::Key_Backslash));
-    m_fullwindowAction->setShortcuts(fullwindowKeysList);
-    connect(m_fullwindowAction, SIGNAL(triggered()), this, SLOT(onFullwindow()));
-    addAction(m_fullwindowAction);
-    //viewMenu->addAction(m_fullwindowAction);
 }
 
 

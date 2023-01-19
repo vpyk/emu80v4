@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -993,7 +993,7 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                     } else if (m_mode == AM_CODE)
                         codeKbdProc(keyCode);
                     break;
-                case PK_F2:
+                case PK_F12:
                     saveDump();
                     break;
                 default:
@@ -1018,6 +1018,65 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                     }
             }
         }
+    }
+}
+
+
+void DebugWindow::sendCmd(DebugCommand cmd)
+{
+    if (m_mode == AM_INPUT)
+        return;
+
+    switch(cmd) {
+    case DCMD_SAVEMEM:
+        saveDump();
+        //processKey(PK_F12, true);
+        break;
+    case DCMD_RUN:
+        run();
+        //processKey(PK_F5, true);
+        break;
+    case DCMD_STEP:
+        //step();
+        processKey(PK_F7, true);
+        break;
+    case DCMD_OVER:
+        //over();
+        processKey(PK_F8, true);
+        break;
+    case DCMD_HERE:
+        //here();
+        processKey(PK_F4, true);
+        break;
+    case DCMD_SKIP:
+        //here();
+        processKey(PK_U, true);
+        break;
+    case DCMD_BPOINT:
+        //breakpoint();
+        processKey(PK_F9, true);
+        break;
+    case DCMD_MNEMO:
+        processKey(PK_Z, true);
+        break;
+    case DCMD_MINI:
+        processKey(PK_M, true);
+        break;
+    case DCMD_DATA:
+        processKey(PK_D, true);
+        break;
+    case DCMD_REGS:
+        processKey(PK_R, true);
+        break;
+    case DCMD_FLAGS:
+        processKey(PK_F, true);
+        break;
+    case DCMD_ADDR:
+        processKey(PK_A, true);
+        break;
+    case DCMD_EDIT:
+        processKey(PK_F2, true);
+        break;
     }
 }
 
