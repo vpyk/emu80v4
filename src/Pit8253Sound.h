@@ -47,7 +47,8 @@ class RkPit8253SoundSource : public Pit8253SoundSource
 {
     public:
         int calcValue() override;
-        virtual void tuneupPit();
+        void tuneupPit() override;
+        void reset() override;
 
         static EmuObject* create(const EmuValuesList&) {return new RkPit8253SoundSource();}
 };

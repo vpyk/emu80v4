@@ -107,9 +107,10 @@ class Pit8253 : public AddressableDevice
         virtual ~Pit8253();
 
         void setFrequency(int64_t freq) override;
-        void reset() override;
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         //std::string getDebugInfo() override;
+
+        void mute(); // i8253 does not have reset input so use this method instead if necessary
 
         // derived from AddressableDevice
         void writeByte(int addr, uint8_t value) override;
