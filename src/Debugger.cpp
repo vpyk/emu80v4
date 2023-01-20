@@ -317,7 +317,7 @@ void DebugWindow::preparePixelBuffer()
             }
         }
 
-    if (m_cursorVisible && m_cursorCounter < 15) {
+    if (m_cursorPhase) {
         int scrX = m_cursorXPos * m_chrW;
         int scrY = m_cursorYPos * m_chrH + m_chrH - 3;
         int pos = scrY * m_curLayout->cols * m_chrW + scrX;
@@ -332,13 +332,15 @@ void DebugWindow::preparePixelBuffer()
 
 void DebugWindow::draw()
 {
-    m_cursorCounter = (m_cursorCounter + 1) % 30;
-
     if (!isVisible())
         return;
 
-    if (m_cursorVisible && m_cursorCounter % 15 == 0)
+     // 250 ms every 500 ms
+    bool newCursorPhase = m_cursorVisible && (palGetCounter() * 4 / palGetCounterFreq() % 2);
+    if (m_cursorPhase != newCursorPhase)
         invalidate();
+
+    m_cursorPhase = newCursorPhase;
 
     const DebuggerOptions& debOpt = g_emulation->getDebuggerOptions();
     m_mnemo8080UpperCase = debOpt.mnemo8080UpperCase;

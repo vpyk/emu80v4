@@ -296,8 +296,8 @@ class DebugWindow : private EmuWindow
         bool m_cursorVisible;                   // признак видимости курсора
         int m_cursorXPos;                       // текущий столбец курсора
         int m_cursorYPos;                       // текущая строка курсора
-        int m_cursorCounter = 0;                // счетчик отрисовки курсора
-
+        //int m_cursorCounter = 0;                // счетчик отрисовки курсора
+        bool m_cursorPhase = false;             // фаза курсора
 
         ActiveMode m_mode = AM_CODE;
 
