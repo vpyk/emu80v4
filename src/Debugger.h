@@ -248,6 +248,7 @@ class DebugWindow : private EmuWindow
         uint32_t* m_pixels = nullptr;
         bool m_needRepaint = true;
         void invalidate();
+        void updateEmuScreen();
 
         uint8_t* m_font = nullptr;
 

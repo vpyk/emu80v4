@@ -226,6 +226,7 @@ void DebugWindow::startDebug()
     codeGotoPc();
     show();
     invalidate();
+    updateEmuScreen();
     draw();
 }
 
@@ -233,6 +234,10 @@ void DebugWindow::startDebug()
 void DebugWindow::invalidate()
 {
     m_needRepaint = true;
+}
+
+
+void DebugWindow::updateEmuScreen() {
     m_platform->reqScreenUpdateForDebug();
 }
 
@@ -1061,6 +1066,9 @@ void DebugWindow::sendCmd(DebugCommand cmd)
         break;
     case DCMD_MINI:
         processKey(PK_M, true);
+        break;
+    case DCMD_CODE:
+        processKey(PK_C, true);
         break;
     case DCMD_DATA:
         processKey(PK_D, true);
