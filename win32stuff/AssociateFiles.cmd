@@ -81,6 +81,11 @@ REG ADD HKCU\Software\Classes\Emu80.rk4 /t REG_SZ /d "KR-04 tape file" /f
 REG ADD HKCU\Software\Classes\Emu80.rk4\shell\open\command /t REG_SZ /d "\"%EXE%\" -4 \"%%1"\" /f 
 REG ADD HKCU\Software\Classes\Emu80.rk4\DefaultIcon /t REG_SZ /d %EXE%,16 /f
 
+REG ADD HKCU\Software\Classes\.rkl /t REG_SZ /d Emu80.rkl /f
+REG ADD HKCU\Software\Classes\Emu80.rkl /t REG_SZ /d "Palmira tape file" /f
+REG ADD HKCU\Software\Classes\Emu80.rkl\shell\open\command /t REG_SZ /d "\"%EXE%\" -plm \"%%1"\" /f 
+REG ADD HKCU\Software\Classes\Emu80.rkl\DefaultIcon /t REG_SZ /d %EXE%,17 /f
+
 
 set IE4UINIT=%SYSTEMROOT%\SYSTEM32\ie4uinit.exe
 if exist %IE4UINIT% goto proceed
