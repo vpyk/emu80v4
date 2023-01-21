@@ -252,14 +252,14 @@ void Emulation::addChild(EmuObject* child)
 };
 
 
-void Emulation::exec(uint64_t ticks)
+void Emulation::exec(uint64_t ticks, bool forced)
 {
     if (m_isPaused)
         return;
 
     uint64_t toTime = m_curClock + ticks - m_clockOffset;
 
-    while (m_curClock < toTime && !m_debugReqCpu) {
+    while (m_curClock < toTime && (!m_debugReqCpu || forced)) {
         uint64_t time = -1;
         IActive* curDev = nullptr;
 
@@ -282,7 +282,7 @@ void Emulation::exec(uint64_t ticks)
     }
     m_clockOffset = m_curClock - toTime;
 
-    if (m_debugReqCpu) {
+    if (!forced && m_debugReqCpu) {
         m_clockOffset = 0;
         // show debugger
         for (auto it = m_platformList.begin(); it != m_platformList.end(); it++)

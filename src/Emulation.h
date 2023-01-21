@@ -82,7 +82,7 @@ class Emulation : public ParentObject
         void newPlatform(const std::string& platformName);
 
         void mainLoopCycle();
-        void exec(uint64_t ticks);
+        void exec(uint64_t ticks, bool forced = false);
 
         //inline Platform* getPlatform() {return m_platform;} //!!!
         inline uint64_t getCurClock() {return m_curClock;}

@@ -635,7 +635,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
     m_platform->reset();
     as->enableRom();
     cpu->disableHooks();
-    g_emulation->exec(int64_t(cpu->getKDiv()) * m_skipTicks);
+    g_emulation->exec(int64_t(cpu->getKDiv()) * m_skipTicks, true);
     cpu->enableHooks();
 
     for (unsigned i = 0; i < 0x100; i++)
@@ -677,7 +677,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
         cpu->setPC(begAddr);
         cpu->setIFF(false);
         cpu->disableHooks();
-        g_emulation->exec(int64_t(cpu->getKDiv()) * 4000000);
+        g_emulation->exec(int64_t(cpu->getKDiv()) * 4000000, true);
         cpu->enableHooks();
         m_as->writeByte(0x4300, 0);
 

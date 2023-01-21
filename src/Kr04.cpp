@@ -376,17 +376,17 @@ void Kr04FileLoader::afterReset()
     Keyboard* kbd = m_platform->getKeyboard();
     for (int i = 0; i < 3; i++) {
         // Mode # 3, press space 3 times
-        g_emulation->exec((int64_t)cpu->getKDiv() * 50000);
+        g_emulation->exec((int64_t)cpu->getKDiv() * 50000, true);
         kbd->processKey(EK_SPACE, true);
-        g_emulation->exec((int64_t)cpu->getKDiv() * 50000);
+        g_emulation->exec((int64_t)cpu->getKDiv() * 50000, true);
         kbd->processKey(EK_SPACE, false);
     }
     // Press CR
-    g_emulation->exec((int64_t)cpu->getKDiv() * 50000);
+    g_emulation->exec((int64_t)cpu->getKDiv() * 50000, true);
     kbd->processKey(EK_CR, true);
-    g_emulation->exec((int64_t)cpu->getKDiv() * 50000);
+    g_emulation->exec((int64_t)cpu->getKDiv() * 50000, true);
     kbd->processKey(EK_CR, false);
-    g_emulation->exec((int64_t)cpu->getKDiv() * 500000);
+    g_emulation->exec((int64_t)cpu->getKDiv() * 500000, true);
 
     AddressableDevice* io = cpu->getIoAddrSpace();
     io->writeByte(0xC2, (io->readByte(0xC2) & 0xFC) | 0x01);

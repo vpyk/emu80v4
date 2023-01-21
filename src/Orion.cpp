@@ -404,7 +404,7 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu) {
-            g_emulation->exec((uint64_t)cpu->getKDiv() * 3000000);
+            g_emulation->exec((uint64_t)cpu->getKDiv() * 3000000, true);
             cpu->setPC(begAddr);
         }
 

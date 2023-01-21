@@ -56,7 +56,7 @@ class Platform : public ParentObject
         virtual void draw();
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys();
-        /*virtual */void loadFile(std::string fileName);
+        bool loadFile(std::string fileName, bool run = true);
         void mouseDrag(int x, int y);
         void updateScreenOnce();
 

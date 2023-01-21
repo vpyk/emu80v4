@@ -208,7 +208,7 @@ void Platform::sysReq(SysReq sr)
             if (m_fastReset && m_fastResetCpuTicks) {
                 Cpu* cpu = getCpu();
                 cpu->disableHooks();
-                g_emulation->exec((int64_t)cpu->getKDiv() * m_fastResetCpuTicks);
+                g_emulation->exec((int64_t)cpu->getKDiv() * m_fastResetCpuTicks); // no 2d parameter: no fast reset when debugger is active
                 cpu->enableHooks();
             }
             updateDebugger();
@@ -375,10 +375,14 @@ void Platform::mouseDrag(int x, int y)
 }
 
 
-void Platform::loadFile(string fileName)
+bool Platform::loadFile(string fileName, bool run)
 {
-    if (m_loader)
-        m_loader->loadFile(fileName, true);  // добавить параметр из конфигурации вместо true !!!
+    if (m_loader) {
+        m_loader->loadFile(fileName, run);
+        updateDebugger();
+        return true;
+    }
+    return false;
 }
 
 

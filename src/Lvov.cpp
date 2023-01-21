@@ -633,7 +633,7 @@ bool LvovFileLoader::loadBinary(bool run)
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu) {
             cpu->disableHooks();
-            g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+            g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
             cpu->enableHooks();
 
             m_io->writeByte(0xD3, 0x8A);
@@ -672,7 +672,7 @@ bool LvovFileLoader::loadBasic(bool run)
     m_platform->reset();
 
     cpu->disableHooks();
-    g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+    g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
     cpu->enableHooks();
 
     unsigned addr;
@@ -700,7 +700,7 @@ bool LvovFileLoader::loadBasic(bool run)
 
         // Workaround to suppress closing file by CloseFileHook
         cpu->disableHooks();
-        g_emulation->exec((int64_t)cpu->getKDiv() * 500000);
+        g_emulation->exec((int64_t)cpu->getKDiv() * 500000, true);
         cpu->enableHooks();
     }
 
@@ -714,7 +714,7 @@ void LvovFileLoader::loadDump(bool run)
     Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
     if (cpu) {
         cpu->disableHooks();
-        g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+        g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
         cpu->enableHooks();
 
         for (unsigned addr = 0; addr <= 0xFFFF; addr++)

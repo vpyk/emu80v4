@@ -88,14 +88,22 @@ bool FileLoader::setProperty(const std::string& propertyName, const EmuValuesLis
     } else if (propertyName == "loadFile") {
         string fileName = values[0].asString();
         if (!fileName.empty()) {
-            m_lastFile = fileName;
-            return loadFile(fileName);
+            bool res = loadFile(fileName, false); // todo: consider to replace with m_platform->loadFile()
+            if (res) {
+                m_lastFile = fileName;
+                m_platform->updateDebugger();
+            }
+            return res;
         }
     } else if (propertyName == "loadRunFile") {
         string fileName = values[0].asString();
         if (!fileName.empty()) {
-            m_lastFile = fileName;
-            return loadFile(fileName, true);
+            bool res = loadFile(fileName, true); // todo: consider to replace with m_platform->loadFile()
+            if (res) {
+                m_lastFile = fileName;
+                m_platform->updateDebugger();
+            }
+            return res;
         }
     }
     return false;
@@ -159,7 +167,7 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         cpu->disableHooks();
-        g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+        g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
         afterReset();
     }
 

@@ -865,7 +865,7 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
             Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
             if (cpu) {
                 cpu->disableHooks();
-                g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+                g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
                 cpu->enableHooks();
                 cpu->setPC(startAddr);
             }
@@ -921,7 +921,7 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
         m_platform->reset();
         if (cpu) {
             cpu->disableHooks();
-            g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks);
+            g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
             cpu->enableHooks();
         }
 
@@ -970,7 +970,7 @@ bool Pk8000FileLoader::loadFile(const std::string& fileName, bool run)
 
             // Workaround to suppress closing file by CloseFileHook
             cpu->disableHooks();
-            g_emulation->exec((int64_t)cpu->getKDiv() * 100000);
+            g_emulation->exec((int64_t)cpu->getKDiv() * 100000, true);
             cpu->enableHooks();
         }
     }
