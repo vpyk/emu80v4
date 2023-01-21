@@ -164,7 +164,7 @@ void MainWindow::createDebugActions()
     QMenu* fileMenu = m_menuBar->addMenu(tr("File"));
 
     // Save memory
-    QAction* dbgSaveMemAction = new QAction("Save memory...", this);
+    QAction* dbgSaveMemAction = new QAction(tr("Save memory..."), this);
     QKeySequence dbgSaveMemKey(Qt::Key_F12);
     dbgSaveMemAction->setShortcut(dbgSaveMemKey);
     addAction(dbgSaveMemAction);
@@ -174,7 +174,7 @@ void MainWindow::createDebugActions()
     QMenu* debugMenu = m_menuBar->addMenu(tr("Debug"));
 
     // Run
-    QAction* dbgRunAction = new QAction("Run", this);
+    QAction* dbgRunAction = new QAction(tr("Run"), this);
     QKeySequence dbgRunKey(swapF5F9 ? Qt::Key_F5 : Qt::Key_F9);
     dbgRunAction->setShortcut(dbgRunKey);
     addAction(dbgRunAction);
@@ -182,7 +182,7 @@ void MainWindow::createDebugActions()
     connect(dbgRunAction, SIGNAL(triggered()), this, SLOT(onDbgRun()));
 
     // Step
-    QAction* dbgStepAction = new QAction("Step", this);
+    QAction* dbgStepAction = new QAction(tr("Step"), this);
     QKeySequence dbgStepKey(Qt::Key_F7);
     dbgStepAction->setShortcut(dbgStepKey);
     addAction(dbgStepAction);
@@ -190,7 +190,7 @@ void MainWindow::createDebugActions()
     connect(dbgStepAction, SIGNAL(triggered()), this, SLOT(onDbgStep()));
 
     // Over
-    QAction* dbgOverAction = new QAction("Step over", this);
+    QAction* dbgOverAction = new QAction(tr("Step over"), this);
     QKeySequence dbgOverKey(Qt::Key_F8);
     dbgOverAction->setShortcut(dbgOverKey);
     addAction(dbgOverAction);
@@ -198,7 +198,7 @@ void MainWindow::createDebugActions()
     connect(dbgOverAction, SIGNAL(triggered()), this, SLOT(onDbgOver()));
 
     // Skip
-    QAction* dbgSkipAction = new QAction("Skip", this);
+    QAction* dbgSkipAction = new QAction(tr("Skip"), this);
     QKeySequence dbgSkipKey(Qt::Key_U);
     dbgSkipAction->setShortcut(dbgSkipKey);
     addAction(dbgSkipAction);
@@ -206,7 +206,7 @@ void MainWindow::createDebugActions()
     connect(dbgSkipAction, SIGNAL(triggered()), this, SLOT(onDbgSkip()));
 
     // Here
-    QAction* dbgHereAction = new QAction("Here", this);
+    QAction* dbgHereAction = new QAction(tr("Here"), this);
     QKeySequence dbgHereKey(Qt::Key_F4);
     dbgHereAction->setShortcut(dbgHereKey);
     addAction(dbgHereAction);
@@ -214,7 +214,7 @@ void MainWindow::createDebugActions()
     connect(dbgHereAction, SIGNAL(triggered()), this, SLOT(onDbgHere()));
 
     // Breakpoint
-    QAction* dbgBreakpointAction = new QAction("Add breakpoint", this);
+    QAction* dbgBreakpointAction = new QAction(tr("Add breakpoint"), this);
     QKeySequence dbgBreakpointKey(swapF5F9 ? Qt::Key_F9 : Qt::Key_F5);
     dbgBreakpointAction->setShortcut(dbgBreakpointKey);
     addAction(dbgBreakpointAction);
@@ -224,7 +224,7 @@ void MainWindow::createDebugActions()
     debugMenu->addSeparator();
 
     // Mnemo
-    QAction* dbgMnemoAction = new QAction("Toggle mnemonics", this);
+    QAction* dbgMnemoAction = new QAction(tr("Toggle mnemonics"), this);
     QKeySequence dbgMnemoKey(Qt::Key_Z);
     dbgMnemoAction->setShortcut(dbgMnemoKey);
     addAction(dbgMnemoAction);
@@ -232,7 +232,7 @@ void MainWindow::createDebugActions()
     connect(dbgMnemoAction, SIGNAL(triggered()), this, SLOT(onDbgMnemo()));
 
     // Mini
-    QAction* dbgMiniAction = new QAction("Toggle mini view", this);
+    QAction* dbgMiniAction = new QAction(tr("Toggle mini view"), this);
     QKeySequence dbgMiniKey(Qt::Key_M);
     dbgMiniAction->setShortcut(dbgMiniKey);
     addAction(dbgMiniAction);
@@ -242,34 +242,34 @@ void MainWindow::createDebugActions()
     QMenu* sectionMenu = m_menuBar->addMenu(tr("Section"));
 
     // Code
-    QAction* dbgCodeAction = new QAction("Code (C, Esc)", this);
+    QAction* dbgCodeAction = new QAction(tr("Code (C, Esc)"), this);
     sectionMenu->addAction(dbgCodeAction);
     connect(dbgCodeAction, SIGNAL(triggered()), this, SLOT(onDbgCode()));
 
     // Data
-    QAction* dbgDataAction = new QAction("Data (D)", this);
+    QAction* dbgDataAction = new QAction(tr("Data (D)"), this);
     sectionMenu->addAction(dbgDataAction);
     connect(dbgDataAction, SIGNAL(triggered()), this, SLOT(onDbgData()));
 
     // Regs
-    QAction* dbgRegsAction = new QAction("Regs (R)", this);
+    QAction* dbgRegsAction = new QAction(tr("Registers (R)"), this);
     sectionMenu->addAction(dbgRegsAction);
     connect(dbgRegsAction, SIGNAL(triggered()), this, SLOT(onDbgRegs()));
 
     // Flags
-    QAction* dbgFlagsAction = new QAction("Flags (F)", this);
+    QAction* dbgFlagsAction = new QAction(tr("Flags (F)"), this);
     sectionMenu->addAction(dbgFlagsAction);
     connect(dbgFlagsAction, SIGNAL(triggered()), this, SLOT(onDbgFlags()));
 
     sectionMenu->addSeparator();
 
     // Addr
-    QAction* dbgAddrAction = new QAction("Addr (A)", this);
+    QAction* dbgAddrAction = new QAction(tr("Enter address (A)"), this);
     sectionMenu->addAction(dbgAddrAction);
     connect(dbgAddrAction, SIGNAL(triggered()), this, SLOT(onDbgAddr()));
 
     // Edit
-    QAction* dbgEditAction = new QAction("Edit (F2, Enter)", this);
+    QAction* dbgEditAction = new QAction(tr("Edit data (F2, Enter)"), this);
     sectionMenu->addAction(dbgEditAction);
     connect(dbgEditAction, SIGNAL(triggered()), this, SLOT(onDbgEdit()));
 
