@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>384</width>
-    <height>160</height>
+    <height>176</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -68,7 +68,6 @@
         <widget class="QLabel" name="nameLabel">
          <property name="font">
           <font>
-           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
@@ -86,7 +85,7 @@
           <string notr="true"/>
          </property>
          <property name="text">
-          <string notr="true">© 2016–2022, Victor Pykhonin</string>
+          <string notr="true">© 2016–2023, Viktor Pykhonin</string>
          </property>
         </widget>
        </item>
