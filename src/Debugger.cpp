@@ -1201,6 +1201,7 @@ void DebugWindow::run()
     m_resetCpuClockFlag = true;
     g_emulation->debugRun();
     hide();
+    m_platform->getWindow()->bringToFront();
 }
 
 

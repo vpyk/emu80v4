@@ -72,7 +72,8 @@ void PalWindow::getSize(int& width, int& height)
 
 void PalWindow::bringToFront()
 {
-    //
+    m_qtWindow->activateWindow();
+    m_qtWindow->raise();
 }
 
 
