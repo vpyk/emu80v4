@@ -224,8 +224,8 @@ void DebugWindow::startDebug()
     m_stateNum = 1 - m_stateNum;
     fillCpuStatus();
     codeGotoPc();
-    show();
     invalidate();
+    show();
     updateEmuScreen();
     draw();
 }

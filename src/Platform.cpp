@@ -154,10 +154,10 @@ Platform::Platform(string configFileName, string name)
 
     Platform::init();
 
+    Platform::reset();
+
     if (m_window)
         m_window->show();
-
-    Platform::reset();
 }
 
 
