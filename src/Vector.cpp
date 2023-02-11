@@ -429,14 +429,14 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
         ptr = linePtr + firstPx - 124;
         m_lastColor = m_borderColor;
         for (int px = firstPx; px < lastPx && px < 750; px++) {
-            *ptr++ = m_palette[m_borderColor];
+            *ptr++ = m_palette[m_mode512px ? (px & 1 ? m_borderColor & 0x0c : m_borderColor & 0x03) : m_borderColor];
         }
     } else {
         // left border
         if (firstPx < 124) firstPx = 124;
         ptr = linePtr + firstPx - 124;
         for (int px = firstPx; px < lastPx && px < 181; px++)
-            *ptr++ = m_palette[m_borderColor];
+            *ptr++ = m_palette[m_mode512px ? (px & 1 ? m_borderColor & 0x0c : m_borderColor & 0x03) : m_borderColor];
 
         // active area
         if (firstPx < 181) firstPx = 181;
@@ -451,11 +451,11 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
             uint8_t btB = m_screenMemory[0xE000 + offset] << dot;
             int logBGcolor = ((btG & 0x80) >> 6) | ((btB & 0x80) >> 7);
             int logYRcolor = ((btY & 0x80) >> 4) | ((btR & 0x80) >> 5);
-            m_lastColor = px & 1 ? logYRcolor : logBGcolor;
+            m_lastColor = logYRcolor | logBGcolor;
             if (m_mode512px) {
-                *ptr++ = m_palette[m_lastColor];
+                *ptr++ = m_palette[px & 1 ? m_lastColor & 0x0c : m_lastColor & 0x03];
             } else {
-                *ptr++ = m_palette[logBGcolor | logYRcolor];
+                *ptr++ = m_palette[m_lastColor];
             }
         }
 
@@ -463,7 +463,7 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
         if (firstPx < 693) firstPx = 693;
         ptr = linePtr + firstPx - 124;
         for (int px = firstPx; px < lastPx && px < 750; px++)
-            *ptr++ = m_palette[m_borderColor];
+            *ptr++ = m_palette[m_mode512px ? (px & 1 ? m_borderColor & 0x0c : m_borderColor & 0x03) : m_borderColor];
 
         if (lastPx < 182 || lastPx >= 694)
             m_lastColor = m_borderColor;
