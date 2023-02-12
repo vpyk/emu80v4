@@ -1061,7 +1061,7 @@ void DebugWindow::sendCmd(DebugCommand cmd)
         break;
     case DCMD_BPOINT:
         //breakpoint();
-        processKey(PK_F9, true);
+        processKey(m_swapF5F9 ? PK_F9 : PK_F5, true);
         break;
     case DCMD_MNEMO:
         processKey(PK_Z, true);
