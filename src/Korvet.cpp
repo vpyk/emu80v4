@@ -588,6 +588,7 @@ KorvetGraphicsAdapter::~KorvetGraphicsAdapter()
 void KorvetGraphicsAdapter::writeByte(int addr, uint8_t value)
 {
     addr &= 0x3FFF;
+    addr += m_rwPage * 0x4000;
 
     if (m_colorRegisterValue & 0x80) {
         // color mode
@@ -627,6 +628,7 @@ void KorvetGraphicsAdapter::writeByte(int addr, uint8_t value)
 uint8_t KorvetGraphicsAdapter::readByte(int addr)
 {
     addr &= 0x3FFF;
+    addr += m_rwPage * 0x4000;
 
     uint8_t res;
     if (m_colorRegisterValue & 0x80) {
