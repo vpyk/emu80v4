@@ -57,13 +57,21 @@ Ram ram0 = 0xF000
 Ram ram1 = 0xF000
 Ram ram2 = 0xF000
 Ram ram3 = 0xF000
+Ram ram4 = 0xF000
+Ram ram5 = 0xF000
+Ram ram6 = 0xF000
+Ram ram7 = 0xF000
 Ram sysRam = 0x400
 
-AddrSpaceMapper ram = 4
+AddrSpaceMapper ram = 8
 ram.page = 0, &ram0
 ram.page = 1, &ram1
 ram.page = 2, &ram2
 ram.page = 3, &ram3
+ram.page = 4, &ram4
+ram.page = 5, &ram5
+ram.page = 6, &ram6
+ram.page = 7, &ram7
 
 Rom rom = @ROM, 0x800
 
@@ -73,7 +81,7 @@ Ppi8255 ppi2
 OrionColorModeSelector colorModeSelector
 OrionMemPageSelector pageSelector
 pageSelector.mapper = &ram
-pageSelector.bits = 2
+pageSelector.bits = 3
 
 OrionScreenSelector screenSelector
 
