@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -257,11 +257,11 @@ EmuLog& EmuLog::operator<<(int n)
 }
 
 
-void palMsgBox(string msg)
+void palMsgBox(string msg, bool critical)
 {
     wxMessageBox(wxString::FromUTF8(msg.c_str()),
                  wxT("Emu80"),
-                 wxOK | wxICON_ERROR);
+                 wxOK | (critical ? wxICON_ERROR : wxICON_INFORMATION));
 }
 
 

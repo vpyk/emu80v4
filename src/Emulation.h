@@ -27,6 +27,7 @@
 #include "EmuTypes.h"
 #include "EmuObjects.h"
 
+class CmdLine;
 class Cpu;
 class EmuWindow;
 class SoundMixer;
@@ -53,7 +54,7 @@ struct DebuggerOptions {
 class Emulation : public ParentObject
 {
     public:
-        Emulation(int argc, char** argv); //: EmuObject();
+        Emulation(CmdLine& cmdLine); //: EmuObject();
 
         virtual ~Emulation();
 
@@ -142,8 +143,7 @@ class Emulation : public ParentObject
         void checkPlatforms();
 
         // параметры командной строки
-        int m_argc;
-        char** m_argv;
+        CmdLine& m_cmdLine;
 
         bool m_platformCreatedFromCmdLine = false;
         void runPlatform (const std::string& platformName);

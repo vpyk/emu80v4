@@ -33,6 +33,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += PAL_QT
 
 SOURCES += \
+    CmdLine.cpp \
     Covox.cpp \
     DbgCalls.cpp \
     DiskImage.cpp \
@@ -126,6 +127,7 @@ HEADERS  += \
     Apogey.h \
     AtaDrive.h \
     CloseFileHook.h \
+    CmdLine.h \
     ConfigReader.h \
     Covox.h \
     Cpu.h \

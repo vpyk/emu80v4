@@ -99,7 +99,8 @@ bool palQtInit(int& argc, char** argv)
     }
 #endif
 
-    application = new QApplication(argc, argv);
+    static int one = 1;
+    application = new QApplication(one, argv); // suppress passing additional arguments
 
     QString p = QCoreApplication::applicationDirPath() + "/_settings/" + "emu80.ini";
     QDir settingsDir(QCoreApplication::applicationDirPath() + "/_settings");
@@ -585,9 +586,9 @@ EmuLog& EmuLog::operator<<(int n)
 }
 
 
-void palMsgBox(std::string msg)
+void palMsgBox(std::string msg, bool critical)
 {
-    QMessageBox msgBox(QMessageBox::Critical, "Emu80", QString::fromUtf8(msg.c_str()));
+    QMessageBox msgBox(critical ? QMessageBox::Critical : QMessageBox::Information, "Emu80", QString::fromUtf8(msg.c_str()));
     msgBox.exec();
 }
 

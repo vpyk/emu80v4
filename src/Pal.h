@@ -18,7 +18,6 @@
 
 // Platform Abstraction Layer
 
-
 #ifdef PAL_QT
 #include "qt/qtPal.h"
 #endif // PAL_QT
@@ -34,6 +33,20 @@
 #ifdef PAL_LITE
 #include "lite/litePal.h"
 #endif // PAL_LITE
+
+#ifdef PAL_QT
+    #ifdef __WIN32__
+        #define EXE_NAME "Emu80qt.exe"
+    #else
+        #define EXE_NAME "Emu80qt"
+    #endif
+#else
+    #ifdef __WIN32__
+        #define EXE_NAME "Emu80.exe"
+    #else
+        #define EXE_NAME "Emu80"
+    #endif
+#endif
 
 bool palInit(int& argc, char** argv);
 void palQuit();

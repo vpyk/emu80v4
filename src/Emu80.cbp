@@ -100,6 +100,8 @@
 		<Unit filename="AtaDrive.h" />
 		<Unit filename="CloseFileHook.cpp" />
 		<Unit filename="CloseFileHook.h" />
+		<Unit filename="CmdLine.cpp" />
+		<Unit filename="CmdLine.h" />
 		<Unit filename="ConfigReader.cpp" />
 		<Unit filename="ConfigReader.h" />
 		<Unit filename="Covox.cpp" />

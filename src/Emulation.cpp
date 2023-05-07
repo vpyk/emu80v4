@@ -24,6 +24,7 @@
 #include "Globals.h"
 #include "EmuObjects.h"
 #include "Emulation.h"
+#include "CmdLine.h"
 #include "ConfigReader.h"
 #include "Platform.h"
 #include "EmuWindow.h"
@@ -32,15 +33,13 @@
 #include "WavReader.h"
 #include "PrnWriter.h"
 #include "FileLoader.h"
+#include "EmuCalls.h"
 
 using namespace std;
 
 
-Emulation::Emulation(int argc, char** argv)
+Emulation::Emulation(CmdLine& cmdLine) : m_cmdLine(cmdLine)
 {
-    m_argc = argc;
-    m_argv = argv;
-
     m_frameRate = 100;
     m_vsync = true;
     m_sampleRate = 48000;
@@ -117,7 +116,7 @@ void Emulation::checkPlatforms()
             it++;
 
     if (m_platformList.empty()) {
-        palMsgBox("Error: platform configuration files not found!\nFiles emu80.conf etc. should be placed in the excecutable file directory.");
+        palMsgBox("Error: platform configuration files not found!\nFiles emu80.conf etc. should be placed in the excecutable file directory.", true);
         palRequestForQuit();
     }
 }
@@ -125,63 +124,102 @@ void Emulation::checkPlatforms()
 
 void Emulation::processCmdLine()
 {
-    // Command line options
-    bool loadOnly = false;
-    for (int i = 1; i < m_argc; i++) {
-        if (string(m_argv[i]) == "-l")
-            loadOnly = true;
-    }
+    m_cmdLine.processPlatforms(*m_config->getPlatformInfos());
 
-    // Command line file name
-    string cmdLineFileName = "";
-    for (int i = 1; i < m_argc; i++)
-        if (m_argv[i][0] != '-') {
-            cmdLineFileName = m_argv[i];
-            break;
-        }
+    string cmdLineFileName = m_cmdLine["run"];
+    bool loadOnly = m_cmdLine.checkParam("load");
+    if (loadOnly)
+        cmdLineFileName = m_cmdLine["load"];
+
+    // Configuration file
+    string cfgFile = m_cmdLine["conf-file"];
 
     // Command line platform options
-    string platformName = "";
-    const std::vector<PlatformInfo>* platforms = m_config->getPlatformInfos();
-    for (auto it = platforms->begin(); it != platforms->end(); it++) {
-        for (int i = 1; i < m_argc; i++) {
-            if (m_argv[i] == '-' + it->cmdLineOption) {
-                platformName = it->objName;
-                break;
-            }
-            if (platformName != "")
-                break;
-        }
-    }
+    string platformName = m_cmdLine["platform"];
 
-    // Extention based platform
-    string cmdLineFileExt = "";
-    if (platformName == "") {
-        string::size_type dotPos = cmdLineFileName.find_last_of(".");
-        if (dotPos != string::npos) {
-            cmdLineFileExt = cmdLineFileName.substr(dotPos + 1);
-            for (unsigned i = 0; i < cmdLineFileExt.size(); i++)
-                cmdLineFileExt[i] = tolower(cmdLineFileExt[i]);
-        }
-    }
-    if (cmdLineFileExt != "") {
-        std::map<std::string, std::string>* extentionMap = m_config->getExtentionMap();
-        auto it = extentionMap->find(cmdLineFileExt);
-        if (it != extentionMap->end())
-            platformName = it->second;
-    }
-
-    if (platformName != "") {
-        runPlatform(platformName);
+    if (!cfgFile.empty()) {
+        if (platformName.empty())
+            platformName = "userconfig";
+        Platform* newPlatform = new Platform(cfgFile, platformName);
+        addChild(newPlatform);
         m_platformCreatedFromCmdLine = true;
+    } else {
+        // Extention based platform
+        string cmdLineFileExt = "";
+        if (platformName == "") {
+            string::size_type dotPos = cmdLineFileName.find_last_of(".");
+            if (dotPos != string::npos) {
+                cmdLineFileExt = cmdLineFileName.substr(dotPos + 1);
+                for (unsigned i = 0; i < cmdLineFileExt.size(); i++)
+                    cmdLineFileExt[i] = tolower(cmdLineFileExt[i]);
+            }
+        }
+        if (cmdLineFileExt != "") {
+            std::map<std::string, std::string>* extentionMap = m_config->getExtentionMap();
+            auto it = extentionMap->find(cmdLineFileExt);
+            if (it != extentionMap->end())
+                platformName = it->second;
+        }
+
+        if (platformName != "") {
+            runPlatform(platformName);
+            m_platformCreatedFromCmdLine = true;
+        }
     }
 
-    if (cmdLineFileName != "" && !m_platformList.empty()) {
+    if (m_platformList.empty())
+        return; // Platform was not created
+
+    // Post-config file
+    string postCfgFile = m_cmdLine["post-conf"];
+    if (!postCfgFile.empty()) {
+        ConfigReader cr(postCfgFile, platformName);
+        cr.processConfigFile(this);
+        getConfig()->updateConfig();
+    }
+
+    // Load file
+    if (!cmdLineFileName.empty()) {
         Platform* platform = *m_platformList.begin();
         FileLoader* loader = platform->getLoader();
         if (loader)
             loader->loadFile(cmdLineFileName, !loadOnly);
     }
+
+    // Disk A
+    string diskA = m_cmdLine["disk-a"];
+    if (!diskA.empty())
+        emuSetPropertyValue(platformName + ".diskA", "fileName", diskA);
+
+    // Disk B
+    string diskB = m_cmdLine["disk-b"];
+    if (!diskB.empty())
+        emuSetPropertyValue(platformName + ".diskB", "fileName", diskB);
+
+    // Disk C
+    string diskC = m_cmdLine["disk-c"];
+    if (!diskC.empty())
+        emuSetPropertyValue(platformName + ".diskC", "fileName", diskC);
+
+    // Disk D
+    string diskD = m_cmdLine["disk-d"];
+    if (!diskD.empty())
+        emuSetPropertyValue(platformName + ".diskD", "fileName", diskD);
+
+    // HDD
+    string hdd = m_cmdLine["hdd"];
+    if (!hdd.empty())
+        emuSetPropertyValue(platformName + ".hdd", "fileName", hdd);
+
+    // EDD
+    string edd = m_cmdLine["edd"];
+    if (!edd.empty())
+        emuSetPropertyValue(platformName + ".edd", "fileName", edd);
+
+    // EDD2
+    string edd2 = m_cmdLine["edd2"];
+    if (!edd2.empty())
+        emuSetPropertyValue(platformName + ".edd2", "fileName", edd2);
 }
 
 
