@@ -402,6 +402,14 @@ bool KorvetRenderer::setProperty(const string& propertyName, const EmuValuesList
             m_showBorder = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "colorMode") {
+        if (values[0].asString() == "mono")
+            setColorMode(false);
+        else if (values[0].asString() == "color")
+            setColorMode(true);
+        else
+            return false;
+        return true;
     }
     return false;
 }
