@@ -77,6 +77,7 @@ Rom rom = @ROM, 0x800
 
 Ppi8255 ppi1
 Ppi8255 ppi2
+Ppi8255 ppi3
 
 OrionColorModeSelector colorModeSelector
 OrionMemPageSelector pageSelector
@@ -111,6 +112,7 @@ addrSpace.range = &ram, 0x0000, 0xEFFF
 addrSpace.range = &sysRam, 0xF000, 0xF3FF
 addrSpace.range = &ppi1, 0xF400, 0xF4FF
 addrSpace.range = &ppi2, 0xF500, 0xF5FF
+addrSpace.range = &ppi3, 0xF600, 0xF6FF
 addrSpace.range = &fddSpace, 0xF700, 0xF7FF
 addrSpace.writeRange = &colorModeSelector, 0xF800, 0xF8FF
 addrSpace.writeRange = &pageSelector, 0xF900, 0xF9FF
