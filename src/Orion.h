@@ -45,6 +45,7 @@ class OrionMemPageSelector : public AddressableDevice
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
+        uint8_t m_mask = 0x03;
 };
 
 

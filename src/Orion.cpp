@@ -235,7 +235,7 @@ string OrionRenderer::getPropertyStringValue(const string& propertyName)
 
 void OrionMemPageSelector::writeByte(int, uint8_t value)
 {
-    m_addrSpaceMapper->setCurPage(value & 0x3);
+    m_addrSpaceMapper->setCurPage(value & m_mask);
 };
 
 
@@ -247,6 +247,9 @@ bool OrionMemPageSelector::setProperty(const string& propertyName, const EmuValu
     if (propertyName == "mapper") {
         attachAddrSpaceMapper(static_cast<AddrSpaceMapper*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "bits") {
+        int bits = values[0].asInt();
+        m_mask = ((1 << bits) - 1 & 0xFF);
     }
 
     return false;

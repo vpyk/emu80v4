@@ -73,6 +73,7 @@ Ppi8255 ppi2
 OrionColorModeSelector colorModeSelector
 OrionMemPageSelector pageSelector
 pageSelector.mapper = &ram
+pageSelector.bits = 2
 
 OrionScreenSelector screenSelector
 
