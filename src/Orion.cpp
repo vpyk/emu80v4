@@ -300,11 +300,13 @@ bool OrionColorModeSelector::setProperty(const string& propertyName, const EmuVa
 
 void OrionFddControlRegister::writeByte(int, uint8_t value)
 {
-    m_fdc->setDrive(value & 1);
-    if (m_type == OFT_STANDARD)
+    if (m_type == OFT_STANDARD) {
+        m_fdc->setDrive(value & 1);
         m_fdc->setHead(((value & 0x10) >> 4) ^ 1);
-    else // m_type == OFT_SPDOS
-        m_fdc->setHead((value & 0x2) >> 1);
+    } else { // m_type == OFT_SPDOS
+        m_fdc->setDrive((value & 0x2) >> 1);
+        m_fdc->setHead(value & 1);
+    }
 }
 
 
