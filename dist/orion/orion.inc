@@ -116,6 +116,21 @@ fddReg08.type = spdos
 OrionFddQueryRegister fddQReg
 fddQReg.fdc = &fdc
 
+ifdef HDD
+  DiskImage hdd
+  hdd.label = HDD
+  hdd.filter = "Образы HDD DSDOS (*.ohi,*.hdd;*.img)|*.ohi,*.OHI,*.hdd;*.HDD;*.img;*.IMG|Все файлы (*.*)|*"
+  hdd.fileName = @HDD_IMAGE
+
+  AtaDrive ataDrive
+  ataDrive.geometry = lba
+  ataDrive.diskImage = &hdd
+
+  PpiAtaAdapter ataAdapter
+  ataAdapter.ataDrive = &ataDrive
+  ppi3.circuit = &ataAdapter
+endif
+
 AddrSpace fddSpace
 fddSpace.range = &fdc, 0x00, 0x03
 fddSpace.range = &fddQReg, 0x04, 0x04
