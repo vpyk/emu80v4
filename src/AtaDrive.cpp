@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -48,7 +48,93 @@ void AtaDrive::assignDiskImage(DiskImage* image)
 
 void AtaDrive::reset()
 {
-    //
+    m_cs = 0;
+    m_addr = 0;
+    m_rdData = 0xFFFF;
+    m_wrData = 0;
+    m_dataReg = 0;
+    m_ior = false;
+    m_iow = false;
+    m_reset = false;
+
+    m_dev = 0;
+    m_useLba = false;
+    m_cylinder = 0;
+    m_head = 0;
+    m_sector = 1;
+    m_lbaAddress = 0;
+    m_sectorCount = 0;
+    m_lastCommand = 0;
+    m_prefilledData = false;
+}
+
+
+void AtaDrive::writeData(uint16_t value)
+{
+    m_wrData = value;
+}
+
+
+uint16_t AtaDrive::readData()
+{
+    if (m_addr != 0 || m_cs != 1)
+        return m_rdData;
+    else
+        return m_dataReg;
+}
+
+void AtaDrive::writeControl(int cs, int addr, bool ior, bool iow, bool rst)
+{
+    // workaround for DSDOS
+    if (m_ior && ior && addr == 0 && cs == 1 && m_addr != 0)
+        m_ior = false;
+
+    m_cs = cs;
+    m_addr = addr;
+
+    if (!m_reset && rst)
+        reset();
+
+    if (m_cs == 0 || m_cs == 3)
+        m_rdData = 0xFFFF;
+
+    if (!m_ior && ior && addr == 0 && cs == 1) {
+        if (m_dataCounter) {
+            if (!m_prefilledData && !(m_dataCounter & 0xFF)) {
+                m_image->read(m_sectorBuf, 512);
+                m_dataPtr = m_sectorBuf;
+            }
+            m_dataReg = m_rdData = m_dataPtr[0] + (m_dataPtr[1] << 8);
+            m_dataPtr += 2;
+            m_dataCounter--;
+        } else
+            m_dataReg = m_rdData = 0xFFFF;
+        }
+
+    if (ior) {
+        switch(addr) {
+        case 0:
+            break;
+        case 1:
+            // error register
+            m_rdData = 0x00; // except diagnostic !
+            break;
+        case 7:
+            // status register
+            m_rdData = (m_image->getImagePresent() ? 0x40 : 0x20) | (m_dataCounter ? 0x08 : 0) | (m_dev != 0 ? 0x80 : 0) | 0x10; // DRDY & DSC & DRQ if data transfer is active, DF if no disk
+            break;
+        default:
+            m_rdData = 0xFFFF;
+            break;
+        }
+    }
+
+    if (!m_iow && iow)
+        writeReg(m_addr, m_wrData);
+
+    m_ior = ior;
+    m_iow = iow;
+    m_reset = rst;
 }
 
 
@@ -100,6 +186,11 @@ void AtaDrive::writeReg(int reg, uint16_t value)
     case 7:
         // command register
         m_lastCommand = value; // for future use
+
+        // only drive 0 for now
+        if (m_dev != 0)
+            break;
+
         switch (value) {
         case 0xEC:
             identify();
@@ -118,32 +209,17 @@ void AtaDrive::writeReg(int reg, uint16_t value)
 }
 
 
-uint16_t AtaDrive::readReg(int reg)
+uint16_t AtaDrive::readReg(int addr)
 {
-    reg &= 0x7;
+    writeControl(1, addr, true, false, false);
+    writeControl(1, addr, false, false, false);
+    return readData();
+}
 
-    switch(reg) {
-    case 0:
-        // data port
-        if (m_dataCounter) {
-            if (!m_prefilledData && !(m_dataCounter-- & 0xFF)) {
-                m_image->read(m_sectorBuf, 512);
-                m_dataPtr = m_sectorBuf;
-            }
-            uint16_t ret = *m_dataPtr++;
-            ret += *m_dataPtr++ << 8;
-            return ret;
-        }
-        return 0;
-    case 1:
-        // error register
-        return 0x00; // except diagnostic !
-    case 7:
-        // status register
-        return (m_image->getImagePresent() ? 0x40 : 0x20) | (m_dataCounter ? 0x08 : 0) | 0x10; // DRDY & DSC & DRQ if data transfer is active, DF if no disk
-    default:
-        return 0;
-    }
+
+uint8_t AtaDrive::readStatus()
+{
+    return (m_image->getImagePresent() ? 0x40 : 0x20) | (m_dataCounter ? 0x08 : 0) | (m_dev != 0 ? 0x80 : 0) | 0x10;
 }
 
 
@@ -179,7 +255,8 @@ void AtaDrive::identify()
 {
     memset(m_sectorBuf, 0, 512);
 
-    putWord(0, 0x0040);
+    //putWord(0, 0x0040);
+  putWord(0, 0x55aa);
     if (!m_lba) {
         putWord(1, m_cylinders);
         putWord(3, m_heads);
@@ -188,9 +265,12 @@ void AtaDrive::identify()
     putStr(10, "0000000000");
     putStr(23, "v.1.00");
     putStr(27, "Emu80 Virtual ATA Controller");
-    putWord(49, 0x0030);
-    putWord(50, 0x4000);
-    putWord(51, 0x0002);
+    //putWord(49, m_lba ? 0x0200 : 0);
+    //putWord(49, 0x030);
+    putWord(49, m_lba ? 0x0202 : 0);
+
+    //putWord(50, 0x4000);
+    //putWord(51, 0x0002);
 
     if (m_image->getImagePresent()) {
         uint32_t size = m_image->getSize() / 512;
@@ -203,7 +283,9 @@ void AtaDrive::identify()
     }
 
     m_dataPtr = m_sectorBuf;
-    m_dataCounter = 256;
+    m_dataReg = m_dataPtr[0] + (m_dataPtr[1] << 8);
+    //m_dataPtr += 2;
+    m_dataCounter = 256/* - 1*/;
     m_prefilledData = true;
 }
 
@@ -215,8 +297,8 @@ void AtaDrive::readSectors()
 
     seek();
 
-    m_dataCounter = 256 * m_sectorCount;
     m_prefilledData = false;
+    m_dataCounter = 256 * m_sectorCount;
 }
 
 

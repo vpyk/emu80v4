@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,20 +39,33 @@ class AtaDrive : public EmuObject
 
         void notify(EmuObject* sender, int data) override;
 
+        // low-level io methods
+        uint16_t readData();
+        void writeData(uint16_t value);
+        void writeControl(int cs, int addr, bool ior, bool iow, bool rst);
+
+        // hi-level io methods
         void writeReg(int addr, uint16_t value);
         uint16_t readReg(int addr);
+        uint8_t readStatus();
 
         void assignDiskImage(DiskImage* image);
 
         static EmuObject* create(const EmuValuesList&) {return new AtaDrive();}
 
     private:
-        //PalFile m_file;
-        //bool m_readOnly = false;
-        //std::string m_fileName = "";
         DiskImage* m_image = nullptr;
 
-        int m_dev = 0; // ignore for now
+        int m_cs = 0;
+        int m_addr = 0;
+        int m_rdData = 0xFFFF;
+        int m_wrData = 0;
+        int m_dataReg = 0;
+        bool m_ior = false;
+        bool m_iow = false;
+        bool m_reset = false;
+
+        int m_dev = 0;
         bool m_useLba = false;
         bool m_lba = true;
         int m_cylinders;

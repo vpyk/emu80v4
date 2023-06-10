@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ class PpiAtaAdapter : public Ppi8255Circuit
         void setPortA(uint8_t value) override; // port 50h
         void setPortB(uint8_t value) override; // port 51h
         void setPortC(uint8_t value) override; // port 52h
+        uint8_t getPortA() override {return 0xFF;}
         uint8_t getPortB() override; // port 51h
         uint8_t getPortC() override; // port 52h
 
@@ -44,8 +45,10 @@ class PpiAtaAdapter : public Ppi8255Circuit
         AtaDrive* m_ataDrive = nullptr;
 
         uint8_t m_portAValue = 0;
-        uint8_t m_portBValue = 0;
-        uint8_t m_portCValue = 0;
+        uint8_t m_portBWrValue = 0;
+        uint8_t m_portCWrValue = 0;
+        uint8_t m_portBRdValue = 0xFF;
+        uint8_t m_portCRdValue = 0xFF;
 };
 
 

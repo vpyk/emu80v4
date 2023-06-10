@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,57 +26,39 @@ using namespace std;
 
 void PpiAtaAdapter::setPortA(uint8_t value)
 {
-    if (m_ataDrive && (value & 0x80) && !(m_portAValue & 0x80)) {
-        //reset
-        m_ataDrive->reset();
-    return;
-    }
-
     int addr =  value & 7;
-    int cs0 = (value & 0x18) >> 3;
+    int cs = (value & 0x18) >> 3;
+    bool iow = value & 0x20;
+    bool ior = value & 0x40;
+    bool reset = value & 0x80;
 
-    if (cs0 != 1)
-        return; // device control and alternate status registers are not implemented
-
-    if ((value & 0x20) && !(m_portAValue & 0x20)) {
-        // write
-        if (m_ataDrive)
-            m_ataDrive->writeReg(addr, addr ? m_portCValue : m_portBValue << 8 | m_portCValue);
-    } else if ((value & 0x40) && !(m_portAValue & 0x40)) {
-        // read
-        if (m_ataDrive) {
-            uint16_t val = m_ataDrive->readReg(addr);
-            if (!addr)
-                m_portBValue = val >> 8;
-            m_portCValue = val & 0xFF;
-        }
-    }
-
-    m_portAValue = value;
+    m_ataDrive->writeControl(cs, addr, ior, iow, reset);
 }
 
 
 void PpiAtaAdapter::setPortB(uint8_t value)
 {
-    m_portBValue = value;
+    m_portBWrValue = value;
+    m_ataDrive->writeData(m_portBWrValue << 8 | m_portCWrValue);
 }
 
 
 void PpiAtaAdapter::setPortC(uint8_t value)
 {
-    m_portCValue = value;
+    m_portCWrValue = value;
+    m_ataDrive->writeData(m_portBWrValue << 8 | m_portCWrValue);
 }
 
 
 uint8_t PpiAtaAdapter::getPortB()
 {
-    return m_portBValue;
+    return m_ataDrive->readData() >> 8;
 }
 
 
 uint8_t PpiAtaAdapter::getPortC()
 {
-    return m_portCValue;
+    return m_ataDrive->readData() & 0xFF;
 }
 
 
