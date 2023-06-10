@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -53,18 +53,6 @@ class Ppi8255 : public AddressableDevice
 
         static EmuObject* create(const EmuValuesList&) {return new Ppi8255();}
 
-        /*
-        void setPortA(uint8_t bValue) {m_portA = bValue;}
-        void setPortB(uint8_t bValue) {m_portB = bValue;}
-        void setPortC(uint8_t bValue) {m_portC = bValue;}
-        uint8_t getPortA() {return m_portA;}
-        uint8_t getPortB() {return m_portB;}
-        uint8_t getPortC() {return m_portC;}
-        PpiChMode getChAMode() {return m_chAMode;}
-        PpiChMode getChBMode() {return m_chBMode;}
-        PpiChMode getChCHiMode() {return m_chCHiMode;}
-        PpiChMode getChCLowMode() {return m_chCLowMode;}
-        */
     private:
         // обвязка ВВ55
         Ppi8255Circuit* m_ppiCircuit = nullptr;

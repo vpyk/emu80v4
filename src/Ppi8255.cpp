@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,69 +59,70 @@ void Ppi8255::writeByte(int addr, uint8_t value)
 {
     addr &= 0x03;
     switch (addr) {
-        case 0:
-            if (m_chAMode == PCM_OUT) {
-                m_portA = value;
+    case 0:
+        if (m_chAMode == PCM_OUT) {
+            m_portA = value;
+            if (m_ppiCircuit)
+                m_ppiCircuit->setPortA(value);
+        }
+        break;
+    case 1:
+        if (m_chBMode == PCM_OUT) {
+            m_portB = value;
+            if (m_ppiCircuit)
+                m_ppiCircuit->setPortB(value);
+        }
+        break;
+    case 2:
+        if (m_chCHiMode == PCM_OUT)
+            m_portC = (m_portC & 0x0F) | (value & 0xF0);
+        if (m_chCLoMode == PCM_OUT)
+            m_portC = (m_portC & 0xF0) | (value & 0x0F);
+        if (m_ppiCircuit && (m_chCLoMode == PCM_OUT || m_chCHiMode == PCM_OUT))
+            m_ppiCircuit->setPortC(m_portC);
+        break;
+    default: //ctrl reg
+        if (!(value & 0x80)) {
+            int bit = (value & 0x0e) >> 1;
+            if ((bit < 4 && m_chCLoMode == PCM_OUT) || (bit >= 4 && m_chCHiMode == PCM_OUT)) {
+                uint8_t mask = ~(1 << bit);
+                m_portC &= mask;
+                m_portC |= ((value & 1) << bit);
                 if (m_ppiCircuit)
-                    m_ppiCircuit->setPortA(value);
-            }
-            break;
-        case 1:
-            if (m_chBMode == PCM_OUT) {
-                m_portB = value;
-                if (m_ppiCircuit)
-                    m_ppiCircuit->setPortB(value);
-            }
-            break;
-        case 2:
-            m_portC = value;
-            if (m_chCHiMode != PCM_OUT)
-                m_portC &= 0x0F;
-            if (m_chCLoMode != PCM_OUT)
-                m_portC &= 0xF0;
-            if (m_ppiCircuit && (m_chCLoMode == PCM_OUT || m_chCHiMode == PCM_OUT))
                     m_ppiCircuit->setPortC(m_portC);
-            break;
-        default: //ctrl reg
-            if (!(value & 0x80)) {
-                int bit = (value & 0x0e) >> 1;
-                if ((bit < 4 && m_chCLoMode == PCM_OUT) || (bit >= 4 && m_chCHiMode == PCM_OUT)) {
-                    uint8_t mask = ~(1 << bit);
-                    m_portC &= mask;
-                    m_portC |= ((value & 1) << bit);
-                    if (m_ppiCircuit)
-                        m_ppiCircuit->setPortC(m_portC);
-                }
-            } else if (!(value & 0x40)) {
-                // установка режима, недвунаправленный режим
-                m_portA = 0x0;
-                m_portB = 0x0;
-                m_portC = 0x0;
+            }
+        } else if (!(value & 0x40)) {
+            // установка режима, недвунаправленный режим
+            m_portA = 0x0;
+            m_portB = 0x0;
+            m_portC = 0x0;
 
-                m_chAMode = value & 0x10 ? PCM_IN : PCM_OUT;
-                m_chBMode = value & 0x02 ? PCM_IN : PCM_OUT;
-                m_chCHiMode = value & 0x08 ? PCM_IN : PCM_OUT;
-                m_chCLoMode = value &0x01 ? PCM_IN : PCM_OUT;
-                // режимы 0 и 1 пока не различаются
+            m_chAMode = value & 0x10 ? PCM_IN : PCM_OUT;
+            m_chBMode = value & 0x02 ? PCM_IN : PCM_OUT;
+            m_chCHiMode = value & 0x08 ? PCM_IN : PCM_OUT;
+            m_chCLoMode = value &0x01 ? PCM_IN : PCM_OUT;
+            // режимы 0 и 1 пока не различаются
 
-                if (m_ppiCircuit) {
-                    m_ppiCircuit->setPortAMode(m_chAMode == PCM_IN);
+            if (m_ppiCircuit) {
+                m_ppiCircuit->setPortAMode(m_chAMode == PCM_IN);
+                if (m_chAMode == PCM_OUT)
                     m_ppiCircuit->setPortA(0);
 
-                    m_ppiCircuit->setPortBMode(m_chBMode == PCM_IN);
+                m_ppiCircuit->setPortBMode(m_chBMode == PCM_IN);
+                if (m_chBMode == PCM_OUT)
                     m_ppiCircuit->setPortB(0);
 
-                    m_ppiCircuit->setPortCLoMode(m_chCLoMode == PCM_IN);
-                    m_ppiCircuit->setPortCHiMode(m_chCHiMode == PCM_IN);
-                    m_ppiCircuit->setPortC(0);
-                }
-            }  else {
-                // двунаправленный режим, пока просто сброс значений регистров
-                m_portA = 0x0;
-                m_portB = 0x0;
-                m_portC = 0x0;
+                m_ppiCircuit->setPortCLoMode(m_chCLoMode == PCM_IN);
+                m_ppiCircuit->setPortCHiMode(m_chCHiMode == PCM_IN);
+                if (m_chAMode == PCM_OUT || m_chBMode == PCM_OUT)
+                    m_ppiCircuit->setPortC(0); // если на вывод толко половина порта, может быть не совсем корректно
             }
-
+        }  else {
+            // двунаправленный режим, пока просто сброс значений регистров
+            m_portA = 0x0;
+            m_portB = 0x0;
+            m_portC = 0x0;
+        }
     }
 }
 
@@ -131,27 +132,32 @@ uint8_t Ppi8255::readByte(int addr)
 {
     addr &= 3;
     switch (addr) {
-        case 0:
-            if (m_chAMode == PCM_IN)
-                m_portA = m_ppiCircuit ? m_ppiCircuit->getPortA() : 0;
-            return m_portA;
-        case 1:
-            if (m_chBMode == PCM_IN)
-                m_portB = m_ppiCircuit ? m_ppiCircuit->getPortB() : 0;
-            return m_portB;
-        case 2:
-            if (m_chCLoMode == PCM_IN || m_chCHiMode == PCM_IN) {
-                uint8_t portC = m_ppiCircuit ? m_ppiCircuit->getPortC() : 0;
-                if (m_chCLoMode == PCM_IN)
-                    m_portC = (m_portC & 0xf0) | (portC & 0x0f);
-                if (m_chCHiMode == PCM_IN)
-                    m_portC = (m_portC & 0x0f) | (portC & 0xf0);
-            }
-            return m_portC;
-
-        default:
-            // ctrl reg
-            return 0xFF; // undefined
+    case 0: {
+        uint8_t portA = m_portA;
+        if (m_chAMode == PCM_IN)
+            portA = m_ppiCircuit ? m_ppiCircuit->getPortA() : 0;
+        return portA;
+    }
+    case 1: {
+        uint8_t portB = m_portB;
+        if (m_chBMode == PCM_IN)
+            portB = m_ppiCircuit ? m_ppiCircuit->getPortB() : 0;
+        return portB;
+    }
+    case 2: {
+        uint8_t portC = m_portC;
+        if (m_chCLoMode == PCM_IN || m_chCHiMode == PCM_IN) {
+            uint8_t val = m_ppiCircuit ? m_ppiCircuit->getPortC() : 0;
+            if (m_chCLoMode == PCM_IN)
+                portC = (portC & 0xf0) | (val & 0x0f);
+            if (m_chCHiMode == PCM_IN)
+                portC = (portC & 0x0f) | (val & 0xf0);
+        }
+        return portC;
+    }
+    default:
+        // ctrl reg
+        return 0xFF; // undefined
     }
 }
 
