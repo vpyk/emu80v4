@@ -41,8 +41,10 @@ void AtaDrive::assignDiskImage(DiskImage* image)
 {
     m_image = image;
 
-    if (image)
+    if (image) {
         image->setOwner(this);
+        m_rdData = m_image->getImagePresent() ? 0xFFFF : 0;
+    }
 }
 
 
@@ -50,7 +52,7 @@ void AtaDrive::reset()
 {
     m_cs = 0;
     m_addr = 0;
-    m_rdData = 0xFFFF;
+    m_rdData = m_image->getImagePresent() ? 0xFFFF : 0;
     m_wrData = 0;
     m_dataReg = 0;
     m_ior = false;
@@ -96,7 +98,7 @@ void AtaDrive::writeControl(int cs, int addr, bool ior, bool iow, bool rst)
         reset();
 
     if (m_cs == 0 || m_cs == 3)
-        m_rdData = 0xFFFF;
+        m_rdData = m_image->getImagePresent() ? 0xFFFF : 0;
 
     if (!m_ior && ior && addr == 0 && cs == 1) {
         if (m_dataCounter) {
@@ -108,7 +110,7 @@ void AtaDrive::writeControl(int cs, int addr, bool ior, bool iow, bool rst)
             m_dataPtr += 2;
             m_dataCounter--;
         } else
-            m_dataReg = m_rdData = 0xFFFF;
+            m_dataReg = m_rdData = m_image->getImagePresent() ? 0xFFFF : 0;
         }
 
     if (ior) {
@@ -121,10 +123,10 @@ void AtaDrive::writeControl(int cs, int addr, bool ior, bool iow, bool rst)
             break;
         case 7:
             // status register
-            m_rdData = (m_image->getImagePresent() ? 0x40 : 0x20) | (m_dataCounter ? 0x08 : 0) | (m_dev != 0 ? 0x80 : 0) | 0x10; // DRDY & DSC & DRQ if data transfer is active, DF if no disk
+            m_rdData = readStatus();
             break;
         default:
-            m_rdData = 0xFFFF;
+            m_rdData = m_image->getImagePresent() ? 0xFFFF : 0;
             break;
         }
     }
@@ -219,7 +221,10 @@ uint16_t AtaDrive::readReg(int addr)
 
 uint8_t AtaDrive::readStatus()
 {
-    return (m_image->getImagePresent() ? 0x40 : 0x20) | (m_dataCounter ? 0x08 : 0) | (m_dev != 0 ? 0x80 : 0) | 0x10;
+    if (m_dev != 0)
+        return 0;
+
+    return (m_image->getImagePresent() ? 0x40 : 0x20) | (m_dataCounter ? 0x08 : 0) | 0x10;
 }
 
 
@@ -360,7 +365,10 @@ void AtaDrive::setVectorGeometry()
 
 void AtaDrive::notify(EmuObject* sender, int data)
 {
-    if (sender == m_image && data == DISKIMAGE_NOTIFY_FILEOPENED) {
+    if (sender != m_image) // just in case
+        return;
+
+    if (data == DISKIMAGE_NOTIFY_FILEOPENED) {
         if (m_image->getImagePresent()) {
             int64_t size = m_image->getSize();
             size /= 512;
@@ -370,5 +378,7 @@ void AtaDrive::notify(EmuObject* sender, int data)
             if (m_vectorGeometry)
                 setVectorGeometry();
         }
-    }
+        m_rdData = 0xFFFF;
+    } else if (data == DISKIMAGE_NOTIFY_FILECLOSED)
+        m_rdData = 0;
 }

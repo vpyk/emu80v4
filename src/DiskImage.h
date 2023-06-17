@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 
 const int DISKIMAGE_NOTIFY_FILEOPENED = 1;
+const int DISKIMAGE_NOTIFY_FILECLOSED = 2;
 
 class DiskImage : public EmuObject
 {
@@ -90,6 +91,9 @@ class FdImage : public DiskImage
 
         void writeNextByte(uint8_t bt);
         void writeByte(int offset, uint8_t bt);
+
+        int getSectors() {return m_nSectors;}
+        int getSectorSize() {return m_sectorSize;}
 
         static EmuObject* create(const EmuValuesList& parameters) {return new FdImage(parameters[0].asInt(), parameters[1].asInt(), parameters[2].asInt(), parameters[3].asInt());} // add check!
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -55,8 +55,12 @@ bool DiskImage::assignFileName(string fileName)
 
     reset();
 
-    if (m_file.isOpen() && m_owner)
-        m_owner->notify(this, DISKIMAGE_NOTIFY_FILEOPENED);
+    if (m_owner) {
+        if (m_file.isOpen())
+            m_owner->notify(this, DISKIMAGE_NOTIFY_FILEOPENED);
+        else
+            m_owner->notify(this, DISKIMAGE_NOTIFY_FILECLOSED);
+    }
 
     return m_file.isOpen();
 }
