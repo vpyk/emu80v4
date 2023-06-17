@@ -120,7 +120,10 @@ ifdef HDD
   DiskImage hdd
   hdd.label = HDD
   hdd.filter = "Образы HDD DSDOS (*.ohi,*.hdd;*.img)|*.ohi,*.OHI,*.hdd;*.HDD;*.img;*.IMG|Все файлы (*.*)|*"
-  hdd.fileName = @HDD_IMAGE
+
+  ifdef HDD_IMAGE
+    hdd.fileName = @HDD_IMAGE
+  endif
 
   AtaDrive ataDrive
   ataDrive.geometry = lba
