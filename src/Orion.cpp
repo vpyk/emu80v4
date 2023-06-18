@@ -249,7 +249,7 @@ bool OrionMemPageSelector::setProperty(const string& propertyName, const EmuValu
         return true;
     } else if (propertyName == "bits") {
         int bits = values[0].asInt();
-        m_mask = ((1 << bits) - 1 & 0xFF);
+        m_mask = (((1 << bits) - 1) & 0xFF);
     }
 
     return false;
