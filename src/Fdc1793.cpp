@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ Fdc1793::Fdc1793()
     m_directionIn = true; // направление движения true=in, false=out
 
     m_addressIdCnt = 0;
+    m_writeTrackCnt = 0;
 
     for (int i = 0; i < MAX_DRIVES; i++)
         m_images[i] = nullptr;
@@ -154,9 +155,14 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                         break;
                     m_images[m_disk]->setCurHead(m_head);
                     m_images[m_disk]->setCurTrack(m_track);
-                    m_images[m_disk]->startSectorAccess(m_sector - 1);
-                    m_accessMode = FAM_READING;
-                    m_status = 0x03;
+                    if (m_sector <= m_images[m_disk]->getSectors()) {
+                        m_images[m_disk]->startSectorAccess(m_sector - 1);
+                        m_accessMode = FAM_READING;
+                        m_status = 0x03;
+                    } else {
+                        m_accessMode = FAM_WAITING;
+                        m_status = 0x10;
+                    }
                     break;
                 case 0xA:
                 case 0xB:
@@ -169,9 +175,14 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     }
                     m_images[m_disk]->setCurHead(m_head);
                     m_images[m_disk]->setCurTrack(m_track);
-                    m_images[m_disk]->startSectorAccess(m_sector - 1);
-                    m_accessMode = FAM_WRITING;
-                    m_status = 0x03;
+                    if (m_sector < m_images[m_disk]->getSectors()) {
+                        m_images[m_disk]->startSectorAccess(m_sector - 1);
+                        m_accessMode = FAM_WRITING;
+                        m_status = 0x03;
+                    } else {
+                        m_accessMode = FAM_WAITING;
+                        m_status = 0x80;
+                    }
                     break;
                 case 0xC:
                     // read address
@@ -194,6 +205,18 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     m_addressIdCnt = 0;
                     m_status = 0x01;
                     break;
+                case 0xF:
+                    // write track
+                    m_accessMode = FAM_WRITING;
+                    m_wrTrackState = WTS_NO_WR;
+                    m_writeTrackCnt = 0;
+                    m_indexDataValid = false;
+                    for (int i = 0; i < 4; i++)
+                        m_indexData[i] = 0;
+                    m_indexDataCnt = 0;
+                    m_writeTrackCnt = 0;
+                    m_status = 0x03;
+                    break;
             }
             break;
         case 1:
@@ -209,20 +232,89 @@ void Fdc1793::writeByte(int addr, uint8_t value)
             m_data = value;
             //m_status &= ~2;
             if (m_images[m_disk] && m_accessMode == FAM_WRITING) {
-                m_images[m_disk]->writeNextByte(m_data);
-                if (!m_images[m_disk]->getReadyStatus()) {
-                    if (m_lastCommand == 0xB) {
-                        m_images[m_disk]->startSectorAccess(m_sector++);
+                if (m_lastCommand == 0xF) {
+                    // write track
+                    if (writeTrackByte(m_data))
                         m_status = 0x03;
-                    }
                     else {
                         m_accessMode = FAM_WAITING;
                         m_status = 0x00;
+                        generateInt();
+                    }
+                } else {
+                    m_images[m_disk]->writeNextByte(m_data);
+                    if (!m_images[m_disk]->getReadyStatus()) {
+                        if (m_lastCommand == 0xB) {
+                            m_images[m_disk]->startSectorAccess(m_sector++);
+                            m_status = 0x03;
+                        }
+                        else {
+                            m_accessMode = FAM_WAITING;
+                            m_status = 0x00;
+                        }
                     }
                 }
             }
             break;
     }
+}
+
+
+bool Fdc1793::writeTrackByte(uint8_t val)
+{
+    if (val == 0xFE) {
+        // ID Address Mark
+        m_wrTrackState = WTS_WR_ID;
+    }
+    else if (val == 0xFB) {
+        // Data Address Mark
+        m_wrTrackState = WTS_WR_DATA;
+    }
+    else if (val == 0xF7)
+        m_writeTrackCnt++;
+    else {
+        switch (m_wrTrackState) {
+        case WTS_WR_ID:
+            m_indexData[m_indexDataCnt++] = val;
+            if (m_indexDataCnt >= 4) {
+                m_indexDataCnt = 0;
+                int track = m_indexData[0];
+                int side = m_indexData[1];
+                int sector = m_indexData[2];
+                int sectorSize = 128 << (m_indexData[3] & 3);
+                m_indexDataValid = m_images[m_disk] &&
+                        (track == m_track) &&
+                        (side == m_head) &&
+                        (sectorSize == m_images[m_disk]->getSectorSize()) &&
+                        (sector <= m_images[m_disk]->getSectors());
+                if (m_indexDataValid) {
+                    m_images[m_disk]->setCurHead(m_head);
+                    m_images[m_disk]->setCurTrack(m_track);
+                    m_images[m_disk]->startSectorAccess(sector - 1);
+                }
+                m_wrTrackState = WTS_NO_WR;
+                m_sectorDataCnt = 0;
+            }
+            break;
+        case WTS_WR_DATA:
+            if (m_images[m_disk] && m_indexDataValid) {
+                m_images[m_disk]->writeNextByte(val);
+                if (++m_sectorDataCnt == m_images[m_disk]->getSectorSize()) {
+                    m_sectorDataCnt = 0;
+                    m_indexDataValid = false;
+                    m_wrTrackState = WTS_NO_WR;
+                }
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (++m_writeTrackCnt >= 6125/*5208*/)
+        return false;
+
+    return true;
 }
 
 
@@ -306,6 +398,25 @@ uint8_t Fdc1793::readByte(int addr)
                                 m_status = 0x06;
                         }
                     }
+                    break;
+                case 0xF:
+                    if (m_dma && m_accessMode == FAM_WRITING) {
+                        m_status = 0;
+                        m_accessMode = FAM_WAITING;
+                        while (m_images[m_disk]->getReadyStatus()) {
+                            if (!m_dma->dmaRequest(m_dmaChannel, m_data)) {
+                                m_status = 0x06;
+                                continue;
+                            }
+                            if (writeTrackByte(m_data))
+                                m_status = 0x03;
+                            else {
+                                m_accessMode = FAM_WAITING;
+                                m_status = 0x00;
+                            }
+                        }
+                    }
+                    break;
             }
             return res;
         }

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,13 @@ class Fdc1793 : public AddressableDevice
         FAM_WRITING
     };
 
-    public:
+    enum WriteTrackState {
+        WTS_NO_WR,
+        WTS_WR_ID,
+        WTS_WR_DATA
+    };
+
+public:
         Fdc1793();
         virtual ~Fdc1793();
 
@@ -90,6 +96,14 @@ class Fdc1793 : public AddressableDevice
 
         int m_addressIdCnt = 0;
         uint8_t m_addressId[6];
+
+        int m_writeTrackCnt = 0;
+        WriteTrackState m_wrTrackState;
+        bool m_indexDataValid = false;
+        uint8_t m_indexData[4];
+        int m_indexDataCnt = 0;
+        int m_sectorDataCnt = 0;
+        bool writeTrackByte(uint8_t val);
 
         void generateInt();
 };
