@@ -261,7 +261,6 @@ void AtaDrive::identify()
     memset(m_sectorBuf, 0, 512);
 
     //putWord(0, 0x0040);
-  putWord(0, 0x55aa);
     if (!m_lba) {
         putWord(1, m_cylinders);
         putWord(3, m_heads);
