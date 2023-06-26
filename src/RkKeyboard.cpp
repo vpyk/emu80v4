@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -215,4 +215,39 @@ uint16_t Ms7007Keyboard::getMatrixData()
     }
 
     return ~val;
+}
+
+
+void KrKeyboard::processKey(EmuKey key, bool isPressed)
+{
+    switch(key) {
+    case EK_LF:
+        key = EK_HELP;
+        break;
+    case EK_HOME:
+        key = EK_EXEC;
+        break;
+    case EK_CLEAR:
+        key = EK_RESET;
+        break;
+    case EK_LAT:
+        key = EK_LANG;
+        break;
+    case EK_RUS:
+        key = EK_GRAPH;
+        break;
+    case EK_VR:
+        key = EK_FIX;
+        break;
+    case EK_NP_CR:
+        key = EK_NP_COMMA;
+        break;
+    case EK_NP_COMMA:
+        key = EK_NP_CR;
+        break;
+    default:
+        break;
+    }
+
+    Ms7007Keyboard::processKey(key, isPressed);
 }

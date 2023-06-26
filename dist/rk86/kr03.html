@@ -6,467 +6,25 @@
     <title></title>
   </head>
   <body>
-    <h2>Электроника КР-04. Краткая справка</h2>
+    <h2>Электроника КР-03. Краткая справка</h2>
     <h3>Общие сведения</h3>
-    <p>При старте ПК «Электроника КР-04» предлагается выбрать один из 4 режимов
-      работы — 48K/40, 48K/80, 16K/64, 32K/64. Первые два используют цветной
-      графический режим и совместимы с РК-86 только на уровне вызовов Монитора,
-      вторые два совместимы с РК-86 в конфигурациях с соответственно 16 и 32
-      КБайт памяти. Программы, написанные специально для КР-04, самостоятельно
-      переключают режим либо работают в любом режиме. Однако при загрузке
-      программ для РК-86 следует при необходимости предварительно выбирать при
-      запуске необходимый режим. Для «родных» файлов КР-04 предлагается
-      использовать расширение «.rk4».</p>
-    <h3>Загрузка с использованием перехватов магнитофонных операций</h3>
-    <p>В ответ на приглашение Монитора «--&gt;» нужно набрать «I&lt;Enter&gt;» и
-      выбрать файл. В случае успешной загрузки Монитор отображает столбец из 3
-      цифр - начального адреса, конечного и контрольной суммы. После загрузки
-      запуск обычно осуществляется с помощью директивы G Монитора
-      («G&lt;Enter&gt;»). В случае запуска не с нулевого адреса в директиве G
-      можно указать адрес запуска, например: «G100&lt;Enter&gt;». Этим способом
-      можно также загружать .wav и .csw-файлы.</p>
-    <h3></h3>
-    <h3>Загрузка файлов с помощью встроенного загрузчика</h3>
-    <p>Двоичные файлы образов ленты «.rkr, .rk4, .rk» можно загружать с помощью
-      пункта меню «Файл -&gt; Загрузить и выполнить», комбинации клавиш Alt-F3
-      (Meta-F3), либо соответствующей кнопки на панели инструментов. Можно также
-      просто перетащить нужный файл в окно эмулятора. При этом в текущей версии
-      эмулятора всегда используется режим 32K/64, так как именно в этом режиме
-      работают большинство файлов для РК-86. В случае необходимости загружать
-      файлы РК-86 в другом режиме, следует предварительно выбрать режим и
-      использоватьдирективу «I» (см. предыдущий пункт).</p>
-    <h3>Работа с SD-контроллером (по схеме vinxru)</h3>
-    <p>В конфигурации с SD-контроллером эмулируется SD-карта, содержащая
-      некоторые программы, разработанных для этого ПК. Для загрузки оболочки
-      необходимо выполнить директивы Монитора «R,FF&lt;Enter&gt;G&lt;Enter&gt;».
-      Далее выбор и запуск файла осуществляется с помощью клавиш управления
-      курсором. Для включения или выключения поддержки SD-контроллера, а также
-      для выбора директории SD-карты используется комбинация клавиш Alt-F8
-      (Meta-F8) или соответствующая кнопка на панели инструментов.</p>
-    <h3>Соответствие клавиш и раскладки клавиатуры</h3>
-    <p>По умолчанию для КР-04 установлена «умная» раскладка клавиатуры, ввод
-      буквенно-цифровых символов в большинстве приложений при этом производится
-      как обычно, раскладка переключается средствами ОС, в которой запущен
-      эмулятор. Для работы с приложениями, использующими строчные буквы
-      (например, текстовым редактором, идущим в комплекте), лучше использовать
-      QWERTY и ЙЦУКЕН-раскладки.</p>
+    <p>ПК «Электроника КР-03» представляет собой «Радио-86РК» с клавиатурой
+      МС7007 и соответствующими изменениями в Мониторе. В данной конфигурации
+      реализован вариант с SD-контроллером по схеме vinxru. Для получения более
+      подробной информации см. <a href="rk86.html">раздел справки по
+        «Радио-86РК»</a>.</p>
+    <h3>Соответствие клавиш КР-03 и раскладки клавиатуры </h3>
+    <p>Для КР-03 не реализована «умная» раскладка клавиатуры, рекомендуется
+      использовать QWERTY и ЙЦУКЕН-раскладки.</p>
+    <p>В отличие от РК-86 в КР-03 испольуются отдельные клавиши для переключения
+      латинского и русского алфавитов, а также верхнего и нижнего регистров.</p>
+    <p>Клавиша НР (Shift на клавиатуре PC) используется для включения режима
+      ввода специальных символов (#$% и т. п.), для выключения этого режима
+      служит клавиша ВР (Menu на клавиатуре PC). Для переключения в режим ввода
+      латинских и русских букв используются клавиш ЛАТ и РУС соответственно (Ins
+      и Del на клавиатуре PC). Клавиша УПР (Ctrl) включает режим ввода
+      управляющих символов, отключается этот режим одной из клавиш РУС или ЛАТ.</p>
     <p> Раскладки клавиатуры в различных режимах:</p>
-    <h4>«Умная» раскладка:</h4>
-    <table class="kbd">
-      <tbody>
-        <tr>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-        </tr>
-        <tr>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="6">АР2</td>
-          <td colspan="6" class="blank">&nbsp;<br>
-            &nbsp;</td>
-          <td colspan="6">F1</td>
-          <td colspan="6">F2</td>
-          <td colspan="6">F3</td>
-          <td colspan="6">F4</td>
-          <td colspan="3" class="blank"><br>
-          </td>
-          <td colspan="6">K5</td>
-          <td colspan="6" class="unused">F6</td>
-          <td colspan="6" class="unused">F7</td>
-          <td colspan="6">ВР</td>
-          <td colspan="3" class="blank"><br>
-          </td>
-          <td colspan="6">
-            <div align="right">зб&nbsp;</div>
-            <div align="left">&nbsp;_</div>
-          </td>
-          <td colspan="6" class="unused">F10</td>
-          <td colspan="6" class="unused">F11</td>
-          <td colspan="6" class="unused">F12</td>
-          <td colspan="2" class="blank"><br>
-          </td>
-          <td colspan="6" class="unused">PS</td>
-          <td colspan="6" class="unused">S/L</td>
-          <td colspan="6" class="special">Ps</td>
-          <td colspan="8" class="blank"><br>
-          </td>
-          <td colspan="18" class="title"> <b>Эл-ка КР-04</b><br>
-            (smart) </td>
-        </tr>
-        <tr>
-          <td class="blank">&nbsp;</td>
-        </tr>
-        <tr>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="6" class="unused">
-            <div align="right">Ё&nbsp;</div>
-            <div align="left">&nbsp;`&nbsp;~</div>
-          </td>
-          <td colspan="6">
-            <div align="right">!&nbsp;</div>
-            <div align="left">&nbsp;1</div>
-          </td>
-          <td colspan="6">
-            <div align="right">@&nbsp;"&nbsp;</div>
-            <div align="left">&nbsp;2</div>
-          </td>
-          <td colspan="6">
-            <div align="right">#&nbsp;</div>
-            <div align="left">&nbsp;3</div>
-          </td>
-          <td colspan="6">
-            <div align="right">¤&nbsp;</div>
-            <div align="left">&nbsp;4</div>
-          </td>
-          <td colspan="6">
-            <div align="right">%&nbsp;</div>
-            <div align="left">&nbsp;5</div>
-          </td>
-          <td colspan="6">
-            <div align="right">^&nbsp;</div>
-            <div align="left">&nbsp;6</div>
-          </td>
-          <td colspan="6">
-            <div align="right">'&nbsp;?&nbsp;</div>
-            <div align="left">&nbsp;7</div>
-          </td>
-          <td colspan="6">
-            <div align="right">*&nbsp;</div>
-            <div align="left">&nbsp;8</div>
-          </td>
-          <td colspan="6">
-            <div align="right">(&nbsp;</div>
-            <div align="left">&nbsp;9</div>
-          </td>
-          <td colspan="6">
-            <div align="right">)&nbsp;</div>
-            <div align="left">&nbsp;0</div>
-          </td>
-          <td colspan="6">
-            <div align="right">_&nbsp;</div>
-            <div align="left">&nbsp;-</div>
-          </td>
-          <td colspan="6">
-            <div align="right">+&nbsp;</div>
-            <div align="left">&nbsp;=</div>
-          </td>
-          <td colspan="12">ЗБ</td>
-          <td colspan="2" class="blank">&nbsp;</td>
-          <td colspan="6">ЛАТ</td>
-          <td colspan="6">↖</td>
-          <td colspan="6">СБР</td>
-          <td colspan="2" class="blank"><br>
-          </td>
-          <td colspan="6" class="special">N/L</td>
-          <td colspan="6">,</td>
-          <td colspan="6" class="unused">*</td>
-          <td colspan="6">-</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-        </tr>
-        <tr>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="9">ТАБ</td>
-          <td colspan="6">
-            <div align="right">Й&nbsp;</div>
-            <div align="left">&nbsp;Q</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Ц&nbsp;</div>
-            <div align="left">&nbsp;W</div>
-          </td>
-          <td colspan="6">
-            <div align="right">У&nbsp;</div>
-            <div align="left">&nbsp;E</div>
-          </td>
-          <td colspan="6">
-            <div align="right">К&nbsp;</div>
-            <div align="left">&nbsp;R</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Е&nbsp;</div>
-            <div align="left">&nbsp;T</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Н&nbsp;</div>
-            <div align="left">&nbsp;Y</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Г&nbsp;</div>
-            <div align="left">&nbsp;U</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Ш&nbsp;</div>
-            <div align="left">&nbsp;I</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Щ&nbsp;</div>
-            <div align="left">&nbsp;O</div>
-          </td>
-          <td colspan="6">
-            <div align="right">З&nbsp;</div>
-            <div align="left">&nbsp;P</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Х&nbsp;</div>
-            <div align="left">&nbsp;[</div>
-          </td>
-          <td colspan="6">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;]</div>
-          </td>
-          <td colspan="9">
-            <div align="right">Э&nbsp;&nbsp;</div>
-            <div align="left">&nbsp;\</div>
-          </td>
-          <td colspan="2" class="blank">&nbsp;<br>
-            &nbsp;</td>
-          <td colspan="6">РУС</td>
-          <td colspan="6" class="special">Spd</td>
-          <td colspan="6">ПС</td>
-          <td colspan="2" class="blank"><br>
-          </td>
-          <td colspan="6">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;7</div>
-          </td>
-          <td colspan="6">
-            <div align="right">↑&nbsp;</div>
-            <div align="left">&nbsp;8</div>
-          </td>
-          <td colspan="6">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;9</div>
-          </td>
-          <td colspan="6" rowspan="2">+</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-        </tr>
-        <tr>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="10" class="unused">C/L</td>
-          <td colspan="6">
-            <div align="right">Ф&nbsp;</div>
-            <div align="left">&nbsp;A</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Ы&nbsp;</div>
-            <div align="left">&nbsp;S</div>
-          </td>
-          <td colspan="6">
-            <div align="right">В&nbsp;</div>
-            <div align="left">&nbsp;D</div>
-          </td>
-          <td colspan="6">
-            <div align="right">А&nbsp;</div>
-            <div align="left">&nbsp;F</div>
-          </td>
-          <td colspan="6">
-            <div align="right">П&nbsp;</div>
-            <div align="left">&nbsp;G</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Р&nbsp;</div>
-            <div align="left">&nbsp;H</div>
-          </td>
-          <td colspan="6">
-            <div align="right">О&nbsp;</div>
-            <div align="left">&nbsp;J</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Л&nbsp;</div>
-            <div align="left">&nbsp;K</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Д&nbsp;</div>
-            <div align="left">&nbsp;L</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Ж&nbsp;+</div>
-            <div align="left">&nbsp;:&nbsp;;</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Э&nbsp;</div>
-            <div align="left">&nbsp;"&nbsp;'</div>
-          </td>
-          <td colspan="14">ВК</td>
-          <td colspan="22" class="blank">&nbsp;<br>
-            &nbsp;</td>
-          <td colspan="6">
-            <div align="right">←&nbsp;</div>
-            <div align="left">&nbsp;4</div>
-          </td>
-          <td colspan="6">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;5</div>
-          </td>
-          <td colspan="6">
-            <div align="right">→&nbsp;</div>
-            <div align="left">&nbsp;6</div>
-          </td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-        </tr>
-        <tr>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="14">НР</td>
-          <td colspan="6">
-            <div align="right">Я&nbsp;</div>
-            <div align="left">&nbsp;Z</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Ч&nbsp;</div>
-            <div align="left">&nbsp;X</div>
-          </td>
-          <td colspan="6">
-            <div align="right">С&nbsp;</div>
-            <div align="left">&nbsp;C</div>
-          </td>
-          <td colspan="6">
-            <div align="right">М&nbsp;</div>
-            <div align="left">&nbsp;V</div>
-          </td>
-          <td colspan="6">
-            <div align="right">И&nbsp;</div>
-            <div align="left">&nbsp;B</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Т&nbsp;</div>
-            <div align="left">&nbsp;N</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Ь&nbsp;</div>
-            <div align="left">&nbsp;M</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Б&nbsp;</div>
-            <div align="left">&nbsp;&lt;&nbsp;,</div>
-          </td>
-          <td colspan="6">
-            <div align="right">Ю&nbsp;</div>
-            <div align="left">&nbsp;&gt;&nbsp;.</div>
-          </td>
-          <td colspan="6">
-            <div align="right">.&nbsp;,&nbsp;</div>
-            <div align="left">&nbsp;?&nbsp;/</div>
-          </td>
-          <td colspan="16">НР</td>
-          <td colspan="8" class="blank">&nbsp;<br>
-            &nbsp;</td>
-          <td colspan="6">↑</td>
-          <td colspan="8" class="blank">&nbsp;<br>
-            &nbsp;</td>
-          <td colspan="6">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;1</div>
-          </td>
-          <td colspan="6">
-            <div align="right">↓&nbsp;</div>
-            <div align="left">&nbsp;2</div>
-          </td>
-          <td colspan="6">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;3</div>
-          </td>
-          <td colspan="6" rowspan="2">ВК</td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-        </tr>
-        <tr>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-          <td colspan="9">УПР</td>
-          <td colspan="7" class="special">Meta</td>
-          <td colspan="7" class="special">Alt</td>
-          <td colspan="37">Пробел</td>
-          <td colspan="7" class="special">Alt</td>
-          <td colspan="7" class="special">Meta</td>
-          <td colspan="7">ВР</td>
-          <td colspan="9">УПР</td>
-          <td colspan="2" class="blank">&nbsp;<br>
-            &nbsp;</td>
-          <td colspan="6">←</td>
-          <td colspan="6">↓</td>
-          <td colspan="6">→</td>
-          <td colspan="2" class="blank">&nbsp;<br>
-            &nbsp;</td>
-          <td colspan="12">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;0</div>
-          </td>
-          <td colspan="6">
-            <div align="right">&nbsp;</div>
-            <div align="left">&nbsp;.</div>
-          </td>
-          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
-        </tr>
-        <tr>
-          <td class="blank">&nbsp;</td>
-        </tr>
-      </tbody>
-    </table>
     <h4>Раскладка QWERTY:</h4>
     <table class="kbd">
       <tbody>
@@ -559,10 +117,7 @@
           <td colspan="6">ВР</td>
           <td colspan="3" class="blank"><br>
           </td>
-          <td colspan="6">
-            <div align="right">зб&nbsp;</div>
-            <div align="left">&nbsp;_</div>
-          </td>
+          <td colspan="6">Sp</td>
           <td colspan="6" class="unused">F10</td>
           <td colspan="6" class="unused">F11</td>
           <td colspan="6" class="unused">F12</td>
@@ -573,7 +128,7 @@
           <td colspan="6" class="special">Ps</td>
           <td colspan="8" class="blank"><br>
           </td>
-          <td colspan="18" class="title"> <b>Эл-ка КР-04</b><br>
+          <td colspan="18" class="title"> <b>Эл-ка КР-03</b><br>
             (qwerty) </td>
         </tr>
         <tr>
@@ -975,10 +530,7 @@
           <td colspan="6">ВР</td>
           <td colspan="3" class="blank"><br>
           </td>
-          <td colspan="6">
-            <div align="right">зб&nbsp;</div>
-            <div align="left">&nbsp;_</div>
-          </td>
+          <td colspan="6">Sp</td>
           <td colspan="6" class="unused">F10</td>
           <td colspan="6" class="unused">F11</td>
           <td colspan="6" class="unused">F12</td>
@@ -989,7 +541,7 @@
           <td colspan="6" class="special">Ps</td>
           <td colspan="8" class="blank"><br>
           </td>
-          <td colspan="18" class="title"> <b>Эл-ка КР-04</b><br>
+          <td colspan="18" class="title"> <b>Эл-ка КР-03</b><br>
             (йцукен) </td>
         </tr>
         <tr>

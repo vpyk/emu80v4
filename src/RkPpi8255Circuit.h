@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 class GeneralSoundSource;
 class RkKeyboard;
+class KrKeyboard;
 
 
 // Обвязка основного ВВ55 в РК86, Апогее и Орионе
@@ -52,6 +53,33 @@ class RkPpi8255Circuit : public Ppi8255Circuit
 
         // Клавиатура типа РК86
         RkKeyboard* m_kbd = nullptr;
+};
+
+
+class Kr03Ppi8255Circuit : public Ppi8255Circuit
+{
+public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        // derived from Ppi8255Circuit
+        uint8_t getPortB() override;
+        uint8_t getPortC() override;
+        void setPortA(uint8_t value) override;
+        void setPortC(uint8_t value) override;
+
+        // Подключение объекта - клавиатуры
+        void attachKeyboard(KrKeyboard* kbd);
+
+        static EmuObject* create(const EmuValuesList&) {return new Kr03Ppi8255Circuit();}
+
+    private:
+        // Источник звука - вывод на магнитофон
+        GeneralSoundSource* m_tapeSoundSource;
+
+        // Клавиатура типа РК86
+        KrKeyboard* m_kbd = nullptr;
+
+        bool m_portCLoInputMode;
 };
 
 

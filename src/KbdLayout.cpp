@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -906,6 +906,74 @@ EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& s
     }
     lang = false;
     return key;
+}
+
+
+EmuKey KrKbdLayout::translateKey(PalKeyCode keyCode)
+{
+    switch (keyCode) {
+    case PK_F8:
+    case PK_MENU:
+        return EK_VR;
+    case PK_F9:
+        return EK_UNDSCR;
+    case PK_KP_0:
+        return EK_NP_0;
+    case PK_KP_1:
+        return EK_NP_1;
+    case PK_KP_2:
+        return EK_NP_2;
+    case PK_KP_3:
+        return EK_NP_3;
+    case PK_KP_4:
+        return EK_NP_4;
+    case PK_KP_5:
+        return EK_NP_5;
+    case PK_KP_6:
+        return EK_NP_6;
+    case PK_KP_7:
+        return EK_NP_7;
+    case PK_KP_8:
+        return EK_NP_8;
+    case PK_KP_9:
+        return EK_NP_9;
+    case PK_KP_PERIOD:
+        return EK_NP_PERIOD;
+    case PK_KP_ENTER:
+        return EK_NP_CR;
+    case PK_KP_DIV:
+        return EK_NP_COMMA;
+    case PK_KP_PLUS:
+        return EK_NP_PLUSMUL;
+    case PK_KP_MINUS:
+        return EK_NP_MINUSDIV;
+    default:
+        break;
+    }
+
+    EmuKey key = RkKbdLayout::translateKey(keyCode);
+    if (key != EK_NONE)
+        return key;
+
+    switch (keyCode) {
+    case PK_DEL:
+        return EK_RUS;
+    default:
+        return EK_NONE;
+    }
+ return key;
+}
+
+
+EmuKey KrKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
+{
+    /*if (keyCode == PK_KP_PLUS || keyCode == PK_KP_MINUS || keyCode == PK_KP_DIV)
+        return EK_NONE;*/
+
+    if (unicodeKey == L'_')
+        return EK_UNDSCR;
+
+    return RkKbdLayout::translateUnicodeKey(unicodeKey, keyCode, shift, lang);
 }
 
 

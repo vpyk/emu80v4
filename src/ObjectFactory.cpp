@@ -135,6 +135,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(RkKeyboard);
     REG_EMU_CLASS(RkKbdLayout);
     REG_EMU_CLASS(RkPpi8255Circuit);
+    REG_EMU_CLASS(Kr03Ppi8255Circuit);
     REG_EMU_CLASS(MikroshaCore);
     REG_EMU_CLASS(MikroshaPpi8255Circuit);
     REG_EMU_CLASS(MikroshaPpi2Circuit);
@@ -236,8 +237,8 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Kr04Ppi8255Circuit);
     REG_EMU_CLASS(Kr04Renderer);
     //REG_EMU_CLASS(Ms7007Keyboard);
-    REG_EMU_CLASS(Kr04Keyboard);
-    REG_EMU_CLASS(Kr04KbdLayout);
+    REG_EMU_CLASS(KrKeyboard);
+    REG_EMU_CLASS(KrKbdLayout);
     REG_EMU_CLASS(Kr04PpiColor8255Circuit);
     REG_EMU_CLASS(Kr04Pit8253SoundSource);
     REG_EMU_CLASS(Kr04FileLoader);
@@ -265,7 +266,9 @@ ObjectFactory::ObjectFactory()
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
 
-    reg("RkKeybLayout", &RkKbdLayout::create); // compatibility issue, old configs may contain rkKeybLayout instead of rkKbdLayout
+    reg("RkKeybLayout", &RkKbdLayout::create);  // compatibility issue, old configs may contain rkKeybLayout instead of rkKbdLayout
+    reg("Kr04Keyboard", &KrKeyboard::create);   // compatibility issue
+    reg("Kr04KbdLayout", &KrKbdLayout::create); // compatibility issue
 }
 
 

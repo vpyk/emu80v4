@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -133,6 +133,14 @@ class Ms7007Keyboard : public Keyboard
 
         uint16_t m_keys[8];
         uint8_t m_mask;
+};
+
+
+class KrKeyboard : public Ms7007Keyboard
+{
+    public:
+        void processKey(EmuKey key, bool isPressed) override;
+        static EmuObject* create(const EmuValuesList&) {return new KrKeyboard();}
 };
 
 

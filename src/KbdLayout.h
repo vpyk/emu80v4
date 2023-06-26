@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -235,6 +235,19 @@ class RkKbdLayout : public KbdLayout
 
     public:
         static EmuObject* create(const EmuValuesList&) {return new RkKbdLayout();}
+};
+
+
+class KrKbdLayout : public RkKbdLayout
+{
+    public:
+        KrKbdLayout() {/*m_separateRusLat = true;*/}
+
+        static EmuObject* create(const EmuValuesList&) {return new KrKbdLayout();}
+
+    protected:
+        EmuKey translateKey(PalKeyCode keyCode) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
 };
 
 

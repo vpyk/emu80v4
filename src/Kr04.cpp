@@ -265,9 +265,11 @@ void Kr04Ppi8255Circuit::setPortC(uint8_t value)
         m_tapeSoundSource->setValue(value & 8);
     m_platform->getCore()->tapeOut(value & 8);
 
-    m_mapper->setCurPage(value & 0x3);
+    if (m_mapper)
+        m_mapper->setCurPage(value & 0x3);
 
-    m_renderer->setHiRes(value & 4);
+    if (m_renderer)
+        m_renderer->setHiRes(value & 4);
 }
 
 
@@ -280,7 +282,7 @@ void Kr04Ppi8255Circuit::setPortCLoMode(bool isInput)
 
 
 
-void Kr04Ppi8255Circuit::attachKeyboard(Kr04Keyboard* kbd)
+void Kr04Ppi8255Circuit::attachKeyboard(KrKeyboard* kbd)
 {
     m_kbd = kbd;
 }
@@ -292,7 +294,7 @@ bool Kr04Ppi8255Circuit::setProperty(const string& propertyName, const EmuValues
         return true;
 
     if (propertyName == "keyboard") {
-        attachKeyboard(static_cast<Kr04Keyboard*>(g_emulation->findObject(values[0].asString())));
+        attachKeyboard(static_cast<KrKeyboard*>(g_emulation->findObject(values[0].asString())));
         return true;
     } else if (propertyName == "tapeSoundSource") {
         m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
@@ -390,108 +392,6 @@ void Kr04FileLoader::afterReset()
 
     AddressableDevice* io = cpu->getIoAddrSpace();
     io->writeByte(0xC2, (io->readByte(0xC2) & 0xFC) | 0x01);
-}
-
-
-void Kr04Keyboard::processKey(EmuKey key, bool isPressed)
-{
-    switch(key) {
-    case EK_LF:
-        key = EK_HELP;
-        break;
-    case EK_HOME:
-        key = EK_EXEC;
-        break;
-    case EK_CLEAR:
-        key = EK_RESET;
-        break;
-    case EK_LAT:
-        key = EK_LANG;
-        break;
-    case EK_RUS:
-        key = EK_GRAPH;
-        break;
-    case EK_VR:
-        key = EK_FIX;
-        break;
-    case EK_NP_CR:
-        key = EK_NP_COMMA;
-        break;
-    case EK_NP_COMMA:
-        key = EK_NP_CR;
-        break;
-    default:
-        break;
-    }
-
-    Ms7007Keyboard::processKey(key, isPressed);
-}
-
-
-EmuKey Kr04KbdLayout::translateKey(PalKeyCode keyCode)
-{
-    switch (keyCode) {
-    case PK_F8:
-        return EK_VR;
-    case PK_F9:
-        return EK_UNDSCR;
-    case PK_KP_0:
-        return EK_NP_0;
-    case PK_KP_1:
-        return EK_NP_1;
-    case PK_KP_2:
-        return EK_NP_2;
-    case PK_KP_3:
-        return EK_NP_3;
-    case PK_KP_4:
-        return EK_NP_4;
-    case PK_KP_5:
-        return EK_NP_5;
-    case PK_KP_6:
-        return EK_NP_6;
-    case PK_KP_7:
-        return EK_NP_7;
-    case PK_KP_8:
-        return EK_NP_8;
-    case PK_KP_9:
-        return EK_NP_9;
-    case PK_KP_PERIOD:
-        return EK_NP_PERIOD;
-    case PK_KP_ENTER:
-        return EK_NP_CR;
-    case PK_KP_DIV:
-        return EK_NP_COMMA;
-    case PK_KP_PLUS:
-        return EK_NP_PLUSMUL;
-    case PK_KP_MINUS:
-        return EK_NP_MINUSDIV;
-    default:
-        break;
-    }
-
-    EmuKey key = RkKbdLayout::translateKey(keyCode);
-    if (key != EK_NONE)
-        return key;
-
-    switch (keyCode) {
-    case PK_DEL:
-        return EK_RUS;
-    default:
-        return EK_NONE;
-    }
- return key;
-}
-
-
-EmuKey Kr04KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
-{
-    /*if (keyCode == PK_KP_PLUS || keyCode == PK_KP_MINUS || keyCode == PK_KP_DIV)
-        return EK_NONE;*/
-
-    if (unicodeKey == L'_')
-        return EK_UNDSCR;
-
-    return RkKbdLayout::translateUnicodeKey(unicodeKey, keyCode, shift, lang);
 }
 
 

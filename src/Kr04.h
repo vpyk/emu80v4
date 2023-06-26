@@ -125,27 +125,6 @@ class Kr04Renderer : public Crt8275Renderer
 };
 
 
-class Kr04Keyboard : public Ms7007Keyboard
-{
-    public:
-        void processKey(EmuKey key, bool isPressed) override;
-        static EmuObject* create(const EmuValuesList&) {return new Kr04Keyboard();}
-};
-
-
-class Kr04KbdLayout : public RkKbdLayout
-{
-    public:
-        Kr04KbdLayout() {/*m_separateRusLat = true;*/}
-
-        static EmuObject* create(const EmuValuesList&) {return new Kr04KbdLayout();}
-
-    protected:
-        EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
-};
-
-
 class Kr04Ppi8255Circuit : public Ppi8255Circuit
 {
 public:
@@ -159,7 +138,7 @@ public:
         void setPortCLoMode(bool isInput) override;
 
         // Подключение объекта - клавиатуры
-        void attachKeyboard(Kr04Keyboard* kbd);
+        void attachKeyboard(KrKeyboard* kbd);
 
         static EmuObject* create(const EmuValuesList&) {return new Kr04Ppi8255Circuit();}
 
@@ -168,9 +147,9 @@ public:
         GeneralSoundSource* m_tapeSoundSource;
 
         // Клавиатура типа РК86
-        Kr04Keyboard* m_kbd = nullptr;
+        KrKeyboard* m_kbd = nullptr;
 
-        AddrSpaceMapper* m_mapper;
+        AddrSpaceMapper* m_mapper = nullptr;
 
         Kr04Renderer* m_renderer = nullptr;
 

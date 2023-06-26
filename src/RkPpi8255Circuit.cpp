@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "RkKeyboard.h"
 #include "RkPpi8255Circuit.h"
 #include "WavReader.h"
+
 
 using namespace std;
 
@@ -81,6 +82,63 @@ bool RkPpi8255Circuit::setProperty(const string& propertyName, const EmuValuesLi
 
     if (propertyName == "rkKeyboard") {
         attachRkKeyboard(static_cast<RkKeyboard*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "tapeSoundSource") {
+        m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+
+    return false;
+}
+
+
+uint8_t Kr03Ppi8255Circuit::getPortB()
+{
+    uint16_t bits = m_kbd->getMatrixData();
+    if (!(bits & 0x100))
+        bits &= ~3;
+    if (!(bits & 0x200))
+        bits &= ~5;
+    if (!(bits & 0x400))
+        bits &= ~7;
+    return bits & 0xFF;
+}
+
+
+uint8_t Kr03Ppi8255Circuit::getPortC()
+{
+    return g_emulation->getWavReader()->getCurValue() ? 0x10 : 0x00;
+}
+
+
+
+void Kr03Ppi8255Circuit::setPortA(uint8_t value)
+{
+    m_kbd->setMatrixMask(value);
+}
+
+
+void Kr03Ppi8255Circuit::setPortC(uint8_t value)
+{
+    if (m_tapeSoundSource)
+        m_tapeSoundSource->setValue(value & 1);
+    m_platform->getCore()->tapeOut(value & 1);
+}
+
+
+void Kr03Ppi8255Circuit::attachKeyboard(KrKeyboard* kbd)
+{
+    m_kbd = kbd;
+}
+
+
+bool Kr03Ppi8255Circuit::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "keyboard") {
+        attachKeyboard(static_cast<KrKeyboard*>(g_emulation->findObject(values[0].asString())));
         return true;
     } else if (propertyName == "tapeSoundSource") {
         m_tapeSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
