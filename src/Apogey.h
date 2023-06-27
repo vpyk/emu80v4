@@ -83,9 +83,7 @@ class ApogeyRenderer : public Crt8275Renderer
 class ApogeyRomDisk : public RkRomDisk
 {
     public:
-        ApogeyRomDisk(std::string romDiskName);
-        uint8_t getPortA() override;
-        void setPortB(uint8_t value) override;
+        ApogeyRomDisk(std::string romDiskName) : RkRomDisk(romDiskName) {}
         void setPortC(uint8_t value) override;
 
         static EmuObject* create(const EmuValuesList& parameters) {return new ApogeyRomDisk(parameters[0].asString());}

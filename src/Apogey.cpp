@@ -187,24 +187,6 @@ string ApogeyRenderer::getPropertyStringValue(const string& propertyName)
 }
 
 
-ApogeyRomDisk::ApogeyRomDisk(string romDiskName)
-{
-    m_romDisk = new uint8_t[512 * 1024];
-    palReadFromFile(romDiskName, 0, 512 * 1024, m_romDisk);
-}
-
-
-uint8_t ApogeyRomDisk::getPortA()
-{
-    return m_romDisk[m_curAddr];
-}
-
-
-void ApogeyRomDisk::setPortB(uint8_t value)
-{
-    m_curAddr = (m_curAddr & ~0xff) | value;
-}
-
 void ApogeyRomDisk::setPortC(uint8_t value)
 {
     bool newA15 = value & 0x80;

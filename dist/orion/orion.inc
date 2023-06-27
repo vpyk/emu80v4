@@ -134,6 +134,11 @@ ifdef HDD
   ppi3.circuit = &ataAdapter
 endif
 
+ifdef EXT_ROMDISK
+  RomDiskPageSelector romDiskPageSelector
+  romDiskPageSelector.bits = 4
+endif  
+
 AddrSpace fddSpace
 fddSpace.range = &fdc, 0x00, 0x03
 fddSpace.range = &fddQReg, 0x04, 0x04
@@ -153,6 +158,10 @@ addrSpace.writeRange = &colorModeSelector, 0xF800, 0xF8FF
 addrSpace.writeRange = &pageSelector, 0xF900, 0xF9FF
 addrSpace.writeRange = &screenSelector, 0xFA00, 0xFAFF
 addrSpace.readRange = &rom, 0xF800, 0xFFFF
+
+ifdef EXT_ROMDISK
+  addrSpace.writeRange = &romDiskPageSelector, 0xFE00, 0xFEFF
+endif  
 
 OrionRenderer crtRenderer
 crtRenderer.screenMemory = &ram0
@@ -190,8 +199,17 @@ ppiCircuit.tapeSoundSource = &tapeSoundSource
 
 ppi1.circuit = &ppiCircuit
 
-RkRomDisk romDisk = @ROM_DISK
+ifndef EXT_ROMDISK
+  RkRomDisk romDisk = @ROM_DISK
+else
+  ExtRkRomDisk romDisk = @ROM_DISK
+endif
+
 ppi2.circuit = &romDisk
+
+ifdef EXT_ROMDISK
+  romDiskPageSelector.romDisk = &romDisk
+endif
 
 
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,11 +25,9 @@
 class RkRomDisk : public Ppi8255Circuit
 {
     public:
-        RkRomDisk() {} // явно не использовать, для производных классов
+        //RkRomDisk() {} // явно не использовать, для производных классов
         RkRomDisk(std::string romDiskName);
         virtual ~RkRomDisk();
-
-        //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         uint8_t getPortA() override;
         uint8_t getPortB() override {return 0xff;}
@@ -42,7 +40,37 @@ class RkRomDisk : public Ppi8255Circuit
 
     protected:
         uint8_t* m_romDisk = nullptr;
+        int m_fileSize = 0;
         unsigned m_curAddr = 0;
 };
+
+
+class ExtRkRomDisk : public RkRomDisk
+{
+    public:
+        ExtRkRomDisk(std::string romDiskName) : RkRomDisk(romDiskName) {}
+
+        void reset() override;
+
+        void setPage(int page);
+
+        static EmuObject* create(const EmuValuesList& parameters) {return new ExtRkRomDisk(parameters[0].asString());}
+};
+
+
+class RomDiskPageSelector : public AddressableDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+        void writeByte(int addr, uint8_t value) override;
+
+        static EmuObject* create(const EmuValuesList&) {return new RomDiskPageSelector();}
+
+    private:
+        ExtRkRomDisk* m_romDisk = nullptr;
+        uint8_t m_mask = 0;
+};
+
 
 #endif // RKROMDISK_H

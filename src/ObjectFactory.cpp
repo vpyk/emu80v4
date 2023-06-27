@@ -178,6 +178,8 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(CloseFileHook);
     REG_EMU_CLASS(Ret8080Hook);
     REG_EMU_CLASS(RkRomDisk);
+    REG_EMU_CLASS(ExtRkRomDisk);
+    REG_EMU_CLASS(RomDiskPageSelector);
     REG_EMU_CLASS(RkSdController);
     REG_EMU_CLASS(RamDisk);
     REG_EMU_CLASS(PeriodicInt8080);
