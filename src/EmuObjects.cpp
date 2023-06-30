@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -137,6 +137,9 @@ bool AddressableDevice::setProperty(const string& propertyName, const EmuValuesL
     } else if (propertyName == "tag" && m_supportsTags && values[0].isInt()) {
             m_tag = values[0].asInt();
             return true;
+    } else if (propertyName == "poke" && values[0].isInt() && values[1].isInt()) {
+        writeByte(values[0].asInt(), values[1].asInt());
+        return true;
     }
 
     return false;

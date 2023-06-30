@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -138,9 +138,6 @@ bool AddrSpace::setProperty(const string& propertyName, const EmuValuesList& val
         return true;
     } else if (propertyName == "writeRange" && values[1].isInt() && values[2].isInt()) {
         addWriteRange(values[1].asInt(), values[2].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString())), values[3].asInt());
-        return true;
-    } else if (propertyName == "poke" && values[0].isInt() && values[1].isInt()) {
-        writeByte(values[0].asInt(), values[1].asInt());
         return true;
     }
 
