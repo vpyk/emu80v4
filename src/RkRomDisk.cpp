@@ -85,6 +85,7 @@ bool RomDiskPageSelector::setProperty(const string& propertyName, const EmuValue
     } else  if (propertyName == "bits") {
         int bits = values[0].asInt();
         m_mask = (((1 << bits) - 1) & 0xFF);
+        return true;
     }
 
     return false;
