@@ -238,6 +238,7 @@ class KorvetRenderer : public CrtRenderer, public IActive
         bool m_colorMode = true;
 
         int m_curLine = 0;
+        uint32_t* m_frameBuf;
 
         void setColorMode(bool colorMode);
 

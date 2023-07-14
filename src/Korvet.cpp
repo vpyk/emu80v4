@@ -218,6 +218,8 @@ KorvetRenderer::KorvetRenderer()
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
 
     memset(m_lut, 0, sizeof(m_lut));
+
+    m_frameBuf = new uint32_t[maxBufSize];
 }
 
 
@@ -225,6 +227,8 @@ KorvetRenderer::~KorvetRenderer()
 {
     if (m_font)
         delete[] m_font;
+
+    delete[] m_frameBuf;
 }
 
 
@@ -280,6 +284,7 @@ void KorvetRenderer::prepareFrame()
 
 void KorvetRenderer::renderFrame()
 {
+    memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     swapBuffers();
     prepareFrame();
 }
@@ -296,7 +301,7 @@ void KorvetRenderer::renderLine(int nLine)
     uint32_t* linePtr;
 
     if (m_showBorder) {
-        linePtr = m_pixelData + m_sizeX * (nLine - 23);
+        linePtr = m_frameBuf + m_sizeX * (nLine - 23);
 
         if (nLine < 40 || nLine >= 296) {
             for(int i = 0; i < m_sizeX; i++)
@@ -312,7 +317,7 @@ void KorvetRenderer::renderLine(int nLine)
     } else {
         if (nLine < 40 || nLine >= 296)
             return;
-        linePtr = m_pixelData + m_sizeX * (nLine - 40);
+        linePtr = m_frameBuf + m_sizeX * (nLine - 40);
     }
 
     nLine -= 40;
