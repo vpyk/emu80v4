@@ -17,6 +17,7 @@
  */
 
 #include <cstring>
+#include <sstream>
 
 #include "Pal.h"
 
@@ -432,6 +433,15 @@ string KorvetRenderer::getPropertyStringValue(const string& propertyName)
     }
 
     return "";
+}
+
+
+string KorvetRenderer::getDebugInfo()
+{
+    stringstream ss;
+    ss << "CRT:" << "\n";
+    ss << "L:" << m_curLine << "\n";
+    return ss.str();
 }
 
 

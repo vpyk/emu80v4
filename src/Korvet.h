@@ -165,6 +165,7 @@ class KorvetRenderer : public CrtRenderer, public IActive
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+        std::string getDebugInfo() override;
 
         const char* getTextScreen() override;
 
