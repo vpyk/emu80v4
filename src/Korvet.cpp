@@ -256,6 +256,9 @@ void KorvetRenderer::operate()
         renderFrame();
     }
 
+    static_cast<KorvetCore*>(m_platform->getCore())->hrtc(true, 0);
+    //static_cast<KorvetCore*>(m_platform->getCore())->hrtc(false, 0);
+
     if (m_curLine == 293)
         static_cast<KorvetCore*>(m_platform->getCore())->int4(false);
     if (m_curLine == 295) {
