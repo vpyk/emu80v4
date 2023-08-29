@@ -49,7 +49,7 @@ void palWxProcessMessages();
 
 void palLog(std::string s);
 
-void palMsgBox(std::string msg);
+void palMsgBox(std::string msg, bool critical = false);
 
 class EmuLog
 {

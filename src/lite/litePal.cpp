@@ -263,7 +263,7 @@ EmuLog& EmuLog::operator<<(int n)
 }
 
 
-void palMsgBox(string msg)
+void palMsgBox(string msg, bool)
 {
     cout << msg << endl;
 }
