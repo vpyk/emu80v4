@@ -19,6 +19,8 @@
 #ifndef EMUTYPES_H
 #define EMUTYPES_H
 
+#include <cstdint>
+
 #include <string>
 
 

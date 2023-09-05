@@ -19,6 +19,8 @@
 #ifndef EMUOBJECTS_H
 #define EMUOBJECTS_H
 
+#include <cstdint>
+
 #include <vector>
 #include <list>
 #include <string>
