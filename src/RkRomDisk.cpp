@@ -40,7 +40,7 @@ RkRomDisk::~RkRomDisk()
 
 uint8_t RkRomDisk::getPortA()
 {
-    return m_curAddr < m_fileSize ? m_romDisk[m_curAddr] : 0xFF;
+    return m_curAddr < unsigned(m_fileSize) ? m_romDisk[m_curAddr] : 0xFF;
 }
 
 
