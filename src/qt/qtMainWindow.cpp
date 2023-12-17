@@ -30,7 +30,7 @@
 #include <QMessageBox>
 #include <QLayout>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QWindow>
 #include <QScreen>
 #include <QSettings>
 
@@ -253,8 +253,7 @@ void MainWindow::showWindow()
         }
         else { //if (m_windowType == EWT_DEBUG) {
             // place debug window within current screen rect
-            int sn = QApplication::desktop()->screenNumber(this);
-            QRect rec = QGuiApplication::screens()[sn]->availableGeometry();
+            QRect rec = windowHandle()->screen()->availableGeometry();
 
             int top = frameGeometry().top();
             int left = frameGeometry().left();
@@ -571,7 +570,7 @@ void MainWindow::createActions()
     m_diskCMenuAction = m_diskCMenu->menuAction();
     m_diskCMenuAction->setToolTip(tr("Load disk C image (Shift-Alt-C)"));
     QList<QKeySequence> diskCKeysList;
-    ADD_HOTKEY(diskCKeysList, Qt::SHIFT + Qt::Key_C);
+    ADD_HOTKEY(diskCKeysList, Qt::SHIFT | Qt::Key_C);
     m_diskCAction->setShortcuts(diskCKeysList);
     addAction(m_diskCAction);
     m_diskCMenu->addAction(m_diskCAction);
@@ -607,7 +606,7 @@ void MainWindow::createActions()
     m_diskDMenuAction = m_diskDMenu->menuAction();
     m_diskDMenuAction->setToolTip(tr("Load disk D image (Shift-Alt-D)"));
     QList<QKeySequence> diskDKeysList;
-    ADD_HOTKEY(diskDKeysList, Qt::SHIFT + Qt::Key_D);
+    ADD_HOTKEY(diskDKeysList, Qt::SHIFT | Qt::Key_D);
     m_diskDAction->setShortcuts(diskDKeysList);
     addAction(m_diskDAction);
     m_diskDMenu->addAction(m_diskDAction);
@@ -650,7 +649,7 @@ void MainWindow::createActions()
     m_hddMenuAction = m_hddMenu->menuAction();
     m_hddMenuAction->setToolTip(tr("Load HDD/CF image (Shift-Alt-H)"));
     QList<QKeySequence> hddKeyList;
-    ADD_HOTKEY(hddKeyList, Qt::SHIFT + Qt::Key_H);
+    ADD_HOTKEY(hddKeyList, Qt::SHIFT | Qt::Key_H);
     m_hddAction->setShortcuts(hddKeyList);
     addAction(m_hddAction);
     m_hddMenu->addAction(m_hddAction);
@@ -745,7 +744,7 @@ void MainWindow::createActions()
     m_edd2MenuAction = m_edd2Menu->menuAction();
     m_edd2MenuAction->setToolTip(tr("Load and assign RAM Disk 2 image (Shift-Alt-E)"));
     QList<QKeySequence> edd2KeyList;
-    ADD_HOTKEY(edd2KeyList, Qt::SHIFT + Qt::Key_E);
+    ADD_HOTKEY(edd2KeyList, Qt::SHIFT | Qt::Key_E);
     m_edd2Action->setShortcuts(edd2KeyList);
     addAction(m_edd2Action);
     m_edd2Menu->addAction(m_edd2Action);
@@ -760,7 +759,7 @@ void MainWindow::createActions()
 
     m_edd2SaveAction = new QAction(tr("Save"), this);
     QList<QKeySequence> edd2SaveKeyList;
-    ADD_HOTKEY(edd2SaveKeyList, Qt::SHIFT + Qt::Key_O);
+    ADD_HOTKEY(edd2SaveKeyList, Qt::SHIFT | Qt::Key_O);
     m_edd2SaveAction->setShortcuts(edd2SaveKeyList);
     m_edd2Menu->addAction(m_edd2SaveAction);
     connect(m_edd2SaveAction, SIGNAL(triggered()), this, SLOT(onEdd2Save()));
@@ -940,9 +939,9 @@ void MainWindow::createActions()
     m_copyTextAction = new QAction(tr("Copy text screen"), this);
     //m_copyTextAction->setToolTip(tr("Copy text screen to clipboard (Alt-Shift-Ins)"));
     QList<QKeySequence> copyTextKeysList;
-    ADD_HOTKEY(copyTextKeysList, Qt::SHIFT + Qt::Key_Insert);
-    //copyTextKeysList.append(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Insert));
-    //copyTextKeysList.append(QKeySequence(Qt::META + Qt::SHIFT + Qt::Key_Insert));
+    ADD_HOTKEY(copyTextKeysList, Qt::SHIFT | Qt::Key_Insert);
+    //copyTextKeysList.append(QKeySequence(Qt::ALT + Qt::SHIFT | Qt::Key_Insert));
+    //copyTextKeysList.append(QKeySequence(Qt::META + Qt::SHIFT | Qt::Key_Insert));
     m_copyTextAction->setShortcuts(copyTextKeysList);
     addAction(m_copyTextAction);
     connect(m_copyTextAction, SIGNAL(triggered()), this, SLOT(onCopyText()));
@@ -1010,7 +1009,7 @@ void MainWindow::createActions()
     m_printerCaptureAction->setCheckable(true);
     m_printerCaptureAction->setToolTip(tr("Capture printer output (Shift-Alt-P)"));
     QList<QKeySequence> printerCaptureKeyList;
-    ADD_HOTKEY(printerCaptureKeyList, Qt::SHIFT + Qt::Key_P);
+    ADD_HOTKEY(printerCaptureKeyList, Qt::SHIFT | Qt::Key_P);
     m_printerCaptureAction->setShortcuts(printerCaptureKeyList);
     addAction(m_printerCaptureAction);
     settingsMenu->addAction(m_printerCaptureAction);

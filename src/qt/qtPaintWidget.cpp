@@ -265,11 +265,18 @@ void PaintWidget::mouseDrag(int x, int y)
     static_cast<MainWindow*>(parent())->mouseDrag(x, y);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  #define POS_X x
+  #define POS_Y y
+#else
+  #define POS_X position().x
+  #define POS_Y position().y
+#endif
 
 void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 {
     if (event->buttons() & Qt::LeftButton)
-        mouseDrag(event->x(), event->y());
+        mouseDrag(event->POS_X(), event->POS_Y());
 
     if (!m_hideCursor)
         return;
@@ -285,22 +292,22 @@ void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 void PaintWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() & Qt::LeftButton)
-        static_cast<MainWindow*>(parent())->mouseClick(event->x(), event->y(), PM_LEFT_CLICK);
+        static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_CLICK);
 
-    mouseDrag(event->x(), event->y());
+    mouseDrag(event->POS_X(), event->POS_Y());
 }
 
 
 void PaintWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() & Qt::LeftButton)
-        static_cast<MainWindow*>(parent())->mouseClick(event->x(), event->y(), PM_LEFT_DBLCLICK);
+        static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_DBLCLICK);
 }
 
 
 void PaintWidget::wheelEvent(QWheelEvent *event)
 {
-    static_cast<MainWindow*>(parent())->mouseClick(event->x(), event->y(), event->delta() > 0 ? PM_WHEEL_UP : PM_WHEEL_DOWN);
+    static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), event->angleDelta().y() > 0 ? PM_WHEEL_UP : PM_WHEEL_DOWN);
 }
 
 

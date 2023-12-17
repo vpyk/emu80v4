@@ -32,6 +32,15 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QAudioFormat>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  #include <QRegularExpression>
+#else
+  #include <QRegExp>
+  #define QRegularExpression QRegExp
+#endif
+
 
 #include "qtMainWindow.h"
 #include "qtRenderHelper.h"
@@ -208,10 +217,15 @@ void palStart()
     QAudioFormat format;
     format.setSampleRate(sampleRate);
     format.setChannelCount(1);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    format.setSampleFormat(QAudioFormat::Int16);
+#else
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::SignedInt);
+#endif
 
     audio = new QAudioOutput(format, nullptr /*palGetMainWindow()*/);
     audio->setBufferSize(sampleRate / 5);
@@ -388,7 +402,7 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
             int extItem = 0;
             QString ext;
             do {
-                ext = itemFilter.section(QRegExp("[;,]"), extItem, extItem);
+                ext = itemFilter.section(QRegularExpression("[;,]"), extItem, extItem);
                 if (ext != "") {
                     if (extItem != 0)
                         newFilter += " ";

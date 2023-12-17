@@ -411,11 +411,11 @@ private:
 
 #ifndef __APPLE__
     #define ADD_HOTKEY(keyList, key) \
-    keyList.append(QKeySequence(Qt::ALT + key)); \
-    keyList.append(QKeySequence(Qt::META + key))
+    keyList.append(QKeySequence(Qt::ALT | key)); \
+    keyList.append(QKeySequence(Qt::META | key))
 #else
     #define ADD_HOTKEY(keyList, key) \
-    keyList.append(QKeySequence(Qt::ALT + key))
+    keyList.append(QKeySequence(Qt::ALT | key))
 #endif
 
 #endif // QTMAINWINDOW_H

@@ -17,6 +17,7 @@
  */
 
 #include <QAction>
+#include <QActionGroup>
 #include <QMenuBar>
 
 #include "qtMainWindow.h"
