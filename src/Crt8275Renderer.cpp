@@ -99,12 +99,14 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
         return;
     else if (scanLines >= 360) {
         // 480p (VGA)
-        double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / (800 / 25.175);
+        // don't PLL horiz. freq for VGA
+        //double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / (800 / 25.175);
+        double effectiveFreq = g_emulation->getFrequency() / 1000000.0 / m_crt->getKDiv();
         visibleX = (144 * effectiveFreq / 25.175 - m_crt->getHrChars() - 1) * charWidth + m_visibleOffsetX;
         //visibleY = 19 - charHeight * m_crt->getVrRows();
         visibleY = (35 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
-        visibleWidth = (640 * effectiveFreq * charWidth) / 25.175;
-        visibleHeight = 480 * charHeight / m_crt->getNLines();
+        visibleWidth = (640 * effectiveFreq * charWidth) / 25.175 + 0.5;
+        visibleHeight = 480 * charHeight / m_crt->getNLines() + 0.5;
     } else if (m_frameRate < 55.0) {
         // 576i (PAL)
         double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / 64.;
