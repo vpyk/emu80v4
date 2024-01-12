@@ -202,6 +202,8 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Pk8000KbdLayout);
     REG_EMU_CLASS(Pk8000FddControlRegister);
     REG_EMU_CLASS(Pk8000FdcStatusRegisters);
+    REG_EMU_CLASS(Pk8000RomDisk);
+    REG_EMU_CLASS(Pk8000RomDiskSelector);
     REG_EMU_CLASS(Psg3910);
     REG_EMU_CLASS(Psg3910SoundSource);
     REG_EMU_CLASS(Pk8000CpuWaits);

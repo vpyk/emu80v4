@@ -25,6 +25,7 @@
 #include "FileLoader.h"
 #include "Keyboard.h"
 #include "CpuWaits.h"
+#include "Memory.h"
 
 class AddrSpaceMapper;
 class Ram;
@@ -449,6 +450,42 @@ public:
 
 private:
     bool m_scr03activeArea = false;
+};
+
+
+class Pk8000RomDisk : public Rom
+{
+public:
+    Pk8000RomDisk(unsigned memSize, std::string fileName) : Rom(memSize, fileName) {}
+
+    uint8_t readByte(int addr) override;
+    const uint8_t* getDataPtr() override;
+    virtual const uint8_t& operator[](int nAddr) override;
+
+    void setPage(int page);
+
+    static EmuObject* create(const EmuValuesList& parameters) {return parameters[1].isInt() ? new Pk8000RomDisk(parameters[1].asInt(), parameters[0].asString()) : nullptr;}
+
+private:
+    int m_curPage = 0;
+};
+
+
+class Pk8000RomDiskSelector : public AddressableDevice
+{
+public:
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    void attachPk8000RomDisk(Pk8000RomDisk* romDisk) {m_romDisk = romDisk;}
+
+    void writeByte(int, uint8_t value) override {m_romDisk->setPage(value);}
+    uint8_t readByte(int)  override {return 0xff;}
+
+    static EmuObject* create(const EmuValuesList&) {return new Pk8000RomDiskSelector();}
+
+private:
+    Pk8000RomDisk* m_romDisk = nullptr;
+
 };
 
 #endif // PK8000_H

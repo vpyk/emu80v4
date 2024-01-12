@@ -112,6 +112,7 @@ Rom::Rom()
 Rom::Rom(unsigned memSize, string fileName)
 {
     m_buf = new uint8_t [memSize];
+    memset(m_buf, 0xFF, memSize);
     m_size = memSize;
     if (palReadFromFile(fileName, 0, memSize, m_buf) == 0/*!= memSize*/) {
         delete[] m_buf;

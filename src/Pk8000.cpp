@@ -1346,3 +1346,41 @@ int Pk8000CpuWaits::getCpuWaitStates(int memTag, int opcode, int normalClocks)
 
     return addClocks;
 }
+
+
+void Pk8000RomDisk::setPage(int page)
+{
+    m_curPage = page;
+}
+
+
+uint8_t Pk8000RomDisk::readByte(int addr)
+{
+    return Rom::readByte(m_curPage * 16384 + addr);
+}
+
+
+const uint8_t* Pk8000RomDisk::getDataPtr()
+{
+    return m_buf + m_curPage * 16384;
+}
+
+
+const uint8_t& Pk8000RomDisk::operator[](int nAddr)
+{
+    return m_buf[m_curPage * 16384 + nAddr]; // no check for borders, use with caution
+}
+
+
+bool Pk8000RomDiskSelector::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "romDisk") {
+        m_romDisk = static_cast<Pk8000RomDisk*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+
+    return false;
+}

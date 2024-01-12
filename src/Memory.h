@@ -58,15 +58,13 @@ class Rom : public AddressableDevice
         virtual ~Rom();
         void writeByte(int, uint8_t)  override {}
         uint8_t readByte(int addr) override;
-        const uint8_t* getDataPtr() {return m_buf;}
-        const uint8_t& operator[](int nAddr) {return m_buf[nAddr];} // no check for borders, use with caution
+        virtual const uint8_t* getDataPtr() {return m_buf;}
+        virtual const uint8_t& operator[](int nAddr) {return m_buf[nAddr];} // no check for borders, use with caution
 
         static EmuObject* create(const EmuValuesList& parameters) {return parameters[1].isInt() ? new Rom(parameters[1].asInt(), parameters[0].asString()) : nullptr;}
 
-protected:
+    protected:
         int m_size;
-
-    private:
         uint8_t* m_buf = nullptr;
 };
 
