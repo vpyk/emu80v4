@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ QString PlatformConfigDialog::getGroupName(QString name)
 bool PlatformConfigDialog::hasConfig(QString platform)
 {
     QString groupName = getGroupName(platform);
-    return groupName == "apogey" || groupName == "rk86" || groupName == "korvet" || groupName == "kr04" || groupName == "vector" || groupName == "mikrosha";
+    return groupName == "apogey" || groupName == "rk86" || groupName == "korvet" || groupName == "kr04" || groupName == "vector" || groupName == "mikrosha" || groupName == "partner";
 }
 
 

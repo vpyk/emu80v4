@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ void ApogeyConfigWidget::tune()
     ui->sdEnableCheckBox->setVisible(m_platform == "kr04");
     ui->romDiskEnableCheckBox->setVisible(m_platform == "mikrosha");
     ui->sdosGroupBox->setVisible(m_platform == "rk86");
-    ui->romDiskGroupBox->setVisible(m_platform != "kr04");
+    ui->romDiskGroupBox->setVisible(m_platform != "kr04" && m_platform != "partner");
     ui->sdGroupBox->setVisible(m_platform != "mikrosha");
 }
 
@@ -153,9 +153,11 @@ void ApogeyConfigWidget::loadConfig()
     } else if (m_platform == "kr04") {
         m_defValues["CFG_SD_DIR"] = "kr04/sdcard";
         m_defValues["CFG_EXT_STORAGE"] = "SD";
-    } else { // if (m_platform == "mikrosha") {
+    } else if (m_platform == "mikrosha") {
         m_defValues["CFG_ROMDISK_FILE"] = "mikrosha/extrom.bin";
         m_defValues["CFG_EXT_STORAGE"] = "NONE";
+    } else { // if (m_platform == "partner") {
+        m_defValues["CFG_SD_DIR"] = "partner/sdcard";
     }
 
     optBegin();
@@ -186,6 +188,8 @@ void ApogeyConfigWidget::saveConfig()
         optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
     } else if (m_platform == "kr04") {
         optSave("CFG_EXT_STORAGE", ui->sdEnableCheckBox->isChecked() ? "SD" : "NONE");
+        optSave("CFG_SD_DIR", ui->sdLabel->text());
+    } else if (m_platform == "partner") {
         optSave("CFG_SD_DIR", ui->sdLabel->text());
     } else {
         optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
