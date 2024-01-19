@@ -67,7 +67,7 @@ struct Frame {
     int nCharsPerRow;
     int nLines;
     bool isOffsetLineMode;
-    Symbol symbols[64][80]; // array of symbols
+    Symbol symbols[64][128]; // array of symbols
 
     // data for alternavive renderer
     int cursorRow;
