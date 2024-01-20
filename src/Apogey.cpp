@@ -203,7 +203,11 @@ bool ApogeyRomDisk::setProperty(const std::string& propertyName, const EmuValues
     if (RkRomDisk::setProperty(propertyName, values))
         return true;
 
-    if (propertyName == "sizeMB") {
+    if (propertyName == "extBits") {
+        int bits = values[0].asInt();
+        m_mask = (1 << bits) - 1;
+        return true;
+    } else if (propertyName == "sizeMB") {
         int mb = values[0].asInt();
         if (mb < 0)
             mb = 0;
