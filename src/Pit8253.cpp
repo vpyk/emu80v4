@@ -492,6 +492,8 @@ uint8_t Pit8253::readByte(int addr)
             m_counters[addr]->updateState();
         uint16_t cntVal = m_latched[addr] ? m_latches[addr] : m_counters[addr]->m_counter;
         uint8_t res = m_waitingHi[addr] ? (cntVal & 0xff00) >> 8 : cntVal & 0xff;
+        if (/* m_latched[addr] && */ m_waitingHi[addr])
+            m_latched[addr] = false;
 
         if (m_rlModes[addr] == PRLM_WORD)
             m_waitingHi[addr] = !m_waitingHi[addr];
