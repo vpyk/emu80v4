@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -85,11 +85,13 @@ class ApogeyRomDisk : public RkRomDisk
     public:
         ApogeyRomDisk(std::string romDiskName) : RkRomDisk(romDiskName) {}
         void setPortC(uint8_t value) override;
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values);
 
         static EmuObject* create(const EmuValuesList& parameters) {return new ApogeyRomDisk(parameters[0].asString());}
 
     private:
         bool m_oldA15 = false;
+        uint8_t m_mask = 0xf; // 512KB
 };
 
 #endif // APOGEY_H

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -193,6 +193,32 @@ void ApogeyRomDisk::setPortC(uint8_t value)
     value &= 0x7f;
     m_curAddr = (m_curAddr & ~0x7f00) | (value << 8);
     if (newA15 && !m_oldA15) // перед переключением банка нужно сбросить бит 7 порта B
-        m_curAddr = (m_curAddr & 0x7fff) | ((m_curAddr & 0xf) << 15);
+        m_curAddr = (m_curAddr & 0x7fff) | ((m_curAddr & m_mask) << 15);
     m_oldA15 = newA15;
 }
+
+
+bool ApogeyRomDisk::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (RkRomDisk::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "sizeMB") {
+        int mb = values[0].asInt();
+        if(mb<=0) mb = 0;
+        else if(mb<=1) mb = 1;
+        else if(mb<=2) mb = 2;
+        else mb = 4;
+        switch(mb)
+        {
+           case 0: m_mask = 0x0f; break; // 512KB
+           case 1: m_mask = 0x1f; break; // 1MB
+           case 2: m_mask = 0x3f; break; // 2MB
+           case 4: m_mask = 0x7f; break; // 4MB
+        }
+        return true;
+    }
+
+    return false;
+}
+
