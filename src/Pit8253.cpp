@@ -443,9 +443,11 @@ void Pit8253::writeByte(int addr, uint8_t value)
             counterMode &= 3;
         if (loadMode == PRLM_LATCH) {
             // команда защелкивания
-            m_latched[counterNum] = true;
-            m_latches[counterNum] = m_counters[counterNum]->m_counter;
-            m_waitingHi[counterNum] = false;
+            if (!m_latched[counterNum]) {
+                m_latched[counterNum] = true;
+                m_latches[counterNum] = m_counters[counterNum]->m_counter;
+                m_waitingHi[counterNum] = false;
+            }
         } else {
             // установка режима счетчика
             m_latches[counterNum] = 0;
