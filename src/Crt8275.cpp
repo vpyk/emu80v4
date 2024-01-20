@@ -157,7 +157,7 @@ void Crt8275::displayBuffer()
     int fifoPos = 0;
 
     for (int i = 0; i < m_nCharsPerRow; i++) {
-        uint8_t chr = m_rowBuf[i];
+        uint8_t chr = m_rowBuf[i % 80];
 
         if (m_isTransparentAttr && ((chr & 0xC0) == 0x80)) {
             // Transparent Field Attribute Code
@@ -555,7 +555,7 @@ void Crt8275::putCharToBuffer(uint8_t byte)
         }
     } else {
         if (m_curBufPos < m_nCharsPerRow)
-            m_rowBuf[m_curBufPos++] = byte;
+            m_rowBuf[m_curBufPos++ % 80] = byte;
         else {
             pause();
             return;
