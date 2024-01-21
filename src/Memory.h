@@ -58,6 +58,7 @@ class Rom : public AddressableDevice
         virtual ~Rom();
         void writeByte(int, uint8_t)  override {}
         uint8_t readByte(int addr) override;
+        int getSize() {return m_size;}
         virtual const uint8_t* getDataPtr() {return m_buf;}
         virtual const uint8_t& operator[](int nAddr) {return m_buf[nAddr];} // no check for borders, use with caution
 

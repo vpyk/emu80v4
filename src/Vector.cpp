@@ -93,7 +93,7 @@ uint8_t VectorAddrSpace::readByte(int addr)
             return m_ramDisk->readByte(m_eramSegment * 0x40000 + m_stackDiskPage * 0x10000 + addr);
         if (m_inRamPagesMask & 2 && addr >= m_eramPageStartAddr && addr <= m_eramPageEndAddr)
             return m_ramDisk->readByte(m_eramSegment * 0x40000 + m_inRamDiskPage * 0x10000 + addr);
-        if (m_romEnabled && addr < 0x8000)
+        if (m_romEnabled && addr < m_rom->getSize())
             return m_rom->readByte(addr); // add rom check
         else
             return m_mainMemory->readByte(addr);
@@ -108,7 +108,7 @@ uint8_t VectorAddrSpace::readByte(int addr)
         return m_ramDisk->readByte(m_inRamDiskPage * 0x10000 + addr);
     if (m_inRamPagesMask2 && (addr >= 0x8000) && m_inRamPagesMask2 & (1 << ((addr & 0x6000) >> 13)))
         return m_ramDisk2->readByte(m_inRamDiskPage2 * 0x10000 + addr);
-    if (m_romEnabled && addr < 0x8000)
+    if (m_romEnabled && addr < m_rom->getSize())
         return m_rom->readByte(addr); // add rom check
     else
         return m_mainMemory->readByte(addr);
