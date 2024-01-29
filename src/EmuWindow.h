@@ -144,6 +144,8 @@ class EmuWindow : public EmuObject, public PalWindow
         bool m_frameDrawn = false;
 
         double calcBestAspectRatio(double srcAspectRatio, int scaleY);
+        bool m_overlay = false;
+        double m_primaryFrameAspectRatio = 1;
 };
 
 #endif // EMUWINDOW_H

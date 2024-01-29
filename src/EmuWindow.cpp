@@ -210,6 +210,9 @@ void EmuWindow::hide()
 
 double EmuWindow::calcBestAspectRatio(double srcAspectRatio, int scaleY)
 {
+    if (m_overlay)
+        return m_primaryFrameAspectRatio * srcAspectRatio;
+
     if (m_squarePixels)
         return 1.0;
 
@@ -222,7 +225,13 @@ double EmuWindow::calcBestAspectRatio(double srcAspectRatio, int scaleY)
         ar = 3;
     else
         ar = round(ar);
-    return ar / scaleY;
+
+    ar /= scaleY;
+
+    if (!m_overlay)
+        m_primaryFrameAspectRatio = ar;
+
+    return ar;
 }
 
 
@@ -369,6 +378,8 @@ void EmuWindow::drawFrame(EmuPixelData frame)
         return;
     }
 
+    m_overlay = false;
+
     m_curImgWidth = frame.width;
     m_curImgHeight = frame.height;
     getSize(m_curWindowWidth, m_curWindowHeight);
@@ -417,6 +428,8 @@ void EmuWindow::drawOverlay(EmuPixelData frame)
 
     if (frame.width == 0 || frame.height == 0 || !frame.pixelData)
         return;
+
+    m_overlay = true;
 
     drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, true, true);
 
