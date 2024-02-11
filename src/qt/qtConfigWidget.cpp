@@ -44,7 +44,7 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new KorvetConfigWidget();
     else if (platformName == "vector")
         widget = new VectorConfigWidget();
-    else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha")
+    else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha" || platformName == "mikro80")
     widget = new ApogeyConfigWidget();
 
     widget->m_platform = platformName;
@@ -136,7 +136,7 @@ void ApogeyConfigWidget::tune()
     ui->romDiskEnableCheckBox->setVisible(m_platform == "mikrosha");
     ui->sdosGroupBox->setVisible(m_platform == "rk86");
     ui->romDiskGroupBox->setVisible(m_platform != "kr04" && m_platform != "partner");
-    ui->sdGroupBox->setVisible(m_platform != "mikrosha");
+    ui->sdGroupBox->setVisible(m_platform != "mikrosha" && m_platform != "mikro80");
 }
 
 
@@ -156,8 +156,10 @@ void ApogeyConfigWidget::loadConfig()
     } else if (m_platform == "mikrosha") {
         m_defValues["CFG_ROMDISK_FILE"] = "mikrosha/extrom.bin";
         m_defValues["CFG_EXT_STORAGE"] = "NONE";
-    } else { // if (m_platform == "partner") {
+    } else if (m_platform == "partner") {
         m_defValues["CFG_SD_DIR"] = "partner/sdcard";
+    } else { // if (m_platform == "mikro80") {
+        m_defValues["CFG_ROMDISK_FILE"] = "mikro80/romdisk.bin";
     }
 
     optBegin();
@@ -191,6 +193,8 @@ void ApogeyConfigWidget::saveConfig()
         optSave("CFG_SD_DIR", ui->sdLabel->text());
     } else if (m_platform == "partner") {
         optSave("CFG_SD_DIR", ui->sdLabel->text());
+    } else if (m_platform == "mikro80") {
+        optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
     } else {
         optSave("CFG_ROMDISK_FILE", ui->romDiskLabel->text());
         optSave("CFG_SD_DIR", ui->sdLabel->text());

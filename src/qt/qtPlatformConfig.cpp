@@ -43,7 +43,9 @@ QString PlatformConfigDialog::getGroupName(QString name)
 bool PlatformConfigDialog::hasConfig(QString platform)
 {
     QString groupName = getGroupName(platform);
-    return groupName == "apogey" || groupName == "rk86" || groupName == "korvet" || groupName == "kr04" || groupName == "vector" || groupName == "mikrosha" || groupName == "partner";
+    return groupName == "apogey" || groupName == "rk86" || groupName == "korvet" ||
+           groupName == "kr04" || groupName == "vector" || groupName == "mikrosha" ||
+           groupName == "partner" || groupName == "mikro80";
 }
 
 

@@ -1,6 +1,11 @@
 ﻿# Файл справки
 @HELP_FILE = mikro80/mikro80.html
 
+# Файл ROM-диска
+ifndef CFG_ROMDISK_FILE
+  @CFG_ROMDISK_FILE = "mikro80/romdisk.bin"
+endif
+
 
 ######## Window ########
 
@@ -63,6 +68,11 @@ addrSpace.poke = 0xF75D, 0x32
 Ppi8255 ppi
 AddrSpaceInverter invertedPpi = &ppi
 
+Ppi8255 ppi2
+
+RkRomDisk romDisk = @CFG_ROMDISK_FILE
+ppi2.circuit = &romDisk
+
 GeneralSoundSource tapeSoundSource
 #tapeSoundSource.muted = yes
 
@@ -72,7 +82,7 @@ tapeReg.tapeSoundSource = &tapeSoundSource
 AddrSpace ioAddrSpace
 ioAddrSpace.range = &tapeReg, 0x01, 0x01
 ioAddrSpace.range = &invertedPpi, 0x04, 0x07
-ioAddrSpace.range = &invertedPpi, 0xA0, 0xA3
+ioAddrSpace.range = &ppi2, 0xA0, 0xA3
 
 Mikro80Renderer crtRenderer
 crtRenderer.screenMemory = &videoRam
