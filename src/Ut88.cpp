@@ -189,16 +189,16 @@ bool Ut88AddrSpaceMapper::setProperty(const string& propertyName, const EmuValue
 
 void Ut88MemPageSelector::writeByte(int, uint8_t value)
 {
-    if ((value & 0x0f) == 0x0f)
+    if ((value & m_mask) == m_mask)
         m_addrSpaceMapper->setCurPage(0);
-    else if (!(value & 0x01))
-        m_addrSpaceMapper->setCurPage(1);
-    else if (!(value & 0x02))
-        m_addrSpaceMapper->setCurPage(2);
-    else if (!(value & 0x04))
-        m_addrSpaceMapper->setCurPage(4);
-    else if (!(value & 0x08))
-        m_addrSpaceMapper->setCurPage(8);
+    else
+        for (int i = 0; i < m_nPages; i++) {
+            if (!(value & 1)) {
+                m_addrSpaceMapper->setCurPage(i + 1);
+                return;
+            }
+            value >>= 1;
+        }
 };
 
 
@@ -209,6 +209,10 @@ bool Ut88MemPageSelector::setProperty(const string& propertyName, const EmuValue
 
     if (propertyName == "mapper") {
         attachAddrSpaceMapper(static_cast<AddrSpaceMapper*>(g_emulation->findObject(values[0].asString())));
+        return true;
+    } else if (propertyName == "pages") {
+        m_nPages = values[0].asInt();
+        m_mask = (((1 << m_nPages) - 1) & 0xFF);
         return true;
     }
 

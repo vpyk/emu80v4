@@ -67,14 +67,14 @@ class Ut88Core : public PlatformCore
 class Ut88AddrSpaceMapper : public AddrSpaceMapper
 {
     public:
-        Ut88AddrSpaceMapper() : AddrSpaceMapper(5) {}
+        Ut88AddrSpaceMapper(int pages) : AddrSpaceMapper(pages) {}
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Ut88AddrSpaceMapper();}
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new Ut88AddrSpaceMapper(parameters[0].asInt()) : nullptr;}
 
     private:
         Cpu8080* m_cpu = nullptr;
@@ -95,6 +95,8 @@ class Ut88MemPageSelector : public AddressableDevice
 
     private:
         AddrSpaceMapper* m_addrSpaceMapper = nullptr;
+        int m_nPages = 4;
+        uint8_t m_mask = 0x0f;
 };
 
 
