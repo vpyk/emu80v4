@@ -54,16 +54,45 @@ Ram ram2 = 0x800
 
 Rom rom = @ROM, 0x800
 
-AddrSpace addrSpace
-addrSpace.range =      &ram1,     0x0000, 0xDFFF
-addrSpace.range =      &videoRam, 0xE000, 0xEFFF
-addrSpace.range =      &ram2,     0xF000, 0xF7FF
-addrSpace.range =      &rom,      0xF800, 0xFFFF
 
-#addrSpace.poke = 0xF75C, 0x54
-#addrSpace.poke = 0xF75D, 0x38
-addrSpace.poke = 0xF75C, 0x4B
-addrSpace.poke = 0xF75D, 0x32
+AddrSpace mainPage = 0x10000
+
+Ram ramDiskPage0 = 0x10000
+Ram ramDiskPage1 = 0x10000
+Ram ramDiskPage2 = 0x10000
+Ram ramDiskPage3 = 0x10000
+Ram ramDiskPage4 = 0x10000
+Ram ramDiskPage5 = 0x10000
+Ram ramDiskPage6 = 0x10000
+Ram ramDiskPage7 = 0x10000
+
+Cpu8080 cpu
+
+Ut88AddrSpaceMapper addrSpace = 9
+addrSpace.cpu = &cpu
+addrSpace.page = 0, &mainPage
+addrSpace.page = 1, &ramDiskPage0
+addrSpace.page = 2, &ramDiskPage1
+addrSpace.page = 3, &ramDiskPage2
+addrSpace.page = 4, &ramDiskPage3
+addrSpace.page = 5, &ramDiskPage4
+addrSpace.page = 6, &ramDiskPage5
+addrSpace.page = 7, &ramDiskPage6
+addrSpace.page = 8, &ramDiskPage7
+
+Ut88MemPageSelector pageSelector
+pageSelector.pages = 9
+pageSelector.mapper = &addrSpace
+
+mainPage.range =      &ram1,     0x0000, 0xDFFF
+mainPage.range =      &videoRam, 0xE000, 0xEFFF
+mainPage.range =      &ram2,     0xF000, 0xF7FF
+mainPage.range =      &rom,      0xF800, 0xFFFF
+
+#mainPage.poke = 0xF75C, 0x54
+#mainPage.poke = 0xF75D, 0x38
+mainPage.poke = 0xF75C, 0x4B
+mainPage.poke = 0xF75D, 0x32
 
 Ppi8255 ppi
 AddrSpaceInverter invertedPpi = &ppi
@@ -82,6 +111,7 @@ tapeReg.tapeSoundSource = &tapeSoundSource
 AddrSpace ioAddrSpace
 ioAddrSpace.range = &tapeReg, 0x01, 0x01
 ioAddrSpace.range = &invertedPpi, 0x04, 0x07
+ioAddrSpace.range = &pageSelector, 0x40, 0x4F
 ioAddrSpace.range = &ppi2, 0xA0, 0xA3
 
 Mikro80Renderer crtRenderer
@@ -93,7 +123,6 @@ Mikro80Core core
 core.window = &window
 core.crtRenderer = &crtRenderer
 
-Cpu8080 cpu
 cpu.frequency = @CPU_FREQUENCY
 cpu.startAddr = 0xF800
 cpu.addrSpace = &addrSpace
@@ -108,6 +137,16 @@ RkPpi8255Circuit ppiCircuit
 ppiCircuit.rkKeyboard = &keyboard
 ppi.circuit = &ppiCircuit
 
+RamDisk ramDisk = 8, 0x10000
+ramDisk.filter = "Файлы RAM-диска Микро-80 (*.ramdisk)|*.ramdisk|Все файлы (*.*)|*"
+ramDisk.page = 0, &ramDiskPage0
+ramDisk.page = 1, &ramDiskPage1
+ramDisk.page = 2, &ramDiskPage2
+ramDisk.page = 3, &ramDiskPage3
+ramDisk.page = 4, &ramDiskPage4
+ramDisk.page = 5, &ramDiskPage5
+ramDisk.page = 6, &ramDiskPage6
+ramDisk.page = 7, &ramDiskPage7
 
 
 ######## File I/O ########
