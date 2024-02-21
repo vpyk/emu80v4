@@ -883,6 +883,16 @@ EmuKey KorvetKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyC
 {
     if (keyCode == PK_KP_MUL || keyCode == PK_KP_DIV || keyCode == PK_KP_MINUS)
         return EK_NONE;
+
+    if (unicodeKey >= L'A' && unicodeKey <= L'Z')
+        unicodeKey += 0x20; // uppercase latin to lowercase
+    else if (unicodeKey >= L'a' && unicodeKey <= L'z')
+        unicodeKey -= 0x20; // lowercase latin to uppercase
+    else if (unicodeKey >= L'А' && unicodeKey <= L'Я')
+        unicodeKey += 0x20; // uppercase cyrillic to lowercase
+    else if (unicodeKey >= L'а' && unicodeKey <= L'я')
+        unicodeKey -= 0x20; // lowercase cyrillic to uppercase
+
     EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
     if (unicodeKey == L'@')
         shift = false;
