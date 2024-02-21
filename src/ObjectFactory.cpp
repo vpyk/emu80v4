@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@
 #include "Kr04.h"
 #include "Korvet.h"
 #include "Palmira.h"
+#include "KbdTapper.h"
 
 #include "EmuConfig.h"
 
@@ -265,6 +266,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(KorvetPit8253SoundSource);
     REG_EMU_CLASS(KorvetCpuCycleWaits);
     REG_EMU_CLASS(KorvetPpiPsgAdapter);
+    REG_EMU_CLASS(KbdTapper);
 
 
     reg("ConfigTab", &EmuConfigTab::create);

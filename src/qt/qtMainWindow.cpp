@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -120,6 +120,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_wavLabel->setVisible(false);
             m_prnLabel = new QLabel("", this);
             m_prnLabel->setVisible(false);
+            m_pasteLabel = new QLabel("", this);
+            m_pasteLabel->setVisible(false);
 
             m_fpsLabel->setToolTip(tr("Emulator FPS"));
             m_speedLabel->setToolTip(tr("Emulation speed"));
@@ -131,6 +133,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_tapeLabel->setToolTip(tr("Tape file I/O"));
             m_wavLabel->setToolTip(tr("Wav file I/O"));
             m_prnLabel->setToolTip(tr("Printer capture"));
+            m_prnLabel->setToolTip(tr("Text pasting"));
 
             m_statusBar = statusBar();
             m_statusBar->setStyleSheet("QStatusBar::item { border: 1px inset #B0B0B0;}");
@@ -141,6 +144,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_statusBar->addWidget(m_tapeLabel);
             m_statusBar->addWidget(m_wavLabel);
             m_statusBar->addWidget(m_prnLabel);
+            m_statusBar->addWidget(m_pasteLabel);
             m_statusBar->addWidget(m_crtModeLabel);
             m_statusBar->addWidget(m_imageSizeLabel);
             m_statusBar->addWidget(m_dmaTimeLabel);
@@ -946,6 +950,15 @@ void MainWindow::createActions()
     addAction(m_copyTextAction);
     connect(m_copyTextAction, SIGNAL(triggered()), this, SLOT(onCopyText()));
 
+    // Paste text from clipboard
+    m_pasteAction = new QAction(tr("Paste text"), this);
+    //m_pasteAction->setToolTip(tr("Paste text from clipboard (Alt-Shift-V)"));
+    QList<QKeySequence> pasteKeysList;
+    ADD_HOTKEY(pasteKeysList, Qt::SHIFT | Qt::Key_V);
+    m_pasteAction->setShortcuts(pasteKeysList);
+    addAction(m_pasteAction);
+    connect(m_pasteAction, SIGNAL(triggered()), this, SLOT(onPaste()));
+
     m_toolBar->addSeparator();
 
     settingsMenu->addSeparator();
@@ -1313,6 +1326,7 @@ void MainWindow::createActions()
     viewMenu->addAction(m_screenshotAction);
     viewMenu->addAction(m_copyImageAction);
     viewMenu->addAction(m_copyTextAction);
+    viewMenu->addAction(m_pasteAction);
     viewMenu->addSeparator();
 
     m_fullscreenAction = new QAction(tr("Fullscreen mode"), this);
@@ -1483,7 +1497,9 @@ void MainWindow::tuneMenu()
     m_loadMenuAction->setVisible(platformGroup != "korvet");
     m_loadRunMenuAction->setVisible(platformGroup != "korvet");
 
-    m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
+    m_pasteAction->setVisible(!emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".kbdTapper", "pasting").empty());
+
+            m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 
     updateLastFiles();
 
@@ -1634,6 +1650,15 @@ void MainWindow::onFpsTimer()
         m_wavLabel->setText(labelText + " " + qFileName + qPosition);
     }
     m_wavLabel->setVisible(fileName != "");
+
+    std::string val = emuGetPropertyValue(platform + "kbdTapper", "pasting");
+    if (val == "yes") {
+        m_pasteLabel->setText(tr("Pasting"));
+        m_pasteLabel->setVisible(true);
+    } else {
+        m_pasteLabel->setText("");
+        m_pasteLabel->setVisible(false);
+    }
 }
 
 
@@ -2530,6 +2555,12 @@ void MainWindow::onCopyImage()
 void MainWindow::onCopyText()
 {
     emuSysReq(m_palWindow, SR_COPYTXT);
+}
+
+
+void MainWindow::onPaste()
+{
+    emuSysReq(m_palWindow, SR_PASTE);
 }
 
 

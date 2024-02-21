@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
             case PK_F:
                 return SR_FONT;
             case PK_V:
-                return SR_CROPTOVISIBLE;
+                return isShiftPressed ? SR_PASTE : SR_CROPTOVISIBLE;
             case PK_C:
                 return isShiftPressed ? SR_DISKC : SR_COLOR;
             case PK_A:

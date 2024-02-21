@@ -40,6 +40,7 @@ SOURCES += \
     Covox.cpp \
     DbgCalls.cpp \
     DiskImage.cpp \
+    KbdTapper.cpp \
     Korvet.cpp \
     Kr04.cpp \
     Main.cpp \
@@ -159,6 +160,7 @@ HEADERS  += \
     GenericModules.h \
     Globals.h \
     KbdLayout.h \
+    KbdTapper.h \
     Keyboard.h \
     Korvet.h \
     Kr04.h \

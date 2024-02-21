@@ -601,6 +601,15 @@ void palCopyTextToClipboard(const char* text)
 }
 
 
+string palGetTextFromClipboard()
+{
+    char* txt = SDL_GetClipboardText();
+    string str = string(txt);
+    SDL_free(txt);
+    return str;
+}
+
+
 string palGetDefaultPlatform()
 {
     return "";

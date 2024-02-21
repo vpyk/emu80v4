@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -556,6 +556,14 @@ void palCopyTextToClipboard(const char* text)
     QClipboard* clipboard = QGuiApplication::clipboard();
     QString str = QString::fromUtf8(text);
     clipboard->setText(str);
+}
+
+
+string palGetTextFromClipboard()
+{
+    QClipboard* clipboard = QGuiApplication::clipboard();
+    QString str = clipboard->text();
+    return str.toUtf8().constData();
 }
 
 

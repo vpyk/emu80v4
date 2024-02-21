@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ void palPlaySample(int16_t sample);
 std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
 
 void palCopyTextToClipboard(const char* text);
-
+std::string palGetTextFromClipboard();
 
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false, PalWindow* wnd = nullptr);
 bool palChooseConfiguration(std::string platformName, PalWindow* wnd);

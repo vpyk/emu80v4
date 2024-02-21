@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -465,9 +465,12 @@ EmuKey KbdLayout::translateCommonUnicodeKeys(unsigned unicodeKey, bool& shift, b
         case L'/':
             key = EK_SLASH;
             break;
-        case L'_':
-            key = EK_BSP;
+        case L' ':
+            key = EK_SPACE;
             break;
+        //case L'_':
+        //    key = EK_BSP;
+        //    break;
 
         // Digits (lower case)
         case L'0':

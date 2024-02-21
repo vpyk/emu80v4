@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ class CrtRenderer;
 class Keyboard;
 class DiskImage;
 class DebugWindow;
+class KbdTapper;
 
 
 class Platform : public ParentObject
@@ -103,6 +104,7 @@ class Platform : public ParentObject
         RamDisk* m_ramDisk = nullptr;
         RamDisk* m_ramDisk2 = nullptr;
         EmuObjectGroup* m_tapeGrp = nullptr;
+        KbdTapper* m_kbdTapper = nullptr;
 
         int m_defConfigTabId = 0;
 

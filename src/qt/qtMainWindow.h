@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -161,6 +161,7 @@ private slots:
     void onScreenshot();
     void onCopyImage();
     void onCopyText();
+    void onPaste();
     void onSettings();
     void onPlatformHelp();
     void onAbout();
@@ -219,6 +220,7 @@ private:
     QLabel* m_tapeLabel;
     QLabel* m_wavLabel;
     QLabel* m_prnLabel;
+    QLabel* m_pasteLabel;
     void createActions();
     void fillPlatformListMenu();
     void tuneMenu();
@@ -358,6 +360,7 @@ private:
     QAction* m_screenshotAction;
     QAction* m_copyImageAction;
     QAction* m_copyTextAction;
+    QAction* m_pasteAction;
     QAction* m_settingsAction;
     QAction* m_tapeHookAction;
     QAction* m_muteTapeAction;

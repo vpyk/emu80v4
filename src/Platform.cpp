@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include "Keyboard.h"
 #include "RamDisk.h"
 #include "Debugger.h"
+#include "KbdTapper.h"
 
 using namespace std;
 
@@ -152,6 +153,11 @@ Platform::Platform(string configFileName, string name)
         }
     }
 
+    // ищем объект - KbdTapper, должен быть единственным
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++)
+        if ((m_kbdTapper = dynamic_cast<KbdTapper*>(*it)))
+            break;
+
     Platform::init();
 
     Platform::reset();
@@ -254,6 +260,11 @@ void Platform::sysReq(SysReq sr)
                 const char* text = m_renderer->getTextScreen();
                 if (text)
                     palCopyTextToClipboard(text);
+            }
+            break;
+        case SR_PASTE:
+            if (m_kbdTapper && m_kbdLayout->getMode() == KbdLayout::KLM_SMART) {
+                m_kbdTapper->typeText(palGetTextFromClipboard());
             }
             break;
         case SR_DISKA:

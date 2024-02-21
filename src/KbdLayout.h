@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -180,7 +180,13 @@ class KbdLayoutHelper;
 class KbdLayout : public EmuObject
 {
     public:
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        enum KbdLayoutMode {
+            KLM_QWERTY,
+            KLM_JCUKEN,
+            KLM_SMART
+        };
+
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
         void setQwertyMode() {m_mode = KLM_QWERTY;}
@@ -188,16 +194,11 @@ class KbdLayout : public EmuObject
         void setSmartMode()  {m_mode = KLM_SMART;}
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys();
+        KbdLayoutMode getMode() {return m_mode;}
 
         bool getNumpadJoystickMode() {return m_numpadJoystick;}
 
     protected:
-        enum KbdLayoutMode {
-            KLM_QWERTY,
-            KLM_JCUKEN,
-            KLM_SMART
-        };
-
         KbdLayoutMode m_mode = KLM_QWERTY;
         bool m_numpadJoystick = false;
         bool m_separateRusLat = false;
