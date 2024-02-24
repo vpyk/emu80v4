@@ -82,6 +82,13 @@ void PalmiraRenderer::attachFontRam(Ram* fontRam)
 }
 
 
+void PalmiraRenderer::setColorMode(Rk86ColorMode)
+{
+    m_colorMode = RCM_COLOR1;
+    m_dashedLten = true;
+}
+
+
 bool PalmiraRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (Rk86Renderer::setProperty(propertyName, values))

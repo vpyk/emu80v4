@@ -47,13 +47,6 @@ class Rk86Core : public PlatformCore
 
 class Rk86Renderer : public Crt8275Renderer
 {
-    enum Rk86ColorMode {
-        RCM_MONO_ORIG,
-        RCM_MONO,
-        RCM_COLOR1,
-        RCM_COLOR2
-    };
-
     public:
         Rk86Renderer();
 
@@ -65,16 +58,21 @@ class Rk86Renderer : public Crt8275Renderer
         static EmuObject* create(const EmuValuesList&) {return new Rk86Renderer();}
 
     protected:
+        enum Rk86ColorMode {
+            RCM_MONO_ORIG,
+            RCM_MONO,
+            RCM_COLOR1,
+            RCM_COLOR2
+        };
+
         const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt) override;
         const uint8_t* getAltFontPtr(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurFgColor(bool gpa0, bool gpa1, bool hglt) override;
         uint32_t getCurBgColor(bool gpa0, bool gpa1, bool hglt) override;
         wchar_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt) override;
-
-    private:
         Rk86ColorMode m_colorMode = RCM_COLOR1;
 
-        void setColorMode(Rk86ColorMode mode);
+        virtual void setColorMode(Rk86ColorMode mode);
 };
 
 

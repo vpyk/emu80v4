@@ -56,6 +56,7 @@ public:
 
 protected:
     const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt) override;
+    void setColorMode(Rk86ColorMode) override;
 
 private:
     bool m_useExtFont = false;
