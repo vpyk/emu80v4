@@ -83,21 +83,19 @@ void Ut88Renderer::primaryRenderFrame()
     for (int row = 0; row < 32; row++)
         for (int col = 0; col < 64; col++) {
             int addr = row * 64 + col;
-            bool rvv = col != 63 && m_screenMemory[addr + 1] & 0x80;
+            bool cursor = col != 63 && m_screenMemory[addr + 1] & 0x80;
             uint8_t* fontPtr = m_font + (m_screenMemory[addr] & 0x7f) * 8;
             for (int l = 0; l < 8; l++) {
                 uint8_t bt = fontPtr[l] << 2;
                 for (int pt = 0; pt < 6; pt++) {
                     bool pixel = (bt & 0x80);
-                    if (rvv)
-                        pixel = !pixel;
                     bt <<= 1;
                     m_pixelData[row * 384 * 10 + l * 384 + col * 6 + pt] = pixel ? 0 : 0xC0C0C0;
                 }
             }
             for (int l = 8; l < 10; l++)
                 for (int pt = 0; pt < 6; pt++)
-                    m_pixelData[row * 384 * 10 + l * 384 + col * 6 + pt] = rvv ? 0xC0C0C0 : 0;
+                    m_pixelData[row * 384 * 10 + l * 384 + col * 6 + pt] = l ==8 && cursor ? 0xC0C0C0 : 0;
         }
 }
 
