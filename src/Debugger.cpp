@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1804,6 +1804,7 @@ void DebugWindow::dumpProcessInput()
     } else {
         writeByte(m_dumpCurAddr, m_inputReturnValue);
         codeUpdate();
+        updateEmuScreen();
         dumpKbdProc(PK_RIGHT); // переходим к редактированию следующего байта
         m_inputFromMode = AM_DUMP;
         dumpKbdProc(PK_F2);
