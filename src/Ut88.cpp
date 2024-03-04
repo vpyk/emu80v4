@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ using namespace std;
 
 void Ut88Core::draw()
 {
-    m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -58,11 +57,12 @@ bool Ut88Core::setProperty(const string& propertyName, const EmuValuesList& valu
 Ut88Renderer::Ut88Renderer()
 {
     m_sizeX = m_prevSizeX = 384;
-    m_sizeY = m_prevSizeY = 320;
-    m_aspectRatio = m_prevAspectRatio = 12. / 13.;
+    m_sizeY = m_prevSizeY = 288;
+    m_aspectRatio = m_prevAspectRatio = 576.0 * 9 / 704 / 8;
     m_bufSize = m_prevBufSize = m_sizeX * m_sizeY;
-    m_pixelData = new uint32_t[512 * 512]; // altRenderer requires more mem
-    m_prevPixelData = new uint32_t[512 * 512];
+    int maxBufSize = 417 * 288;
+    m_pixelData = new uint32_t[maxBufSize];
+    m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
 }
@@ -74,13 +74,45 @@ void Ut88Renderer::attachScreenMemory(Ram* screenMemory)
 }
 
 
+void Ut88Renderer::operate()
+{
+    renderFrame();
+    m_curClock += g_emulation->getFrequency() * 6 * 84 * 320 / 8000000; // 8 MHz pixelclock, 320 scanlines, 84 symbols 6 points wide
+}
+
+
+void Ut88Renderer::prepareDebugScreen()
+{
+    enableSwapBuffersOnce();
+    renderFrame();
+}
+
+
+void Ut88Renderer::toggleCropping()
+{
+    m_useBorder = !m_useBorder;
+}
+
+
 void Ut88Renderer::primaryRenderFrame()
 {
-    m_sizeX = 384;
-    m_sizeY = 320;
-    m_bufSize = m_sizeX * m_sizeY;
+    int offset = 0;
 
-    for (int row = 0; row < 32; row++)
+    if (m_useBorder) {
+        m_sizeX = 417;
+        m_sizeY = 288;
+        memset(m_pixelData, 0, m_sizeX * m_sizeY * sizeof(uint32_t));
+        offset = 417 * 3 + 1;
+        m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
+    } else {
+        m_sizeX = 384;
+        m_sizeY = 280;
+        m_aspectRatio = 576.0 * 9 / 704 / 8;
+    }
+
+    memset(m_pixelData, 0, sizeof(uint32_t) * m_sizeX * m_sizeY);
+
+    for (int row = 0; row < 28; row++)
         for (int col = 0; col < 64; col++) {
             int addr = row * 64 + col;
             bool cursor = col != 63 && m_screenMemory[addr + 1] & 0x80;
@@ -90,17 +122,17 @@ void Ut88Renderer::primaryRenderFrame()
                 for (int pt = 0; pt < 6; pt++) {
                     bool pixel = (bt & 0x80);
                     bt <<= 1;
-                    m_pixelData[row * 384 * 10 + l * 384 + col * 6 + pt] = pixel ? 0 : 0xC0C0C0;
+                    m_pixelData[offset + row * m_sizeX * 10 + l * m_sizeX + col * 6 + pt] = pixel ? 0 : 0xC0C0C0;
                 }
             }
-            for (int l = 8; l < 10; l++)
+            if (cursor)
                 for (int pt = 0; pt < 6; pt++)
-                    m_pixelData[row * 384 * 10 + l * 384 + col * 6 + pt] = l ==8 && cursor ? 0xC0C0C0 : 0;
+                    m_pixelData[offset + row * m_sizeX * 10 + 8 * m_sizeX + col * 6 + pt] = 0xC0C0C0;
         }
 }
 
 
-void Ut88Renderer::altRenderFrame()
+/*void Ut88Renderer::altRenderFrame()
 {
     m_sizeX = 512;
     m_sizeY = 512;
@@ -122,7 +154,7 @@ void Ut88Renderer::altRenderFrame()
                 }
             }
         }
-}
+}*/
 
 
 const char* Ut88Renderer::getTextScreen()
@@ -149,8 +181,31 @@ bool Ut88Renderer::setProperty(const string& propertyName, const EmuValuesList& 
     if (propertyName == "screenMemory") {
         attachScreenMemory(static_cast<Ram*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "visibleArea") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_useBorder = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
+}
+
+
+string Ut88Renderer::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "visibleArea") {
+        return m_useBorder ? "yes" : "no";
+    } else if (propertyName == "crtMode") {
+        return u8"64\u00D728\u00D710@49.60Hz";
+    }
+
+    return "";
 }
 
 

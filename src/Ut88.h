@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,12 +27,20 @@ class Cpu8080;
 class Ram;
 
 
-class Ut88Renderer : public TextCrtRenderer
+class Ut88Renderer : public TextCrtRenderer, public IActive
 {
     public:
         Ut88Renderer();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        // derived from ActiveDevice
+        void operate() override;
+
+        // derived from CrtRenderer
+        void toggleCropping() override;
+        void prepareDebugScreen() override;
 
         const char* getTextScreen() override;
 
@@ -44,7 +52,9 @@ class Ut88Renderer : public TextCrtRenderer
         const uint8_t* m_screenMemory = nullptr;
 
         void primaryRenderFrame() override;
-        void altRenderFrame() override;
+        void altRenderFrame() override {}
+
+        bool m_useBorder = false;
 };
 
 
