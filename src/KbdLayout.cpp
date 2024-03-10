@@ -897,6 +897,12 @@ EmuKey RkKbdLayout::translateKey(PalKeyCode keyCode)
 
 EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& shift, bool& lang)
 {
+    if (unicodeKey == L'_') {
+        lang = false;
+        shift = true;
+        return EK_BSP;
+    }
+
     EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
     if (key != EK_NONE) {
         if (key >= EK_A && key <= EK_Z)
