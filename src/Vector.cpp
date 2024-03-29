@@ -344,8 +344,11 @@ void VectorRenderer::advanceTo(uint64_t clock)
 
     int toPixel = (int64_t(clock) - int64_t(m_curFrameClock)) / m_ticksPerPixel + bias;
 
-    if (toPixel <= m_curFramePixel)
+    if (toPixel <= m_curFramePixel) {
+        if (toPixel < 40 * 768 || toPixel >= 296 * 768)
+            m_lastColor = m_borderColor;
         return;
+    }
 
     if (toPixel >= 312 * 768)
         toPixel = 312 * 768 - 1;
@@ -392,8 +395,7 @@ void VectorRenderer::setLineOffset(uint8_t lineOffset)
 void VectorRenderer::setPaletteColor(uint8_t color)
 {
     advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 27);
-    //advance();
-    //m_palette[m_borderColor] = ((color & 0x7) << 21) | ((color & 0x38) << 10) | (color & 0xC0);
+
     m_colorPalette[m_lastColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
                                   ((color & 0x38) << 10) | ((color & 0x38) << 7) | ((color & 0x30) << 4) |
                                   (color & 0xC0) | ((color & 0xC0) >> 2) | ((color & 0xC0) >> 4) | ((color & 0xC0) >> 6);
