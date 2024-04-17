@@ -361,7 +361,6 @@ void Crt8275::writeByte(int addr, uint8_t value)
         case 1:
             // Writing Command Register
             m_cmdReg = value;
-            m_statusReg &= 0xf7;
             //m_statusReg |= m_isCompleteCommand ? 0 : 0x08;
             m_isCompleteCommand = true;
             m_statusReg &= ~0x08; // reset IC flag
@@ -372,7 +371,7 @@ void Crt8275::writeByte(int addr, uint8_t value)
                     m_parameterNum = 0;
                     m_isCompleteCommand = false;
                     m_isDisplayStarted = false;
-                    m_statusReg &= 0xFb; // reset VE flag
+                    m_statusReg &= 0xBB; // reset IE and VE flags
                     m_statusReg |= 0x08; // set IC flag
                     startRasterIfNotStarted();
                     break;
