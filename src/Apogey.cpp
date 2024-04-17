@@ -211,14 +211,17 @@ bool ApogeyRomDisk::setProperty(const std::string& propertyName, const EmuValues
         int mb = values[0].asInt();
         if (mb < 0)
             mb = 0;
-        else if (mb > 2)
+        else if (mb > 2 && mb <= 4)
             mb = 4;
+        else if (mb > 4)
+            mb = 8;
         switch(mb)
         {
            case 0: m_mask = 0x0f; break; // 512KB
            case 1: m_mask = 0x1f; break; // 1MB
            case 2: m_mask = 0x3f; break; // 2MB
            case 4: m_mask = 0x7f; break; // 4MB
+           case 8: m_mask = 0xff; break; // 8MB
         }
         return true;
     }
