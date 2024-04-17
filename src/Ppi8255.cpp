@@ -114,7 +114,7 @@ void Ppi8255::writeByte(int addr, uint8_t value)
 
                 m_ppiCircuit->setPortCLoMode(m_chCLoMode == PCM_IN);
                 m_ppiCircuit->setPortCHiMode(m_chCHiMode == PCM_IN);
-                if (m_chAMode == PCM_OUT || m_chBMode == PCM_OUT)
+                if (m_chCHiMode == PCM_OUT || m_chCLoMode == PCM_OUT)
                     m_ppiCircuit->setPortC(0); // если на вывод толко половина порта, может быть не совсем корректно
             }
         }  else {
