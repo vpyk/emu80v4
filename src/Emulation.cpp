@@ -66,10 +66,13 @@ Emulation::Emulation(CmdLine& cmdLine) : m_cmdLine(cmdLine)
     getConfig()->updateConfig();
 
     if (m_platformList.empty()) {
+        // Platforms was not created via command line or run file (SDL version)
         string defPlatformName = palGetDefaultPlatform();
         if (defPlatformName != "")
+            // default platform was stored in Qt options file
             runPlatform(defPlatformName);
         else {
+            // first run (SDL or Qt), no default platform
             PlatformInfo pi;
             bool newWnd;
             if (!m_config->getPlatformInfos()->empty() && m_config->choosePlatform(pi, "", newWnd, true)) {
@@ -77,8 +80,10 @@ Emulation::Emulation(CmdLine& cmdLine) : m_cmdLine(cmdLine)
                 m_platformList.push_back(platform);
                 getConfig()->updateConfig();
                 //m_activePlatform = platform;
-            } else
+            } else {
                 palRequestForQuit();
+                return;
+            }
         }
     }
 
