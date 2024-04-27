@@ -480,12 +480,14 @@ void ConfigReader::logPrefix()
     emuLog << "File " << m_configFileName << ", line " << m_curLine << " : ";
 }
 
-void ConfigReader::processConfigFile(ParentObject* parent)
+bool ConfigReader::processConfigFile(ParentObject* parent)
 {
     string t,o,p;
     EmuValuesList v;
+    bool processed = false;
     bool res = getNextLine(t,o,p,&v);
     while (res) {
+        processed = true;
         //cout << t << " " << o << " " << p << endl;
         if (t != "" && o != "" && p == "") {
             if (g_emulation->findObject(m_prefix + o)) {
@@ -520,5 +522,5 @@ void ConfigReader::processConfigFile(ParentObject* parent)
         v.clearList();
         res = getNextLine(t,o,p,&v);
     }
-
+    return processed;
 }

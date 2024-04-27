@@ -62,32 +62,41 @@ Emulation::Emulation(CmdLine& cmdLine) : m_cmdLine(cmdLine)
     m_prnWriter->setName("prnWriter");
 
     ConfigReader cr("emu80.conf");
-    cr.processConfigFile(this);
-    getConfig()->updateConfig();
 
-    if (m_platformList.empty()) {
-        // Platforms was not created via command line or run file (SDL version)
-        string defPlatformName = palGetDefaultPlatform();
-        if (defPlatformName != "")
-            // default platform was stored in Qt options file
-            runPlatform(defPlatformName);
-        else {
-            // first run (SDL or Qt), no default platform
-            PlatformInfo pi;
-            bool newWnd;
-            if (!m_config->getPlatformInfos()->empty() && m_config->choosePlatform(pi, "", newWnd, true)) {
-                Platform* platform = new Platform(pi.configFileName, pi.objName);
-                m_platformList.push_back(platform);
-                getConfig()->updateConfig();
-                //m_activePlatform = platform;
-            } else {
-                palRequestForQuit();
-                return;
-            }
-        }
+    if (!cr.processConfigFile(this)) {
+        palMsgBox("Error: emu80.conf not found!", true);
+        palRequestForQuit();
+        return;
     }
 
-    checkPlatforms();
+    getConfig()->updateConfig();
+
+    if (!m_platformList.empty()) {
+        checkPlatforms();
+        return;
+    }
+
+    // Platforms was not created via command line or run file (SDL version)
+    string defPlatformName = palGetDefaultPlatform();
+    if (!defPlatformName.empty()) {
+        // default platform was stored in Qt options file
+        if (runPlatform(defPlatformName))
+            return;
+    }
+
+    // first run (SDL or Qt), no default platform
+    PlatformInfo pi;
+    bool newWnd;
+    if (!m_config->getPlatformInfos()->empty() && m_config->choosePlatform(pi, "", newWnd, true)) {
+        Platform* platform = new Platform(pi.configFileName, pi.objName);
+        m_platformList.push_back(platform);
+        getConfig()->updateConfig();
+        //m_activePlatform = platform;
+    } else {
+        palRequestForQuit();
+        return;
+    }
+
 }
 
 #include <typeinfo>
@@ -121,7 +130,7 @@ void Emulation::checkPlatforms()
             it++;
 
     if (m_platformList.empty()) {
-        palMsgBox("Error: platform configuration files not found!\nFiles emu80.conf etc. should be placed in the excecutable file directory.", true);
+        palMsgBox("Error: Can't create platform, exiting.\nRun again to select another one.", true);
         palRequestForQuit();
     }
 }
@@ -167,8 +176,7 @@ void Emulation::processCmdLine()
         }
 
         if (platformName != "") {
-            runPlatform(platformName);
-            m_platformCreatedFromCmdLine = true;
+            m_platformCreatedFromCmdLine = runPlatform(platformName);
         }
     }
 
@@ -228,15 +236,20 @@ void Emulation::processCmdLine()
 }
 
 
-void Emulation::runPlatform(const string& platformName)
+bool Emulation::runPlatform(const string& platformName)
 {
     const std::vector<PlatformInfo>* platformVector = m_config->getPlatformInfos();
     for (unsigned i = 0; i < platformVector->size(); i++)
         if ((*platformVector)[i].objName == platformName) {
             Platform* newPlatform = new Platform((*platformVector)[i].configFileName, platformName);
+            if (!newPlatform->getWindow()) {
+                delete newPlatform;
+                return false;
+            }
             addChild(newPlatform);
-            break;
+            return true;
         }
+    return false;
 }
 
 
@@ -247,6 +260,7 @@ void Emulation::newPlatform(const string& platformName)
         delete (*it);
     m_platformList.clear();
     runPlatform(platformName);
+    checkPlatforms();
 }
 
 void Emulation::registerActiveDevice(IActive* device)

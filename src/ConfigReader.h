@@ -36,7 +36,7 @@ class ConfigReader : public EmuObject
 
         //bool setProperty(const string& propertyName, const EmuValuesList& values) override;
 
-        void processConfigFile(ParentObject* parent);
+        bool processConfigFile(ParentObject* parent);
 
     private:
         struct ConfigReaderState {

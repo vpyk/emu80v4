@@ -400,7 +400,10 @@ void MainWindow::fillPlatformListMenu()
         if (!value.isEmpty()) {
             m_lastPlatformsActions[i]->setVisible(true);
             m_lastPlatformsActions[i]->setData(value);
-            m_lastPlatformsActions[i]->setText(m_platformNames[value]);
+            QString platformName = m_platformNames[value];
+            if (platformName.isEmpty())
+                platformName = value;
+            m_lastPlatformsActions[i]->setText(platformName);
         }
     }
     settings.endGroup();

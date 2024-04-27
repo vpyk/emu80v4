@@ -146,7 +146,7 @@ class Emulation : public ParentObject
         CmdLine& m_cmdLine;
 
         bool m_platformCreatedFromCmdLine = false;
-        void runPlatform (const std::string& platformName);
+        bool runPlatform (const std::string& platformName);
 
         DebuggerOptions m_debuggerOptions;
 };
