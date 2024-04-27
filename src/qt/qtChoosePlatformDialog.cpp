@@ -44,7 +44,7 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
         QString s = QString::fromUtf8((*it).platformName.c_str());
         QListWidgetItem* item = new QListWidgetItem(s);
         ui->platformListWidget->addItem(item);
-        if ((*it).objName.find(".") == std::string::npos || (*it).objName == "orion.2") { //todo rename orion.2 and remove check
+        if ((*it).objName.find(".") == std::string::npos) {
             QFont font = item->font();
             font.setBold(true);
             item->setFont(font);

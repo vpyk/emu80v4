@@ -378,11 +378,8 @@ void MainWindow::fillPlatformListMenu()
 
             QAction* action = new QAction(platformName, m_platformListMenu);
             action->setData(platform);
-            if (!platform.contains(".") || platform == "orion.2") { // todo: replace with "orion"
-                if (platform != "orion.2")
-                    menu->setTitle(platformName);
-                else
-                    menu->setTitle(u8"Орион-128");
+            if (!platform.contains(".")) {
+                menu->setTitle(platformName);
                 QFont font = action->font();
                 font.setBold(true);
                 action->setFont(font);
@@ -397,6 +394,11 @@ void MainWindow::fillPlatformListMenu()
 
     for (int i = 0; i < LAST_PLATFORMS_QTY; i++) {
         QString value = settings.value(QString::number(i)).toString();
+
+        // workaround for changed Orion platform name
+        if (value == "orion.2")
+            value = "orion";
+
         if (!value.isEmpty()) {
             m_lastPlatformsActions[i]->setVisible(true);
             m_lastPlatformsActions[i]->setData(value);
