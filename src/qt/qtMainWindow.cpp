@@ -2163,6 +2163,7 @@ void MainWindow::onLoad()
         m_loaderLastFiles.addToLastFiles(lastFileName);
         updateLastFiles();
     }
+    updateActions();
 }
 
 
@@ -2172,6 +2173,7 @@ void MainWindow::onLoadLastFiles()
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".loader", "loadFile", action->text().toStdString());
     m_loaderLastFiles.addToLastFiles(action->text());
     updateLastFiles();
+    updateActions();
 }
 
 
@@ -2183,6 +2185,7 @@ void MainWindow::onLoadRun()
         m_loaderLastFiles.addToLastFiles(lastFileName);
         updateLastFiles();
     }
+    updateActions();
 }
 
 
@@ -2192,6 +2195,7 @@ void MainWindow::onLoadRunLastFiles()
     emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".loader", "loadRunFile", action->text().toStdString());
     m_loaderLastFiles.addToLastFiles(action->text());
     updateLastFiles();
+    updateActions();
 }
 
 
