@@ -336,7 +336,7 @@ bool RkSdController::cmdFind()
                 break;
             } else if (*ptr == '.')
                 nPeriods++;
-        if (hasNonLatin || nPeriods > 2) {
+        if (hasNonLatin || nPeriods > 1) {
             delete (*it);
             it = m_fileList.erase(it);
             continue;
@@ -353,8 +353,11 @@ bool RkSdController::cmdFind()
         string ext = "";
         if (periodPos != string::npos) {
             ext  = fileName.substr(periodPos + 1, string::npos);
-            if (ext.size() > 3)
+            if (ext.size() > 3) {
+                delete (*it);
+                it = m_fileList.erase(it);
                 continue;
+            }
             std::transform(ext.begin(), ext.end(), ext.begin(), ::toupper);
         }
 
