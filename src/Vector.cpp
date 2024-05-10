@@ -608,7 +608,8 @@ string VectorRenderer::getDebugInfo()
 
 bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
 {
-    string ext = fileName.substr(fileName.find_last_of("."));
+    auto periodPos = fileName.find_last_of(".");
+    string ext = periodPos != string::npos ? fileName.substr(periodPos) : fileName;
     transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (ext == ".fdd") {
         if (!emuSetPropertyValue(m_platform->getName() + ".diskA", "fileName", fileName))
