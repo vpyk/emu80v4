@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
  */
 
 #include <sstream>
-#include <string.h>
+#include <algorithm>
+#include <cstring>
 
 #include "Globals.h"
 #include "EmuCalls.h"
