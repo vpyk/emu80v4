@@ -622,11 +622,6 @@ bool Pit8253Helper::setProperty(const std::string& propertyName, const EmuValues
     if (propertyName == "core") {
         m_core = static_cast<PlatformCore*>(g_emulation->findObject(values[0].asString()));
         return true;
-    } else if (propertyName == "id") {
-        if (values[0].isInt()) {
-            m_id = values[0].asInt();
-            return true;
-        }
     }
     return false;
 }

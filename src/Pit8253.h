@@ -156,7 +156,6 @@ public:
 private:
     Pit8253Counter* m_counter = nullptr;
     PlatformCore* m_core = nullptr;
-    int m_id = 0;
 
     void checkForInt();
 };
