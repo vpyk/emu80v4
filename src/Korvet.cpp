@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -262,16 +262,16 @@ void KorvetRenderer::operate()
         renderFrame();
     }
 
-    static_cast<KorvetCore*>(m_platform->getCore())->hrtc(true, 0);
-    static_cast<KorvetCore*>(m_platform->getCore())->hrtc(false, 0);
-
-    if (m_curLine == 293)
+    if (m_curLine == 297) // acrually SVBL in much shorter than 1 scanline
         static_cast<KorvetCore*>(m_platform->getCore())->int4(false);
-    if (m_curLine == 295) {
+    if (m_curLine == 296) {
         m_platform->getCore()->vrtc(true);
         static_cast<KorvetCore*>(m_platform->getCore())->int4(true);
     } else if (m_curLine == 39)
         m_platform->getCore()->vrtc(false);
+
+    static_cast<KorvetCore*>(m_platform->getCore())->hrtc(true, 0);
+    static_cast<KorvetCore*>(m_platform->getCore())->hrtc(false, 0);
 
     m_curClock += g_emulation->getFrequency() / 10000000 * 640;
 }
