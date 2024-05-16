@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -207,7 +207,12 @@ void Pic8259::eoi(int level)
     if (level == 8) // no interrupt in progress
         return;
     m_irr &= ~(1 << level);
+
     updateCurLevel();
-    if (m_curLevel >= 0)
-        setInt(m_curLevel);
+
+    int newLevel = m_curLevel;
+    m_curLevel = 8;
+
+    if (newLevel < 8)
+        setInt(newLevel);
 }
