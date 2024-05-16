@@ -465,6 +465,8 @@ void Pit8253::writeByte(int addr, uint8_t value)
         if (loadMode == PRLM_LATCH) {
             // команда защелкивания
             if (!m_latched[counterNum]) {
+                if (!m_counters[counterNum]->m_extClockMode)
+                    m_counters[counterNum]->updateState();
                 m_latched[counterNum] = true;
                 m_latches[counterNum] = m_counters[counterNum]->m_counter;
                 m_waitingHi[counterNum] = false;
