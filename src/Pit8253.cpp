@@ -74,7 +74,7 @@ void Pit8253Counter::outChangeNotify()
     m_prevOut = m_out;
 
     if (m_core) {
-        m_core->timer(0, m_out);
+        m_core->timer(m_number, m_out);
     }
 }
 
