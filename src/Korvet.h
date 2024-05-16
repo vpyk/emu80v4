@@ -87,6 +87,7 @@ class KorvetCore : public PlatformCore
         void vrtc(bool isActive) override;
         void hrtc(bool, int) override;
         void inte(bool isActive) override;
+        void timer(int id, bool isActive) override;
 
         void int4(bool isActive);
         void int7();
@@ -101,6 +102,7 @@ class KorvetCore : public PlatformCore
         Pit8253* m_pit = nullptr;
         Pic8259* m_pic = nullptr;
         bool m_curVrtc = true;
+        bool m_curHrtc = false;
 };
 
 

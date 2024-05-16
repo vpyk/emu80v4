@@ -146,18 +146,24 @@ void KorvetCore::vrtc(bool isActive)
     if (m_curVrtc != isActive) {
         m_curVrtc = isActive;
         m_ppiCircuit->setVbl(!isActive);
-        m_pit->getCounter(2)->setGate(!isActive);
+        //m_pit->getCounter(2)->setGate(!isActive);
     }
 }
 
 
 void KorvetCore::hrtc(bool isActive, int)
 {
-    Pit8253Counter* cnt = m_pit->getCounter(2);
-    bool prev = cnt->getOut();
-    cnt->operateForTicks(1);
-    if (!prev && cnt->getOut())
-        m_pic->irq(5, isActive);
+    if (isActive && !m_curHrtc) {
+        Pit8253Counter* cnt = m_pit->getCounter(2);
+        cnt->operateForTicks(1);
+    }
+    m_curHrtc = isActive;
+}
+
+
+void KorvetCore::timer(int /*id*/, bool isActive)
+{
+    m_pic->irq(5, isActive);
 }
 
 
@@ -257,7 +263,7 @@ void KorvetRenderer::operate()
     }
 
     static_cast<KorvetCore*>(m_platform->getCore())->hrtc(true, 0);
-    //static_cast<KorvetCore*>(m_platform->getCore())->hrtc(false, 0);
+    static_cast<KorvetCore*>(m_platform->getCore())->hrtc(false, 0);
 
     if (m_curLine == 293)
         static_cast<KorvetCore*>(m_platform->getCore())->int4(false);

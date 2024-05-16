@@ -37,6 +37,7 @@ Pit8253Counter::Pit8253Counter(Pit8253* pit, int number)
     m_isCounting = false;
     m_gate = true;
     m_out = false;
+    m_prevOut = false;
     m_counterInitValue = 0xffff;
     m_counter = 0xffff;
     m_mode = 0;
@@ -61,6 +62,19 @@ void Pit8253Counter::planIrq()
         m_helper->updateAndScheduleNext((g_emulation->getCurClock() / m_kDiv + ticksToUpdate) * m_kDiv);
     else
         m_helper->updateAndScheduleNext(0); // don't schedule, just update and generate int if necessary
+}
+
+
+void Pit8253Counter::outChangeNotify()
+{
+    if (m_prevOut == m_out)
+        return;
+
+    m_prevOut = m_out;
+
+    if (m_core) {
+        m_core->timer(0, m_out);
+    }
 }
 
 
@@ -171,6 +185,8 @@ void Pit8253Counter::operateForTicks(int ticks)
                 m_tempSumOut += ticks;
             break;
     }
+
+        outChangeNotify();
 }
 
 void Pit8253Counter::updateState()
@@ -281,6 +297,7 @@ void Pit8253Counter::setMode(int mode)
         default:
             break;
     }
+        outChangeNotify();
     planIrq();
 }
 
@@ -334,6 +351,8 @@ void Pit8253Counter::setCounter(uint16_t counter)
             // not implemented yet
             break;
     }
+
+        outChangeNotify();
     planIrq();
 }
 
@@ -361,6 +380,8 @@ void Pit8253Counter::setGate(bool gate)
         default:
             break;
     }
+
+        outChangeNotify();
     planIrq();
 }
 
@@ -518,7 +539,15 @@ bool Pit8253::setProperty(const std::string& propertyName, const EmuValuesList& 
         } else
             return false;
         return true;
+    } else if (propertyName == "core") {
+        int cnt = values[0].asInt();
+        if (cnt >=0 && cnt <= 3) {
+            m_counters[cnt]->m_core = static_cast<PlatformCore*>(g_emulation->findObject(values[1].asString()));
+        } else
+            return false;
+        return true;
     }
+
     return false;
 }
 
@@ -544,7 +573,7 @@ string Pit8253::getDebugInfo()
         ss << "\n";
     }
     return ss.str();
-}*/
+ }*/
 
 
 Pit8253Helper::Pit8253Helper()
@@ -555,12 +584,6 @@ Pit8253Helper::Pit8253Helper()
 
 void Pit8253Helper::updateAndScheduleNext(uint64_t time)
 {
-    bool isActive = m_counter->getOut();
-    if (isActive != m_request) {
-        m_core->timer(0, isActive);
-    }
-    m_request = isActive;
-
     if (time) {
         m_curClock = time;
         resume();
