@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ Pit8253Counter::Pit8253Counter(Pit8253* pit, int number)
     m_counterInitValue = 0xffff;
     m_counter = 0xffff;
     m_mode = 0;
+    m_countDelay = 0;
 }
 
 
@@ -52,11 +53,11 @@ void Pit8253Counter::planIrq()
     int ticksToUpdate = 0;
 
     if (m_mode == 3)
-        ticksToUpdate = (m_counter + 1) / 2;
+        ticksToUpdate = (m_counter + 1) / 2 + m_countDelay;
     else if (m_mode == 2)
-        ticksToUpdate = !m_out ? 1 : m_counter - 1;
+        ticksToUpdate = !m_out ? 1 : m_counter - 1  + m_countDelay;
     else if (m_mode == 0 && !m_out)
-        ticksToUpdate = m_counter;
+        ticksToUpdate = m_counter + m_countDelay;
 
     if (ticksToUpdate)
         m_helper->updateAndScheduleNext((g_emulation->getCurClock() / m_kDiv + ticksToUpdate) * m_kDiv);
@@ -80,6 +81,16 @@ void Pit8253Counter::outChangeNotify()
 
 void Pit8253Counter::operateForTicks(int ticks)
 {
+    if (m_countDelay) {
+        int ticksToSkip = min(ticks, m_countDelay);
+        ticks -= ticksToSkip;
+        m_countDelay -= ticksToSkip;
+        if (m_out)
+            m_tempSumOut += ticksToSkip;
+        if (!ticks)
+            return;
+    }
+
     if (!m_gate) {
         if (m_out)
             m_tempSumOut += ticks;
@@ -337,12 +348,14 @@ void Pit8253Counter::setCounter(uint16_t counter)
             m_counter = m_counterInitValue;
             m_isCounting = true;
             m_out = false;
+            m_countDelay = 2;
             break;
         case 2:
         case 3:
             if (!m_isCounting)
                 m_counter = m_counterInitValue;
             m_isCounting = true;
+            m_countDelay = 2;
             break;
         case 1:
         case 4:
@@ -554,7 +567,7 @@ bool Pit8253::setProperty(const std::string& propertyName, const EmuValuesList& 
 }
 
 
-/*#include <sstream>
+/* #include <sstream>
 #include <iomanip>
 string Pit8253::getDebugInfo()
 {

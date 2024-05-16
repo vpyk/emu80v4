@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -84,6 +84,7 @@ class Pit8253Counter : public EmuObject //PassiveDevice
         int m_counter;
         int m_counterInitValue;
         bool m_isCounting;
+        int m_countDelay = 0;
 
         void setMode(int mode);
         void setHalfOfCounter();
