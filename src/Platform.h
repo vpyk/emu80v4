@@ -44,7 +44,7 @@ class Platform : public ParentObject
 {
     public:
         //Platform();
-        Platform(const std::string& configFileName, std::string name = "", std::string postConfigFileName = "");
+        Platform(std::string configFileName, std::string name = "");
         virtual ~Platform();
         void addChild(EmuObject* child) override;
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
