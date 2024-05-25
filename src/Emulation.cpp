@@ -179,7 +179,7 @@ void Emulation::processCmdLine()
         }
 
         if (platformName != "") {
-            m_platformCreatedFromCmdLine = runPlatform(platformName);
+            m_platformCreatedFromCmdLine = runPlatform(platformName, postCfgFile);
         }
     }
 
