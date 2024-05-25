@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ class Emulation : public ParentObject
         CmdLine& m_cmdLine;
 
         bool m_platformCreatedFromCmdLine = false;
-        bool runPlatform (const std::string& platformName);
+        bool runPlatform (const std::string& platformName, const std::string& postConfigFile = "");
 
         DebuggerOptions m_debuggerOptions;
 };

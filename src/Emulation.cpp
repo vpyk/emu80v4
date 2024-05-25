@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -148,13 +148,16 @@ void Emulation::processCmdLine()
     // Configuration file
     string cfgFile = m_cmdLine["conf-file"];
 
+    // Post-config file
+    string postCfgFile = m_cmdLine["post-conf"];
+
     // Command line platform options
     string platformName = m_cmdLine["platform"];
 
     if (!cfgFile.empty()) {
         if (platformName.empty())
             platformName = "userconfig";
-        Platform* newPlatform = new Platform(cfgFile, platformName);
+        Platform* newPlatform = new Platform(cfgFile, platformName, postCfgFile);
         addChild(newPlatform);
         m_platformCreatedFromCmdLine = true;
     } else {
@@ -182,14 +185,6 @@ void Emulation::processCmdLine()
 
     if (m_platformList.empty())
         return; // Platform was not created
-
-    // Post-config file
-    string postCfgFile = m_cmdLine["post-conf"];
-    if (!postCfgFile.empty()) {
-        ConfigReader cr(postCfgFile, platformName);
-        cr.processConfigFile(this);
-        getConfig()->updateConfig();
-    }
 
     // Load file
     if (!cmdLineFileName.empty()) {
@@ -236,12 +231,12 @@ void Emulation::processCmdLine()
 }
 
 
-bool Emulation::runPlatform(const string& platformName)
+bool Emulation::runPlatform(const string& platformName, const string& postConfigFile)
 {
     const std::vector<PlatformInfo>* platformVector = m_config->getPlatformInfos();
     for (unsigned i = 0; i < platformVector->size(); i++)
         if ((*platformVector)[i].objName == platformName) {
-            Platform* newPlatform = new Platform((*platformVector)[i].configFileName, platformName);
+            Platform* newPlatform = new Platform((*platformVector)[i].configFileName, platformName, postConfigFile);
             if (!newPlatform->getWindow()) {
                 delete newPlatform;
                 return false;

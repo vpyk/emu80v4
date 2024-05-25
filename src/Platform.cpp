@@ -38,7 +38,7 @@
 
 using namespace std;
 
-Platform::Platform(string configFileName, string name)
+Platform::Platform(const string& configFileName, string name, std::string postConfigFileName)
 {
     string::size_type slashPos = configFileName.find_last_of("\\/");
     if (slashPos != string::npos)
@@ -60,6 +60,11 @@ Platform::Platform(string configFileName, string name)
 
     ConfigReader cr(configFileName, getName());
     cr.processConfigFile(this);
+
+    if (!postConfigFileName.empty()) {
+        ConfigReader cr2(configFileName, getName());
+        cr2.processConfigFile(this);
+    }
 
     // ищем объект-окно, должен быть единственным
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
