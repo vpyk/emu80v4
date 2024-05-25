@@ -62,7 +62,7 @@ Platform::Platform(const string& configFileName, string name, std::string postCo
     cr.processConfigFile(this);
 
     if (!postConfigFileName.empty()) {
-        ConfigReader cr2(postConfigFileName, getName());
+        ConfigReader cr2(configFileName, getName());
         cr2.processConfigFile(this);
     }
 
