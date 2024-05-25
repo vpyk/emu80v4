@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,8 @@ class Pic8259 : public AddressableDevice
         int m_addrInterval = 8;      // isr table interval
         uint16_t m_isrPageAddr = 0;  // isr table base address
         bool m_levelMode = false;    // level interrupt mode (instead of  edge)
-        int m_curLevel = 8;          // last in-service request level
+        int m_curInServiceLevel = 8; // current in-service level
+        int m_curRequestLevel = 8;   // current request level
         int m_highestPrio = 0;       // bottom priority level
         bool m_readIsrFlag = false;  // read ISR (true) or IRR (false)
         bool m_pollMode = false;     // poll mode flag
@@ -63,8 +64,8 @@ class Pic8259 : public AddressableDevice
         bool m_rotateOnAeoi = false; // auto EOI
         bool m_inte = false;         // inte cpu output
 
-        void updateCurLevel();
-        void setInt(int level);
+        void updateCurLevels();
+        void serviceInt();
         void eoi(int level);
 };
 
