@@ -129,13 +129,7 @@ void KorvetCore::draw()
 
 void KorvetCore::inte(bool isActive)
 {
-    if (!isActive)
-        m_pic->inte(false);
-    else {
-        Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
-        if (cpu->getInte())
-            m_pic->inte(true);
-    }
+    m_pic->inte(isActive);
 }
 
 

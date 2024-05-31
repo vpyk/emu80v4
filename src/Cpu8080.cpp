@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  Based on i8080 core object model code by:
  *  Alexander Demin <alexander@demin.ws> (https://github.com/begoon/i8080-core)
@@ -1674,9 +1674,8 @@ int Cpu8080::i8080_execute(int opcode) {
 
         case 0xFB:            /* ei */
             cpu_cycles = 4;
-            m_iffPendingCnt = 2;
-            IFF = 0;             // interrupts are disabled internally during the EI instruction
-            m_core->inte(true);  // whereas INTE is already active
+            if (!IFF)
+                m_iffPendingCnt = 2;
             break;
 
         case 0xFC:            /* cm addr */
