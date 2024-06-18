@@ -1774,6 +1774,8 @@ void Cpu8080::intRst(int vect) {
         RST(vect * 8);
         m_statusWord = 0xA2;
         m_curClock += m_kDiv * 11;
+        /*if (m_waits)
+            m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xFF, 11);*/
     }
 }
 
@@ -1790,6 +1792,8 @@ void Cpu8080::intCall(uint16_t addr) {
         PC = addr;
         m_statusWord = 0xA2;
         m_curClock += m_kDiv * 17;
+        /*if (m_waits)
+            m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xCD, 17);*/
     }
 }
 

@@ -249,7 +249,7 @@ void VectorCore::inte(bool isActive)
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu->getInte()) {
             cpu->intRst(7);
-            cpu->hrq(cpu->getKDiv() * 16); // add waits to RST
+            cpu->hrq(cpu->getKDiv() * 5); // add waits to RST
         }
     }
 }
@@ -262,7 +262,7 @@ void VectorCore::vrtc(bool isActive)
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu->getInte()) {
             cpu->intRst(7);
-            cpu->hrq(cpu->getKDiv() * 16); // add waits to RST
+            cpu->hrq(cpu->getKDiv() * 5); // add waits to RST
         }
     }
 }
@@ -339,7 +339,7 @@ void VectorRenderer::operate()
 
 void VectorRenderer::advanceTo(uint64_t clock)
 {
-    const int bias = 145;
+    const int bias = 189;
 
     if (clock <= m_curFrameClock)
         return;

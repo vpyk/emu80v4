@@ -2613,8 +2613,8 @@ void CpuZ80::intRst(int vect)
         else {
             PC = GetWORD((ir | 0xFF)); // r is ignored
             m_curClock += m_kDiv * 19;
-            if (m_waits)
-                m_curClock += m_waits->getCpuWaitStates(0, 0xE3, 19); // similar to xthl
+            /*if (m_waits)
+                m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xE3, 19);*/ // similar to xthl
         }
         m_curClock += m_kDiv * 11; // revise!
     }
@@ -2633,8 +2633,8 @@ void CpuZ80::intCall(uint16_t addr)
         PUSH(PC);
         PC = addr;
         m_curClock += m_kDiv * 19;
-        if (m_waits)
-            m_curClock += m_waits->getCpuWaitStates(0, 0xCD, 17);
+        /*if (m_waits)
+            m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xCD, 17);*/
     }
 }
 
