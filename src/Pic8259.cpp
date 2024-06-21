@@ -220,7 +220,7 @@ void Pic8259::eoi(int level)
     if (m_rotateOnAeoi)
         m_highestPrio = (level + 1) & 7;
 
-    if (m_irr & m_imr)
+    if (m_irr & ~m_imr)
         serviceInt();
     else
         updateCurLevels();
