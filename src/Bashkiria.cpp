@@ -26,8 +26,6 @@
 #include "AddrSpace.h"
 #include "SoundMixer.h"
 #include "Cpu.h"
-#include "TapeRedirector.h"
-#include "WavReader.h"
 #include "PrnWriter.h"
 
 using namespace std;
@@ -61,6 +59,28 @@ void Bashkiria_2M_Core::inte(bool isActive)
 }
 
 
+void Bashkiria_2M_Core::timer(int /*id*/, bool isActive)
+{
+    if (!isActive)
+        return;
+
+    // signal front
+    Pit8253Counter* cnt0 = m_pit->getCounter(0);
+    Pit8253Counter* cnt2 = m_pit->getCounter(2);
+
+    //cnt2->updateState();
+    cnt0->operateForTicks(cnt2->getSumOutTicks());
+    //cnt0->operateForTicks(1);
+
+    if (m_pic) {
+        m_pic->irq(1, cnt0->getOut());
+    }
+
+    //cnt0->resetStats(); ???
+    cnt2->resetStats();
+}
+
+
 bool Bashkiria_2M_Core::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (PlatformCore::setProperty(propertyName, values))
@@ -71,6 +91,9 @@ bool Bashkiria_2M_Core::setProperty(const string& propertyName, const EmuValuesL
         return true;
     } else if (propertyName == "pic") {
         m_pic = static_cast<Pic8259*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "pit") {
+        m_pit = static_cast<Pit8253*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 
@@ -199,7 +222,7 @@ string Bashkiria_2M_Renderer::getPropertyStringValue(const string& propertyName)
     if (propertyName == "visibleArea") {
         return m_showBorder ? "yes" : "no";
     } else if (propertyName == "crtMode") {
-        return u8"384\u00D7256@50Hz" ;
+        return u8"384\u00D7256@50.08Hz" ;
     } else if (propertyName == "colorMode") {
         return m_colorMode ? "color" : "mono";
     }
@@ -307,7 +330,7 @@ bool Bashkiria_2M_Ppi8255Circuit2::setProperty(const string& propertyName, const
 }
 
 
-void Bashkiria_2M_PitIrqWatchdog::writeByte(int addr, uint8_t value)
+/*void Bashkiria_2M_PitIrqWatchdog::writeByte(int addr, uint8_t value)
 {
     if (m_pit) m_pit->writeByte(addr, value);
 }
@@ -354,7 +377,7 @@ void Bashkiria_2M_PitIrqWatchdog::operate()
         cnt2->resetStats();
     }
     m_curClock += 13*m_kDiv;
-}
+}*/
 
 
 Bashkiria_2M_Keyboard::Bashkiria_2M_Keyboard()
@@ -421,11 +444,11 @@ EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
     case PK_LEFT:  return EK_NP_4;
     case PK_RIGHT: return EK_NP_6;
     case PK_UP:    return EK_NP_8;
-    case PK_DEL:   return EK_LF;
+    //case PK_DEL:   return EK_LF;
     case PK_LALT:  return EK_FIX;
-    case PK_PGUP:  return EK_SEL;
-    case PK_PGDN:  return EK_LANG;
-    case PK_MENU:  return EK_MENU;
+    //case PK_PGUP:  return EK_SEL;
+    //case PK_PGDN:  return EK_LANG;
+    //case PK_MENU:  return EK_MENU;
     case PK_F12:   return EK_STOP;
     case PK_F6:    return EK_F6;
     case PK_F7:    return EK_F7;
@@ -440,7 +463,7 @@ EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
         return key;
 
     switch (keyCode) {
-    case PK_LCTRL: return EK_CTRL;
+    //case PK_LCTRL: return EK_CTRL;
     default:       return EK_NONE;
     }
 }
@@ -471,7 +494,7 @@ uint8_t Bashkiria_2M_KbdMem::readByte(int addr)
 
 bool Bashkiria_2M_KbdMem::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "kbd") {
@@ -504,6 +527,12 @@ void Bashkiria_2M_Pit8253SoundSource::setGate(bool gate)
 }
 
 
+void Bashkiria_2M_Pit8253SoundSource::tuneupPit()
+{
+    m_pit->getCounter(0)->setExtClockMode(true);
+}
+
+
 void Bashkiria_2M_Spi8251::writeByte(int addr, uint8_t value)
 {
     if (m_snd && (addr&1)==1) m_snd->setGate((value&0x20)==0);
@@ -512,7 +541,7 @@ void Bashkiria_2M_Spi8251::writeByte(int addr, uint8_t value)
 
 bool Bashkiria_2M_Spi8251::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
-    if (EmuObject::setProperty(propertyName, values))
+    if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "b2m_soundsource") {

@@ -347,8 +347,8 @@ void Pit8253Counter::setCounter(uint16_t counter)
         case 0:
             m_counter = m_counterInitValue;
             m_isCounting = true;
-            m_out = false;
-            //m_out = counter == 1;
+            //m_out = false;
+            m_out = counter == 1;
             m_countDelay = 2;
             break;
         case 2:

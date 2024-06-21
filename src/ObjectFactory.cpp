@@ -273,7 +273,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Bashkiria_2M_Palette);
     REG_EMU_CLASS(Bashkiria_2M_Ppi8255Circuit1);
     REG_EMU_CLASS(Bashkiria_2M_Ppi8255Circuit2);
-    REG_EMU_CLASS(Bashkiria_2M_PitIrqWatchdog);
+    //REG_EMU_CLASS(Bashkiria_2M_PitIrqWatchdog);
     REG_EMU_CLASS(Bashkiria_2M_Keyboard);
     REG_EMU_CLASS(Bashkiria_2M_KbdLayout);
     REG_EMU_CLASS(Bashkiria_2M_KbdMem);

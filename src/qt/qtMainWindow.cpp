@@ -1499,8 +1499,8 @@ void MainWindow::tuneMenu()
 
     m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "lvov");
 
-    m_loadMenuAction->setVisible(platformGroup != "korvet");
-    m_loadRunMenuAction->setVisible(platformGroup != "korvet");
+    m_loadMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria");
+    m_loadRunMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria");
 
     m_pasteAction->setVisible(!emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".kbdTapper", "pasting").empty());
 

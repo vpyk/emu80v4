@@ -39,6 +39,7 @@ class Bashkiria_2M_Core : public PlatformCore
         void draw() override;
         void vrtc(bool isActive) override;
         void inte(bool isActive) override;
+        void timer(int id, bool isActive) override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
@@ -47,6 +48,7 @@ class Bashkiria_2M_Core : public PlatformCore
     private:
         CrtRenderer* m_crtRenderer = nullptr;
         Pic8259* m_pic = nullptr;
+        Pit8253* m_pit = nullptr;
 };
 
 
@@ -142,7 +144,7 @@ class Bashkiria_2M_Ppi8255Circuit2 : public Ppi8255Circuit
 };
 
 
-class Bashkiria_2M_PitIrqWatchdog : public AddressableDevice, public IActive
+/*class Bashkiria_2M_PitIrqWatchdog : public AddressableDevice, public IActive
 {
     public:
         // derived from AddressableDevice
@@ -159,7 +161,7 @@ class Bashkiria_2M_PitIrqWatchdog : public AddressableDevice, public IActive
     private:
         Pit8253* m_pit = nullptr;
         Pic8259* m_pic = nullptr;
-};
+};*/
 
 
 class Bashkiria_2M_Keyboard : public Keyboard
@@ -225,6 +227,7 @@ class Bashkiria_2M_Pit8253SoundSource : public Pit8253SoundSource
 {
     public:
         int calcValue() override;
+        void tuneupPit() override;
 
         void setGate(bool gate);
 
