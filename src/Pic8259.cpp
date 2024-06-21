@@ -20,6 +20,9 @@
 
 // Реализация контроллера прерываний КР580ВН59
 
+#include <sstream>
+#include <bitset>
+
 #include "Globals.h"
 #include "Pic8259.h"
 #include "Cpu.h"
@@ -224,4 +227,16 @@ void Pic8259::eoi(int level)
         serviceInt();
     else
         updateCurLevels();
+}
+
+
+string Pic8259::getDebugInfo()
+{
+   stringstream ss;
+   ss << "PIC i8259:\n";
+   //ss << "LEV 76543210\n";
+   ss << "IRR " << bitset<8>(m_irr) << "\n";
+   ss << "IMR " << bitset<8>(m_imr) << "\n";
+   ss << "ISR " << bitset<8>(m_isr) << "\n";
+   return ss.str();
 }

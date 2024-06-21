@@ -29,7 +29,7 @@ class Pic8259 : public AddressableDevice
 {
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        //std::string getDebugInfo() override;
+        std::string getDebugInfo() override;
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
