@@ -733,7 +733,7 @@ EmuKey KbdLayout::translateCommonUnicodeKeys(unsigned unicodeKey, bool& shift, b
             shift = true;
             break;
 
-       // Cyrillic letters (upper case)
+       // Cyrillic letters (lower case)
        case L'а':
            key = EK_A;
            lang = true;

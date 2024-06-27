@@ -1,6 +1,7 @@
 ﻿/*
  *  bashkiria-2m for Emu80 v. 4.x
  *  © Dmitry Tselikov <bashkiria-2m.narod.ru>, 2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -178,18 +179,21 @@ class Bashkiria_2M_Keyboard : public Keyboard
 
     private:
         const EmuKey m_keyMatrix[11][8] = {
-            { EK_U,        EK_A,         EK_T,     EK_L,   EK_W,   EK_F6,      EK_F,     EK_F7       },
-            { EK_J,        EK_Y,         EK_V,     EK_K,   EK_R,   EK_Q,       EK_B,     EK_LBRACKET },
-            { EK_D,        EK_F8,        EK_E,     EK_N,   EK_C,   EK_H,       EK_Z,     EK_G        },
-            { EK_RBRACKET, EK_X,         EK_O,     EK_F9,  EK_I,   EK_P,       EK_S,     EK_M        },
-            { EK_8,        EK_7,         EK_6,     EK_5,   EK_4,   EK_3,       EK_2,     EK_MINUS    },
-            { EK_COMMA,    EK_SEMICOLON, EK_COLON, EK_AT,  EK_1,   EK_BKSLASH, EK_0,     EK_9        },
-            { EK_SPACE,    EK_TAB,       EK_BSP,   EK_DEL, EK_INS, EK_STOP,    EK_CLEAR, EK_CR       },
-            { EK_SHIFT,    EK_FIX,       EK_CTRL,  EK_SEL, EK_ESC, EK_MENU,    EK_LANG,  EK_LF       },
+            { EK_U,        EK_A,         EK_T,     EK_L,        EK_W,   EK_GRAVE,   EK_F,     EK_TILDE    },
+            { EK_J,        EK_Y,         EK_V,     EK_K,        EK_R,   EK_Q,       EK_B,     EK_LBRACE   },
+            { EK_D,        EK_LBRACKET,  EK_E,     EK_N,        EK_C,   EK_H,       EK_Z,     EK_G        },
+            { EK_RBRACE,   EK_X,         EK_O,     EK_RBRACKET, EK_I,   EK_P,       EK_S,     EK_M        },
+            { EK_8,        EK_7,         EK_6,     EK_5,        EK_4,   EK_3,       EK_2,     EK_MINUS    },
+            { EK_COMMA,    EK_SEMICOLON, EK_EQU,   EK_YO,       EK_1,   EK_BKSLASH, EK_0,     EK_9        },
+            { EK_SPACE,    EK_TAB,       EK_BSP,   EK_DEL,      EK_INS, EK_STOP,    EK_CLEAR, EK_CR       },
+            { EK_SHIFT,    EK_FIX,       EK_CTRL,  EK_SEL,      EK_ESC, EK_GRAPH,   EK_LANG,  EK_LF       },
 
-            { EK_NP_7,   EK_NP_6,       EK_NP_5,    EK_NP_4,   EK_NP_3,  EK_NP_2,  EK_NP_1,  EK_NP_0 },
-            { EK_SLASH,  EK_NP_PERIOD,  EK_CARET,   EK_PERIOD, EK_NONE,  EK_NONE,  EK_NP_9,  EK_NP_8 },
-            { EK_NONE,   EK_NONE,       EK_NONE,    EK_F5,     EK_F4,    EK_F3,    EK_F2,    EK_F1   }
+            { EK_SHOME,    EK_RIGHT,     EK_MENU,  EK_LEFT,     EK_END, EK_DOWN,    EK_HOME,  EK_PHOME },
+            { EK_SLASH,    EK_PEND,      EK_COLON, EK_PERIOD,   EK_NONE,EK_NONE,    EK_SEND,  EK_UP },
+            { EK_NONE,     EK_NONE,      EK_NONE,  EK_F5,       EK_F4,  EK_F3,      EK_F2,    EK_F1   }
+/*            { EK_NP_7,   EK_NP_6,       EK_NP_5,    EK_NP_4,   EK_NP_3,  EK_NP_2,  EK_NP_1,  EK_NP_0 },
+            { EK_SLASH,  EK_NP_PERIOD,  EK_COLON,   EK_PERIOD, EK_NONE,  EK_NONE,  EK_NP_9,  EK_NP_8 },
+            { EK_NONE,   EK_NONE,       EK_NONE,    EK_F5,     EK_F4,    EK_F3,    EK_F2,    EK_F1   }*/
         };
 
         uint8_t m_keys[11];
@@ -199,12 +203,17 @@ class Bashkiria_2M_Keyboard : public Keyboard
 class Bashkiria_2M_KbdLayout : public KbdLayout
 {
     public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
 
         static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_KbdLayout();}
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
         EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
+
+    private:
+        bool m_downAsNumpad5 = false;
 };
 
 

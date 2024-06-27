@@ -164,6 +164,14 @@ enum EmuKey
     EK_NP_COMMA,
     EK_NP_CR,
 
+    // Added in Bashkiria
+    EK_EQU,
+    EK_LBRACE,
+    EK_RBRACE,
+    EK_TILDE,
+    EK_GRAVE,
+    EK_YO,
+
     // Joystick
     EK_JS_UP,
     EK_JS_DOWN,

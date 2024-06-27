@@ -1,6 +1,7 @@
 ﻿/*
  *  bashkiria-2m for Emu80 v. 4.x
  *  © Dmitry Tselikov <bashkiria-2m.narod.ru>, 2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,7 +25,6 @@
 #include "EmuWindow.h"
 #include "Platform.h"
 #include "AddrSpace.h"
-#include "SoundMixer.h"
 #include "Cpu.h"
 #include "PrnWriter.h"
 
@@ -425,35 +425,41 @@ uint8_t Bashkiria_2M_Keyboard::getMatrixData(int mask)
 
 EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
 {
+    if (m_mode == KLM_JCUKEN)
+        return EK_NONE;
+
     switch (keyCode) {
-    case PK_KP_0: return EK_NP_0;
-    case PK_KP_1: return EK_NP_1;
-    case PK_KP_2: return EK_NP_2;
-    case PK_KP_3: return EK_NP_3;
-    case PK_KP_4: return EK_NP_4;
-    case PK_KP_5: return EK_NP_5;
-    case PK_KP_6: return EK_NP_6;
-    case PK_KP_7: return EK_NP_7;
-    case PK_KP_8: return EK_NP_8;
-    case PK_KP_9: return EK_NP_9;
-    case PK_KP_PERIOD: return EK_NP_PERIOD;
-    case PK_KP_DIV:    return EK_DEL;
-    case PK_KP_MUL:    return EK_INS;
-    case PK_KP_MINUS:  return EK_CLEAR;
-    case PK_DOWN:  return EK_NP_2;
-    case PK_LEFT:  return EK_NP_4;
-    case PK_RIGHT: return EK_NP_6;
-    case PK_UP:    return EK_NP_8;
-    //case PK_DEL:   return EK_LF;
-    case PK_LALT:  return EK_FIX;
-    //case PK_PGUP:  return EK_SEL;
-    //case PK_PGDN:  return EK_LANG;
-    //case PK_MENU:  return EK_MENU;
-    case PK_F12:   return EK_STOP;
-    case PK_F6:    return EK_F6;
-    case PK_F7:    return EK_F7;
-    case PK_F8:    return EK_F8;
-    case PK_F9:    return EK_F9;
+    case PK_INS:
+        return EK_INS;
+    case PK_DEL:
+        return EK_DEL;
+    case PK_PGUP:
+        return EK_LANG;
+    case PK_KP_0:
+        return EK_PHOME;
+    case PK_DOWN:
+        return m_downAsNumpad5 ? EK_MENU : EK_DOWN;
+
+    case PK_EQU:
+        return EK_EQU;
+    case PK_LBRACKET:
+        return EK_LBRACE;
+    case PK_RBRACKET:
+        return EK_RBRACE;
+    case PK_APOSTROPHE:
+        return EK_COLON;
+    case PK_TILDE:
+        return EK_YO;
+
+    case PK_F6:
+        return EK_GRAVE;
+    case PK_F7:
+        return EK_TILDE;
+    case PK_F8:
+        return EK_LBRACKET;
+    case PK_F9:
+        return EK_RBRACKET;
+
     default:
         break;
     }
@@ -463,21 +469,261 @@ EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
         return key;
 
     switch (keyCode) {
-    //case PK_LCTRL: return EK_CTRL;
-    default:       return EK_NONE;
+    case PK_KP_1:
+        return EK_HOME;
+    case PK_LCTRL:
+    case PK_RCTRL:
+        return EK_CTRL;
+    case PK_F6:
+        return EK_UNDSCR;
+    case PK_F10:
+        return EK_GRAPH;
+    case PK_KP_PLUS:
+    case PK_MENU:
+        return EK_FIX;
+    case PK_F12:
+        return EK_STOP;
+    case PK_F11:
+        return EK_SEL;
+    case PK_KP_MUL:
+        return EK_INS;
+    case PK_KP_DIV:
+        return EK_DEL;
+    case PK_KP_7:
+        return EK_SHOME; //7
+    case PK_KP_9:
+        return EK_SEND;  // 9
+    case PK_KP_3:
+        return EK_END;   // 3
+    case PK_KP_PERIOD:
+        return EK_PEND;  // .
+    case PK_KP_0:
+        return EK_PEND;  // 0
+    case PK_KP_5:
+        return EK_MENU;  // 5
+
+    case PK_KP_MINUS:
+        return EK_CLEAR;  // - ОЧЭК
+    default:
+        return EK_NONE;
     }
 }
 
 
+#include <iostream>
+
 EmuKey Bashkiria_2M_KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
 {
-    if (keyCode == PK_KP_MUL || keyCode == PK_KP_PLUS || keyCode == PK_KP_MINUS || keyCode == PK_KP_DIV)
+    lang = false;
+    shift = false;
+
+    if (keyCode == PK_KP_MUL || keyCode == PK_KP_DIV || keyCode == PK_KP_MINUS || keyCode == PK_KP_PLUS)
         return EK_NONE;
 
-    if (unicodeKey == L'_')
-        return EK_UNDSCR;
+    if (unicodeKey >= L'A' && unicodeKey <= L'Z')
+        unicodeKey += 0x20; // uppercase latin to lowercase
+    else if (unicodeKey >= L'a' && unicodeKey <= L'z')
+        unicodeKey -= 0x20; // lowercase latin to uppercase
 
-    return translateCommonUnicodeKeys(unicodeKey, shift, lang);
+    switch (unicodeKey) {
+    case L'@':
+        shift = false;
+        return EK_2;
+    case L'%':
+        shift = false;
+        return EK_5;
+    case L'^':
+        shift = false;
+        return EK_6;
+    case L'&':
+        shift = false;
+        return EK_7;
+    case L'*':
+        shift = false;
+        return EK_8;
+    case L'(':
+        shift = false;
+        return EK_9;
+    case L')':
+        shift = false;
+        return EK_0;
+
+    case L'-':
+        shift = true;
+        return EK_MINUS;
+    case L'_':
+        shift = false;
+        return EK_MINUS;
+    case L'=':
+        shift = true;
+        return EK_EQU;
+    case L'+':
+        shift = false;
+        return EK_EQU;
+
+    case L'[':
+        shift = true;
+        return EK_LBRACKET;
+    case L']':
+        shift = true;
+        return EK_RBRACKET;
+    case L'{':
+        shift = true;
+        return EK_LBRACE;
+    case L'}':
+        shift = true;
+        return EK_RBRACE;
+
+    case L'\'':
+        shift = false;
+        return EK_SEMICOLON;
+    case L';':
+        shift = true;
+        return EK_SEMICOLON;
+
+    case L'\"':
+        shift = false;
+        return EK_COLON;
+    case L':':
+        shift = true;
+        return EK_COLON;
+
+    case L'~':
+        shift = false;
+        return EK_TILDE;
+    case L'`':
+        shift = false;
+        return EK_GRAVE;
+    }
+
+    bool rus = false;
+    if ((unicodeKey >= L'А' && unicodeKey <= L'Я') || unicodeKey == L'Ё')
+        rus = true;
+    else if ((unicodeKey >= L'а' && unicodeKey <= L'я')  || unicodeKey == L'ё') {
+        rus = true;
+        if (unicodeKey != L'ё')
+            unicodeKey -= 0x20;
+        else
+            unicodeKey -= 0x50;
+        //shift = true; // Baskiria does not allow simultaneously shift and lang :(
+    }
+
+    if (!rus) {
+        EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
+
+        if (key >= EK_0 && key <= EK_9)
+            shift = !shift;
+
+        if (key == EK_SLASH || key == EK_COMMA || key == EK_PERIOD)
+            shift = !shift;
+
+        return key;
+    } else {
+        lang = true;
+        //shift = true;
+        cout << lang << " " << shift << endl;
+        switch (unicodeKey) {
+        case L'А':
+            return EK_F;
+        case L'Б':
+            return EK_GRAVE;
+        case L'В':
+            return EK_D;
+        case L'Г':
+            return EK_U;
+        case L'Д':
+            return EK_L;
+        case L'Е':
+            return EK_T;
+        case L'Ё':
+            return EK_YO;
+        case L'Ж':
+            return EK_LBRACKET;
+        case L'З':
+            return EK_P;
+        case L'И':
+            return EK_B;
+        case L'Й':
+            return EK_Q;
+        case L'К':
+            return EK_R;
+        case L'Л':
+            return EK_K;
+        case L'М':
+            return EK_V;
+        case L'Н':
+            return EK_Y;
+        case L'О':
+            return EK_J;
+        case L'П':
+            return EK_G;
+        case L'Р':
+            return EK_H;
+        case L'С':
+            return EK_C;
+        case L'Т':
+            return EK_N;
+        case L'У':
+            return EK_E;
+        case L'Ф':
+            return EK_A;
+        case L'Х':
+            return EK_LBRACE;
+        case L'Ц':
+            return EK_W;
+        case L'Ч':
+            return EK_X;
+        case L'Ш':
+            return EK_I;
+        case L'Щ':
+            return EK_O;
+        case L'Ъ':
+            return EK_RBRACE;
+        case L'Ы':
+            return EK_S;
+        case L'Ь':
+            return EK_M;
+        case L'Э':
+            return EK_RBRACKET;
+        case L'Ю':
+            return EK_TILDE;
+        case L'Я':
+            return EK_Z;
+        default:
+            return EK_NONE; // normally this should not occur
+        }
+    }
+}
+
+
+bool Bashkiria_2M_KbdLayout::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (KbdLayout::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "downAsNumpad5") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_downAsNumpad5 = values[0].asString() == "yes";
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+string Bashkiria_2M_KbdLayout::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = KbdLayout::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "downAsNumpad5")
+        return m_downAsNumpad5 ? "yes" : "no";
+
+    return "";
 }
 
 
