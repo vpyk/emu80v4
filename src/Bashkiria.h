@@ -145,26 +145,6 @@ class Bashkiria_2M_Ppi8255Circuit2 : public Ppi8255Circuit
 };
 
 
-/*class Bashkiria_2M_PitIrqWatchdog : public AddressableDevice, public IActive
-{
-    public:
-        // derived from AddressableDevice
-        void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr) override;
-
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-
-        // derived from IActive
-        void operate() override;
-
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_PitIrqWatchdog();}
-
-    private:
-        Pit8253* m_pit = nullptr;
-        Pic8259* m_pic = nullptr;
-};*/
-
-
 class Bashkiria_2M_Keyboard : public Keyboard
 {
     public:
@@ -191,9 +171,6 @@ class Bashkiria_2M_Keyboard : public Keyboard
             { EK_SHOME,    EK_RIGHT,     EK_MENU,  EK_LEFT,     EK_END, EK_DOWN,    EK_HOME,  EK_PHOME },
             { EK_SLASH,    EK_PEND,      EK_COLON, EK_PERIOD,   EK_NONE,EK_NONE,    EK_SEND,  EK_UP },
             { EK_NONE,     EK_NONE,      EK_NONE,  EK_F5,       EK_F4,  EK_F3,      EK_F2,    EK_F1   }
-/*            { EK_NP_7,   EK_NP_6,       EK_NP_5,    EK_NP_4,   EK_NP_3,  EK_NP_2,  EK_NP_1,  EK_NP_0 },
-            { EK_SLASH,  EK_NP_PERIOD,  EK_COLON,   EK_PERIOD, EK_NONE,  EK_NONE,  EK_NP_9,  EK_NP_8 },
-            { EK_NONE,   EK_NONE,       EK_NONE,    EK_F5,     EK_F4,    EK_F3,    EK_F2,    EK_F1   }*/
         };
 
         uint8_t m_keys[11];

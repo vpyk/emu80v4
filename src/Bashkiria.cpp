@@ -68,15 +68,12 @@ void Bashkiria_2M_Core::timer(int /*id*/, bool isActive)
     Pit8253Counter* cnt0 = m_pit->getCounter(0);
     Pit8253Counter* cnt2 = m_pit->getCounter(2);
 
-    //cnt2->updateState();
     cnt0->operateForTicks(cnt2->getSumOutTicks());
-    //cnt0->operateForTicks(1);
 
     if (m_pic) {
         m_pic->irq(1, cnt0->getOut());
     }
 
-    //cnt0->resetStats(); ???
     cnt2->resetStats();
 }
 
@@ -330,56 +327,6 @@ bool Bashkiria_2M_Ppi8255Circuit2::setProperty(const string& propertyName, const
 }
 
 
-/*void Bashkiria_2M_PitIrqWatchdog::writeByte(int addr, uint8_t value)
-{
-    if (m_pit) m_pit->writeByte(addr, value);
-}
-
-
-uint8_t Bashkiria_2M_PitIrqWatchdog::readByte(int addr)
-{
-    return m_pit ? m_pit->readByte(addr) : 0xFF;
-}
-
-
-bool Bashkiria_2M_PitIrqWatchdog::setProperty(const std::string& propertyName, const EmuValuesList& values)
-{
-    if (EmuObject::setProperty(propertyName, values))
-        return true;
-
-    if (propertyName == "pit") {
-        m_pit = static_cast<Pit8253*>(g_emulation->findObject(values[0].asString()));
-        if (m_pit) m_pit->getCounter(0)->setExtClockMode(true);
-        return true;
-    } else if (propertyName == "pic") {
-        m_pic = static_cast<Pic8259*>(g_emulation->findObject(values[0].asString()));
-        return true;
-    }
-
-    return false;
-}
-
-
-void Bashkiria_2M_PitIrqWatchdog::operate()
-{
-    if (m_pit) {
-        Pit8253Counter* cnt0 = m_pit->getCounter(0);
-        Pit8253Counter* cnt2 = m_pit->getCounter(2);
-
-        cnt2->updateState();
-        cnt0->operateForTicks(cnt2->getSumOutTicks());
-
-        if (m_pic) {
-            m_pic->irq(1, cnt0->getOut());
-        }
-
-        //cnt0->resetStats(); ???
-        cnt2->resetStats();
-    }
-    m_curClock += 13*m_kDiv;
-}*/
-
-
 Bashkiria_2M_Keyboard::Bashkiria_2M_Keyboard()
 {
     Bashkiria_2M_Keyboard::resetKeys();
@@ -510,8 +457,6 @@ EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-#include <iostream>
-
 EmuKey Bashkiria_2M_KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
 {
     lang = false;
@@ -621,7 +566,6 @@ EmuKey Bashkiria_2M_KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCo
     } else {
         lang = true;
         //shift = true;
-        cout << lang << " " << shift << endl;
         switch (unicodeKey) {
         case L'А':
             return EK_F;
