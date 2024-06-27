@@ -268,17 +268,16 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(KorvetCpuCycleWaits);
     REG_EMU_CLASS(KorvetPpiPsgAdapter);
     REG_EMU_CLASS(KbdTapper);
-    REG_EMU_CLASS(Bashkiria_2M_Core);
-    REG_EMU_CLASS(Bashkiria_2M_Renderer);
-    REG_EMU_CLASS(Bashkiria_2M_Palette);
-    REG_EMU_CLASS(Bashkiria_2M_Ppi8255Circuit1);
-    REG_EMU_CLASS(Bashkiria_2M_Ppi8255Circuit2);
-    //REG_EMU_CLASS(Bashkiria_2M_PitIrqWatchdog);
-    REG_EMU_CLASS(Bashkiria_2M_Keyboard);
-    REG_EMU_CLASS(Bashkiria_2M_KbdLayout);
-    REG_EMU_CLASS(Bashkiria_2M_KbdMem);
-    REG_EMU_CLASS(Bashkiria_2M_Pit8253SoundSource);
-    REG_EMU_CLASS(Bashkiria_2M_Spi8251);
+    REG_EMU_CLASS(Bashkiria2mCore);
+    REG_EMU_CLASS(Bashkiria2mRenderer);
+    REG_EMU_CLASS(Bashkiria2mPalette);
+    REG_EMU_CLASS(Bashkiria2mPpi8255Circuit1);
+    REG_EMU_CLASS(Bashkiria2mPpi8255Circuit2);
+    REG_EMU_CLASS(Bashkiria2mKeyboard);
+    REG_EMU_CLASS(Bashkiria2mKbdLayout);
+    REG_EMU_CLASS(Bashkiria2mKbdMem);
+    REG_EMU_CLASS(Bashkiria2mPit8253SoundSource);
+    REG_EMU_CLASS(Bashkiria2mSpi8251);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);

@@ -34,7 +34,7 @@ class GeneralSoundSource;
 class AddrSpaceMapper;
 
 
-class Bashkiria_2M_Core : public PlatformCore
+class Bashkiria2mCore : public PlatformCore
 {
     public:
         void draw() override;
@@ -44,7 +44,7 @@ class Bashkiria_2M_Core : public PlatformCore
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Core();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mCore();}
 
     private:
         CrtRenderer* m_crtRenderer = nullptr;
@@ -53,10 +53,10 @@ class Bashkiria_2M_Core : public PlatformCore
 };
 
 
-class Bashkiria_2M_Renderer : public CrtRenderer, public IActive
+class Bashkiria2mRenderer : public CrtRenderer, public IActive
 {
     public:
-        Bashkiria_2M_Renderer();
+        Bashkiria2mRenderer();
         void renderFrame() override;
 
         void toggleColorMode() override;
@@ -73,7 +73,7 @@ class Bashkiria_2M_Renderer : public CrtRenderer, public IActive
         // derived from IActive
         void operate() override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Renderer();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mRenderer();}
 
     private:
         const uint8_t* m_screenMemory = nullptr;
@@ -90,21 +90,21 @@ class Bashkiria_2M_Renderer : public CrtRenderer, public IActive
 };
 
 
-class Bashkiria_2M_Palette : public AddressableDevice
+class Bashkiria2mPalette : public AddressableDevice
 {
     public:
         void writeByte(int addr, uint8_t value) override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Palette();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mPalette();}
 
     private:
-        Bashkiria_2M_Renderer* m_renderer = nullptr;
+        Bashkiria2mRenderer* m_renderer = nullptr;
 };
 
 
-class Bashkiria_2M_Ppi8255Circuit1 : public Ppi8255Circuit
+class Bashkiria2mPpi8255Circuit1 : public Ppi8255Circuit
 {
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -114,11 +114,11 @@ class Bashkiria_2M_Ppi8255Circuit1 : public Ppi8255Circuit
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Ppi8255Circuit1();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mPpi8255Circuit1();}
 
     private:
         // renderer for scroll setting
-        Bashkiria_2M_Renderer* m_renderer = nullptr;
+        Bashkiria2mRenderer* m_renderer = nullptr;
 
         uint8_t m_printerData = 0;
         bool m_printerStrobe = true;
@@ -128,7 +128,7 @@ class Bashkiria_2M_Ppi8255Circuit1 : public Ppi8255Circuit
 };
 
 
-class Bashkiria_2M_Ppi8255Circuit2 : public Ppi8255Circuit
+class Bashkiria2mPpi8255Circuit2 : public Ppi8255Circuit
 {
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -138,24 +138,24 @@ class Bashkiria_2M_Ppi8255Circuit2 : public Ppi8255Circuit
         void setPortB(uint8_t value) override;
         void setPortC(uint8_t value) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Ppi8255Circuit2();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mPpi8255Circuit2();}
 
     private:
         Fdc1793* m_fdc = nullptr;
 };
 
 
-class Bashkiria_2M_Keyboard : public Keyboard
+class Bashkiria2mKeyboard : public Keyboard
 {
     public:
-        Bashkiria_2M_Keyboard();
+        Bashkiria2mKeyboard();
 
         void resetKeys() override;
         void processKey(EmuKey key, bool isPressed) override;
 
         uint8_t getMatrixData(int mask);
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Keyboard();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mKeyboard();}
 
     private:
         const EmuKey m_keyMatrix[11][8] = {
@@ -177,13 +177,13 @@ class Bashkiria_2M_Keyboard : public Keyboard
 };
 
 
-class Bashkiria_2M_KbdLayout : public KbdLayout
+class Bashkiria2mKbdLayout : public KbdLayout
 {
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_KbdLayout();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mKbdLayout();}
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
@@ -194,7 +194,7 @@ class Bashkiria_2M_KbdLayout : public KbdLayout
 };
 
 
-class Bashkiria_2M_KbdMem : public AddressableDevice
+class Bashkiria2mKbdMem : public AddressableDevice
 {
     public:
         void writeByte(int addr, uint8_t value) override;
@@ -202,14 +202,14 @@ class Bashkiria_2M_KbdMem : public AddressableDevice
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_KbdMem();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mKbdMem();}
 
     private:
-        Bashkiria_2M_Keyboard* m_kbd = nullptr;
+        Bashkiria2mKeyboard* m_kbd = nullptr;
 };
 
 
-class Bashkiria_2M_Pit8253SoundSource : public Pit8253SoundSource
+class Bashkiria2mPit8253SoundSource : public Pit8253SoundSource
 {
     public:
         int calcValue() override;
@@ -217,23 +217,23 @@ class Bashkiria_2M_Pit8253SoundSource : public Pit8253SoundSource
 
         void setGate(bool gate);
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Pit8253SoundSource();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mPit8253SoundSource();}
 
     private:
 };
 
 
-class Bashkiria_2M_Spi8251 : public AddressableDevice
+class Bashkiria2mSpi8251 : public AddressableDevice
 {
     public:
         void writeByte(int addr, uint8_t value) override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
-        static EmuObject* create(const EmuValuesList&) {return new Bashkiria_2M_Spi8251();}
+        static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mSpi8251();}
 
     private:
-        Bashkiria_2M_Pit8253SoundSource* m_snd = nullptr;
+        Bashkiria2mPit8253SoundSource* m_snd = nullptr;
 };
 
 

@@ -31,7 +31,7 @@
 using namespace std;
 
 
-void Bashkiria_2M_Core::draw()
+void Bashkiria2mCore::draw()
 {
     m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
@@ -39,13 +39,13 @@ void Bashkiria_2M_Core::draw()
 }
 
 
-void Bashkiria_2M_Core::vrtc(bool isActive)
+void Bashkiria2mCore::vrtc(bool isActive)
 {
     m_pic->irq(0, !isActive);
 }
 
 
-void Bashkiria_2M_Core::inte(bool isActive)
+void Bashkiria2mCore::inte(bool isActive)
 {
     if(!m_pic) return;
 
@@ -59,7 +59,7 @@ void Bashkiria_2M_Core::inte(bool isActive)
 }
 
 
-void Bashkiria_2M_Core::timer(int /*id*/, bool isActive)
+void Bashkiria2mCore::timer(int /*id*/, bool isActive)
 {
     if (!isActive)
         return;
@@ -78,13 +78,13 @@ void Bashkiria_2M_Core::timer(int /*id*/, bool isActive)
 }
 
 
-bool Bashkiria_2M_Core::setProperty(const string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mCore::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (PlatformCore::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
-        m_crtRenderer = static_cast<Bashkiria_2M_Renderer*>(g_emulation->findObject(values[0].asString()));
+        m_crtRenderer = static_cast<Bashkiria2mRenderer*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "pic") {
         m_pic = static_cast<Pic8259*>(g_emulation->findObject(values[0].asString()));
@@ -98,7 +98,7 @@ bool Bashkiria_2M_Core::setProperty(const string& propertyName, const EmuValuesL
 }
 
 
-Bashkiria_2M_Renderer::Bashkiria_2M_Renderer()
+Bashkiria2mRenderer::Bashkiria2mRenderer()
 {
     setFrequency(15625);
     m_sizeX = m_prevSizeX = 384;
@@ -113,7 +113,7 @@ Bashkiria_2M_Renderer::Bashkiria_2M_Renderer()
 }
 
 
-void Bashkiria_2M_Renderer::renderFrame()
+void Bashkiria2mRenderer::renderFrame()
 {
     if (m_showBorderChanged) m_showBorderChanged = false; else return;
 
@@ -132,7 +132,7 @@ void Bashkiria_2M_Renderer::renderFrame()
 }
 
 
-void Bashkiria_2M_Renderer::operate()
+void Bashkiria2mRenderer::operate()
 {
     if (m_line<256) {
         int addr = (m_page==0 ? 0x1000 : 0x9000) + ((m_line+m_scrollAct)&0xFF);
@@ -155,20 +155,20 @@ void Bashkiria_2M_Renderer::operate()
 }
 
 
-void Bashkiria_2M_Renderer::toggleColorMode()
+void Bashkiria2mRenderer::toggleColorMode()
 {
     m_colorMode = !m_colorMode;
 }
 
 
-void Bashkiria_2M_Renderer::toggleCropping()
+void Bashkiria2mRenderer::toggleCropping()
 {
     m_showBorder = !m_showBorder;
     m_showBorderChanged = true;
 }
 
 
-void Bashkiria_2M_Renderer::setPalette(int addr, uint8_t value)
+void Bashkiria2mRenderer::setPalette(int addr, uint8_t value)
 {
     value = ~value;
     for(int i=0; i<2; ++i) {
@@ -182,7 +182,7 @@ void Bashkiria_2M_Renderer::setPalette(int addr, uint8_t value)
 }
 
 
-bool Bashkiria_2M_Renderer::setProperty(const string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
@@ -208,7 +208,7 @@ bool Bashkiria_2M_Renderer::setProperty(const string& propertyName, const EmuVal
 }
 
 
-string Bashkiria_2M_Renderer::getPropertyStringValue(const string& propertyName)
+string Bashkiria2mRenderer::getPropertyStringValue(const string& propertyName)
 {
     string res;
 
@@ -228,19 +228,19 @@ string Bashkiria_2M_Renderer::getPropertyStringValue(const string& propertyName)
 }
 
 
-void Bashkiria_2M_Palette::writeByte(int addr, uint8_t value)
+void Bashkiria2mPalette::writeByte(int addr, uint8_t value)
 {
     if (m_renderer) m_renderer->setPalette(addr, value);
 }
 
 
-bool Bashkiria_2M_Palette::setProperty(const std::string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mPalette::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
 
-    if (propertyName == "b2m_renderer") {
-        m_renderer = static_cast<Bashkiria_2M_Renderer*>(g_emulation->findObject(values[0].asString()));
+    if (propertyName == "crtRenderer") {
+        m_renderer = static_cast<Bashkiria2mRenderer*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 
@@ -248,13 +248,13 @@ bool Bashkiria_2M_Palette::setProperty(const std::string& propertyName, const Em
 }
 
 
-bool Bashkiria_2M_Ppi8255Circuit1::setProperty(const string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mPpi8255Circuit1::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "renderer") {
-        m_renderer = static_cast<Bashkiria_2M_Renderer*>(g_emulation->findObject(values[0].asString()));
+        m_renderer = static_cast<Bashkiria2mRenderer*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "mapper") {
         m_addrSpaceMapper = static_cast<AddrSpaceMapper*>(g_emulation->findObject(values[0].asString()));
@@ -265,19 +265,19 @@ bool Bashkiria_2M_Ppi8255Circuit1::setProperty(const string& propertyName, const
 }
 
 
-void Bashkiria_2M_Ppi8255Circuit1::setPortA(uint8_t value)
+void Bashkiria2mPpi8255Circuit1::setPortA(uint8_t value)
 {
     m_printerData = value;
 }
 
 
-void Bashkiria_2M_Ppi8255Circuit1::setPortB(uint8_t value)
+void Bashkiria2mPpi8255Circuit1::setPortB(uint8_t value)
 {
     m_renderer->setScroll(value);
 }
 
 
-void Bashkiria_2M_Ppi8255Circuit1::setPortC(uint8_t value)
+void Bashkiria2mPpi8255Circuit1::setPortC(uint8_t value)
 {
     m_renderer->setVideoPage(value>>7);
 
@@ -293,18 +293,18 @@ void Bashkiria_2M_Ppi8255Circuit1::setPortC(uint8_t value)
 }
 
 
-uint8_t Bashkiria_2M_Ppi8255Circuit2::getPortA()
+uint8_t Bashkiria2mPpi8255Circuit2::getPortA()
 {
     return 0xFF;
 }
 
 
-void Bashkiria_2M_Ppi8255Circuit2::setPortB(uint8_t)//value)
+void Bashkiria2mPpi8255Circuit2::setPortB(uint8_t)//value)
 {
 }
 
 
-void Bashkiria_2M_Ppi8255Circuit2::setPortC(uint8_t value)
+void Bashkiria2mPpi8255Circuit2::setPortC(uint8_t value)
 {
     if(m_fdc) {
         m_fdc->setHead(value&2?0:1);
@@ -313,7 +313,7 @@ void Bashkiria_2M_Ppi8255Circuit2::setPortC(uint8_t value)
 }
 
 
-bool Bashkiria_2M_Ppi8255Circuit2::setProperty(const string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mPpi8255Circuit2::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))
         return true;
@@ -327,20 +327,20 @@ bool Bashkiria_2M_Ppi8255Circuit2::setProperty(const string& propertyName, const
 }
 
 
-Bashkiria_2M_Keyboard::Bashkiria_2M_Keyboard()
+Bashkiria2mKeyboard::Bashkiria2mKeyboard()
 {
-    Bashkiria_2M_Keyboard::resetKeys();
+    Bashkiria2mKeyboard::resetKeys();
 }
 
 
-void Bashkiria_2M_Keyboard::resetKeys()
+void Bashkiria2mKeyboard::resetKeys()
 {
     for (int i = 0; i < 11; i++)
         m_keys[i] = 0;
 }
 
 
-void Bashkiria_2M_Keyboard::processKey(EmuKey key, bool isPressed)
+void Bashkiria2mKeyboard::processKey(EmuKey key, bool isPressed)
 {
     if (key == EK_NONE)
         return;
@@ -357,7 +357,7 @@ void Bashkiria_2M_Keyboard::processKey(EmuKey key, bool isPressed)
 }
 
 
-uint8_t Bashkiria_2M_Keyboard::getMatrixData(int mask)
+uint8_t Bashkiria2mKeyboard::getMatrixData(int mask)
 {
     uint8_t val = 0;
     for (int i = 0; i < 11; i++) {
@@ -370,7 +370,7 @@ uint8_t Bashkiria_2M_Keyboard::getMatrixData(int mask)
 }
 
 
-EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
+EmuKey Bashkiria2mKbdLayout::translateKey(PalKeyCode keyCode)
 {
     if (m_mode == KLM_JCUKEN)
         return EK_NONE;
@@ -457,7 +457,7 @@ EmuKey Bashkiria_2M_KbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey Bashkiria_2M_KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
+EmuKey Bashkiria2mKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
 {
     lang = false;
     shift = false;
@@ -640,7 +640,7 @@ EmuKey Bashkiria_2M_KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCo
 }
 
 
-bool Bashkiria_2M_KbdLayout::setProperty(const string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mKbdLayout::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (KbdLayout::setProperty(propertyName, values))
         return true;
@@ -656,7 +656,7 @@ bool Bashkiria_2M_KbdLayout::setProperty(const string& propertyName, const EmuVa
 }
 
 
-string Bashkiria_2M_KbdLayout::getPropertyStringValue(const string& propertyName)
+string Bashkiria2mKbdLayout::getPropertyStringValue(const string& propertyName)
 {
     string res;
 
@@ -671,24 +671,24 @@ string Bashkiria_2M_KbdLayout::getPropertyStringValue(const string& propertyName
 }
 
 
-void Bashkiria_2M_KbdMem::writeByte(int, uint8_t)
+void Bashkiria2mKbdMem::writeByte(int, uint8_t)
 {
 }
 
 
-uint8_t Bashkiria_2M_KbdMem::readByte(int addr)
+uint8_t Bashkiria2mKbdMem::readByte(int addr)
 {
     return m_kbd ? m_kbd->getMatrixData(addr&0x100 ? (addr&7)<<8 : addr&0xFF) : 0xFF;
 }
 
 
-bool Bashkiria_2M_KbdMem::setProperty(const std::string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mKbdMem::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
     if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "kbd") {
-        m_kbd = static_cast<Bashkiria_2M_Keyboard*>(g_emulation->findObject(values[0].asString()));
+        m_kbd = static_cast<Bashkiria2mKeyboard*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 
@@ -696,7 +696,7 @@ bool Bashkiria_2M_KbdMem::setProperty(const std::string& propertyName, const Emu
 }
 
 
-int Bashkiria_2M_Pit8253SoundSource::calcValue()
+int Bashkiria2mPit8253SoundSource::calcValue()
 {
     int res = 0;
 
@@ -711,31 +711,31 @@ int Bashkiria_2M_Pit8253SoundSource::calcValue()
 }
 
 
-void Bashkiria_2M_Pit8253SoundSource::setGate(bool gate)
+void Bashkiria2mPit8253SoundSource::setGate(bool gate)
 {
     if (m_pit) m_pit->getCounter(1)->setGate(gate);
 }
 
 
-void Bashkiria_2M_Pit8253SoundSource::tuneupPit()
+void Bashkiria2mPit8253SoundSource::tuneupPit()
 {
     m_pit->getCounter(0)->setExtClockMode(true);
 }
 
 
-void Bashkiria_2M_Spi8251::writeByte(int addr, uint8_t value)
+void Bashkiria2mSpi8251::writeByte(int addr, uint8_t value)
 {
     if (m_snd && (addr&1)==1) m_snd->setGate((value&0x20)==0);
 }
 
 
-bool Bashkiria_2M_Spi8251::setProperty(const std::string& propertyName, const EmuValuesList& values)
+bool Bashkiria2mSpi8251::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
     if (AddressableDevice::setProperty(propertyName, values))
         return true;
 
-    if (propertyName == "b2m_soundsource") {
-        m_snd = static_cast<Bashkiria_2M_Pit8253SoundSource*>(g_emulation->findObject(values[0].asString()));
+    if (propertyName == "soundSource") {
+        m_snd = static_cast<Bashkiria2mPit8253SoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
     }
 
