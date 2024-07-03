@@ -57,6 +57,7 @@ class Bashkiria2mRenderer : public CrtRenderer, public IActive
 {
     public:
         Bashkiria2mRenderer();
+        ~Bashkiria2mRenderer();
         void renderFrame() override;
 
         void toggleColorMode() override;
@@ -76,13 +77,13 @@ class Bashkiria2mRenderer : public CrtRenderer, public IActive
         static EmuObject* create(const EmuValuesList&) {return new Bashkiria2mRenderer();}
 
     private:
+        uint32_t* m_frameBuf;
         const uint8_t* m_screenMemory = nullptr;
         int m_line = 0, m_scrollAct = 0;
         uint8_t m_scroll = 0;
         uint8_t m_page = 0;
         bool m_colorMode = true;
         bool m_showBorder = false;
-        bool m_showBorderChanged = true;
         uint32_t m_palette[2][4] = {
             {0x000000,0xB4B4B4,0x5A5A5A,0xFFFFFF},
             {0x000000,0x00FF00,0x0000FF,0xFF0000}

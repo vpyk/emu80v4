@@ -33,7 +33,6 @@ using namespace std;
 
 void Bashkiria2mCore::draw()
 {
-    m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -110,25 +109,31 @@ Bashkiria2mRenderer::Bashkiria2mRenderer()
     m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
+
+    m_frameBuf = new uint32_t[maxBufSize];
+}
+
+
+Bashkiria2mRenderer::~Bashkiria2mRenderer()
+{
+    delete[] m_frameBuf;
 }
 
 
 void Bashkiria2mRenderer::renderFrame()
 {
-    if (m_showBorderChanged) m_showBorderChanged = false; else return;
+    memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
+    swapBuffers();
 
-    for(int i=0; i<2; ++i) {
-        swapBuffers();
-        if (m_showBorder) {
-            m_sizeX = 417; m_sizeY = 288;
-            m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
-        } else {
-            m_sizeX = 384; m_sizeY = 256;
-            m_aspectRatio = 576.0 * 9 / 704 / 8;
-        }
-        m_bufSize = m_sizeX * m_sizeY;
-        memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
+    if (m_showBorder) {
+        m_sizeX = 417; m_sizeY = 288;
+        m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
+    } else {
+        m_sizeX = 384; m_sizeY = 256;
+        m_aspectRatio = 576.0 * 9 / 704 / 8;
     }
+    m_bufSize = m_sizeX * m_sizeY;
+    memset(m_frameBuf, 0, m_bufSize * sizeof(uint32_t));
 }
 
 
@@ -142,14 +147,15 @@ void Bashkiria2mRenderer::operate()
             uint16_t b1 = m_screenMemory[addr];
             uint16_t b2 = m_screenMemory[addr+0x4000]<<1;
             for (int pt = 0; pt < 8; pt++, b1 >>= 1, b2 >>= 1)
-                m_pixelData[(m_line + offsetY) * m_sizeX + col * 8 + pt + offsetX] = nColor[(b1&1)|(b2&2)];
+                m_frameBuf[(m_line + offsetY) * m_sizeX + col * 8 + pt + offsetX] = nColor[(b1&1)|(b2&2)];
         }
         m_curClock += m_kDiv; ++m_line;
     } else if(m_line<312) {
         m_platform->getCore()->vrtc(true);
         m_curClock += m_kDiv*56; m_line += 56;
     } else {
-        swapBuffers(); m_scrollAct = m_scroll;
+        renderFrame();
+        m_scrollAct = m_scroll;
         m_platform->getCore()->vrtc(false); m_line = 0;
     }
 }
@@ -164,7 +170,6 @@ void Bashkiria2mRenderer::toggleColorMode()
 void Bashkiria2mRenderer::toggleCropping()
 {
     m_showBorder = !m_showBorder;
-    m_showBorderChanged = true;
 }
 
 
