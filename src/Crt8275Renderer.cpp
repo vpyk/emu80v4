@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -68,14 +68,17 @@ void Crt8275Renderer::calcAspectRatio(int charWidth)
 
     if (m_frameRate == 0.0)
         m_aspectRatio = 1.0;
-    else if (scanLines >= 360) {
-        // VGA
+    else if (scanLines >= 475) {
+        // VGA (480p)
         m_aspectRatio = 25.175 / m_fntCharWidth / m_freqMHz; // 480.0 * 25.175 * 4 / 640 / m_fntCharWidth / m_freqMHz / 3;
+    } else if (scanLines >= 360) {
+        // VGA400
+        m_aspectRatio = 25.175 * 5 / 6 / m_fntCharWidth / m_freqMHz; // 400.0 * 25.175 * 4 / 640 / m_fntCharWidth / m_freqMHz / 3;
     } else if (m_frameRate < 55.0) {
-        // PAL
+        // 625i (PAL)
         m_aspectRatio = 576.0 * 9 / 704 / charWidth / m_freqMHz; // 576 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
     } else if (scanLines < 360) {
-        // NTSC
+        // 480i (NTSC)
         m_aspectRatio = 480.0 * 9 / 704 / charWidth / m_freqMHz; // 480 * 13.5 * 4 / 704 / m_fntCharWidth / freqMHz / 3 / 2
     }
 }
@@ -97,7 +100,7 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
 
     if (m_frameRate == 0.0)
         return;
-    else if (scanLines >= 360) {
+    else if (scanLines >= 475) {
         // 480p (VGA)
         // don't PLL horiz. freq for VGA
         //double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / (800 / 25.175);
@@ -107,6 +110,14 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
         visibleY = (35 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
         visibleWidth = (640 * effectiveFreq * charWidth) / 25.175 + 0.5;
         visibleHeight = 480 * charHeight / m_crt->getNLines() + 0.5;
+    } else if (scanLines >= 360) {
+        // VGA400
+        // don't PLL horiz. freq for VGA
+        double effectiveFreq = g_emulation->getFrequency() / 1000000.0 / m_crt->getKDiv();
+        visibleX = (144 * effectiveFreq / 25.175 - m_crt->getHrChars() - 1) * charWidth + m_visibleOffsetX;
+        visibleY = (33 * charHeight / m_crt->getNLines()) - charHeight * m_crt->getVrRows();
+        visibleWidth = (640 * effectiveFreq * charWidth) / 25.175 + 0.5;
+        visibleHeight = 400 * charHeight / m_crt->getNLines() + 0.5;
     } else if (m_frameRate < 55.0) {
         // 576i (PAL)
         double effectiveFreq = (m_crt->getNCharsPerRow() + m_crt->getHrChars()) / 64.;
