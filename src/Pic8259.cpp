@@ -133,7 +133,9 @@ void Pic8259::irq(int vect, bool state)
                 serviceInt();
             }
         }
+        m_irs |= mask;
     } else {
+        m_irs &= ~mask;
         m_irr &= ~mask;
     }
 }
