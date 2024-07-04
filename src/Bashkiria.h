@@ -191,7 +191,7 @@ class Bashkiria2mKbdLayout : public KbdLayout
         EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
 
     private:
-        bool m_downAsNumpad5 = false;
+        bool m_upAsNumpad5 = false;
 };
 
 

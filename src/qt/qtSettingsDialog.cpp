@@ -158,6 +158,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("kbdLayout.layout");
     loadRunningConfigValue("kbdLayout.numpadJoystick");
     loadRunningConfigValue("kbdLayout.downAsNumpad5");
+    loadRunningConfigValue("kbdLayout.upAsNumpad5");
     loadRunningConfigValue("keyboard.matrix");
     loadRunningConfigValue("platform.codePage");
     loadRunningConfigValue("platform.fastReset");
@@ -458,6 +459,11 @@ void SettingsDialog::fillControlValues()
     val = m_options.value("kbdLayout.downAsNumpad5", "");
     ui->downAsNumpad5CheckBox->setVisible(val != "");
     ui->downAsNumpad5CheckBox->setChecked(val == "yes");
+
+    // Up as numpad 5
+    val = m_options.value("kbdLayout.upAsNumpad5", "");
+    ui->upAsNumpad5CheckBox->setVisible(val != "");
+    ui->upAsNumpad5CheckBox->setChecked(val == "yes");
 
     // Keyboard matrix
     val = m_options.value("keyboard.matrix", "");
@@ -826,6 +832,9 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     if (ui->downAsNumpad5CheckBox->isVisible())
         m_options["kbdLayout.downAsNumpad5"] = ui->downAsNumpad5CheckBox->isChecked() ? "yes" : "no";
+
+    if (ui->upAsNumpad5CheckBox->isVisible())
+        m_options["kbdLayout.upAsNumpad5"] = ui->upAsNumpad5CheckBox->isChecked() ? "yes" : "no";
 
     if (ui->fastResetCheckBox->isVisible())
         m_options["platform.fastReset"] = ui->fastResetCheckBox->isChecked() ? "yes" : "no";

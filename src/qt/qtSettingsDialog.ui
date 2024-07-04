@@ -387,6 +387,7 @@
            </property>
            <property name="font">
             <font>
+             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1340,6 +1341,13 @@
         <widget class="QCheckBox" name="downAsNumpad5CheckBox">
          <property name="text">
           <string>Down key acts as Numpad 5 (Menu)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="upAsNumpad5CheckBox">
+         <property name="text">
+          <string>Up key acts as Numpad 5 (Menu)</string>
          </property>
         </widget>
        </item>

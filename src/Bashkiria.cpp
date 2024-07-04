@@ -389,8 +389,8 @@ EmuKey Bashkiria2mKbdLayout::translateKey(PalKeyCode keyCode)
         return EK_LANG;
     case PK_KP_0:
         return EK_PHOME;
-    case PK_DOWN:
-        return m_downAsNumpad5 ? EK_MENU : EK_DOWN;
+    case PK_UP:
+        return m_upAsNumpad5 ? EK_MENU : EK_UP;
 
     case PK_EQU:
         return EK_EQU;
@@ -650,9 +650,9 @@ bool Bashkiria2mKbdLayout::setProperty(const string& propertyName, const EmuValu
     if (KbdLayout::setProperty(propertyName, values))
         return true;
 
-    if (propertyName == "downAsNumpad5") {
+    if (propertyName == "upAsNumpad5") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
-            m_downAsNumpad5 = values[0].asString() == "yes";
+            m_upAsNumpad5 = values[0].asString() == "yes";
             return true;
         }
     }
@@ -669,8 +669,8 @@ string Bashkiria2mKbdLayout::getPropertyStringValue(const string& propertyName)
     if (res != "")
         return res;
 
-    if (propertyName == "downAsNumpad5")
-        return m_downAsNumpad5 ? "yes" : "no";
+    if (propertyName == "upAsNumpad5")
+        return m_upAsNumpad5 ? "yes" : "no";
 
     return "";
 }
