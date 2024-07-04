@@ -612,16 +612,3 @@ void Pit8253Helper::operate()
     m_counter->updateState();
     m_counter->planIrq();
 }
-
-
-bool Pit8253Helper::setProperty(const std::string& propertyName, const EmuValuesList& values)
-{
-    if (EmuObject::setProperty(propertyName, values))
-        return true;
-
-    if (propertyName == "core") {
-        m_core = static_cast<PlatformCore*>(g_emulation->findObject(values[0].asString()));
-        return true;
-    }
-    return false;
-}

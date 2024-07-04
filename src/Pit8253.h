@@ -145,7 +145,7 @@ class Pit8253Helper : public ActiveDevice
 public:
     Pit8253Helper();
     void operate() override;
-    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+    //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
     void setCounter(Pit8253Counter* cnt) {m_counter = cnt;}
 
@@ -155,7 +155,6 @@ public:
 
 private:
     Pit8253Counter* m_counter = nullptr;
-    PlatformCore* m_core = nullptr;
 
     void checkForInt();
 };
