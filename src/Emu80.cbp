@@ -98,6 +98,8 @@
 		<Unit filename="Apogey.h" />
 		<Unit filename="AtaDrive.cpp" />
 		<Unit filename="AtaDrive.h" />
+		<Unit filename="Bashkiria.cpp" />
+		<Unit filename="Bashkiria.h" />
 		<Unit filename="CloseFileHook.cpp" />
 		<Unit filename="CloseFileHook.h" />
 		<Unit filename="CmdLine.cpp" />
