@@ -247,7 +247,8 @@ void MainWindow::showWindow()
                 int left = settings.value("left").toInt();
                 int top = settings.value("top").toInt();
                 move(left, top);
-                if (settings.contains("width") && settings.contains("height")) {
+                bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
+                if (resizable && settings.contains("width") && settings.contains("height")) {
                     int width = settings.value("width").toInt();
                     int height = settings.value("height").toInt();
                     m_paintWidget->setFixedSize(width, height);
