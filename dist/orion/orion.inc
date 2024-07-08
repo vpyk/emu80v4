@@ -39,7 +39,7 @@ window.customScreenFormat = 1.111
 window.squarePixels = yes
 
 
-	
+    
 ######## Platform ########
 
 platform.helpFile = @HELP_FILE
@@ -218,7 +218,7 @@ endif
 OrionFileLoader loader
 loader.addrSpace = &ram0
 loader.ramDiskAddrSpace = &ram1
-loader.filter = "Файлы Ориона (*.rko, *.bru, *.ord)|*.rko;*.bru;*.ord;*.RKO;*.BRU;*.ORD|Все файлы (*.*)|*"
+loader.filter = "Файлы Ориона (*.rko, *.bru, *.ord, *.ori)|*.rko;*.bru;*.ord;*.RKO;*.BRU;*.ORD;*.ORI|Все файлы (*.*)|*"
 
 ifdef USE_TAPE
   TapeRedirector tapeInFile

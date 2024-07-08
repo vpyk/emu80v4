@@ -368,13 +368,16 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
     uint8_t* ptr = buf;
 
     int bruOffset = 0;
-
     int len = (ptr[0x0b] << 8) | ptr[0x0a];;
 
-    if (len == 0) {
-        // RKO
+    if (!memcmp(ptr, "Orion-128 file\r\n", 16)) {
+        // ORI file
+        bruOffset = 16;
+    } else if (len == 0)
+        // RKO file
         bruOffset = 0x4d;
 
+    if (bruOffset != 0) {
         if (fileSize < bruOffset + 32) {
             delete[] buf;
             return false;
