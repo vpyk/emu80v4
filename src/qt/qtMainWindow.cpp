@@ -246,6 +246,16 @@ void MainWindow::showWindow()
                 int left = settings.value("left").toInt();
                 int top = settings.value("top").toInt();
                 move(left, top);
+                if (settings.contains("width") && settings.contains("height")) {
+                    int width = settings.value("width").toInt();
+                    int height = settings.value("height").toInt();
+                    m_paintWidget->setFixedSize(width, height);
+                    layout()->setSizeConstraint(QLayout::SetFixedSize);
+                    adjustSize();
+                    m_paintWidget->setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+                    layout()->setSizeConstraint(QLayout::SetNoConstraint);
+                    setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+                }
             } else {
                 QRect screenRec = QGuiApplication::primaryScreen()->availableGeometry();
                 QRect frameRec = frameGeometry();
@@ -3173,6 +3183,8 @@ void MainWindow::savePosition()
     settings.beginGroup("window");
     settings.setValue("left", x());
     settings.setValue("top", y());
+    settings.setValue("width", m_paintWidget->width());
+    settings.setValue("height", m_paintWidget->height());
     settings.endGroup();
 }
 
