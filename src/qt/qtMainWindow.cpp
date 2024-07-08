@@ -207,6 +207,7 @@ void MainWindow::adjustClientSize()
 
     if (resizable || m_fullscreenMode) {
         m_paintWidget->setFixedSize(m_paintWidget->width(), m_paintWidget->height());
+        layout()->setSizeConstraint(QLayout::SetFixedSize);
         if (!m_fullscreenMode)
             adjustSize();
         m_paintWidget->setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
