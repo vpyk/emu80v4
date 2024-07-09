@@ -360,7 +360,7 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
     if (!buf)
         return false;
 
-    if (fileSize < 32) {
+    if (fileSize < 16) {
         delete[] buf;
         return false;
     }
@@ -378,7 +378,7 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
         bruOffset = 0x4d;
 
     if (bruOffset != 0) {
-        if (fileSize < bruOffset + 32) {
+        if (fileSize < bruOffset + 16) {
             delete[] buf;
             return false;
         }
@@ -388,7 +388,7 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
         len = (ptr[0x0b] << 8) | ptr[0x0a];
     }
 
-    len = (((len - 1) | 0xf ) + 17);
+    //len = (((len - 1) | 0xf ) + 17);
 
     if (fileSize < len) {
         delete[] buf;
@@ -396,13 +396,8 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
     }
 
     if (run) {
-        if (len < 16) {
-            delete[] buf;
-            return false;
-        }
         uint16_t begAddr = (ptr[0x09] << 8) | ptr[0x08];
         uint16_t nBytes = (ptr[0x0b] << 8) | ptr[0x0a];
-        len -= 16;
         ptr += 16;
         if (len < nBytes) {
             delete[] buf;
