@@ -311,8 +311,7 @@ void MainWindow::MainWindow::hideWindow()
     hide();
 }
 
-
- void MainWindow::setFullScreen(bool fullscreen)
+void MainWindow::setFullScreen(bool fullscreen)
 {
     bool visible = !(m_fullwindowAction->isChecked() || fullscreen);
 
@@ -323,11 +322,28 @@ void MainWindow::MainWindow::hideWindow()
     if (m_toolBar)
         m_toolBar->setVisible(visible);
     if (fullscreen) {
+        m_savedWindowPos = pos();
+        if (m_savedWindowPos.x() < 0)
+            m_savedWindowPos.rx() = 0;
+        if (m_savedWindowPos.y() < 0)
+            m_savedWindowPos.ry() = 0;
+        m_savedWindowSize = size();
         layout()->setSizeConstraint(QLayout::SetNoConstraint);
         setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         showFullScreen();
-    } else
+    } else {
         showNormal();
+#ifdef Q_OS_UNIX
+        // workaround for X Window
+        // wait for window to show
+        for (int i = 0 ; i < 20 ; i++)
+            qApp->processEvents();
+        if (pos() != m_savedWindowPos)
+            move(m_savedWindowPos);
+        if (size() != m_savedWindowSize)
+            resize(m_savedWindowSize);
+#endif
+    }
     m_fullscreenMode = fullscreen;
     adjustClientSize();
 }

@@ -254,6 +254,9 @@ private:
     bool m_showFirstTime = true;
     QPoint m_hiddenWindowPos = {0, 0};
 
+    QPoint m_savedWindowPos = {0, 0};
+    QSize m_savedWindowSize = {0, 0};
+
     SettingsDialog* m_settingsDialog = nullptr;
 
     QIcon m_diskAOnIcon             = QIcon(":/icons/disk_a.png");
