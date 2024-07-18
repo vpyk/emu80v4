@@ -132,6 +132,9 @@ void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
 }
 
 
+void palUpdateConfig() {
+}
+
 #else
 
 #ifndef PAL_WASM
