@@ -22,7 +22,7 @@ OBJECTS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.cpp=.o))
 DEPENDS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.cpp=.d))
 
 SRC_WEB_FILES := $(foreach file,$(SRC_WEB_FILES),$(SRC_DIR)/wasm/web/$(file))
-WEB_FILES := $(foreach file,$(SRC_WEB_FILES),$(BUILD_DIR)/$(file))
+WEB_FILES := $(foreach file,$(SRC_WEB_FILES),$(BUILD_DIR)/$(notdir $(file)))
 
 all: $(TARGETS) $(WEB_FILES)
 
@@ -38,7 +38,7 @@ $(DEPENDS): $(OBJ_DIR)/%.d: $(SRC_DIR)/%.cpp
 	$(EMCC) -MM -MP -MT"$(@:.d=.o)" $(EMFLAGS) $< > $@
 
 $(WEB_FILES): $(SRC_WEB_FILES)
-	@mkdir -p $(dir $@)
+	@mkdir -p $(BUILD_DIR)
 	cp -f $(SRC_WEB_FILES) $(BUILD_DIR)
 
 clean:
