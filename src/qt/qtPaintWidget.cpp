@@ -181,7 +181,7 @@ void PaintWidget::initializeGL()
     m_program->link();
 
     m_program->bind();
-    //m_program->setUniformValue("texture", 0);
+    //m_program->setUniformValue("texture1", 0);
     m_program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
     m_program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
     m_program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 2, sizeof(float) * 4);
@@ -222,6 +222,9 @@ void PaintWidget::paintGL()
 {
     glClearColor(m_fillColor.red() / 255.0, m_fillColor.green() / 255.0, m_fillColor.blue() / 255.0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    m_vbo.bind();
+    m_program->bind();
 
     if (m_image) {
         glDisable(GL_BLEND);

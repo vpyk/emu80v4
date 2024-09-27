@@ -34,11 +34,15 @@
 #include <QClipboard>
 #include <QAudioFormat>
 
+
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   #include <QRegularExpression>
+  #include <QAudioSink>
+  #define AUDIO_SINK_TYPE QAudioSink
 #else
   #include <QRegExp>
   #define QRegularExpression QRegExp
+  #define AUDIO_SINK_TYPE QAudioOutput
 #endif
 
 
@@ -191,17 +195,17 @@ const string& palGetBasePath()
 }
 
 
-static QAudioOutput* audio = nullptr;
+static AUDIO_SINK_TYPE* audio = nullptr;
 
 static EmuAudioIoDevice* audioDevice = nullptr;
 
 
 void palQtQuit()
 {
-    if (audioDevice)
-        delete audioDevice;
     if (audio)
         audio->stop();
+    if (audioDevice)
+        delete audioDevice;
 
     delete translator;
     delete application;
@@ -220,6 +224,7 @@ void palStart()
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     format.setSampleFormat(QAudioFormat::Int16);
+    format.setChannelConfig(QAudioFormat::ChannelConfigMono);
 #else
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
@@ -227,7 +232,7 @@ void palStart()
     format.setSampleType(QAudioFormat::SignedInt);
 #endif
 
-    audio = new QAudioOutput(format, nullptr /*palGetMainWindow()*/);
+    audio = new AUDIO_SINK_TYPE(format, nullptr /*palGetMainWindow()*/);
     audio->setBufferSize(sampleRate / 5);
     audioDevice = new EmuAudioIoDevice(sampleRate, frameRate);
     audioDevice->start();

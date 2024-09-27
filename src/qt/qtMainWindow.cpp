@@ -1944,7 +1944,7 @@ void MainWindow::keyPressEvent(QKeyEvent* evt)
         emuSysReq(m_palWindow, SR_SPEEDUP);
         return;
     }
-    unsigned unicodeKey = evt->text()[0].unicode(); // "at()" does not operate with empty strings
+    unsigned unicodeKey = evt->text().isEmpty() ? 0 : evt->text()[0].unicode(); // "at()" does not operate with empty strings
     emuKeyboard(m_palWindow, translateKey(evt), true, unicodeKey);
 }
 
@@ -1955,7 +1955,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* evt)
         emuSysReq(m_palWindow, SR_SPEEDNORMAL);
         return;
     }
-    unsigned unicodeKey = evt->text()[0].unicode();
+    unsigned unicodeKey = evt->text().isEmpty() ? 0 : evt->text()[0].unicode(); // "at()" does not operate with empty strings
     emuKeyboard(m_palWindow, translateKey(evt), false, unicodeKey);
 }
 
