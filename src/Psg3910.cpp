@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -184,7 +184,7 @@ void Psg3910::step()
             m_counters[i].toneValue = !m_counters[i].toneValue;
         }
 
-        bool tone = m_counters[i].freq ? m_counters[i].toneValue : false; // silent if tone freq = 0
+        bool tone = m_counters[i].toneValue;
         bool val = (m_counters[i].toneGate || tone) && (m_counters[i].noiseGate || m_noiseValue);
 
         m_counters[i].outValue = val ? logAmps[m_counters[i].var ? m_envValue : m_counters[i].amp] : 0.0;
