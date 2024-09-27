@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     }
                     m_images[m_disk]->setCurHead(m_head);
                     m_images[m_disk]->setCurTrack(m_track);
-                    if (m_sector < m_images[m_disk]->getSectors()) {
+                    if (m_sector <= m_images[m_disk]->getSectors()) {
                         m_images[m_disk]->startSectorAccess(m_sector - 1);
                         m_accessMode = FAM_WRITING;
                         m_status = 0x03;
