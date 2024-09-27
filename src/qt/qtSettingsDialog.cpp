@@ -752,7 +752,7 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     m_options["cpu.debugOnHalt"] = ui->debugHltCheckBox->isChecked() ? "yes" : "no";
 
-    m_options["cpu.debugOnOllegalCmd"] = ui->debugIllegalCheckBox->isChecked() ? "yes" : "no";
+    m_options["cpu.debugOnIllegalCmd"] = ui->debugIllegalCheckBox->isChecked() ? "yes" : "no";
 
     val = "";
     if (ui->colorGroupBox->isVisible()) {
