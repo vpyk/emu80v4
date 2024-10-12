@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -77,12 +77,6 @@ void PaintWidget::colorFill(QColor color)
 
 void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
-    int dstWidth, dstHeight, dstX, dstY;
-    if (!blend && !useAlpha) {
-        static_cast<MainWindow*>(parent())->getPalWindow()->calcDstRect(imageWidth, imageHeight, aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
-        m_dstRect.setRect(dstX, dstY, dstWidth, dstHeight);
-    }
-
     if (m_image2) {
         delete m_image2;
         m_image2 = nullptr;
@@ -93,7 +87,7 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
         m_imageData2 = new uchar[imageWidth * imageHeight * 4];
         memcpy(m_imageData2, pixels, imageWidth * imageHeight * 4);
         m_image2 = new QImage(m_imageData2, imageWidth, imageHeight, useAlpha ? QImage::Format_ARGB32 : QImage::Format_RGB32);
-        m_img2aspectRatio = aspectRatio;
+        //m_img2aspectRatio = aspectRatio;
         if (!useAlpha)
             *m_image2 = m_image2->convertToFormat(QImage::Format_ARGB32); // add alpha channel
         m_useAlpha = useAlpha;
@@ -192,7 +186,7 @@ void PaintWidget::initializeGL()
 }
 
 
-void PaintWidget::paintImageGL(QImage* img, double aspectRatio)
+void PaintWidget::paintImageGL(QImage* img/*, double aspectRatio*/)
 {
     int dstWidth, dstHeight, dstX, dstY;
     PalWindow* palWindow = static_cast<MainWindow*>(parent())->getPalWindow();
@@ -200,12 +194,13 @@ void PaintWidget::paintImageGL(QImage* img, double aspectRatio)
     if (!palWindow)
         return;
 
-    palWindow->calcDstRect(img->width(), img->height(), aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
+    //palWindow->calcDstRect(img->width(), img->height(), aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
+    palWindow->calcDstRect(m_image->width(), m_image->height(), m_img1aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
+    m_dstRect.setRect(dstX, dstY, dstWidth, dstHeight);
 
     m_program->setUniformValue("sharp", m_smoothing == ST_SHARP);
     m_program->setUniformValue("textureSize", img->size());
     m_program->setUniformValue("destSize", QSize(dstWidth, dstHeight));
-    //m_program->setUniformValue("destPos", m_dstRect.topLeft());
 
     QOpenGLTexture* texture = new QOpenGLTexture(*img, QOpenGLTexture::DontGenerateMipMaps);
     texture->setMagnificationFilter(m_smoothing != ST_NEAREST ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
@@ -228,18 +223,18 @@ void PaintWidget::paintGL()
 
     if (m_image) {
         glDisable(GL_BLEND);
-        paintImageGL(m_image, m_img1aspectRatio);
+        paintImageGL(m_image/*, m_img1aspectRatio*/);
 
         if (m_image2) {
             if (m_useAlpha) {
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                paintImageGL(m_image2, m_img2aspectRatio);
+                paintImageGL(m_image2/*, m_img2aspectRatio*/);
             } else {
                 glEnable(GL_BLEND);
                 glBlendColor(0.0, 0.0, 0.0, 0.5);
                 glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-                paintImageGL(m_image2, m_img2aspectRatio);
+                paintImageGL(m_image2/*, m_img2aspectRatio*/);
             }
         }
     }

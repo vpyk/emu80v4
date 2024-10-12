@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -144,8 +144,8 @@ class EmuWindow : public EmuObject, public PalWindow
         bool m_frameDrawn = false;
 
         double calcBestAspectRatio(double srcAspectRatio, int scaleY);
-        bool m_overlay = false;
-        double m_primaryFrameAspectRatio = 1;
+        /*bool m_overlay = false;
+        double m_primaryFrameAspectRatio = 1;*/
 };
 
 #endif // EMUWINDOW_H

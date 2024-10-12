@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void onHideCursorTimer();
 
     private:
-        void paintImageGL(QImage* img, double aspectRatio);
+        void paintImageGL(QImage* img/*, double aspectRatio*/);
 
         void mouseDrag(int x, int y);
 
@@ -72,7 +72,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         uchar* m_imageData;
         uchar* m_imageData2;
         double m_img1aspectRatio;
-        double m_img2aspectRatio;
+        //double m_img2aspectRatio;
 
         bool m_useAlpha = false;
         QColor m_fillColor = Qt::black;

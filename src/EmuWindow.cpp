@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -210,8 +210,8 @@ void EmuWindow::hide()
 
 double EmuWindow::calcBestAspectRatio(double srcAspectRatio, int scaleY)
 {
-    if (m_overlay)
-        return m_primaryFrameAspectRatio * srcAspectRatio;
+    /*if (m_overlay)
+        return m_primaryFrameAspectRatio * srcAspectRatio;*/
 
     if (m_squarePixels)
         return 1.0;
@@ -228,8 +228,8 @@ double EmuWindow::calcBestAspectRatio(double srcAspectRatio, int scaleY)
 
     ar /= scaleY;
 
-    if (!m_overlay)
-        m_primaryFrameAspectRatio = ar;
+    /*if (!m_overlay)
+        m_primaryFrameAspectRatio = ar;*/
 
     return ar;
 }
@@ -378,7 +378,7 @@ void EmuWindow::drawFrame(EmuPixelData frame)
         return;
     }
 
-    m_overlay = false;
+    //m_overlay = false;
 
     m_curImgWidth = frame.width;
     m_curImgHeight = frame.height;
@@ -429,7 +429,7 @@ void EmuWindow::drawOverlay(EmuPixelData frame)
     if (frame.width == 0 || frame.height == 0 || !frame.pixelData)
         return;
 
-    m_overlay = true;
+    //m_overlay = true;
 
     drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, true, true);
 
