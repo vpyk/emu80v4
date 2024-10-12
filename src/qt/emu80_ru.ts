@@ -1201,7 +1201,7 @@
     </message>
     <message>
         <location filename="qtSettingsDialog.ui" line="354"/>
-        <source>* Options marked by &quot;*&quot; takes effect after emulator restart</source>
+        <source>* Options marked by &quot;*&quot; take effect after emulator restart</source>
         <translation>Настройки, помеченные &quot;*&quot; вступят в силу после перезапуска эмулятора</translation>
     </message>
     <message>
