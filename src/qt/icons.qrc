@@ -49,5 +49,7 @@
         <file>icons/edd_on.png</file>
         <file>icons/edd2.png</file>
         <file>icons/edd2_on.png</file>
+        <file>icons/15x.png</file>
+        <file>icons/25x.png</file>
     </qresource>
 </RCC>

@@ -117,6 +117,8 @@ private slots:
     void on3x();
     void on4x();
     void on5x();
+    void on15x();
+    void on25x();
     void onFit();
     void onFullscreen();
     void onFullwindow();
@@ -282,6 +284,8 @@ private:
     QIcon m_3xIcon                  = QIcon(":/icons/3x.png");
     QIcon m_4xIcon                  = QIcon(":/icons/4x.png");
     QIcon m_5xIcon                  = QIcon(":/icons/5x.png");
+    QIcon m_15xIcon                 = QIcon(":/icons/15x.png");
+    QIcon m_25xIcon                 = QIcon(":/icons/25x.png");
     QIcon m_resizableIcon           = QIcon(":/icons/resizable.png");
 
     QMenu* m_loadRunMenu = nullptr;
@@ -390,6 +394,8 @@ private:
     QAction* m_preset3xAction;
     QAction* m_preset4xAction;
     QAction* m_preset5xAction;
+    QAction* m_preset15xAction;
+    QAction* m_preset25xAction;
     QAction* m_presetFitAction;
     QAction* m_platformHelpAction;
     QAction* m_aboutAction;

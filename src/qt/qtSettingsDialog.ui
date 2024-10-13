@@ -387,7 +387,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -416,7 +415,17 @@
            </item>
            <item>
             <property name="text">
+             <string>1.5x</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string notr="true">2x</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>2.5x</string>
             </property>
            </item>
            <item>
@@ -464,17 +473,50 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="userSizeRadioButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>User-changeable</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QRadioButton" name="userSizeRadioButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>User-changeable</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>15</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -614,7 +656,17 @@
               </item>
               <item>
                <property name="text">
+                <string>1.5x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
                 <string notr="true">2x</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>2.5x</string>
                </property>
               </item>
               <item>
@@ -825,6 +877,9 @@
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1465,6 +1520,8 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>configTabWidget</tabstop>
+  <tabstop>langComboBox</tabstop>
   <tabstop>showHelpCheckBox</tabstop>
   <tabstop>fpsSpinBox</tabstop>
   <tabstop>maxFpsCheckBox</tabstop>
@@ -1480,6 +1537,7 @@
   <tabstop>presetComboBox</tabstop>
   <tabstop>autoSizeRadioButton</tabstop>
   <tabstop>userSizeRadioButton</tabstop>
+  <tabstop>preserveSizeCheckBox</tabstop>
   <tabstop>fixedSizeRadioButton</tabstop>
   <tabstop>widthLineEdit</tabstop>
   <tabstop>heightLineEdit</tabstop>
@@ -1487,12 +1545,19 @@
   <tabstop>fixedScaleComboBox</tabstop>
   <tabstop>stretchRadioButton</tabstop>
   <tabstop>stretchPropIntRadioButton</tabstop>
+  <tabstop>aspectCheckBox</tabstop>
+  <tabstop>wideComboBox</tabstop>
+  <tabstop>customFormatLineEdit</tabstop>
+  <tabstop>adaptArRadioButton</tabstop>
+  <tabstop>sqrArRadioButton</tabstop>
   <tabstop>debugHltCheckBox</tabstop>
   <tabstop>debugIllegalCheckBox</tabstop>
   <tabstop>upper8080checkBox</tabstop>
   <tabstop>upperZ80checkBox</tabstop>
   <tabstop>forceZ80checkBox</tabstop>
   <tabstop>swapF5F9checkBox</tabstop>
+  <tabstop>rkCodePageRadioButton</tabstop>
+  <tabstop>koi8CodePageRadioButton</tabstop>
   <tabstop>bwRadioButton</tabstop>
   <tabstop>color1RadioButton</tabstop>
   <tabstop>color2RadioButton</tabstop>
@@ -1521,9 +1586,7 @@
   <tabstop>kbdEurekaRadioButton</tabstop>
   <tabstop>numpadJoystickCheckBox</tabstop>
   <tabstop>downAsNumpad5CheckBox</tabstop>
-  <tabstop>langComboBox</tabstop>
-  <tabstop>rkCodePageRadioButton</tabstop>
-  <tabstop>koi8CodePageRadioButton</tabstop>
+  <tabstop>upAsNumpad5CheckBox</tabstop>
   <tabstop>fastResetCheckBox</tabstop>
  </tabstops>
  <resources/>

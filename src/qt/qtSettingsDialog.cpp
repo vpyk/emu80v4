@@ -309,27 +309,33 @@ void SettingsDialog::fillControlValues()
     if (val == "1x") {
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(0);
-    } else if (val == "2x") {
+    } else if (val == "1.5x") {
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(1);
-    } else if (val == "3x") {
+    } else if (val == "2x") {
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(2);
-    } else if (val == "4x") {
+    } else if (val == "2.5x") {
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(3);
-    } else if (val == "5x") {
+    } else if (val == "3x") {
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(4);
-    } else if (val == "2x3") {
+    } else if (val == "4x") {
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(5);
-    } else if (val == "3x5") {
+    } else if (val == "5x") {
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(6);
+    } else if (val == "2x3") {
+        ui->fixedScaleRadioButton->setChecked(true);
+        ui->fixedScaleComboBox->setCurrentIndex(2);
+    } else if (val == "3x5") {
+        ui->fixedScaleRadioButton->setChecked(true);
+        ui->fixedScaleComboBox->setCurrentIndex(4);
     } else if (val == "4x6") {
         ui->fixedScaleRadioButton->setChecked(true);
-        ui->fixedScaleComboBox->setCurrentIndex(7);
+        ui->fixedScaleComboBox->setCurrentIndex(5);
     } else {
         ui->fixedScaleRadioButton->setChecked(false);
         ui->stretchRadioButton->setChecked(val == "fit");
@@ -503,11 +509,13 @@ void SettingsDialog::on_presetComboBox_currentIndexChanged(int index)
     case 3:
     case 4:
     case 5:
+    case 6:
+    case 7:
         ui->autoSizeRadioButton->setChecked(true);
         ui->fixedScaleRadioButton->setChecked(true);
         ui->fixedScaleComboBox->setCurrentIndex(index - 1);
         break;
-    case 6:
+    case 8:
         ui->userSizeRadioButton->setChecked(true);
         ui->stretchRadioButton->setChecked(true);
         break;
@@ -550,9 +558,17 @@ void SettingsDialog::adjustPresetComboBoxState()
              ui->fixedScaleRadioButton->isChecked() &&
              ui->fixedScaleComboBox->currentIndex() == 4)
          ui->presetComboBox->setCurrentIndex(5);
+    else if (ui->autoSizeRadioButton->isChecked() &&
+             ui->fixedScaleRadioButton->isChecked() &&
+             ui->fixedScaleComboBox->currentIndex() == 5)
+        ui->presetComboBox->setCurrentIndex(6);
+    else if (ui->autoSizeRadioButton->isChecked() &&
+             ui->fixedScaleRadioButton->isChecked() &&
+             ui->fixedScaleComboBox->currentIndex() == 6)
+        ui->presetComboBox->setCurrentIndex(7);
     else if (ui->userSizeRadioButton->isChecked() &&
              ui->stretchRadioButton->isChecked())
-         ui->presetComboBox->setCurrentIndex(6);
+         ui->presetComboBox->setCurrentIndex(8);
     else
         ui->presetComboBox->setCurrentIndex(0);
     m_presetComboBoxEventsAllowed = true;
@@ -717,7 +733,31 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     val = "";
     if (ui->fixedScaleRadioButton->isChecked())
-        val = QString::number(ui->fixedScaleComboBox->currentIndex() + 1) + "x";
+        switch (ui->fixedScaleComboBox->currentIndex()) {
+        case 0:
+            val = "1x";
+            break;
+        case 1:
+            val = "1.5x";
+            break;
+        case 2:
+            val = "2x";
+            break;
+        case 3:
+            val = "2.5x";
+            break;
+        case 4:
+            val = "3x";
+            break;
+        case 5:
+            val = "4x";
+            break;
+        case 6:
+            val = "5x";
+            break;
+        default:
+            break;
+        }
     else if (ui->stretchRadioButton->isChecked())
         val = "fit";
     else if (ui->stretchPropIntRadioButton->isChecked())

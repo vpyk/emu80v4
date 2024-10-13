@@ -1346,6 +1346,29 @@ void MainWindow::createActions()
 
     m_presetMenu->addSeparator();
 
+    // 1.5x preset
+    m_preset15xAction = new QAction(m_15xIcon, tr("Fixed: 1.5x"), this);
+    m_preset15xAction->setCheckable(true);
+    QList<QKeySequence> preset15xKeysList;
+    ADD_HOTKEY(preset15xKeysList, Qt::Key_8);
+    presetGroup->addAction(m_preset15xAction);
+    m_preset15xAction->setShortcuts(preset15xKeysList);
+    addAction(m_preset15xAction);
+    m_presetMenu->addAction(m_preset15xAction);
+    connect(m_preset15xAction, SIGNAL(triggered()), this, SLOT(on15x()));
+
+    // 2.5x preset
+    m_preset25xAction = new QAction(m_25xIcon, tr("Fixed: 2.5x"), this);
+    m_preset25xAction->setCheckable(true);
+    QList<QKeySequence> preset25xKeysList;
+    ADD_HOTKEY(preset25xKeysList, Qt::Key_9);
+    presetGroup->addAction(m_preset25xAction);
+    m_preset25xAction->setShortcuts(preset25xKeysList);
+    addAction(m_preset25xAction);
+    m_presetMenu->addAction(m_preset25xAction);
+    connect(m_preset25xAction, SIGNAL(triggered()), this, SLOT(on25x()));
+    m_presetMenu->addSeparator();
+
     // Fit preset
     m_presetFitAction = new QAction(m_resizableIcon, tr("Resizable"), this);
     //m_presetFitAction->setToolTip(tr("Preset: Fit (Alt-0)"));
@@ -2139,6 +2162,20 @@ void MainWindow::on4x()
 void MainWindow::on5x()
 {
     emuSysReq(m_palWindow, SR_5X);
+    saveConfig();
+}
+
+
+void MainWindow::on15x()
+{
+    emuSysReq(m_palWindow, SR_1_5X);
+    saveConfig();
+}
+
+
+void MainWindow::on25x()
+{
+    emuSysReq(m_palWindow, SR_2_5X);
     saveConfig();
 }
 
@@ -3085,6 +3122,12 @@ void MainWindow::updateActions()
         } else if (frameScale == "5x") {
             m_preset5xAction->setChecked(true);
             m_presetAction->setIcon(m_5xIcon);
+        } else if (frameScale == "1.5x") {
+            m_preset15xAction->setChecked(true);
+            m_presetAction->setIcon(m_15xIcon);
+        } else if (frameScale == "2.5x") {
+            m_preset25xAction->setChecked(true);
+            m_presetAction->setIcon(m_25xIcon);
         } else
             noPreset = true;
     } else

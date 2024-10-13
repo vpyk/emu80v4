@@ -91,7 +91,7 @@ void EmuWindow::setFrameScale(FrameScale fs)
 }
 
 
-void EmuWindow::setFixedYScale(int yScale)
+void EmuWindow::setFixedYScale(double yScale)
 {
     m_scaleY = yScale;
 }
@@ -208,7 +208,7 @@ void EmuWindow::hide()
 }
 
 
-double EmuWindow::calcBestAspectRatio(double srcAspectRatio, int scaleY)
+double EmuWindow::calcBestAspectRatio(double srcAspectRatio, double scaleY)
 {
     /*if (m_overlay)
         return m_primaryFrameAspectRatio * srcAspectRatio;*/
@@ -459,7 +459,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_1X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_FIXED);
-            setFixedYScale(1);
+            setFixedYScale(1.);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             m_platform->updateScreenOnce();
@@ -467,7 +467,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_2X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_FIXED);
-            setFixedYScale(2);
+            setFixedYScale(2.);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             m_platform->updateScreenOnce();
@@ -475,7 +475,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_3X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_FIXED);
-            setFixedYScale(3);
+            setFixedYScale(3.);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             m_platform->updateScreenOnce();
@@ -483,7 +483,7 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_4X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_FIXED);
-            setFixedYScale(4);
+            setFixedYScale(4.);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             m_platform->updateScreenOnce();
@@ -491,7 +491,23 @@ void EmuWindow::sysReq(SysReq sr)
         case SR_5X:
             setWindowStyle(WS_AUTOSIZE);
             setFrameScale(FS_FIXED);
-            setFixedYScale(5);
+            setFixedYScale(5.);
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
+            break;
+        case SR_1_5X:
+            setWindowStyle(WS_AUTOSIZE);
+            setFrameScale(FS_FIXED);
+            setFixedYScale(1.5);
+            if (m_windowType == EWT_EMULATION)
+                g_emulation->getConfig()->updateConfig();
+            m_platform->updateScreenOnce();
+            break;
+        case SR_2_5X:
+            setWindowStyle(WS_AUTOSIZE);
+            setFrameScale(FS_FIXED);
+            setFixedYScale(2.5);
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             m_platform->updateScreenOnce();
@@ -585,38 +601,46 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             return true;
         } else if (values[0].asString() == "1x") {
             setFrameScale(FS_FIXED);
-            setFixedYScale(1);
+            setFixedYScale(1.);
+            return true;
+        } else if (values[0].asString() == "1.5x") {
+            setFrameScale(FS_FIXED);
+            setFixedYScale(1.5);
             return true;
         } else if (values[0].asString() == "2x") {
             setFrameScale(FS_FIXED);
-            setFixedYScale(2);
+            setFixedYScale(2.);
+            return true;
+        } else if (values[0].asString() == "2.5x") {
+            setFrameScale(FS_FIXED);
+            setFixedYScale(2.5);
             return true;
         } else if (values[0].asString() == "3x") {
             setFrameScale(FS_FIXED);
-            setFixedYScale(3);
+            setFixedYScale(3.);
             return true;
         } else if (values[0].asString() == "4x") {
             setFrameScale(FS_FIXED);
-            setFixedYScale(4);
+            setFixedYScale(4.);
             return true;
         } else if (values[0].asString() == "5x") {
             setFrameScale(FS_FIXED);
-            setFixedYScale(5);
+            setFixedYScale(5.);
             return true;
         } else if (values[0].asString() == "2x3") {
             // compatibility
             setFrameScale(FS_FIXED);
-            setFixedYScale(2);
+            setFixedYScale(2.);
             return true;
         } else if (values[0].asString() == "3x5") {
             // compatibility
             setFrameScale(FS_FIXED);
-            setFixedYScale(3);
+            setFixedYScale(3.);
             return true;
         } else if (values[0].asString() == "4x6") {
             // compatibility
             setFrameScale(FS_FIXED);
-            setFixedYScale(4);
+            setFixedYScale(4.);
             return true;
         } else if (values[0].asString() == "fixed") {
             setFrameScale(FS_FIXED);
@@ -739,16 +763,20 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
     } else if (propertyName == "frameScale") {
         switch (m_frameScale) {
             case FS_FIXED:
-                switch (m_scaleY) {
-                    case 1:
-                        return "1x";
+                switch (int(m_scaleY * 2)) {
                     case 2:
-                        return "2x";
+                        return "1x";
                     case 3:
-                        return "3x";
+                        return "1.5x";
                     case 4:
-                        return "4x";
+                        return "2x";
                     case 5:
+                        return "2.5x";
+                    case 6:
+                        return "3x";
+                    case 8:
+                        return "4x";
+                    case 10:
                         return "5x";
                     default:
                         return "";
