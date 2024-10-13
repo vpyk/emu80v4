@@ -102,6 +102,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
 
     switch (m_windowType) {
     case EWT_EMULATION:
+        savePosition();
+
         if (!m_settingsDialog) {
             m_settingsDialog = new SettingsDialog(this);
 
@@ -167,6 +169,20 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
 
         m_settingsDialog->initConfig();
         updateConfig(); // немного избыточно
+
+        {
+            bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
+            if (resizable) {
+                QSettings settings;
+                settings.beginGroup("window");
+                if (settings.contains("width") && settings.contains("height")) {
+                    int width = settings.value("width").toInt();
+                    int height = settings.value("height").toInt();
+                    setClientSize(width, height);
+                    setClientSize(0, 0); //resizable
+                }
+            }
+        }
 
         if (m_settingsDialog->getOptionValue("showHelp") == "yes") {
             std::string helpFile = palMakeFullFileName(emuGetPropertyValue(m_palWindow->getPlatformObjectName(), "helpFile"));
