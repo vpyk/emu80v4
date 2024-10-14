@@ -195,3 +195,33 @@ string Rk86Renderer::getPropertyStringValue(const string& propertyName)
 
     return "";
 }
+
+
+RkPixeltronRenderer::RkPixeltronRenderer()
+{
+    m_fntCharWidth = 6;
+
+    m_customDraw = true;
+
+    m_ltenOffset = false;
+    m_gpaOffset  = false;
+}
+
+
+void RkPixeltronRenderer::customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool /*rvv*/, bool gpa0, bool /*gpa1*/, bool /*hglt*/)
+{
+    int offset = (gpa0 ? 0x400 : 0) + symbol * 8 + (line & 7);
+    uint8_t bt = ~m_font[offset];
+    if (lten)
+        bt = 0x3f;
+    else if (vsp)
+        bt = 0x00;
+
+    uint32_t fgColor = (bt & 0x40) ? 0xC0C0C0 : 0xFFFFFF;
+    uint32_t bgColor = (bt & 0x80) ? 0x404040 : 0x000000;
+
+    for (int i = 0; i < 6; i++) {
+        *linePtr++ = (bt & 0x20) ? fgColor : bgColor;
+        bt <<= 1;
+    }
+}

@@ -76,4 +76,15 @@ class Rk86Renderer : public Crt8275Renderer
 };
 
 
+class RkPixeltronRenderer : public Crt8275Renderer
+{
+    public:
+        RkPixeltronRenderer();
+
+        static EmuObject* create(const EmuValuesList&) {return new RkPixeltronRenderer();}
+
+    protected:
+        void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt) override;
+};
+
 #endif // RK86_H
