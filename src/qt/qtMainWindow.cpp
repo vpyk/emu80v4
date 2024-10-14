@@ -81,6 +81,9 @@ MainWindow::~MainWindow()
 void MainWindow::setPalWindow(PalWindow* palWindow)
 {
     if (!palWindow) {
+        if (m_windowType == EWT_EMULATION)
+            savePosition();
+
         m_windowType = EWT_UNDEFINED;
         m_platformName = "";
         m_platformGroupName = "";
@@ -102,8 +105,6 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
 
     switch (m_windowType) {
     case EWT_EMULATION:
-        savePosition();
-
         if (!m_settingsDialog) {
             m_settingsDialog = new SettingsDialog(this);
 
@@ -176,10 +177,11 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
                 QSettings settings;
                 settings.beginGroup("window");
                 if (settings.contains("width") && settings.contains("height")) {
-                    int width = settings.value("width").toInt();
-                    int height = settings.value("height").toInt();
-                    setClientSize(width, height);
-                    setClientSize(0, 0); //resizable
+                    m_clientWidth = settings.value("width").toInt();
+                    m_clientHeight = settings.value("height").toInt();
+                    adjustClientSize();
+                    m_clientWidth = m_clientHeight = 0;
+                    adjustClientSize(); //resizable
                 }
             }
         }
@@ -209,6 +211,26 @@ void MainWindow::setClientSize(int width, int height)
     // minimum window size
     if (width != 0 && width < 120) width = 120;
     if (height != 0 && height < 75) height = 75;
+
+    if (m_windowType == EWT_EMULATION) {
+        QSettings settings;
+        settings.beginGroup("system");
+        bool preserveSize = settings.value("preserveSize") == "yes";
+
+        if (width == 0 && height == 0) {
+            if (preserveSize) {
+                settings.endGroup();
+                settings.beginGroup("window");
+                if (settings.contains("width") && settings.contains("height")) {
+                    m_clientWidth = settings.value("width").toInt();
+                    m_clientHeight = settings.value("height").toInt();
+                    adjustClientSize();
+                }
+            }
+        } else
+            if (!preserveSize)
+            savePosition();
+    }
 
     m_clientWidth = width;
     m_clientHeight = height;
@@ -3260,8 +3282,13 @@ void MainWindow::savePosition()
     settings.beginGroup("window");
     settings.setValue("left", x());
     settings.setValue("top", y());
-    settings.setValue("width", m_paintWidget->width());
-    settings.setValue("height", m_paintWidget->height());
+
+    bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
+    if (resizable || m_settingsDialog->getOptionValue("preserveSize") != "yes") {
+        settings.setValue("width", m_paintWidget->width());
+        settings.setValue("height", m_paintWidget->height());
+    }
+
     settings.endGroup();
 }
 

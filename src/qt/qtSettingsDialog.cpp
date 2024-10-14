@@ -218,6 +218,7 @@ void SettingsDialog::loadSavedConfig()
     m_options["vsync"] = settings.value("vsync").toString();
     m_options["sampleRate"] = settings.value("sampleRate").toString();
     m_options["showHelp"] = settings.value("showHelp", "yes").toString();
+    m_options["preserveSize"] = settings.value("preserveSize", "yes").toString();
     settings.endGroup();
 
     settings.beginGroup(m_platformGroup);
@@ -252,6 +253,9 @@ void SettingsDialog::fillControlValues()
 
     // Show help
     ui->showHelpCheckBox->setChecked(m_options["showHelp"] == "yes");
+
+    // Preserve size
+    ui->preserveSizeCheckBox->setChecked(m_options["preserveSize"] == "yes");
 
     // OpenGL driver
     /*val = m_options["glDriver"];
@@ -680,6 +684,8 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     m_options["showHelp"] = ui->showHelpCheckBox->isChecked() ? "yes" : "no";
 
+    m_options["preserveSize"] = ui->preserveSizeCheckBox->isChecked() ? "yes" : "no";
+
     val = QString::number(ui->fpsSpinBox->value());
     if (val != m_options["maxFps"]) {
         m_options["maxFps"] = val;
@@ -921,7 +927,7 @@ void SettingsDialog::saveRunningConfig()
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
         if (value != "" && option != "locale" && option != "showHelp" && option != "maxFps" &&
-                           option != "limitFps" && option != "sampleRate" && option != "vsync") {
+                           option != "limitFps" && option != "sampleRate" && option != "vsync" && option != "preserveSize") {
             setRunningConfigValue(option, value);
         }
     }
@@ -938,7 +944,7 @@ void SettingsDialog::saveStoredConfig()
     for (const auto& option: m_options.keys()) {
         QString value = m_options.value(option);
         if (option.left(10) != "emulation." /*&& value != ""*/ && option != "locale" && option != "showHelp" &&
-                option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync")
+                option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync" && option != "preserveSize")
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -946,7 +952,8 @@ void SettingsDialog::saveStoredConfig()
     settings.beginGroup("system");
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (option.left(10) != "emulation." && value != "" && (option == "locale" || option == "showHelp" || option == "maxFps" || option == "limitFps" || option == "sampleRate" || option == "vsync"))
+        if (option.left(10) != "emulation." && value != "" && (option == "locale" || option == "showHelp" || option == "maxFps" ||
+                                                               option == "limitFps" || option == "sampleRate" || option == "vsync" || option == "preserveSize"))
             settings.setValue(option, value);
     }
     settings.endGroup();
