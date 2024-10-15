@@ -66,7 +66,7 @@ void KbdTapper::typeText(std::string str)
     //sendNextKey();
     scheduleKey();
 
-    g_emulation->setSpeedUpFactor(c_speedUpFactor);
+    g_emulation->setTemporarySpeedUpFactor(c_speedUpFactor);
 }
 
 
@@ -82,7 +82,7 @@ void KbdTapper::stop()
 
     pause();
 
-    g_emulation->setSpeedUpFactor(1);
+    g_emulation->setTemporarySpeedUpFactor(0);
 }
 
 

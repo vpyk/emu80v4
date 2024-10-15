@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ bool WavReader::chooseAndLoadFile()
 {
     if (m_isOpen) {
         m_file.close();
-        g_emulation->setSpeedUpFactor(1);
+        g_emulation->setTemporarySpeedUpFactor(0);
         m_isOpen = false;
         return false;
     }
@@ -81,7 +81,7 @@ bool WavReader::loadFile(const std::string& fileName, TapeRedirector* tapeRedire
         m_hasMoreSamples = true;
         readNextSample();
 
-        g_emulation->setSpeedUpFactor(m_speedUpFactor);
+        g_emulation->setTemporarySpeedUpFactor(m_speedUpFactor);
     }
 
     return res;
@@ -326,7 +326,7 @@ bool WavReader::getCurValue()
     else {
         m_isOpen = false;
         m_file.close();
-        g_emulation->setSpeedUpFactor(1);
+        g_emulation->setTemporarySpeedUpFactor(0);
         if (m_tapeRedirector)
             m_tapeRedirector->closeFile();
         return false;
@@ -371,7 +371,7 @@ bool WavReader::setProperty(const std::string& propertyName, const EmuValuesList
         if (m_speedUpFactor == 0)
             m_speedUpFactor = 1;
         if (m_isOpen)
-            g_emulation->setSpeedUpFactor(m_speedUpFactor);
+            g_emulation->setTemporarySpeedUpFactor(m_speedUpFactor);
         return true;
     }
     return false;

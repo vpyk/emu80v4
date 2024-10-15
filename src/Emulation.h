@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -99,9 +99,10 @@ class Emulation : public ParentObject
         void setFrameRate(int frameRate);               // установка частоты кадров, 0 - max
         void setVsync(bool vsync);                      // установка vsync
         bool getVsync() {return m_vsync;}
-        void setSpeedUpFactor(unsigned speed);
+        void setTemporarySpeedUpFactor(unsigned speed);
+        void updateFrequency();
 
-        unsigned getSpeedUpFactor() {return m_speedUpFactor;}
+        double getSpeedUpFactor() {return m_currentSpeedUpFactor;}
         bool getPausedState() {return m_isPaused;}
 
         void processCmdLine();
@@ -119,9 +120,12 @@ class Emulation : public ParentObject
         Cpu* m_debugReqCpu = nullptr;
 
         bool m_isPaused = false;
-        unsigned m_speedUpFactor = 1;
+        double m_speedUpFactor = 1.0;
+        double m_currentSpeedUpFactor = 1.0;
+        int m_speedGrade = 0;
 
         uint64_t m_frequency;
+        uint64_t m_curFrequency;
         unsigned m_frameRate;
         bool m_vsync;
         unsigned m_sampleRate;
@@ -149,6 +153,8 @@ class Emulation : public ParentObject
         bool runPlatform (const std::string& platformName);
 
         DebuggerOptions m_debuggerOptions;
+
+        void setSpeedByGrade(int speedGrade);
 };
 
 

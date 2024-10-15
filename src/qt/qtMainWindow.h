@@ -108,6 +108,9 @@ private slots:
     void onPause();
     void onForwardOn();
     void onForwardOff();
+    void onSpeedUp();
+    void onSpeedDown();
+    void onSpeedNormal();
     void onDebug();
     void onColorMode();
     void onColorSelect();
@@ -363,6 +366,9 @@ private:
     QAction* m_resetAction;
     QAction* m_pauseAction;
     QAction* m_forwardAction;
+    QAction* m_speedUpAction;
+    QAction* m_speedDownAction;
+    QAction* m_speedNormalAction;
     QAction* m_debugAction;
     QAction* m_screenshotAction;
     QAction* m_copyImageAction;

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -470,10 +470,22 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
             m_isPaused = !m_isPaused;
             break;
         case SR_SPEEDUP:
-            setSpeedUpFactor(4);
+            setTemporarySpeedUpFactor(4);
             break;
         case SR_SPEEDNORMAL:
-            setSpeedUpFactor(1);
+            setTemporarySpeedUpFactor(0);
+            break;
+        case SR_SPEEDSTEPUP:
+            if (m_speedGrade < 12)
+                setSpeedByGrade(++m_speedGrade);
+            break;
+        case SR_SPEEDSTEPDOWN:
+        if (m_speedGrade > -12)
+            setSpeedByGrade(--m_speedGrade);
+            break;
+        case SR_SPEEDSTEPNORMAL:
+            m_speedGrade = 0;
+            setSpeedByGrade(0);
             break;
         case SR_LOADWAV:
             if (m_wavReader) {
@@ -520,7 +532,7 @@ void Emulation::mainLoopCycle()
     unsigned dt = m_sysClock - m_prevSysClock;
     if (dt > palGetCounterFreq() / 10) // 0.1 s
         dt = palGetCounterFreq() / 10;
-    uint64_t ticks = m_frequency * m_speedUpFactor * dt / palGetCounterFreq();
+    uint64_t ticks = m_curFrequency * dt / palGetCounterFreq();
     m_prevSysClock = m_sysClock;
     exec(ticks);
 }
@@ -529,7 +541,7 @@ void Emulation::mainLoopCycle()
 void Emulation::setFrequency(int64_t freq)
 {
     m_frequency = freq;
-    m_mixer->setFrequency(freq);
+    updateFrequency();
 }
 
 
@@ -554,7 +566,7 @@ void Emulation::setSampleRate(int sampleRate)
 {
     if (palSetSampleRate(sampleRate)) {
         m_sampleRate = sampleRate;
-        m_mixer->setFrequency(m_frequency);
+        m_mixer->setFrequency(m_curFrequency);
     }
 }
 
@@ -582,10 +594,46 @@ void Emulation::dropFile(EmuWindow* wnd, const string& fileName)
 }
 
 
-void Emulation::setSpeedUpFactor(unsigned speed)
+void Emulation::updateFrequency()
 {
-    m_speedUpFactor = speed;
-    m_mixer->setFrequency(m_frequency * m_speedUpFactor);
+    m_curFrequency = m_frequency * m_currentSpeedUpFactor;
+    m_mixer->setFrequency(m_curFrequency);
+}
+
+
+void Emulation::setTemporarySpeedUpFactor(unsigned speed)
+{
+    if (speed)
+        m_currentSpeedUpFactor = speed;
+    else  // speed = 0, cancel temporary speed up
+        m_currentSpeedUpFactor = m_speedUpFactor;
+
+    updateFrequency();
+}
+
+
+void Emulation::setSpeedByGrade(int speedGrade)
+{
+    if (speedGrade == 0) {
+        m_speedUpFactor = m_currentSpeedUpFactor = 1.0;
+        updateFrequency();
+        return;
+    }
+
+    bool slowDown = speedGrade < 0;
+    speedGrade = abs(speedGrade);
+
+    int twoPower = speedGrade / 3;
+    int extraSteps = speedGrade % 3;
+
+    const double kStep = 1.26; // pow(2, 1/3);
+
+    double k = (1 << twoPower);
+    for (int i = 0; i < extraSteps; i++)
+        k *= kStep;
+
+    m_speedUpFactor = m_currentSpeedUpFactor = slowDown ? (1 / k) : k;
+    updateFrequency();
 }
 
 

@@ -956,6 +956,38 @@ void MainWindow::createActions()
 
     platformMenu->addSeparator();
 
+    // Speed up
+    m_speedUpAction = new QAction(tr("Speed up"), this);
+    m_speedUpAction->setToolTip(tr("Speed up (Alt-PgUp)"));
+    QList<QKeySequence> speedUpKeysList;
+    ADD_HOTKEY(speedUpKeysList, Qt::Key_PageUp);
+    m_speedUpAction->setShortcuts(speedUpKeysList);
+    addAction(m_speedUpAction);
+    platformMenu->addAction(m_speedUpAction);
+    connect(m_speedUpAction, SIGNAL(triggered()), this, SLOT(onSpeedUp()));
+
+    // Speed down
+    m_speedDownAction = new QAction(tr("Speed down"), this);
+    m_speedDownAction->setToolTip(tr("Speed down (Alt-PgDn)"));
+    QList<QKeySequence> speedDownKeysList;
+    ADD_HOTKEY(speedDownKeysList, Qt::Key_PageDown);
+    m_speedDownAction->setShortcuts(speedDownKeysList);
+    addAction(m_speedDownAction);
+    platformMenu->addAction(m_speedDownAction);
+    connect(m_speedDownAction, SIGNAL(triggered()), this, SLOT(onSpeedDown()));
+
+    // Speed normal
+    m_speedNormalAction = new QAction(tr("Normal speed"), this);
+    m_speedNormalAction->setToolTip(tr("Normal speed (Alt-Home)"));
+    QList<QKeySequence> speedNormalKeysList;
+    ADD_HOTKEY(speedNormalKeysList, Qt::Key_Home);
+    m_speedNormalAction->setShortcuts(speedNormalKeysList);
+    addAction(m_speedNormalAction);
+    platformMenu->addAction(m_speedNormalAction);
+    connect(m_speedNormalAction, SIGNAL(triggered()), this, SLOT(onSpeedNormal()));
+
+    platformMenu->addSeparator();
+
     // Debug
     m_debugAction = new QAction(QIcon(":/icons/debug.png"), tr("Debug..."), this);
     m_debugAction->setToolTip(tr("Debug (Alt-D)"));
@@ -1656,9 +1688,9 @@ void MainWindow::onFpsTimer()
         m_frameCount = 0;
     }
 
-    unsigned speed = emuGetEmulationSpeedFactor();
-    m_speedLabel->setVisible(speed != 1);
-    m_speedLabel->setText(speed ? QString::number(speed) + "x" : tr("Paused"));
+    double speed = emuGetEmulationSpeedFactor();
+    m_speedLabel->setVisible(speed != 1.);
+    m_speedLabel->setText(speed != 0. ? QString::number(speed, 'f', 2) + "x" : tr("Paused"));
 
 
     std::string platform = m_palWindow->getPlatformObjectName() + ".";
@@ -2068,6 +2100,24 @@ void MainWindow::onPause()
 {
     bool paused = ((QAction*)sender())->isChecked();
     emuSysReq(m_palWindow, paused ? SR_PAUSEON : SR_PAUSEOFF);
+}
+
+
+void MainWindow::onSpeedUp()
+{
+    emuSysReq(m_palWindow, SR_SPEEDSTEPUP);
+}
+
+
+void MainWindow::onSpeedDown()
+{
+    emuSysReq(m_palWindow, SR_SPEEDSTEPDOWN);
+}
+
+
+void MainWindow::onSpeedNormal()
+{
+    emuSysReq(m_palWindow, SR_SPEEDSTEPNORMAL);
 }
 
 

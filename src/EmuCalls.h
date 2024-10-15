@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ bool emuSetPropertyValue(const std::string& objName, const std::string& propName
 std::string emuGetPropertyValue(const std::string& objName, const std::string& propName);
 const std::vector<PlatformInfo>* emuGetPlatforms();
 void emuSelectPlatform(const std::string& platform);
-unsigned emuGetEmulationSpeedFactor();
+double emuGetEmulationSpeedFactor();
 
 void emuExitFullscreenMode(PalWindow* wnd);
 
