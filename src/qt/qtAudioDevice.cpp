@@ -69,7 +69,7 @@ qint64 EmuAudioIoDevice::readData(char *data, qint64 maxSize)
 
 qint64 EmuAudioIoDevice::bytesAvailable() const
 {
-    return m_pos * 2;
+    return 16384 * 2;// m_pos * 2;
 }
 
 
