@@ -38,6 +38,7 @@
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   #include <QRegularExpression>
   #include <QAudioSink>
+  #include <QMediaDevices>
   #define AUDIO_SINK_TYPE QAudioSink
 #else
   #include <QRegExp>
@@ -232,7 +233,13 @@ void palStart()
     format.setSampleType(QAudioFormat::SignedInt);
 #endif
 
-    audio = new AUDIO_SINK_TYPE(format, nullptr /*palGetMainWindow()*/);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QMediaDevices devices;
+    audio = new QAudioSink(devices.defaultAudioOutput(), format);
+#else
+    audio = new QAudioOutput(format);
+#endif
+
     audio->setBufferSize(sampleRate / 5);
     audioDevice = new EmuAudioIoDevice(sampleRate, frameRate);
     audioDevice->start();
