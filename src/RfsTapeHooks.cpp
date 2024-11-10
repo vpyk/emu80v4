@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -65,9 +65,26 @@ bool RfsTapeOutHook::hookProc()
 
     m_file->writeByte(outByte);
 
-    cpu->ret();
+    if (!m_leaveAddr)
+        cpu->ret();
+    else
+        cpu->setPC(m_leaveAddr);
 
     return true;
+}
+
+
+bool RfsTapeOutHook::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (CpuHook::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "leaveAddr") {
+        m_leaveAddr = values[0].asInt();
+        return true;
+    }
+
+    return false;
 }
 
 

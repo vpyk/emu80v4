@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,10 +38,14 @@ class RfsTapeOutHook : public CpuHook
     public:
         RfsTapeOutHook(uint16_t addr) : CpuHook(addr) {}
         //virtual ~RfsTapeOutHook() {}
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         bool hookProc() override;
 
         static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new RfsTapeOutHook(parameters[0].asInt()) : nullptr;}
+
+    private:
+        uint16_t m_leaveAddr = 0;
 };
 
 
