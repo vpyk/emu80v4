@@ -34,6 +34,7 @@ class MsxTapeOutHook : public CpuHook
 
     private:
         bool m_regC = false;
+        uint16_t m_leaveAddr = 0;
 
         int m_curPos = 0;
 };

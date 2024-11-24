@@ -63,7 +63,10 @@ bool MsxTapeOutHook::hookProc()
         m_file->writeByte(outByte);
     ++m_curPos;
 
-    static_cast<Cpu8080Compatible*>(m_cpu)->ret();
+    if (!m_leaveAddr)
+        cpu->ret();
+    else
+        cpu->setPC(m_leaveAddr);
 
     return true;
 }
@@ -79,6 +82,9 @@ bool MsxTapeOutHook::setProperty(const string& propertyName, const EmuValuesList
             m_regC = values[0].asString() == "C";
             return true;
         }
+    } else if (propertyName == "leaveAddr") {
+        m_leaveAddr = values[0].asInt();
+        return true;
     }
 
     return false;
