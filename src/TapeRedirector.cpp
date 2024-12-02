@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -79,8 +79,9 @@ void TapeRedirector::openFile()
         return;
     }
 
-    ext = ext.substr(0, 3);
+    ext = ext.substr(0, 4);
     m_lvt = (ext == ".lv" || ext == ".LV");
+    m_tsx = (ext == ".tsx" || ext == ".TSX");
 
     if (m_fileName == "") {
         m_cancelled = true;
@@ -92,6 +93,8 @@ void TapeRedirector::openFile()
 
     m_cancelled = !m_isOpen;
     //m_read = false;
+
+    m_bytesLeftInBlock = 0;
 
     updateTimer();
 }
@@ -125,8 +128,11 @@ void TapeRedirector::setFilePos(unsigned pos)
 
 uint8_t TapeRedirector::readByte()
 {
+    if (m_tsx && m_isOpen && !m_bytesLeftInBlock)
+        advanceToNextBlock();
+
     if (!m_isOpen && !m_cancelled)
-        openFile();
+    openFile();
 
     if (!m_isOpen)
         return 0;
@@ -138,6 +144,9 @@ uint8_t TapeRedirector::readByte()
             switchToNextLvt();
         }
     }
+
+    if (m_tsx)
+        --m_bytesLeftInBlock;
 
     updateTimer();
 
@@ -326,6 +335,12 @@ bool TapeRedirector::isLvt()
 }
 
 
+bool TapeRedirector::isTsx()
+{
+    return m_tsx;
+}
+
+
 void TapeRedirector::switchToNextLvt()
 {
     if (m_isOpen)
@@ -343,6 +358,138 @@ void TapeRedirector::switchToNextLvt()
             m_file.open(m_fileName, m_rwMode);
             m_isOpen = m_file.isOpen();
             //m_cancelled = false;
+        }
+    }
+}
+
+
+bool TapeRedirector::bytesAvailable(int n)
+{
+    if (!m_isOpen)
+        return false;
+
+    return ((m_file.getSize() - m_file.getPos()) >= n);
+}
+
+
+void TapeRedirector::skipBytes(int n)
+{
+    for (int i = 0; i < n; i++)
+        m_file.read8();
+}
+
+
+void TapeRedirector::readBuffer(uint8_t* buf, int n)
+{
+    for (int i = 0; i < n; i++)
+        *buf++ = m_file.read8();
+}
+
+
+static const uint8_t tsxHeader[8] = {0x5A, 0x58, 0x54, 0x61, 0x70, 0x65, 0x21, 0x1A};
+
+void TapeRedirector::advanceToNextBlock()
+{
+    if (!m_tsx)
+        return;
+
+    if (m_bytesLeftInBlock) {
+        skipBytes(m_bytesLeftInBlock);
+        m_bytesLeftInBlock = 0;
+    }
+
+    if (isEof())
+        return;
+
+    while (!m_bytesLeftInBlock) {
+        uint8_t blockId = m_file.read8();
+        switch (blockId) {
+        case 0x5A: {
+            // TZX Header or Glue block
+            if (!bytesAvailable(9)) {
+                closeFile();
+                return;
+            }
+            uint8_t buf[7];
+
+            readBuffer(buf, 7);
+
+            if (memcmp(buf, tsxHeader + 1, 6)) {
+                closeFile();
+                return;
+            }
+            skipBytes(2); // version: 2 bytes
+            break;
+        }
+        case 0x32: {
+            // Archive info block
+            if (!bytesAvailable(2)) {
+                closeFile();
+                return;
+            }
+            uint16_t blockSize = m_file.read16();
+            if (!bytesAvailable(blockSize)) {
+                closeFile();
+                return;
+            }
+            skipBytes(blockSize);
+            break;
+        }
+        case 0x35: {
+            // Custom info block
+            if (!bytesAvailable(14)) {
+                closeFile();
+                return;
+            }
+            skipBytes(16);
+            uint32_t blockSize = m_file.read32();
+            if (!bytesAvailable(blockSize)) {
+                closeFile();
+                return;
+            }
+            skipBytes(blockSize);
+            break;
+        }
+        case 0x30: {
+            // Text description
+            if (!bytesAvailable(1)) {
+                closeFile();
+                return;
+            }
+            uint8_t blockSize = m_file.read8();
+            if (!bytesAvailable(blockSize)) {
+                closeFile();
+                return;
+            }
+            skipBytes(blockSize);
+            break;
+        }
+        case 0x4B: {
+            // Kansas City (MSX) block
+            if (!bytesAvailable(4)) {
+                closeFile();
+                return;
+            }
+            uint32_t blockSize = m_file.read32();
+            if (!bytesAvailable(blockSize)) {
+                closeFile();
+                return;
+            }
+
+            skipBytes(12);
+
+            // todo: check last 2 bytes for bitmapped options
+            //uint8_t buf[12];
+            //readBuffer(buf, 12);
+
+            m_bytesLeftInBlock = blockSize - 12;
+
+            break;
+        }
+        default:
+            // unknown block, close file
+            closeFile();
+            return;
         }
     }
 }
