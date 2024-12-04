@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "WavReader.h"
 #include "Cpu.h"
 #include "Pit8253.h"
+#include "TapeRedirector.h"
 
 using namespace std;
 
@@ -683,12 +684,21 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
     if (!buf)
         return false;
 
+    bool res = loadMemFile(buf, fileSize, fileName, run);
+
+    delete[] buf;
+
+    return res;
+}
+
+
+bool SpecFileLoader::loadMemFile(uint8_t* data, int fileSize, const std::string& fileName, bool run)
+{
     if (fileSize < 7) {
-        delete[] buf;
         return false;
     }
 
-    uint8_t* ptr = buf;
+    uint8_t* ptr = data;
 
     if ((*ptr) == 0xE6) {
         ptr++;
@@ -706,7 +716,6 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
         ++ptr;
         --fileSize;
         if (fileSize < 7) {
-            delete[] buf;
             return false;
         }
     }
@@ -720,7 +729,6 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
 
     if (begAddr == 0xE6E6 || begAddr == 0xD3D3 || fileSize < progLen/* + 2*/) {
         // Basic or EDM File
-        delete[] buf;
         return false;
     }
 
@@ -736,6 +744,89 @@ bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
         if (cpu) {
             g_emulation->exec(int64_t(cpu->getKDiv()) * 2000000, true);
             cpu->setPC(begAddr);
+        }
+    }
+
+    return true;
+}
+
+
+bool Sp580FileLoader::loadFile(const std::string& fileName, bool run)
+{
+    int fileSize;
+    uint8_t* buf = palReadFile(fileName, fileSize, false);
+    if (!buf)
+        return false;
+
+    MsxFileParser parser(buf, fileSize);
+
+    switch (parser.getFormat()) {
+    case MsxFileParser::Format::MF_UNKNOWN: {
+        bool res = SpecFileLoader::loadMemFile(buf, fileSize, fileName, run);
+        delete[] buf;
+        return res; }
+    case MsxFileParser::Format::MF_CAS:
+    case MsxFileParser::Format::MF_TSX: {
+        int pos, len;
+        if (!parser.getNextBlock(pos, len)) {
+            delete[] buf;
+            return false;
+        }
+        if (len < 10 || buf[pos] != 0) {
+            delete[] buf;
+            return false;
+        }
+
+        uint8_t* ptr = buf + pos;
+
+        uint16_t begAddr = (ptr[2] << 8) | ptr[1];
+        uint16_t endAddr = (ptr[4] << 8) | ptr[3];
+        uint16_t startAddr = (ptr[8] << 8) | ptr[7];
+
+        if (!parser.getNextBlock(pos, len)) {
+            delete[] buf;
+            return false;
+        }
+
+        if (len < endAddr - begAddr + 1) {
+            delete[] buf;
+            return false;
+        }
+
+        ptr = buf + pos;
+        for (uint16_t addr = begAddr; addr <= endAddr; addr++)
+            m_as->writeByte(addr, *ptr++);
+
+        pos = pos + len;//endAddr - begAddr + 1;
+
+        if (run) {
+            m_platform->reset();
+            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+            if (cpu) {
+                g_emulation->exec(int64_t(cpu->getKDiv()) * 2000000, true);
+
+                // Press CR
+                Keyboard* kbd = m_platform->getKeyboard();
+                g_emulation->exec((int64_t)cpu->getKDiv() * 50000, true);
+                kbd->processKey(EK_CR, true);
+                g_emulation->exec((int64_t)cpu->getKDiv() * 50000, true);
+                kbd->processKey(EK_CR, false);
+                g_emulation->exec((int64_t)cpu->getKDiv() * 1000000, true);
+
+                if (m_allowMultiblock && m_tapeRedirector && pos != fileSize) {
+                    m_tapeRedirector->assignFile(fileName, "r");
+                    m_tapeRedirector->openFile();
+                    m_tapeRedirector->assignFile("", "r");
+                    m_tapeRedirector->setFilePos(pos);
+                }
+
+                cpu->setSP(0x8FA7);
+                m_as->writeByte(0x8FA7, 0xC0);
+                m_as->writeByte(0x8FA8, 0xFB);
+                cpu->setPC(startAddr);
+            }
+        }
+
         }
     }
 

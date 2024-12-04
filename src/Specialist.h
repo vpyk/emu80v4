@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -331,6 +331,18 @@ class SpecFileLoader : public FileLoader
         bool loadFile(const std::string& fileName, bool run = false) override;
 
         static EmuObject* create(const EmuValuesList&) {return new SpecFileLoader();}
+
+    protected:
+        bool loadMemFile(uint8_t* data, int fileSize, const std::string& fileName, bool run);
+};
+
+
+class Sp580FileLoader : public SpecFileLoader
+{
+public:
+    bool loadFile(const std::string& fileName, bool run = false) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new Sp580FileLoader();}
 };
 
 

@@ -437,7 +437,7 @@ void TapeRedirector::advanceToNextBlock()
         }
         case 0x35: {
             // Custom info block
-            if (!bytesAvailable(14)) {
+            if (!bytesAvailable(20)) {
                 closeFile();
                 return;
             }

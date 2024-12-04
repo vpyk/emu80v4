@@ -122,6 +122,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(SpecPpi8255Circuit);
     REG_EMU_CLASS(SpecRomDisk);
     REG_EMU_CLASS(SpecFileLoader);
+    REG_EMU_CLASS(Sp580FileLoader);
     REG_EMU_CLASS(SpecMxFileLoader);
     REG_EMU_CLASS(SpecMxPit8253SoundSource);
     REG_EMU_CLASS(EurekaCore);
