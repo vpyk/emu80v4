@@ -379,7 +379,7 @@ void SettingsDialog::fillControlValues()
 
     // Color mode
     val = m_options.value("crtRenderer.colorMode", "");
-    ui->colorGroupBox->setVisible(m_platformGroup == "apogey" || m_platformGroup == "rk86" || m_platformGroup == "spec");
+    ui->colorGroupBox->setVisible(m_platformGroup == "apogey" || m_platformGroup == "rk86" || m_platformGroup == "spec" || m_platformGroup == "sp580");
     if (m_platformGroup == "apogey") {
         ui->color1RadioButton->setText(tr("Color"));
         ui->color2RadioButton->setVisible(false);
@@ -392,7 +392,7 @@ void SettingsDialog::fillControlValues()
         ui->bwRadioButton->setChecked(val == "mono");
         ui->color1RadioButton->setChecked(val == "color1");
         ui->color2RadioButton->setChecked(val == "color2");
-    } else if (m_platformGroup == "spec") {
+    } else if (m_platformGroup == "spec" || m_platformGroup == "sp580") {
         ui->color1RadioButton->setText(tr("4-color mode"));
         ui->color2RadioButton->setVisible(true);
         ui->color2RadioButton->setText(tr("8-color mode"));
@@ -809,12 +809,12 @@ void SettingsDialog::on_applyPushButton_clicked()
                 val = "color";
             else if (m_platformGroup == "rk86")
                 val = "color1";
-            else if (m_platformGroup == "spec")
+            else if (m_platformGroup == "spec" || m_platformGroup == "sp580")
                 val = "4color";
         } else if (ui->color2RadioButton->isChecked()) {
             if (m_platformGroup == "rk86")
                 val = "color2";
-            else if (m_platformGroup == "spec")
+            else if (m_platformGroup == "spec" || m_platformGroup == "sp580")
                 val = "8color";
         }
     }

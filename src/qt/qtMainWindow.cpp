@@ -1588,7 +1588,7 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("Color Module"));
         m_colorColor2Action->setData("colorModule");
-    } else if (platformGroup == "spec") {
+    } else if (platformGroup == "spec" || platformGroup == "sp580") {
         hasColor = true;
 
         m_colorMonoOrigAction->setVisible(false);
