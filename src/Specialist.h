@@ -182,7 +182,8 @@ class SpecKeyboard : public Keyboard
             SKT_ORIGINAL,
             SKT_MX,
             SKT_LIK,
-            SKT_EUREKA
+            SKT_EUREKA,
+            SKT_SP580
         };
 
         SpecKeyboard();
@@ -198,6 +199,7 @@ class SpecKeyboard : public Keyboard
         void setHMatrixMask(uint8_t mask);
         uint16_t getHMatrixData();
         bool getShift();
+        SpecKeyboardType getMatrixType() {return m_kbdType;}
 
         static EmuObject* create(const EmuValuesList&) {return new SpecKeyboard();}
 
@@ -232,6 +234,21 @@ class SpecKeyboard : public Keyboard
             { EK_LANG,  EK_Q,     EK_F,       EK_J,        EK_SEMICOLON, EK_ESC   }
         };
 
+        const EmuKey m_keyMatrixSp580[12][6] = {
+            { EK_CR,    EK_BSP,   EK_PERIOD,  EK_COLON,    EK_MINUS,     EK_CLEAR },
+            { EK_LF,    EK_SLASH, EK_BKSLASH, EK_H,        EK_0,         EK_F10   },
+            { EK_RIGHT, EK_COMMA, EK_V,       EK_Z,        EK_9,         EK_F11   },
+            { EK_RPT,   EK_AT,    EK_D,       EK_RBRACKET, EK_8,         EK_F7    },
+            { EK_LEFT,  EK_B,     EK_L,       EK_LBRACKET, EK_7,         EK_F6    },
+            { EK_SPACE, EK_X,     EK_O,       EK_G,        EK_6,         EK_F5    },
+            { EK_NONE,  EK_T,     EK_R,       EK_N,        EK_5,         EK_F4    },
+            { EK_NONE,  EK_I,     EK_P,       EK_E,        EK_4,         EK_F3    },
+            { EK_DOWN,  EK_M,     EK_A,       EK_K,        EK_3,         EK_F2    },
+            { EK_UP,    EK_S,     EK_W,       EK_U,        EK_2,         EK_F1    },
+            { EK_HOME,  EK_CARET, EK_Y,       EK_C,        EK_1,         EK_TAB   },
+            { EK_LANG,  EK_Q,     EK_F,       EK_J,        EK_SEMICOLON, EK_ESC   }
+        };
+
         //bool m_mxMatrix = false;
         SpecKeyboardType m_kbdType = SKT_ORIGINAL;
 
@@ -252,6 +269,7 @@ class SpecKbdLayout : public RkKbdLayout
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang) override;
 };
 
 

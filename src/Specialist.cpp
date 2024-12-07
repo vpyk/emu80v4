@@ -514,10 +514,18 @@ void SpecKeyboard::processKey(EmuKey key, bool isPressed)
     int i, j;
     bool isFound = false;
 
+    using t_matrix = EmuKey[12][6];
+
     // Основная матрица
+    const t_matrix* keyMatrix = &m_keyMatrix;
+    if (m_kbdType == SKT_MX)
+        keyMatrix = &m_keyMatrixMx;
+    else if (m_kbdType == SKT_SP580)
+        keyMatrix = &m_keyMatrixSp580;
+
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 12; j++) {
-            if ((m_kbdType == SKT_MX ? m_keyMatrixMx[j][i] : m_keyMatrix[j][i]) == key) {
+            if ((*keyMatrix)[j][i] == key) {
                 isFound = true;
                 break;
             }
@@ -606,6 +614,9 @@ bool SpecKeyboard::setProperty(const string& propertyName, const EmuValuesList& 
         } else if (values[0].asString() == "eureka") {
             m_kbdType = SKT_EUREKA;
             return true;
+        } else if (values[0].asString() == "sp580") {
+            m_kbdType = SKT_SP580;
+            return true;
         } else
             return false;
     }
@@ -677,7 +688,22 @@ EmuKey SpecKbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
+EmuKey SpecKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
+{
+    EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
+
+    SpecKeyboard* kbd = static_cast<SpecKeyboard*>(m_platform->getKeyboard());
+    if (kbd->getMatrixType() != SpecKeyboard::SKT_SP580)
+        return key;
+
+    if (key == EK_SEMICOLON || key == EK_AT)
+        shift = !shift;
+
+    return key;
+}
+
+
+    bool SpecFileLoader::loadFile(const std::string& fileName, bool run)
 {
     int fileSize;
     uint8_t* buf = palReadFile(fileName, fileSize, false);
