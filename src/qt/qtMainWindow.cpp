@@ -1183,6 +1183,13 @@ void MainWindow::createActions()
     colorModeGroup->addAction(m_colorColor2Action);
     connect(m_colorColor2Action, SIGNAL(triggered()), this, SLOT(onColorSelect()));
 
+    m_colorGrayscaleAction = new QAction(QIcon(":/icons/gray.png"), tr("Grayscale"), this);
+    m_colorGrayscaleAction->setCheckable(true);
+    m_colorGrayscaleAction->setData("grayscale");
+    m_colorModeMenu->addAction(m_colorGrayscaleAction);
+    colorModeGroup->addAction(m_colorGrayscaleAction);
+    connect(m_colorGrayscaleAction, SIGNAL(triggered()), this, SLOT(onColorSelect()));
+
     m_colorModeMenu->setIcon(QIcon(":/icons/colormode.png"));
     m_colorMenuAction = m_colorModeMenu->menuAction();
     m_colorMenuAction->setToolTip(tr("Color mode (Alt-C)"));
@@ -1548,11 +1555,33 @@ void MainWindow::tuneMenu()
         m_colorColor1Action->setText(tr("Color (Tolkalin)"));
         m_colorColor1Action->setData("color1");
 
+        m_colorGrayscaleAction->setVisible(false);
+        m_colorGrayscaleAction->setEnabled(false);
+
         m_colorColor2Action->setVisible(true);
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("Color (Akimenko)"));
         m_colorColor2Action->setData("color2");
-    } else if (platformGroup == "apogey" || platformGroup == "bashkiria" || platformGroup == "orion" || platformGroup == "lvov" ||
+    } else if (platformGroup == "apogey") {
+        hasColor = true;
+
+        m_colorMonoOrigAction->setVisible(false);
+        m_colorMonoOrigAction->setEnabled(false);
+
+        m_colorMonoAction->setVisible(true);
+        m_colorMonoAction->setEnabled(true);
+
+        m_colorColor1Action->setVisible(true);
+        m_colorColor1Action->setEnabled(true);
+        m_colorColor1Action->setText(tr("Color"));
+        m_colorColor1Action->setData("color");
+
+        m_colorGrayscaleAction->setVisible(true);
+        m_colorGrayscaleAction->setEnabled(true);
+
+        m_colorColor2Action->setVisible(false);
+        m_colorColor2Action->setEnabled(false);
+    } else if (platformGroup == "bashkiria" || platformGroup == "orion" || platformGroup == "lvov" ||
                platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "korvet") {
         hasColor = true;
 
@@ -1566,6 +1595,9 @@ void MainWindow::tuneMenu()
         m_colorColor1Action->setEnabled(true);
         m_colorColor1Action->setText(tr("Color"));
         m_colorColor1Action->setData("color");
+
+        m_colorGrayscaleAction->setVisible(false);
+        m_colorGrayscaleAction->setEnabled(false);
 
         m_colorColor2Action->setVisible(false);
         m_colorColor2Action->setEnabled(false);
@@ -1584,6 +1616,9 @@ void MainWindow::tuneMenu()
         m_colorColor1Action->setText(tr("Color"));
         m_colorColor1Action->setData("color");
 
+        m_colorGrayscaleAction->setVisible(false);
+        m_colorGrayscaleAction->setEnabled(false);
+
         m_colorColor2Action->setVisible(true);
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("Color Module"));
@@ -1601,6 +1636,9 @@ void MainWindow::tuneMenu()
         m_colorColor1Action->setEnabled(true);
         m_colorColor1Action->setText(tr("4-color"));
         m_colorColor1Action->setData("4color");
+
+        m_colorGrayscaleAction->setVisible(false);
+        m_colorGrayscaleAction->setEnabled(false);
 
         m_colorColor2Action->setVisible(true);
         m_colorColor2Action->setEnabled(true);

@@ -68,8 +68,14 @@ class ApogeyRenderer : public Crt8275Renderer
         wchar_t getUnicodeSymbol(uint8_t chr, bool gpa0, bool gpa1, bool hglt) override;
 
     private:
-        bool m_colorMode = true;
-        void setColorMode(bool colorMode);
+        enum class ColorMode {
+            Mono,
+            Color,
+            Grayscale
+        };
+
+        ColorMode m_colorMode = ColorMode::Color;
+        void setColorMode(ColorMode colorMode);
 
         const wchar_t* c_apogeySymbols =
             L" ▘▝▀▗▚▐▜ ★⬯↑⬮ ↣↓▖▌▞▛▄▙▟█∼≈╋┃━↢✿▕"
