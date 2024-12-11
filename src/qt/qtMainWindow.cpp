@@ -954,6 +954,15 @@ void MainWindow::createActions()
     connect(forwardButton, SIGNAL(pressed()), this, SLOT(onForwardOn()));
     connect(forwardButton, SIGNAL(released()), this, SLOT(onForwardOff()));
 
+    // Full throttle
+    QToolButton* fullThrottleButton = new QToolButton(this);
+    fullThrottleButton->setFocusPolicy(Qt::NoFocus);
+    fullThrottleButton->setIcon(QIcon(":/icons/full_throttle.png"));
+    fullThrottleButton->setToolTip(tr("Full Throttle (Alt-End)"));
+    m_toolBar->addWidget(fullThrottleButton);
+    connect(fullThrottleButton, SIGNAL(pressed()), this, SLOT(onFullThrottleOn()));
+    connect(fullThrottleButton, SIGNAL(released()), this, SLOT(onForwardOff()));
+
     platformMenu->addSeparator();
 
     // Speed up
@@ -1728,7 +1737,12 @@ void MainWindow::onFpsTimer()
 
     double speed = emuGetEmulationSpeedFactor();
     m_speedLabel->setVisible(speed != 1.);
-    m_speedLabel->setText(speed != 0. ? QString::number(speed, 'f', 2) + "x" : tr("Paused"));
+    if (speed == 0.)
+        m_speedLabel->setText(tr("Paused"));
+    else if (speed < 0.)
+        m_speedLabel->setText(tr("Max"));
+    else
+        m_speedLabel->setText(QString::number(speed, 'f', 2) + "x");
 
 
     std::string platform = m_palWindow->getPlatformObjectName() + ".";
@@ -2072,7 +2086,7 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
 void MainWindow::keyPressEvent(QKeyEvent* evt)
 {
     if (evt->key() == Qt::Key_End && !(evt->modifiers() & Qt::KeypadModifier)) {
-        emuSysReq(m_palWindow, SR_SPEEDUP);
+        emuSysReq(m_palWindow, evt->modifiers() & Qt::AltModifier ? SR_FULLTHROTTLE : SR_SPEEDUP);
         return;
     }
     unsigned unicodeKey = evt->text().isEmpty() ? 0 : evt->text()[0].unicode(); // "at()" does not operate with empty strings
@@ -2174,6 +2188,12 @@ void MainWindow::onForwardOn()
 void MainWindow::onForwardOff()
 {
     emuSysReq(m_palWindow, SR_SPEEDNORMAL);
+}
+
+
+void MainWindow::onFullThrottleOn()
+{
+    emuSysReq(m_palWindow, SR_FULLTHROTTLE);
 }
 
 

@@ -100,10 +100,12 @@ class Emulation : public ParentObject
         void setVsync(bool vsync);                      // установка vsync
         bool getVsync() {return m_vsync;}
         void setTemporarySpeedUpFactor(unsigned speed);
+        void setTemporarySpeedUpFactorDbl(double speed);
         void updateFrequency();
 
         double getSpeedUpFactor() {return m_currentSpeedUpFactor;}
         bool getPausedState() {return m_isPaused;}
+        bool getFullThrottleState() {return m_fullThrottle;}
 
         void processCmdLine();
 
@@ -118,6 +120,7 @@ class Emulation : public ParentObject
         uint64_t m_sysClock;
         uint64_t m_prevSysClock = 0;
         Cpu* m_debugReqCpu = nullptr;
+        bool m_fullThrottle = false;
 
         bool m_isPaused = false;
         double m_speedUpFactor = 1.0;

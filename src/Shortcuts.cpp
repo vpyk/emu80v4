@@ -108,6 +108,8 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
                 return SR_SPEEDSTEPDOWN;
             case PK_HOME:
                 return SR_SPEEDSTEPNORMAL;
+            case PK_END:
+                return SR_FULLTHROTTLE;
             default:
                 return SR_NONE;
         } else {

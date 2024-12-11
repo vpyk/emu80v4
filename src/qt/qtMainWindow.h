@@ -107,6 +107,7 @@ private slots:
     void onReset();
     void onPause();
     void onForwardOn();
+    void onFullThrottleOn();
     void onForwardOff();
     void onSpeedUp();
     void onSpeedDown();

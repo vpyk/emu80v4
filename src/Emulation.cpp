@@ -470,9 +470,14 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
             m_isPaused = !m_isPaused;
             break;
         case SR_SPEEDUP:
-            setTemporarySpeedUpFactor(4);
+            setTemporarySpeedUpFactorDbl(m_speedUpFactor <= 4 ? m_speedUpFactor * 4 : 16);
+            break;
+        case SR_FULLTHROTTLE:
+            m_fullThrottle = true;
+            setTemporarySpeedUpFactor(1);
             break;
         case SR_SPEEDNORMAL:
+            m_fullThrottle = false;
             setTemporarySpeedUpFactor(0);
             break;
         case SR_SPEEDSTEPUP:
@@ -515,14 +520,14 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
     }
 }
 
-
+ #include <iostream>
 void Emulation::mainLoopCycle()
 {
     if (m_prevSysClock == 0) // first run
         m_prevSysClock = palGetCounter() - palGetCounterFreq() / 60;
 
     draw();
-    if (m_frameRate > 0) {
+    if (m_frameRate > 0 && !m_fullThrottle) {
         int64_t delay = palGetCounterFreq() / m_frameRate - (palGetCounter() - m_prevSysClock);
         if (delay > 0)
             palDelay(delay);
@@ -534,7 +539,23 @@ void Emulation::mainLoopCycle()
         dt = palGetCounterFreq() / 10;
     uint64_t ticks = m_curFrequency * dt / palGetCounterFreq();
     m_prevSysClock = m_sysClock;
+
+    int64_t cntBeforeExec = palGetCounter();
     exec(ticks);
+    int64_t cntAfterExec = palGetCounter();
+
+    int nn = 1;
+    static int avgNn = 1;
+    if (m_fullThrottle) {
+        while (cntAfterExec - cntBeforeExec < (dt * 7 / 8)) {
+            nn++;
+            exec(ticks);
+            cntAfterExec = palGetCounter();
+        }
+        avgNn = (2 * avgNn + nn) / 3;
+        std::cout << avgNn << " " << nn << " " << std::endl;
+        m_mixer->setFrequency(m_frequency * avgNn);
+    }
 }
 
 
@@ -608,6 +629,13 @@ void Emulation::setTemporarySpeedUpFactor(unsigned speed)
     else  // speed = 0, cancel temporary speed up
         m_currentSpeedUpFactor = m_speedUpFactor;
 
+    updateFrequency();
+}
+
+
+void Emulation::setTemporarySpeedUpFactorDbl(double speed)
+{
+    m_currentSpeedUpFactor = speed;
     updateFrequency();
 }
 

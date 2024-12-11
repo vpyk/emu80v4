@@ -109,6 +109,9 @@ double emuGetEmulationSpeedFactor()
     if (g_emulation->getPausedState())
         return 0.;
 
+    if (g_emulation->getFullThrottleState())
+        return -1;
+
     return g_emulation->getSpeedUpFactor();
 }
 
