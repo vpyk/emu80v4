@@ -63,7 +63,12 @@ SpecCore core
 core.window = &window
 core.crtRenderer = &crtRenderer
 
-Cpu8080 cpu
+ifndef Z80
+  Cpu8080 cpu
+else
+  CpuZ80 cpu
+endif
+
 cpu.frequency = 2000000
 cpu.startAddr = 0xC000
 cpu.addrSpace = &addrSpace
