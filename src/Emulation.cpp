@@ -520,7 +520,7 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
     }
 }
 
- #include <iostream>
+
 void Emulation::mainLoopCycle()
 {
     if (m_prevSysClock == 0) // first run
@@ -553,7 +553,6 @@ void Emulation::mainLoopCycle()
             cntAfterExec = palGetCounter();
         }
         avgNn = (2 * avgNn + nn) / 3;
-        std::cout << avgNn << " " << nn << " " << std::endl;
         m_mixer->setFrequency(m_frequency * avgNn);
     }
 }
