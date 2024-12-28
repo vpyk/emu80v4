@@ -84,6 +84,7 @@ class Emulation : public ParentObject
 
         void mainLoopCycle();
         void exec(uint64_t ticks, bool forced = false);
+        void screenUpdateReq();
 
         //inline Platform* getPlatform() {return m_platform;} //!!!
         inline uint64_t getCurClock() {return m_curClock;}
@@ -119,7 +120,9 @@ class Emulation : public ParentObject
         uint64_t m_clockOffset = 0;
         uint64_t m_sysClock;
         uint64_t m_prevSysClock = 0;
+        uint64_t m_timeAfterLastDraw = 0;
         Cpu* m_debugReqCpu = nullptr;
+        bool m_scrUpdateReq = false;
         bool m_fullThrottle = false;
 
         bool m_isPaused = false;
@@ -129,9 +132,9 @@ class Emulation : public ParentObject
 
         uint64_t m_frequency;
         uint64_t m_curFrequency;
-        unsigned m_frameRate;
-        bool m_vsync;
-        unsigned m_sampleRate;
+        unsigned m_fpsLimit = 0;
+        bool m_vsync = true;
+        unsigned m_sampleRate = 48000;
 
         std::list<EmuObject*> m_objectList;
         std::list<Platform*> m_platformList;

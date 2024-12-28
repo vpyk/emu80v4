@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>540</width>
+    <width>530</width>
     <height>527</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -97,22 +97,40 @@
           <string>Video</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="frLabel">
-            <property name="text">
-             <string>Maximum FPS* :</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item row="2" column="0" colspan="3">
+           <layout class="QHBoxLayout" name="horizontalLayout_14">
             <item>
-             <widget class="QSpinBox" name="fpsSpinBox">
+             <widget class="QCheckBox" name="limitFpsCheckBox">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Limit FPS to:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="fpsSpinBox">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
               </property>
               <property name="specialValueText">
                <string/>
@@ -132,42 +150,55 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="maxFpsCheckBox">
+             <spacer name="horizontalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="6" column="0" colspan="3">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QCheckBox" name="vsyncCheckBox">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string/>
+              </property>
               <property name="text">
-               <string>No fps limit</string>
+               <string notr="true">V-Sync*</string>
               </property>
              </widget>
             </item>
+            <item>
+             <spacer name="horizontalSpacer_15">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string notr="true">V-Sync*:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QCheckBox" name="vsyncCheckBox">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Enable</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
@@ -260,6 +291,12 @@
             </item>
             <item>
              <widget class="QSpinBox" name="volumeSpinBox">
+              <property name="minimumSize">
+               <size>
+                <width>40</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="minimum">
                <number>1</number>
               </property>
@@ -360,10 +397,13 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>286</width>
-           <height>83</height>
+           <height>60</height>
           </size>
          </property>
         </spacer>
@@ -1533,8 +1573,8 @@
   <tabstop>configTabWidget</tabstop>
   <tabstop>langComboBox</tabstop>
   <tabstop>showHelpCheckBox</tabstop>
+  <tabstop>limitFpsCheckBox</tabstop>
   <tabstop>fpsSpinBox</tabstop>
-  <tabstop>maxFpsCheckBox</tabstop>
   <tabstop>vsyncCheckBox</tabstop>
   <tabstop>srComboBox</tabstop>
   <tabstop>muteCheckBox</tabstop>
@@ -1608,8 +1648,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>493</x>
-     <y>552</y>
+     <x>438</x>
+     <y>516</y>
     </hint>
     <hint type="destinationlabel">
      <x>543</x>

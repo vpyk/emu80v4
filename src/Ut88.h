@@ -40,7 +40,6 @@ class Ut88Renderer : public TextCrtRenderer, public IActive
 
         // derived from CrtRenderer
         void toggleCropping() override;
-        void prepareDebugScreen() override;
 
         const char* getTextScreen() override;
 

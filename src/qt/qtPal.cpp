@@ -65,7 +65,7 @@ using namespace std;
 static string basePath;
 
 static int sampleRate = 48000;
-static int frameRate = 100;
+//static int frameRate = 100;
 static bool vsync = true;
 
 static bool isRunning = false;
@@ -142,7 +142,7 @@ bool palQtInit(int& argc, char** argv)
     } else
         glDriver = settings.value("glDriver").toString();*/
 
-    frameRate = 100;
+    /*frameRate = 100;
     if (!settings.contains("maxFps"))
         settings.setValue("maxFps", frameRate);
     else
@@ -154,7 +154,7 @@ bool palQtInit(int& argc, char** argv)
     else
         limitFps = settings.value("limitFps").toBool();
     if (!limitFps)
-        frameRate = 0;
+        frameRate = 0;*/
 
     vsync = true;
     if (!settings.contains("vsync"))
@@ -215,7 +215,7 @@ void palQtQuit()
 
 void palStart()
 {
-    emuSetPropertyValue("emulation", "maxFps", QString::number(frameRate).toStdString());      // !!!
+    //emuSetPropertyValue("emulation", "maxFps", QString::number(frameRate).toStdString());      // !!!
     emuSetPropertyValue("emulation", "vsync", vsync ? "yes" : "no");                           // !!!
     emuSetPropertyValue("emulation", "sampleRate", QString::number(sampleRate).toStdString()); // !!!
 
@@ -241,7 +241,7 @@ void palStart()
 #endif
 
     audio->setBufferSize(sampleRate / 5);
-    audioDevice = new EmuAudioIoDevice(sampleRate, frameRate);
+    audioDevice = new EmuAudioIoDevice(sampleRate/*, frameRate*/);
     audioDevice->start();
     audio->start(audioDevice);
 
@@ -270,11 +270,12 @@ void palExecute()
 }
 
 
-bool palSetFrameRate(int)
+/*bool palSetFrameRate(int)
 {
     // Not used in Qt version
     return true;
-}
+}*/
+
 
 bool palSetVsync(bool)
 {

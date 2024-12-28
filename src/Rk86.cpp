@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,9 @@ void Rk86Core::vrtc(bool isActive)
     if (isActive) {
         m_crtRenderer->renderFrame();
     }
+
+    if (isActive)
+        g_emulation->screenUpdateReq();
 }
 
 

@@ -40,7 +40,7 @@ using namespace std;
 
 void SpecCore::draw()
 {
-    m_crtRenderer->renderFrame();
+    //m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -139,6 +139,14 @@ void SpecRenderer::renderFrame()
             for (int pt = 0; pt < 8; pt++, bt <<= 1)
                 m_pixelData[(row + offsetY) * m_sizeX + col * 8 + pt + offsetX] = (bt & 0x80) ? fgColor : bgColor;
         }
+}
+
+
+void SpecRenderer::operate()
+{
+    renderFrame();
+    m_curClock += g_emulation->getFrequency() * 512 * 312 / 8000000; // 8 MHz pixelclock, 312 scanlines, 512 pixels wide
+    g_emulation->screenUpdateReq(); // transfer to Core
 }
 
 

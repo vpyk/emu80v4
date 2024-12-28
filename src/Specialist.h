@@ -91,7 +91,7 @@ class SpecMxColorRegister : public AddressableDevice
 };
 
 
-class SpecRenderer : public CrtRenderer
+class SpecRenderer : public CrtRenderer, public IActive
 {
     enum SpecColorMode {
         SCM_MONO,
@@ -125,6 +125,9 @@ class SpecRenderer : public CrtRenderer
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        // derived from ActiveDevice
+        void operate() override;
 
         inline void attachScreenMemory(SpecVideoRam* videoMemory) {m_screenMemory = videoMemory->getDataPtr(); m_colorMemory = videoMemory->getColorDataPtr();}
 

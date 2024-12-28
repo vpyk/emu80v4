@@ -78,13 +78,7 @@ void Ut88Renderer::operate()
 {
     renderFrame();
     m_curClock += g_emulation->getFrequency() * 6 * 84 * 320 / 8000000; // 8 MHz pixelclock, 320 scanlines, 84 symbols 6 points wide
-}
-
-
-void Ut88Renderer::prepareDebugScreen()
-{
-    enableSwapBuffersOnce();
-    renderFrame();
+    g_emulation->screenUpdateReq();
 }
 
 

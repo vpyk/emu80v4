@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ using namespace std;
 
 void OrionCore::draw()
 {
-    m_crtRenderer->renderFrame();
+    //m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -167,6 +167,14 @@ void OrionRenderer::renderFrame()
                     }
                 }
         }
+}
+
+
+void OrionRenderer::operate()
+{
+    renderFrame();
+    m_curClock += g_emulation->getFrequency() * 640 * 312 / 10000000; // 10 MHz pixelclock, 312 scanlines, 640 pixels wide
+    g_emulation->screenUpdateReq(); // transfer to Core
 }
 
 

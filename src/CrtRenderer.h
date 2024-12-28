@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class CrtRenderer : public EmuObject
 
         virtual void renderFrame() = 0;
         virtual EmuPixelData getPixelData();
-        virtual void prepareDebugScreen() {}
+        virtual void prepareDebugScreen();
 
         virtual void toggleRenderingMethod() {}
         virtual void toggleColorMode() {}
@@ -69,6 +69,7 @@ class CrtRenderer : public EmuObject
         virtual bool isRasterPresent() {return true;}
         void swapBuffers();
 
+        bool m_defaultDebugRendering = true;
         bool reqForSwapBuffers = false;
         void enableSwapBuffersOnce() {reqForSwapBuffers = true;}
 

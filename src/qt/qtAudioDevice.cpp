@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,13 @@
 #include "qtAudioDevice.h"
 
 
-EmuAudioIoDevice::EmuAudioIoDevice(int sampleRate, int frameRate) : QIODevice(nullptr)
+EmuAudioIoDevice::EmuAudioIoDevice(int sampleRate/*, int frameRate*/) : QIODevice(nullptr)
 {
     m_buffer = new QByteArray();
     m_pos = 0;
-    if (frameRate == 0 || frameRate > 60)
-        frameRate = 60;
+    /*if (frameRate == 0 || frameRate > 60)
+        frameRate = 60;*/
+    const int frameRate = 60; // !!!
     m_minSamples = sampleRate / (frameRate - 6);
     m_maxSamples = (sampleRate / (frameRate - 2)) * 5;
 

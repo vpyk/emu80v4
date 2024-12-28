@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -125,6 +125,7 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-Enter\t– полноэкранный режим\n"
         "Shift-Alt-P\t– выбор файла для перенаправления печати\n"
         "End\t– ускоренная работа при нажатой клавише (4x)\n"
+        "Alt-End\t– макс. скорость при нажатой клавише\n"
         "Pause, Alt-P\t– пауза/возобновление\n"
         "Alt-PgUp, Alt-PgDn\t- ускорение/замедление\n"
         "Alt-Home\t- нормальная скорость\n"

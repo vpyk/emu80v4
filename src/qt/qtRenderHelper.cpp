@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ RenderHelper* g_renderHelper;
 RenderHelper::RenderHelper(QWidget *parent) : QObject(parent)
 {
     m_timer = new QTimer();
-    m_timer->setInterval(5);
+    m_timer->setInterval(2);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 }
 

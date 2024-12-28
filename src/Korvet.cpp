@@ -254,6 +254,7 @@ void KorvetRenderer::operate()
     if (++m_curLine == 312) {
         m_curLine = 0;
         renderFrame();
+        g_emulation->screenUpdateReq();
     }
 
     if (m_curLine == 297) // acrually SVBL in much shorter than 1 scanline

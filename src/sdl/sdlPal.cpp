@@ -125,6 +125,7 @@ void palResume()
     SDL_PauseAudioDevice(audioDevId, false);
 }
 
+
 static bool palProcessEvents();
 
 
@@ -153,6 +154,7 @@ void palSdlQuit()
 #ifdef PAL_WASM
     wasmDeleteUserFile();
 #endif
+
     SDL_CloseAudioDevice(audioDevId);
     SDL_Quit();
 }
@@ -669,6 +671,7 @@ static bool palProcessEvents()
         }
     }
 
+    SDL_Delay(2);
     return false;
 }
 

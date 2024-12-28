@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -267,7 +267,7 @@ void SettingsDialog::fillControlValues()
 
     // Frame rate limitation
     bool limitFps = m_options["limitFps"] == "true";
-    ui->maxFpsCheckBox->setChecked(!limitFps);
+    ui->limitFpsCheckBox->setChecked(limitFps);
 
     // VSync
     val = m_options["vsync"];
@@ -683,20 +683,9 @@ void SettingsDialog::on_applyPushButton_clicked()
     }*/
 
     m_options["showHelp"] = ui->showHelpCheckBox->isChecked() ? "yes" : "no";
-
     m_options["preserveSize"] = ui->preserveSizeCheckBox->isChecked() ? "yes" : "no";
-
-    val = QString::number(ui->fpsSpinBox->value());
-    if (val != m_options["maxFps"]) {
-        m_options["maxFps"] = val;
-        rebootFlag = true;
-    }
-
-    bool limitFps = !ui->maxFpsCheckBox->isChecked();
-    if (limitFps != (m_options["limitFps"] == "true")) {
-        m_options["limitFps"] = limitFps ? "true" : "false";
-        rebootFlag = true;
-    }
+    m_options["limitFps"] = ui->limitFpsCheckBox->isChecked() ? "true" : "false";
+    m_options["maxFps"] = QString::number(ui->fpsSpinBox->value());
 
     val = ui->vsyncCheckBox->isChecked() ? "yes" : "no";
     if (val != m_options["vsync"]) {
@@ -929,6 +918,8 @@ void SettingsDialog::saveRunningConfig()
         if (value != "" && option != "locale" && option != "showHelp" && option != "maxFps" &&
                            option != "limitFps" && option != "sampleRate" && option != "vsync" && option != "preserveSize") {
             setRunningConfigValue(option, value);
+        } else if (option == "maxFps") {
+            setRunningConfigValue("emulation.maxFps", m_options.value("limitFps") == "true" ? value : 0);
         }
     }
 }
@@ -1021,15 +1012,9 @@ void SettingsDialog::on_okPushButton_clicked()
 }
 
 
-void SettingsDialog::on_vsyncCheckBox_toggled(bool checked)
+void SettingsDialog::on_limitFpsCheckBox_toggled(bool checked)
 {
-    ui->maxFpsCheckBox->setChecked(checked);
-}
-
-
-void SettingsDialog::on_maxFpsCheckBox_toggled(bool checked)
-{
-    ui->fpsSpinBox->setEnabled(!checked);
+    ui->fpsSpinBox->setEnabled(checked);
 }
 
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class OrionMemPageSelector : public AddressableDevice
 };
 
 
-class OrionRenderer : public CrtRenderer
+class OrionRenderer : public CrtRenderer, public IActive
 {
     enum OrionColorMode {
         OCM_MONO = 0,
@@ -80,6 +80,9 @@ class OrionRenderer : public CrtRenderer
         std::string getPropertyStringValue(const std::string& propertyName) override;
         void toggleColorMode()  override {m_isColorMode = !m_isColorMode;}
         void toggleCropping() override;
+
+        // derived from ActiveDevice
+        void operate() override;
 
         void attachScreenMemory(Ram* screenMemory);
         void attachColorMemory(Ram* colorMemory);

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class EurekaCore : public SpecCore
 };
 
 
-class EurekaRenderer : public CrtRenderer
+class EurekaRenderer : public CrtRenderer, public IActive
 {
     const uint32_t eurekaPalette[4] = {
         0x000000, 0x0000FF, 0xFF0000, 0x00FF00,
@@ -53,6 +53,9 @@ class EurekaRenderer : public CrtRenderer
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        // derived from ActiveDevice
+        void operate() override;
 
         inline void attachVideoRam(Ram* videoRam) {m_videoRam = videoRam->getDataPtr();}
         inline void setColorMode(bool colorMode) {m_colorMode = colorMode;}

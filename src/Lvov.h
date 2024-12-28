@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ class GeneralSoundSource;
 class AddrSpaceMapper;
 
 
-class LvovRenderer : public CrtRenderer
+class LvovRenderer : public CrtRenderer, public IActive
 {
     /*const uint32_t lvovPalette[4] = {
         0x000000, 0x0000FF, 0x00FF00, 0xFF0000,
@@ -54,6 +54,9 @@ public:
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        // derived from ActiveDevice
+        void operate() override;
 
         inline void attachScreenMemory(Ram* videoMemory) {m_screenMemory = videoMemory->getDataPtr();}
         inline void setPaletteByte(uint8_t palette) {m_paletteByte = palette;}

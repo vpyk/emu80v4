@@ -40,6 +40,9 @@ void Bashkiria2mCore::draw()
 
 void Bashkiria2mCore::vrtc(bool isActive)
 {
+    if (isActive)
+        g_emulation->screenUpdateReq();
+
     m_pic->irq(0, !isActive);
 }
 

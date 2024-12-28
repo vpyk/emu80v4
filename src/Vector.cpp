@@ -257,6 +257,9 @@ void VectorCore::inte(bool isActive)
 
 void VectorCore::vrtc(bool isActive)
 {
+    if (isActive)
+        g_emulation->screenUpdateReq();
+
     if (isActive && m_intsEnabled) {
         m_intReq = true;
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());

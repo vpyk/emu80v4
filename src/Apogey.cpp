@@ -43,6 +43,9 @@ void ApogeyCore::vrtc(bool isActive)
     if (isActive) {
         m_crtRenderer->renderFrame();
     }
+
+    if (isActive)
+        g_emulation->screenUpdateReq();
 }
 
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class Ram;
 class GeneralSoundSource;
 
 
-class Mikro80Renderer : public TextCrtRenderer
+class Mikro80Renderer : public TextCrtRenderer, public IActive
 {
     public:
         Mikro80Renderer();
@@ -35,6 +35,9 @@ class Mikro80Renderer : public TextCrtRenderer
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         const char* getTextScreen() override;
+
+        // derived from ActiveDevice
+        void operate() override;
 
         void attachScreenMemory(Ram* screenMemory);
 

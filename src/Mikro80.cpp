@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ using namespace std;
 
 void Mikro80Core::draw()
 {
-    m_crtRenderer->renderFrame();
+    //m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -144,6 +144,14 @@ const char* Mikro80Renderer::getTextScreen()
     }
 
     return generateTextScreen(wTextArray, 64, 32);
+}
+
+
+void Mikro80Renderer::operate()
+{
+    renderFrame();
+    m_curClock += g_emulation->getFrequency() * 512 * 400 / 8000000; // 8 MHz pixelclock, 400 (?) scanlines, 512 pixels wide
+    g_emulation->screenUpdateReq(); // transfer to Core
 }
 
 

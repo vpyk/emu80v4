@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -160,6 +160,14 @@ void EurekaRenderer::renderFrame()
                     m_pixelData[offset + row * m_sizeX + col * 8 + pt] = (bt & 0x80) ? 0xC0C0C0 : 0x000000;
             }
     }
+}
+
+
+void EurekaRenderer::operate()
+{
+    renderFrame();
+    m_curClock += g_emulation->getFrequency() * 512 * 312 / 8000000; // 8 MHz pixelclock, 312 scanlines, 512 pixels wide
+    g_emulation->screenUpdateReq(); // transfer to Core
 }
 
 

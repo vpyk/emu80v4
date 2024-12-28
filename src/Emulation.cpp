@@ -40,7 +40,7 @@ using namespace std;
 
 Emulation::Emulation(CmdLine& cmdLine) : m_cmdLine(cmdLine)
 {
-    m_frameRate = 100;
+    m_fpsLimit = 0;
     m_vsync = true;
     m_sampleRate = 48000;
 
@@ -99,7 +99,6 @@ Emulation::Emulation(CmdLine& cmdLine) : m_cmdLine(cmdLine)
 
 }
 
-#include <typeinfo>
 
 Emulation::~Emulation()
 {
@@ -316,7 +315,7 @@ void Emulation::exec(uint64_t ticks, bool forced)
 
     uint64_t toTime = m_curClock + ticks - m_clockOffset;
 
-    while (m_curClock < toTime && (!m_debugReqCpu || forced)) {
+    while ((m_curClock < toTime) && (!m_debugReqCpu || forced)) {
         uint64_t time = -1;
         IActive* curDev = nullptr;
 
@@ -337,6 +336,7 @@ void Emulation::exec(uint64_t ticks, bool forced)
         m_curClock = time;
         curDev->operate();
     }
+
     m_clockOffset = m_curClock - toTime;
 
     if (!forced && m_debugReqCpu) {
@@ -352,11 +352,20 @@ void Emulation::exec(uint64_t ticks, bool forced)
 }
 
 
+void Emulation::screenUpdateReq()
+{
+    m_scrUpdateReq = true;
+}
+
+
 void Emulation::draw()
 {
     for (auto it = m_platformList.begin(); it != m_platformList.end(); it++) {
         (*it)->draw();
     }
+
+    m_scrUpdateReq = false;
+    m_timeAfterLastDraw = 0;
 }
 
 
@@ -485,8 +494,8 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
                 setSpeedByGrade(++m_speedGrade);
             break;
         case SR_SPEEDSTEPDOWN:
-        if (m_speedGrade > -12)
-            setSpeedByGrade(--m_speedGrade);
+            if (m_speedGrade > -12)
+                setSpeedByGrade(--m_speedGrade);
             break;
         case SR_SPEEDSTEPNORMAL:
             m_speedGrade = 0;
@@ -524,19 +533,27 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
 void Emulation::mainLoopCycle()
 {
     if (m_prevSysClock == 0) // first run
-        m_prevSysClock = palGetCounter() - palGetCounterFreq() / 60;
+        m_prevSysClock = palGetCounter() - palGetCounterFreq() / 500;
 
-    draw();
-    if (m_frameRate > 0 && !m_fullThrottle) {
-        int64_t delay = palGetCounterFreq() / m_frameRate - (palGetCounter() - m_prevSysClock);
-        if (delay > 0)
-            palDelay(delay);
+    if (m_scrUpdateReq) {
+        if (m_fpsLimit == 0 || m_timeAfterLastDraw > palGetCounterFreq() / m_fpsLimit) {
+            draw();
+        }
+    } else {
+        // min 30 fps when there are no requests for screen update from emulation core
+        if (m_timeAfterLastDraw > palGetCounterFreq() / 30) {
+            draw();
+        }
     }
 
     m_sysClock = palGetCounter();
     unsigned dt = m_sysClock - m_prevSysClock;
-    if (dt > palGetCounterFreq() / 10) // 0.1 s
-        dt = palGetCounterFreq() / 10;
+    m_timeAfterLastDraw += dt;
+
+    // provide at least 20 fps when CPU power is not enougt to emulate at 100% speed
+    if (dt > palGetCounterFreq() / 20) // 1/20 s
+        dt = palGetCounterFreq() / 20;
+
     uint64_t ticks = m_curFrequency * dt / palGetCounterFreq();
     m_prevSysClock = m_sysClock;
 
@@ -568,9 +585,9 @@ void Emulation::setFrequency(int64_t freq)
 // установка частоты кадров, 0 - max
 void Emulation::setFrameRate(int frameRate)
 {
-    m_frameRate = frameRate;
+    m_fpsLimit = frameRate;
     // для изменения "на лету" добавить перебор всех окон и пересоздание рендерера при необходимости
-    palSetFrameRate(frameRate);
+    //palSetFrameRate(frameRate);
 }
 
 

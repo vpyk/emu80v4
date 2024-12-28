@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -55,41 +55,22 @@ public slots:
 private slots:
 
     void on_volumeSpinBox_valueChanged(int arg1);
-
     void on_presetComboBox_currentIndexChanged(int index);
-
     void on_fixedSizeRadioButton_toggled(bool checked);
-
     void on_autoSizeRadioButton_toggled(bool checked);
-
     void on_userSizeRadioButton_toggled(bool checked);
-
     void on_fixedScaleRadioButton_toggled(bool checked);
-
     void on_stretchRadioButton_toggled(bool checked);
-
     void on_stretchPropIntRadioButton_toggled(bool checked);
-
     void on_aspectCheckBox_toggled(bool checked);
-
     void on_applyPushButton_clicked();
-
     void on_speedUpCheckBox_toggled(bool checked);
-
     void on_okPushButton_clicked();
-
-    void on_vsyncCheckBox_toggled(bool checked);
-
-    void on_maxFpsCheckBox_toggled(bool checked);
-
+    void on_limitFpsCheckBox_toggled(bool checked);
     void on_volumeSlider_valueChanged(int value);
-
     void on_fixedScaleComboBox_currentIndexChanged(int index);
-
     void on_smoothingNearestRadioButton_toggled(bool checked);
-
     void on_smoothingSharpRadioButton_toggled(bool checked);
-
     void on_smoothingBilinearRadioButton_toggled(bool checked);
 
 private:

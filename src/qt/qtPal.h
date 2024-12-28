@@ -48,7 +48,7 @@ void palDelay(uint64_t time);
 bool palSetSampleRate(int sampleRate);
 int palGetSampleRate();
 
-bool palSetFrameRate(int frameRate);
+//bool palSetFrameRate(int frameRate);
 bool palSetVsync(bool vsync);
 
 std::string palMakeFullFileName(std::string fileName);

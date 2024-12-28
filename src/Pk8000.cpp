@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -111,6 +111,8 @@ bool Pk8000Core::setProperty(const string& propertyName, const EmuValuesList& va
 
 Pk8000Renderer::Pk8000Renderer()
 {
+    m_defaultDebugRendering = false;
+
     for (int i = 0; i < 4; i++) {
         m_screenMemoryBanks[i] = nullptr;
         m_screenMemoryRamBanks[i] = nullptr;
@@ -157,6 +159,7 @@ void Pk8000Renderer::operate()
         if (++m_curLine == 308) {
             m_curLine = 0;
             renderFrame();
+            g_emulation->screenUpdateReq();
         }
 
         // New scanline

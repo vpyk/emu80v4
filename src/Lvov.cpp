@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2024
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ using namespace std;
 
 void LvovCore::draw()
 {
-    m_crtRenderer->renderFrame();
+    //m_crtRenderer->renderFrame();
     m_window->drawFrame(m_crtRenderer->getPixelData());
     m_window->endDraw();
 }
@@ -135,6 +135,14 @@ void LvovRenderer::renderFrame()
                 m_pixelData[(row + offsetY) * m_sizeX + col * 4 + p + offsetX] = color;
             }
         }
+}
+
+
+void LvovRenderer::operate()
+{
+    renderFrame();
+    m_curClock += g_emulation->getFrequency() * 320 * 312 / 5000000; // 5 MHz pixelclock, 312 (?) scanlines, 320 pixels wide
+    g_emulation->screenUpdateReq(); // transfer to Core
 }
 
 
