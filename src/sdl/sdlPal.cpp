@@ -51,7 +51,7 @@ static string basePath;
 static SDL_AudioDeviceID audioDevId;
 
 const int audioBufferSize = 2048;
-static int16_t audioBuffer[BUF_NUM][audioBufferSize];
+static uint32_t audioBuffer[BUF_NUM][audioBufferSize];
 static int audioBufferPos;
 static int audioBufferNumIn;
 static int audioBufferNumOut;
@@ -98,7 +98,7 @@ void palStart()
     SDL_AudioSpec spec;
     spec.freq = sampleRate;
     spec.format = AUDIO_S16;
-    spec.channels = 1;
+    spec.channels = 2;
     spec.samples = 2048;
     spec.callback = audioCallback;
 
@@ -689,12 +689,12 @@ void audioCallback(void*, Uint8* stream, int len)
     //cout << audioBufferNumIn << ":" << audioBufferNumOut << " ";
     //cout << (audioBufferNumIn + BUF_NUM - audioBufferNumOut) % BUF_NUM << ":" << audioBufferPos << " ";
 
-    if (len != audioBufferSize * 2)
+    if (len != audioBufferSize * 4)
         return; // error
     if (audioBufferNumIn == audioBufferNumOut) {
         //memset(stream, 0, len);
         for (int i = audioBufferPos; i < audioBufferSize; i++)
-            ((uint16_t*)stream)[i] = ::lastSample;
+            ((uint32_t*)stream)[i] = ::lastSample;
         audioBufferPos = 0;
     } else {
         memcpy(stream, audioBuffer[audioBufferNumOut], len);
@@ -705,6 +705,14 @@ void audioCallback(void*, Uint8* stream, int len)
 
 void palPlaySample(int16_t sample)
 {
+    palPlaySample(sample, sample);
+}
+
+
+void palPlaySample(int16_t left, int16_t right)
+{
+    uint32_t sample = ((right << 16) & 0xFFFF0000) | (left & 0xFFFF);
+
     ::lastSample = sample;
     audioBuffer[audioBufferNumIn][audioBufferPos++] = sample;
     if (audioBufferPos == audioBufferSize) {

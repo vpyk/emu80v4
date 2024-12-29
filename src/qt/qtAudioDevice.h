@@ -29,7 +29,8 @@ class EmuAudioIoDevice : public QIODevice
         EmuAudioIoDevice(int sampleRate/*, int frameRate*/);
         //~EmuAudioIoDevice();
 
-        void addSample(int16_t sample);
+        void addSample(int16_t sample); // mono
+        void addSample(int16_t leftSample, int16_t rightSample); //stereo
 
         void start();
         void stop();
@@ -42,12 +43,12 @@ class EmuAudioIoDevice : public QIODevice
     private:
         qint64 m_pos;
         QByteArray* m_buffer;
-        int16_t m_lastSample = 0;
+        uint32_t m_lastSample = 0;
 
         int m_minSamples;
         int m_maxSamples;
 
-        int16_t m_buf[16384];
+        uint32_t m_buf[16384];
 };
 
 

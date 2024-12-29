@@ -162,6 +162,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("keyboard.matrix");
     loadRunningConfigValue("platform.codePage");
     loadRunningConfigValue("platform.fastReset");
+    loadRunningConfigValue("psgSoundSource.mixing");
     loadRunningConfigValue("diskA.readOnly");
     loadRunningConfigValue("diskB.readOnly");
     loadRunningConfigValue("diskC.readOnly");
@@ -487,6 +488,11 @@ void SettingsDialog::fillControlValues()
     val = m_options.value("platform.fastReset", "");
     ui->fastResetCheckBox->setVisible(val != "");
     ui->fastResetCheckBox->setChecked(val == "yes");
+
+    // AY Stereo
+    val = m_options.value("psgSoundSource.mixing", "");
+    ui->ayStereoCheckBox->setVisible(val != "");
+    ui->ayStereoCheckBox->setChecked(val == "stereo");
 }
 
 
@@ -873,6 +879,9 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     if (ui->fastResetCheckBox->isVisible())
         m_options["platform.fastReset"] = ui->fastResetCheckBox->isChecked() ? "yes" : "no";
+
+    if (ui->ayStereoCheckBox->isVisible())
+        m_options["psgSoundSource.mixing"] = ui->ayStereoCheckBox->isChecked() ? "stereo" : "mono";
 
     val = "";
     if (ui->qwertyRadioButton->isChecked())

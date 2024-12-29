@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -1483,6 +1483,13 @@
         <widget class="QCheckBox" name="fastResetCheckBox">
          <property name="text">
           <string>Fast reset</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="ayStereoCheckBox">
+         <property name="text">
+          <string>AY stereo mode (ABC)</string>
          </property>
         </widget>
        </item>

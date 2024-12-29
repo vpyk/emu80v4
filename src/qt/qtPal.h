@@ -59,7 +59,8 @@ uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePat
 
 void palRequestForQuit();
 
-void palPlaySample(int16_t sample);
+void palPlaySample(int16_t sample); // mono, not used for now
+void palPlaySample(int16_t left, int16_t right); // stereo
 
 std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
 

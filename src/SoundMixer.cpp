@@ -30,14 +30,19 @@ using namespace std;
 // Вызывается 48000 (SAMPLE_RATE) раз в секунду для получения текущего сэмпла и его проигрывания
 void SoundMixer::operate()
 {
-    int sample = 0;
-    for(auto it = m_soundSources.begin(); it != m_soundSources.end(); it++)
-        sample += m_volume < 7 ? (*it)->calcValue() : abs((*it)->calcValue());
+    int leftSample = 0;
+    int rightSample = 0;
+    for(auto it = m_soundSources.begin(); it != m_soundSources.end(); it++) {
+        int left, right;
+        (*it)->getSample(left, right);
+        leftSample += m_volume < 7 ? left : abs(left);
+        rightSample += m_volume < 7 ? right : abs(right);
+    }
 
-    if (!m_muted)
-        palPlaySample((sample >> m_sampleShift) + m_silenceLevel);
-    else
-        palPlaySample(m_silenceLevel);
+    leftSample = m_muted ? m_silenceLevel : (leftSample >> m_sampleShift) + m_silenceLevel;
+    rightSample = m_muted ? m_silenceLevel : (rightSample >> m_sampleShift) + m_silenceLevel;
+
+    palPlaySample(leftSample, rightSample);
 
     m_curClock += m_ticksPerSample;
 
@@ -124,6 +129,13 @@ void SoundSource::setMuted(bool muted)
 void SoundSource::updateAmpFactor()
 {
     m_ampFactor = m_muted ? 0 : m_negative ? -1 : 1;
+}
+
+
+void SoundSource::getSample(int& left, int& right)
+{
+    int val = calcValue();
+    left = right = val;
 }
 
 

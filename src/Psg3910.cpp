@@ -68,9 +68,9 @@ void Psg3910::reset()
         m_counters[i].counter = 0;
         m_counters[i].toneValue = false;
         m_counters[i].outValue = 0.0;
+        m_accum[i] = 0.0;
     }
 
-    m_accum = 0.0;
 }
 
 
@@ -177,7 +177,6 @@ void Psg3910::step()
         envStep();
     }
 
-    m_outValue = 0.0;
     for (unsigned i = 0; i < 3; i++) {
         if (++m_counters[i].counter >= m_counters[i].freq) {
             m_counters[i].counter = 0;
@@ -188,7 +187,6 @@ void Psg3910::step()
         bool val = (m_counters[i].toneGate || tone) && (m_counters[i].noiseGate || m_noiseValue);
 
         m_counters[i].outValue = val ? logAmps[m_counters[i].var ? m_envValue : m_counters[i].amp] : 0.0;
-        m_outValue += m_counters[i].outValue;
     }
 }
 
@@ -214,30 +212,62 @@ void Psg3910::updateState()
 
     while(m_discreteClock < curClock) {
         step();
-        m_accum += m_outValue * m_kDiv * 8;
         m_discreteClock += m_kDiv * 8;
+        for (int i = 0; i < 3; i++)
+            m_accum[i] += m_counters[i].outValue * m_kDiv * 8;
     }
 }
 
 
-uint16_t Psg3910::getOutput()
+void Psg3910::getOutputs(uint16_t* outputs)
 {
+
     updateState();
 
     uint64_t curClock = g_emulation->getCurClock();
 
-    double delta = m_outValue * (m_discreteClock - curClock);
-    uint16_t res = (m_accum - delta) / (curClock - m_prevClock) * MAX_SND_AMP;
-    m_accum = delta;
-    m_prevClock = curClock;
+    for (int i = 0; i < 3; i++) {
+        double delta = m_counters[i].outValue * (m_discreteClock - curClock);
+        outputs[i] = (m_accum[i] - delta) / (curClock - m_prevClock) * MAX_SND_AMP;
+        m_accum[i] = delta;
+    }
 
-    return res;
+    m_prevClock = curClock;
 }
 
 
 int Psg3910SoundSource::calcValue()
 {
-    return m_psg ? m_psg->getOutput() * m_ampFactor : 0;
+    // not used since getSample is implemented
+    return 0; //m_psg ? m_psg->getOutput() * m_ampFactor : 0;
+}
+
+
+void Psg3910SoundSource::getSample(int& left, int& right)
+{
+
+    if (!m_psg) {
+        left = right = 0;
+        return;
+    }
+
+    uint16_t outputs[3];
+
+    m_psg->getOutputs(outputs);
+
+    // max amp = 3
+    if (m_stereo) {
+        // Stereo ABC
+        // L = 1/2*A + 1/3*B + 1/6*C
+        // R = 1/6*A + 1/3*B + 1/2*C
+        left =  m_ampFactor * (outputs[0] * 3 / 2 + outputs[1] + outputs[2] / 2);
+        right = m_ampFactor * (outputs[0] / 2 + outputs[1] + outputs[2] * 3 / 2);
+    } else {
+        // Mono
+        // L = 1/3*A + 1/3*B + 1/3*C
+        // R = 1/3*A + 1/3*B + 1/3*C
+        left = right = m_ampFactor * (outputs[0] + outputs[1] + outputs[2]);
+    }
 }
 
 
@@ -249,7 +279,32 @@ bool Psg3910SoundSource::setProperty(const string& propertyName, const EmuValues
     if (propertyName == "psg") {
         attachPsg(static_cast<Psg3910*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "mixing") {
+        if (values[0].asString() == "mono")
+            m_stereo = false;
+        else if (values[0].asString() == "stereo")
+            m_stereo = true;
+        else
+            return false;
+
+        return true;
     }
 
     return false;
 }
+
+
+string Psg3910SoundSource::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = SoundSource::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "mixing")
+        return m_stereo ? "stereo" : "mono";
+
+    return "";
+}
+

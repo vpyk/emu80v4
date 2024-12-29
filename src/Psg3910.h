@@ -40,7 +40,7 @@ class Psg3910 : public AddressableDevice
         uint8_t readByte(int addr) override;
 
         void updateState();
-        uint16_t getOutput();
+        void getOutputs(uint16_t* outputs);
 
         static EmuObject* create(const EmuValuesList&) {return new Psg3910();}
 
@@ -59,8 +59,7 @@ class Psg3910 : public AddressableDevice
 
         uint64_t m_prevClock = 0;
         uint64_t m_discreteClock = 0;
-        double m_accum = 0.0;
-        double m_outValue = 0;
+        double m_accum[3];
 
         Psg3910Counter m_counters[3];
         unsigned m_noiseFreq;
@@ -88,7 +87,10 @@ class Psg3910SoundSource : public SoundSource
 {
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
         int calcValue() override;
+        void getSample(int& left, int& right) override;
 
         void attachPsg(Psg3910* psg) {m_psg = psg;}
 
@@ -96,6 +98,9 @@ class Psg3910SoundSource : public SoundSource
 
     protected:
         Psg3910* m_psg = nullptr;
+
+    private:
+        bool m_stereo = true;
 };
 
 

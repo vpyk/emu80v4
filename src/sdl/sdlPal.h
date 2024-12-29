@@ -57,6 +57,7 @@ uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePat
 void palRequestForQuit();
 
 void palPlaySample(int16_t sample);
+void palPlaySample(int16_t left, int16_t right);
 
 std::string palGetDefaultPlatform();
 

@@ -1698,58 +1698,63 @@
         <translation>Быстрый сброс</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1521"/>
+        <location filename="qtSettingsDialog.ui" line="1492"/>
+        <source>AY stereo mode (ABC)</source>
+        <translation>Режим стерео AY (ABC)</translation>
+    </message>
+    <message>
+        <location filename="qtSettingsDialog.ui" line="1528"/>
         <source>Auto save</source>
         <translation>Автоматически сохранять настройки</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1544"/>
+        <location filename="qtSettingsDialog.ui" line="1551"/>
         <source>Ok</source>
         <translation>Ок</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1564"/>
+        <location filename="qtSettingsDialog.ui" line="1571"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1557"/>
+        <location filename="qtSettingsDialog.ui" line="1564"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="384"/>
+        <location filename="qtSettingsDialog.cpp" line="385"/>
         <source>Color</source>
         <translation>Цветной</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="389"/>
+        <location filename="qtSettingsDialog.cpp" line="390"/>
         <source>Color mode 1 (Tolkalin)</source>
         <translation>Цветной (схема Толкалина)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="391"/>
+        <location filename="qtSettingsDialog.cpp" line="392"/>
         <source>Color mode 2 (Akimenko)</source>
         <translation>Цветной (схема Акименко)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="396"/>
+        <location filename="qtSettingsDialog.cpp" line="397"/>
         <source>4-color mode</source>
         <translation>4-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="398"/>
+        <location filename="qtSettingsDialog.cpp" line="399"/>
         <source>8-color mode</source>
         <translation>8-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="904"/>
+        <location filename="qtSettingsDialog.cpp" line="913"/>
         <source>Emu80: warning</source>
         <oldsource>Warning</oldsource>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="905"/>
+        <location filename="qtSettingsDialog.cpp" line="914"/>
         <source>Some settings will take effect after emulator restart</source>
         <translation>Некоторые настройки вступят в силу после перезапуска эмулятора</translation>
     </message>

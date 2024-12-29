@@ -87,3 +87,9 @@ ConfigRadioSelector codePageSelector = &platform, codePage, "Таблица си
 codePageSelector.addItem = rk, "РК-86"
 codePageSelector.addItem = koi8, "КОИ-8"
 configTab.addControl = 3, &codePageSelector
+
+#psgSoundSource.mixing
+ConfigRadioSelector ayStereoSelector = &psgSoundSource, mixing, "Режим AY"
+ayStereoSelector.addItem = stereo, "Стерео"
+ayStereoSelector.addItem = mono, "Моно"
+configTab.addControl = 3, &ayStereoSelector

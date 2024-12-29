@@ -221,11 +221,11 @@ void palStart()
 
     QAudioFormat format;
     format.setSampleRate(sampleRate);
-    format.setChannelCount(1);
+    format.setChannelCount(2);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     format.setSampleFormat(QAudioFormat::Int16);
-    format.setChannelConfig(QAudioFormat::ChannelConfigMono);
+    format.setChannelConfig(QAudioFormat::ChannelConfigStereo);
 #else
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
@@ -362,6 +362,13 @@ void palPlaySample(int16_t sample)
 {
     if (audioDevice)
         audioDevice->addSample(sample);
+}
+
+
+void palPlaySample(int16_t left, int16_t right)
+{
+    if (audioDevice)
+        audioDevice->addSample(left, right);
 }
 
 
