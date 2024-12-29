@@ -130,6 +130,17 @@ void palUpdateConfig()
 }
 
 
+EM_JS(void, jsQuitRequest, (), {
+    if (typeof window.top.quitRequest === "function")
+        window.top.quitRequest();
+});
+
+void palRequestForQuit()
+{
+    jsQuitRequest();
+}
+
+
 char* wasmEmuGetPropertyValue(char* objName, char* propName)
 {
     const int MAX_RES_LEN = 32;

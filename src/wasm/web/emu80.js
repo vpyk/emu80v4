@@ -367,6 +367,14 @@ function updateConfig()
 }
 
 
+function quitRequest()
+{
+    platformSelect.value = "";
+    fileSelect.value = "";
+    run([]);
+}
+
+
 function toggleButton(button)
 {
     if (button.classList.contains("is-active")) {

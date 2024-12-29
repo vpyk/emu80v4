@@ -676,12 +676,14 @@ static bool palProcessEvents()
 }
 
 
+#ifndef PAL_WASM
 void palRequestForQuit()
 {
     SDL_Event ev;
     ev.type = SDL_QUIT;
     SDL_PushEvent(&ev);
 }
+#endif //PAL_WASM
 
 
 void audioCallback(void*, Uint8* stream, int len)

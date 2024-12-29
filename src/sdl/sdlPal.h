@@ -54,7 +54,9 @@ std::string palMakeFullFileName(std::string fileName);
 int palReadFromFile(const std::string& fileName, int first, int size, uint8_t* buffer, bool useBasePath = true);
 uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePath = true);
 
+#ifndef PAL_WASM
 void palRequestForQuit();
+#endif //PAL_WASM
 
 void palPlaySample(int16_t sample);
 void palPlaySample(int16_t left, int16_t right);

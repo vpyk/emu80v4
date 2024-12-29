@@ -20,5 +20,6 @@
 #define WASMPAL_H
 
 void palUpdateConfig();
+void palRequestForQuit();
 
 #endif // WASMPAL_H
