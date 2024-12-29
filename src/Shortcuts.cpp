@@ -106,6 +106,10 @@ SysReq TranslateKeyToSysReq(PalKeyCode key, bool isKeyDown, bool isAltPressed, b
                 return SR_SPEEDSTEPUP;
             case PK_PGDN:
                 return SR_SPEEDSTEPDOWN;
+            case PK_UP:
+                return SR_SPEEDSTEPUPFINE;
+            case PK_DOWN:
+                return SR_SPEEDSTEPDOWNFINE;
             case PK_HOME:
                 return SR_SPEEDSTEPNORMAL;
             case PK_END:

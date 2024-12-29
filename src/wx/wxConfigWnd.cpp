@@ -128,6 +128,7 @@ ConfigWnd::ConfigWnd(wxWindow* parent)
         "Alt-End\t– макс. скорость при нажатой клавише\n"
         "Pause, Alt-P\t– пауза/возобновление\n"
         "Alt-PgUp, Alt-PgDn\t- ускорение/замедление\n"
+        "Alt-Up, Alt-Down\t- точное ускорение/замедление\n"
         "Alt-Home\t- нормальная скорость\n"
         "Alt-F1\t– эта подсказка\n\n"
         "Вместо клавиши Alt может быть использована Meta (Win)"

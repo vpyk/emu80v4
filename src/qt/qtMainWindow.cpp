@@ -985,6 +985,26 @@ void MainWindow::createActions()
     platformMenu->addAction(m_speedDownAction);
     connect(m_speedDownAction, SIGNAL(triggered()), this, SLOT(onSpeedDown()));
 
+    // Speed up (fine)
+    m_speedUpFineAction = new QAction(tr("Speed up (fine)"), this);
+    m_speedUpFineAction->setToolTip(tr("Fine speed up (Alt-Up)"));
+    QList<QKeySequence> speedUpFineKeysList;
+    ADD_HOTKEY(speedUpFineKeysList, Qt::Key_Up);
+    m_speedUpFineAction->setShortcuts(speedUpFineKeysList);
+    addAction(m_speedUpFineAction);
+    platformMenu->addAction(m_speedUpFineAction);
+    connect(m_speedUpFineAction, SIGNAL(triggered()), this, SLOT(onSpeedUpFine()));
+
+    // Speed down (fine)
+    m_speedDownFineAction = new QAction(tr("Speed down (fine)"), this);
+    m_speedDownFineAction->setToolTip(tr("Fine speed down (Alt-Down)"));
+    QList<QKeySequence> speedDownFineKeysList;
+    ADD_HOTKEY(speedDownFineKeysList, Qt::Key_Down);
+    m_speedDownFineAction->setShortcuts(speedDownFineKeysList);
+    addAction(m_speedDownFineAction);
+    platformMenu->addAction(m_speedDownFineAction);
+    connect(m_speedDownFineAction, SIGNAL(triggered()), this, SLOT(onSpeedDownFine()));
+
     // Speed normal
     m_speedNormalAction = new QAction(tr("Normal speed"), this);
     m_speedNormalAction->setToolTip(tr("Normal speed (Alt-Home)"));
@@ -2164,6 +2184,18 @@ void MainWindow::onSpeedUp()
 void MainWindow::onSpeedDown()
 {
     emuSysReq(m_palWindow, SR_SPEEDSTEPDOWN);
+}
+
+
+void MainWindow::onSpeedUpFine()
+{
+    emuSysReq(m_palWindow, SR_SPEEDSTEPUPFINE);
+}
+
+
+void MainWindow::onSpeedDownFine()
+{
+    emuSysReq(m_palWindow, SR_SPEEDSTEPDOWNFINE);
 }
 
 

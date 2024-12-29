@@ -490,11 +490,24 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
             setTemporarySpeedUpFactor(0);
             break;
         case SR_SPEEDSTEPUP:
-            if (m_speedGrade < 12)
-                setSpeedByGrade(++m_speedGrade);
+            if (m_speedGrade < 44)
+                setSpeedByGrade(m_speedGrade += 4);
+            else
+                setSpeedByGrade(m_speedGrade = 48);
             break;
         case SR_SPEEDSTEPDOWN:
-            if (m_speedGrade > -12)
+            if (m_speedGrade > -44)
+                setSpeedByGrade(m_speedGrade -= 4);
+            else
+                setSpeedByGrade(m_speedGrade = -48);
+            break;
+            break;
+        case SR_SPEEDSTEPUPFINE:
+            if (m_speedGrade < 48)
+                setSpeedByGrade(++m_speedGrade);
+            break;
+        case SR_SPEEDSTEPDOWNFINE:
+            if (m_speedGrade > -48)
                 setSpeedByGrade(--m_speedGrade);
             break;
         case SR_SPEEDSTEPNORMAL:
@@ -658,7 +671,9 @@ void Emulation::setTemporarySpeedUpFactorDbl(double speed)
 
 void Emulation::setSpeedByGrade(int speedGrade)
 {
-    if (speedGrade == 0) {
+    const double powers[12] = {1.0, 1.0595, 1.1225, 1.1892, 1.2599, 1.3348, 1.4242, 1.4983, 1.5874, 1.6818, 1.7818, 1.8877};
+
+        if (speedGrade == 0) {
         m_speedUpFactor = m_currentSpeedUpFactor = 1.0;
         updateFrequency();
         return;
@@ -666,15 +681,7 @@ void Emulation::setSpeedByGrade(int speedGrade)
 
     bool slowDown = speedGrade < 0;
     speedGrade = abs(speedGrade);
-
-    int twoPower = speedGrade / 3;
-    int extraSteps = speedGrade % 3;
-
-    const double kStep = 1.26; // pow(2, 1/3);
-
-    double k = (1 << twoPower);
-    for (int i = 0; i < extraSteps; i++)
-        k *= kStep;
+    double k = (1 << (speedGrade / 12)) * powers[speedGrade % 12];
 
     m_speedUpFactor = m_currentSpeedUpFactor = slowDown ? (1 / k) : k;
     updateFrequency();
