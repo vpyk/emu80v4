@@ -396,8 +396,8 @@
     <message>
         <location filename="qtMainWindow.cpp" line="780"/>
         <location filename="qtMainWindow.cpp" line="835"/>
-        <location filename="qtMainWindow.cpp" line="3181"/>
-        <location filename="qtMainWindow.cpp" line="3225"/>
+        <location filename="qtMainWindow.cpp" line="3197"/>
+        <location filename="qtMainWindow.cpp" line="3242"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
@@ -740,11 +740,11 @@
         <location filename="qtMainWindow.cpp" line="656"/>
         <location filename="qtMainWindow.cpp" line="692"/>
         <location filename="qtMainWindow.cpp" line="735"/>
-        <location filename="qtMainWindow.cpp" line="3065"/>
-        <location filename="qtMainWindow.cpp" line="3086"/>
-        <location filename="qtMainWindow.cpp" line="3107"/>
-        <location filename="qtMainWindow.cpp" line="3128"/>
-        <location filename="qtMainWindow.cpp" line="3150"/>
+        <location filename="qtMainWindow.cpp" line="3076"/>
+        <location filename="qtMainWindow.cpp" line="3098"/>
+        <location filename="qtMainWindow.cpp" line="3120"/>
+        <location filename="qtMainWindow.cpp" line="3142"/>
+        <location filename="qtMainWindow.cpp" line="3165"/>
         <source>Unmount</source>
         <translation>Извлечь диск</translation>
     </message>
@@ -1104,11 +1104,17 @@
         <translation>Сбросить все настройки?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3070"/>
-        <location filename="qtMainWindow.cpp" line="3091"/>
-        <location filename="qtMainWindow.cpp" line="3112"/>
-        <location filename="qtMainWindow.cpp" line="3133"/>
-        <location filename="qtMainWindow.cpp" line="3162"/>
+        <location filename="qtMainWindow.cpp" line="3049"/>
+        <source>Mounted:</source>
+        <oldsource>Mounted: </oldsource>
+        <translation>Подключен:</translation>
+    </message>
+    <message>
+        <location filename="qtMainWindow.cpp" line="3081"/>
+        <location filename="qtMainWindow.cpp" line="3103"/>
+        <location filename="qtMainWindow.cpp" line="3125"/>
+        <location filename="qtMainWindow.cpp" line="3147"/>
+        <location filename="qtMainWindow.cpp" line="3177"/>
         <source>Unmount </source>
         <translation>Извлечь</translation>
     </message>
@@ -1117,18 +1123,18 @@
         <translation type="vanished">Отвязать </translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3200"/>
-        <location filename="qtMainWindow.cpp" line="3244"/>
+        <location filename="qtMainWindow.cpp" line="3216"/>
+        <location filename="qtMainWindow.cpp" line="3261"/>
         <source>Save </source>
         <translation>Сохранить </translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3389"/>
+        <location filename="qtMainWindow.cpp" line="3406"/>
         <source>JCUKEN</source>
         <translation>ЙЦУКЕН</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3392"/>
+        <location filename="qtMainWindow.cpp" line="3409"/>
         <source>&quot;Smart&quot;</source>
         <translation>«Умная»</translation>
     </message>

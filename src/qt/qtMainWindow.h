@@ -238,6 +238,7 @@ private:
     void savePosition();
     void updateLastFiles();
     void updateLastPlatforms(QString platform);
+    void updateMountToolTip(QAction* action, const QString& fileName);
 
     LastFileList m_loaderLastFiles = LastFileList("loader");
     LastFileList m_fddLastFiles = LastFileList("fdd");

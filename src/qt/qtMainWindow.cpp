@@ -3041,6 +3041,16 @@ void MainWindow::saveConfig()
 }
 
 
+void MainWindow::updateMountToolTip(QAction* action, const QString& fileName)
+{
+    QString toolTip = action->toolTip();
+    toolTip = toolTip.left(toolTip.indexOf('\n'));
+    if (!fileName.isEmpty())
+        toolTip = toolTip + "\n" + tr("Mounted:") + " " + fileName;
+    action->setToolTip(toolTip);
+}
+
+
 void MainWindow::updateActions()
 {
     std::string platform = "";
@@ -3060,6 +3070,7 @@ void MainWindow::updateActions()
     m_diskAAction->setVisible(!val.empty()); // turn off shortcut
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskA", "fileName").c_str());
+        updateMountToolTip(m_diskAMenuAction, qFileName);
         if (qFileName.isEmpty()) {
             m_diskAUnmountAction->setEnabled(false);
             m_diskAUnmountAction->setText(tr("Unmount"));
@@ -3081,6 +3092,7 @@ void MainWindow::updateActions()
     m_diskBAction->setVisible(!val.empty()); // turn off shortcut
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskB", "fileName").c_str());
+        updateMountToolTip(m_diskBMenuAction, qFileName);
         if (qFileName.isEmpty()) {
             m_diskBUnmountAction->setEnabled(false);
             m_diskBUnmountAction->setText(tr("Unmount"));
@@ -3102,6 +3114,7 @@ void MainWindow::updateActions()
     m_diskCAction->setVisible(!val.empty()); // turn off shortcut
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskC", "fileName").c_str());
+        updateMountToolTip(m_diskCMenuAction, qFileName);
         if (qFileName.isEmpty()) {
             m_diskCUnmountAction->setEnabled(false);
             m_diskCUnmountAction->setText(tr("Unmount"));
@@ -3123,6 +3136,7 @@ void MainWindow::updateActions()
     m_diskDAction->setVisible(!val.empty()); // turn off shortcut
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "diskD", "fileName").c_str());
+        updateMountToolTip(m_diskDMenuAction, qFileName);
         if (qFileName.isEmpty()) {
             m_diskDUnmountAction->setEnabled(false);
             m_diskDUnmountAction->setText(tr("Unmount"));
@@ -3145,6 +3159,7 @@ void MainWindow::updateActions()
     m_menuHddSeparator->setVisible(!val.empty());
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "hdd", "fileName").c_str());
+        updateMountToolTip(m_hddMenuAction, qFileName);
         if (qFileName.isEmpty()) {
             m_hddUnmountAction->setEnabled(false);
             m_hddUnmountAction->setText(tr("Unmount"));
@@ -3175,6 +3190,7 @@ void MainWindow::updateActions()
     //m_menuEddSeparator->setVisible(!val.empty());
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "ramDisk", "fileName").c_str());
+        updateMountToolTip(m_eddMenuAction, qFileName);
         if (qFileName.isEmpty()) {
             m_eddUnassignAction->setEnabled(false);
             m_eddSaveAction->setEnabled(false);
@@ -3219,6 +3235,7 @@ void MainWindow::updateActions()
     //m_menuEddSeparator->setVisible(!val.empty());
     if (!val.empty()) {
         QString qFileName = QString::fromUtf8(emuGetPropertyValue(platform + "ramDisk2", "fileName").c_str());
+        updateMountToolTip(m_edd2MenuAction, qFileName);
         if (qFileName.isEmpty()) {
             m_edd2UnassignAction->setEnabled(false);
             m_edd2SaveAction->setEnabled(false);
