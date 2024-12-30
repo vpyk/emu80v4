@@ -26,9 +26,6 @@ const dmaSpan = document.getElementById("dmaSpan");
 const extraIframeSize = (parseInt(getComputedStyle(iframe).getPropertyValue("border-width")) + 
                         parseInt(getComputedStyle(iframe).getPropertyValue("padding"))) * 2;
 
-const searchStr = window.location.search
-const args = searchStr.substr(1).trim().split("&");
-
 let curPlatform = "";
 
 let infoTimer = null;
@@ -39,6 +36,7 @@ fileInput.style.display='none'
 
 let platforms = []
 let files = []
+
 
 iframe.addEventListener("load", () => {
         const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -78,9 +76,15 @@ iframe.addEventListener("load", () => {
                     case "PageDown":
                 event.preventDefault();
                 }
+                // Alt-Home,Up,Down
+                if (event.altkey && (event.keyCode == 0x24 || event.keyCode == 0x26 || event.keyCode == 0x28))
+                    event.preventDefault();
             });
         }
     })
+
+
+window.addEventListener("popstate", () => {processParams(false)});
 
 
 setInterval( () => {
@@ -104,7 +108,7 @@ fetch("catalog/platforms.json")
     .then(response => response.json())
     .then(data => fillPlatformsFromJson(data))
     .catch(error => console.error("Error reading platform list: ", error))
-    .finally(() => analyzeParams());
+    .finally(() => processParams());
 
 
 function fillPlatformsFromJson(data) {
@@ -119,27 +123,27 @@ function fillPlatformsFromJson(data) {
 }
 
 
-function analyzeParams()
+function processParams(saveState = true)
 {
-    let platformName = undefined;
-    let programName = undefined;
+    const params = new URLSearchParams(window.location.search);
 
-    for (const arg of args) {
-        if (arg.startsWith("platform=")) {
-            platformName = arg.split("=")[1];
-            platformSelect.value = platformName;
-            platformChange();
-        } else if (arg.startsWith("run=")) {
-            programName = arg.split("=")[1];
-            fileSelect.value = programName;
-        }
-    }
+    let platform = params.get("platform");
+    let file = params.get("run");
 
-    const programParam = programName ? `run=${programName}` : "";
+    if (platform === null) platform = "";
+    if (file === null) file = "";
 
-    if (platformName) {
-        run([`platform=${platformName}`, programParam])
-    }
+    platformSelect.value = platform;
+    platformChange().then( () => {
+        fileSelect.value = file.split("/").at(-1);
+    });
+
+    const programParam = file ? `run=${file}` : "";
+
+    if (platform)
+        run([`platform=${platform}`, programParam], saveState)
+    else
+        run([], saveState)
 }
 
 
@@ -148,26 +152,27 @@ function platformChange() {
         fileSelect.remove(i);
 
     if (platformSelect.value) {
-        fileSelectDiv.style.visibility = "visible"
-        fillFiles(platformSelect.value)
-
         const platform = platforms.find(item => item.name === platformSelect.value);
         if (platform) {
             fileInput.setAttribute("accept", platform.extensions);
         } else {
             fileInput.setAttribute("accept", ".*");
         }
+
+        fileSelectDiv.style.visibility = "visible"
+        return fillFiles(platformSelect.value)
     } else
         fileSelectDiv.style.visibility = "hidden"
+        return Promise.resolve()
 }
 
 
 function fillFiles(platform)
 {
-    fetch(`catalog/${platform}/files.json`)
-        .then(response => response.json())
-        .then(data => fillFilesFromJson(data))
-        .catch(error => console.error("Error reading file list: ", error))
+    return fetch(`catalog/${platform}/files.json`)
+           .then(response => response.json())
+           .then(data => fillFilesFromJson(data))
+           .catch(error => console.error("Error reading file list: ", error))
 }
 
 
@@ -200,9 +205,9 @@ function runPlatform() {
 }
 
 
-function run(args) {
+function run(args, saveState = true) {
+    let query = "";
     if (args.length) {
-        let query = "";
         for (arg of args) {
             if (!arg)
                 continue;
@@ -211,9 +216,13 @@ function run(args) {
             else
                 query += "&" + arg;
         }
-        iframe.contentWindow.location = `emuframe.html${query}`;
+        iframe.contentWindow.location.replace(`emuframe.html${query}`);
     } else {
-        iframe.contentWindow.location = "dummyframe.html";
+        iframe.contentWindow.location.replace("dummyframe.html");
+    }
+
+    if (saveState) {
+        history.pushState({}, "", `${document.location.pathname}${query}`)
     }
 }
 
@@ -370,7 +379,7 @@ function updateConfig()
 function quitRequest()
 {
     platformSelect.value = "";
-    fileSelect.value = "";
+    platformChange();
     run([]);
 }
 
