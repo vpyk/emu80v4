@@ -134,6 +134,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("emulation.debugZ80MnemoUpperCase");
     loadRunningConfigValue("emulation.debugForceZ80Mnemonics");
     loadRunningConfigValue("emulation.debugSwapF5F9");
+    loadRunningConfigValue("emulation.debugResetKeys");
     loadRunningConfigValue("window.windowStyle");
     loadRunningConfigValue("window.frameScale");
     loadRunningConfigValue("window.smoothing");
@@ -283,6 +284,7 @@ void SettingsDialog::fillControlValues()
     ui->upperZ80checkBox->setChecked(m_options["emulation.debugZ80MnemoUpperCase"] == "yes");
     ui->forceZ80checkBox->setChecked(m_options["emulation.debugForceZ80Mnemonics"] == "yes");
     ui->swapF5F9checkBox->setChecked(m_options["emulation.debugSwapF5F9"] == "yes");
+    ui->resetKeysCheckBox->setChecked(m_options["emulation.debugResetKeys"] == "yes");
 
     // Debugger code page
     val = m_options["platform.codePage"];
@@ -709,6 +711,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["emulation.debugZ80MnemoUpperCase"] = ui->upperZ80checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugForceZ80Mnemonics"] = ui->forceZ80checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugSwapF5F9"] = ui->swapF5F9checkBox->isChecked() ? "yes" : "no";
+    m_options["emulation.debugResetKeys"] = ui->resetKeysCheckBox->isChecked() ? "yes" : "no";
 
     val = "";
     if (ui->rkCodePageRadioButton->isChecked())

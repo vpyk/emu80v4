@@ -49,6 +49,7 @@ struct DebuggerOptions {
     bool mnemoZ80UpperCase = false;
     bool forceZ80Mnemonics = false;
     bool swapF5F9 = true;
+    bool resetKeys = true;
 };
 
 class Emulation : public ParentObject

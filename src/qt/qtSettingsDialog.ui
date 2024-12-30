@@ -1081,6 +1081,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="resetKeysCheckBox">
+         <property name="text">
+          <string>Reset pressed keys on leaving debugger</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1615,6 +1625,7 @@
   <tabstop>swapF5F9checkBox</tabstop>
   <tabstop>rkCodePageRadioButton</tabstop>
   <tabstop>koi8CodePageRadioButton</tabstop>
+  <tabstop>resetKeysCheckBox</tabstop>
   <tabstop>bwRadioButton</tabstop>
   <tabstop>color1RadioButton</tabstop>
   <tabstop>color2RadioButton</tabstop>
@@ -1645,6 +1656,7 @@
   <tabstop>downAsNumpad5CheckBox</tabstop>
   <tabstop>upAsNumpad5CheckBox</tabstop>
   <tabstop>fastResetCheckBox</tabstop>
+  <tabstop>ayStereoCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections>

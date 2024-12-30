@@ -347,6 +347,7 @@ void DebugWindow::draw()
     m_mnemoZ80UpperCase = debOpt.mnemoZ80UpperCase;
     m_forceZ80Mnemonics = debOpt.forceZ80Mnemonics;
     m_swapF5F9 = debOpt.swapF5F9;
+    m_resetKeys = debOpt.resetKeys;
 
     m_codePage = m_platform->getCodePage();
 
@@ -1199,6 +1200,8 @@ void DebugWindow::run()
     m_isRunning = true;
     checkForCurBreakpoint();
     m_resetCpuClockFlag = true;
+    if (m_resetKeys)
+        m_platform->resetKeys();
     g_emulation->debugRun();
     hide();
     m_platform->getWindow()->bringToFront();
@@ -1227,6 +1230,8 @@ void DebugWindow::over()
         m_isRunning = true;
         checkForCurBreakpoint();
         m_resetCpuClockFlag = false;
+        if (m_resetKeys)
+            m_platform->resetKeys();
         g_emulation->debugRun();
         hide();
     } else
@@ -1265,6 +1270,8 @@ void DebugWindow::here()
     }
 
     m_resetCpuClockFlag = true;
+    if (m_resetKeys)
+        m_platform->resetKeys();
     g_emulation->debugRun();
     hide();
 }
