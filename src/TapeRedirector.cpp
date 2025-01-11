@@ -80,8 +80,9 @@ void TapeRedirector::openFile()
     }
 
     ext = ext.substr(0, 4);
-    m_lvt = (ext == ".lv" || ext == ".LV");
     m_tsx = (ext == ".tsx" || ext == ".TSX");
+    ext = ext.substr(0, 3);
+    m_lvt = (ext == ".lv" || ext == ".LV");
 
     if (m_fileName == "") {
         m_cancelled = true;
