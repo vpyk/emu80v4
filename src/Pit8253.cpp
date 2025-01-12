@@ -82,7 +82,8 @@ void Pit8253Counter::outChangeNotify()
 void Pit8253Counter::operateForTicks(int ticks)
 {
     if (m_countDelay) {
-        int ticksToSkip = min(ticks, m_countDelay);
+        //int ticksToSkip = min(ticks, m_countDelay);
+        int ticksToSkip = ticks < m_countDelay ? ticks : m_countDelay;
         ticks -= ticksToSkip;
         m_countDelay -= ticksToSkip;
         if (m_out)
