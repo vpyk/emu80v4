@@ -696,7 +696,7 @@ EmuKey SpecKbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey SpecKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
+EmuKey SpecKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& shift, bool& lang)
 {
     EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
 

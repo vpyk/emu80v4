@@ -23,7 +23,7 @@
 #define VER_COMMA_SEP 4,0,499,0
 
 #define VI_FILE_DESCR "Emu80 executable"
-#define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2024"
+#define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2025"
 #define VI_FILE_NAME "Emu80qt.exe"
 #define VI_PRODUCT "Emu80"
 

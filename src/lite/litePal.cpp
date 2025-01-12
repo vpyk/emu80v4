@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <sstream>
 #include <iostream>
 
-#ifdef __WIN32__
+#ifdef _WIN32
     #include <mem.h>
     #include <windows.h>
     #include <commdlg.h>
@@ -27,14 +27,14 @@
     #include <dirent.h>
     #include <sys/stat.h>
     #include <time.h>
-#endif // __WIN32__
+#endif // _WIN32
 
 #include "litePal.h"
 
 using namespace std;
 
 
-#ifdef __WIN32__
+#ifdef _WIN32
 
 string palOpenFileDialog(string title, string filter, bool write, PalWindow* window)
 {
@@ -44,8 +44,8 @@ string palOpenFileDialog(string title, string filter, bool write, PalWindow* win
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = 0;
 
-    wchar_t* filterStr = new wchar_t[filter.size() * 4 + 1];
-    MultiByteToWideChar(CP_UTF8, 0, filter.c_str(), -1, filterStr, filter.size() * 4);
+    wchar_t* filterStr = new wchar_t[filter.size() * 4 + 4];
+    MultiByteToWideChar(CP_UTF8, 0, filter.c_str(), -1, filterStr, filter.size() * 4 + 4);
     filterStr[wcslen(filterStr) + 1] = L'\0';
     unsigned len = wcslen(filterStr);
     for (unsigned i = 0; i < len; i++)
@@ -53,8 +53,8 @@ string palOpenFileDialog(string title, string filter, bool write, PalWindow* win
             filterStr[i] = L'\0';
     ofn.lpstrFilter = filterStr;
 
-    wchar_t* titleStr = new wchar_t[title.size() * 4];
-    MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, titleStr, title.size() * 4);
+    wchar_t* titleStr = new wchar_t[title.size() * 4 + 4];
+    MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, titleStr, title.size() * 4 + 4);
     titleStr[wcslen(filterStr) + 1] = L'\0';
     ofn.lpstrTitle = titleStr;
 
@@ -67,8 +67,8 @@ string palOpenFileDialog(string title, string filter, bool write, PalWindow* win
     //ofn.lpstrDefExt = "rk";
     if (write ? GetOpenFileNameW(&ofn) : GetSaveFileNameW(&ofn)) {
         int len = wcslen(str);
-        char* utf8str = new char[len * 4]; // с запасом
-        WideCharToMultiByte(CP_UTF8, 0, str, -1, utf8str, len * 4, 0, 0);
+        char* utf8str = new char[len * 4 + 4]; // с запасом
+        WideCharToMultiByte(CP_UTF8, 0, str, -1, utf8str, len * 4 + 4, 0, 0);
         string s = utf8str;
         delete[] utf8str;
         delete[] filterStr;
@@ -90,8 +90,8 @@ void palGetDirContent(const string& dir, list<PalFileInfo*>& fileList)
 
     utf8Mask += "/*";
 
-    wchar_t* wideMask = new wchar_t[utf8Mask.size() * 4];
-    MultiByteToWideChar(CP_UTF8, 0, utf8Mask.c_str(), -1, wideMask, utf8Mask.size() * 4);
+    wchar_t* wideMask = new wchar_t[utf8Mask.size() * 4 + 4];
+    MultiByteToWideChar(CP_UTF8, 0, utf8Mask.c_str(), -1, wideMask, utf8Mask.size() * 4 + 4);
 
     WIN32_FIND_DATAW fd;
     HANDLE hf;

@@ -106,6 +106,7 @@ uint32_t ApogeyRenderer::getCurFgColor(bool gpa0, bool gpa1, bool hglt)
     case ColorMode::Mono:
         return hglt ? 0xFFFFFF : 0xC0C0C0;
     case ColorMode::Color:
+    default: // normally this should never occurs
         return (gpa0 ? 0 : 0x0000FF) | (gpa1 ? 0 : 0x00FF00) | (hglt ? 0 : 0xFF0000);
     case ColorMode::Grayscale:
         return c_bwPalette[(gpa0 ? 0 : 4) + (gpa1 ? 0 : 2) + (hglt ? 0 : 1)];

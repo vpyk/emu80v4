@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,13 +39,13 @@
 #endif // PAL_WASM
 
     #ifdef PAL_QT
-    #ifdef __WIN32__
+    #ifdef _WIN32
         #define EXE_NAME "Emu80qt.exe"
     #else
         #define EXE_NAME "Emu80qt"
     #endif
 #else
-    #ifdef __WIN32__
+    #ifdef _WIN32
         #define EXE_NAME "Emu80.exe"
     #else
         #define EXE_NAME "Emu80"

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2022-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLUNIFORM2FPROC glUniform2f;
 
-#ifdef __WIN32__
+#ifdef _WIN32
 PFNGLBLENDCOLORPROC glBlendColor;
 #endif
 
@@ -84,7 +84,7 @@ bool sdlInitGLExtensions()
     glUniform1i = (PFNGLUNIFORM1IPROC) SDL_GL_GetProcAddress("glUniform1i");
     glUniform2f = (PFNGLUNIFORM2FPROC) SDL_GL_GetProcAddress("glUniform2f");
 
-#ifdef __WIN32__
+#ifdef _WIN32
     glBlendColor = nullptr;
     glBlendColor = (PFNGLBLENDCOLORPROC) wglGetProcAddress("glBlendColor");
 #endif

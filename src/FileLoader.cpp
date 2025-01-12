@@ -275,9 +275,9 @@ bool MsxFileParser::getNextBlock(int& pos, int& size)
         return true; }
 
     case Format::MF_TSX:
-        int curPos = m_nextTsxBlockPos;
+        unsigned curPos = m_nextTsxBlockPos;
         while(true) {
-            if (curPos >= m_size)
+            if (int(curPos) >= m_size)
                 return false;
             uint8_t blockId = m_data[curPos];
             switch (blockId) {
@@ -340,4 +340,5 @@ bool MsxFileParser::getNextBlock(int& pos, int& size)
         }
         return false; // this should never occur
     }
+    return false; // this should never occur
 }
