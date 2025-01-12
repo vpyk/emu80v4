@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,12 @@
 
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <shellapi.h>
+#include <stringapiset.h>
+#endif
+
 #include "Pal.h"
 
 #include "CmdLine.h"
@@ -26,6 +32,40 @@
 using namespace std;
 
 Emulation* g_emulation = nullptr;
+
+#ifdef _WIN32
+
+void getWinCmdLine(int& argc, char**& argv)
+{
+    int nArgs;
+    LPWSTR *wargs = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+
+    int* argSizes = new int[nArgs];
+
+    int bytesNeeded = 0;
+    for (int i = 0; i < nArgs; i++) {
+        argSizes[i] = WideCharToMultiByte(CP_UTF8, 0, wargs[i], -1, 0, 0, 0, 0);
+        bytesNeeded += argSizes[i];
+    }
+    bytesNeeded += nArgs * sizeof(char*);
+
+    void* buf = new char[bytesNeeded];
+
+    argc = nArgs;
+    argv = reinterpret_cast<char**>(buf);
+
+    char* args = reinterpret_cast<char*>(buf) + nArgs * sizeof(char*);
+
+    for (int i = 0; i < nArgs; i++) {
+        argv[i] = args;
+        args += WideCharToMultiByte(CP_UTF8, 0, wargs[i], -1, args, argSizes[i], 0, 0);
+    }
+
+    delete[] argSizes;
+}
+
+#endif
+
 
 void displayCmdLineHelp()
 {
@@ -48,10 +88,22 @@ void displayCmdLineHelp()
 
 int main (int argc, char** argv)
 {
+#ifdef _WIN32
+    getWinCmdLine(argc, argv);
+#endif
+
     CmdLine cmdLine(argc, argv);
 
-    if (!palInit(argc, argv))
+    if (!palInit(argc, argv)) {
+#ifdef _WIN32
+        delete[] argv;
+#endif
         return 1;
+    }
+
+#ifdef _WIN32
+    delete[] argv;
+#endif
 
     if (cmdLine.checkParam("help")) {
         displayCmdLineHelp();
