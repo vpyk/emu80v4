@@ -147,9 +147,12 @@ class PalWindow
             })";
 
 
-        const char* c_fShader = R"(
-            precision highp float;
-            uniform sampler2D texture1;
+        const char* c_fShader =
+#ifdef PAL_WASM
+         R"(precision highp float;
+         )"
+#endif
+         R"(uniform sampler2D texture1;
             uniform vec2 textureSize;
             uniform bool sharp;
 
