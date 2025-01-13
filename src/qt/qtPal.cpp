@@ -241,7 +241,7 @@ void palStart()
 #endif
 
     audio->setBufferSize(sampleRate / 5);
-    audioDevice = new EmuAudioIoDevice(sampleRate/*, frameRate*/);
+    audioDevice = new EmuAudioIoDevice();
     audioDevice->start();
     audio->start(audioDevice);
 

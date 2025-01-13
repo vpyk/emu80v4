@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class EmuAudioIoDevice : public QIODevice
     Q_OBJECT
 
     public:
-        EmuAudioIoDevice(int sampleRate/*, int frameRate*/);
+        EmuAudioIoDevice();
         //~EmuAudioIoDevice();
 
         void addSample(int16_t sample); // mono

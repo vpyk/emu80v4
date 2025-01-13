@@ -19,15 +19,13 @@
 #include "qtAudioDevice.h"
 
 
-EmuAudioIoDevice::EmuAudioIoDevice(int sampleRate/*, int frameRate*/) : QIODevice(nullptr)
+EmuAudioIoDevice::EmuAudioIoDevice() : QIODevice(nullptr)
 {
     m_buffer = new QByteArray();
     m_pos = 0;
-    /*if (frameRate == 0 || frameRate > 60)
-        frameRate = 60;*/
-    const int frameRate = 60; // !!!
-    m_minSamples = sampleRate / (frameRate - 6);
-    m_maxSamples = (sampleRate / (frameRate - 2)) * 5;
+
+    m_minSamples = 1024;
+    m_maxSamples = 4096;
 
     memset(m_buf, 0, sizeof(m_buf));
 }
