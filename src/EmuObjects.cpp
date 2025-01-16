@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,51 @@
 
 using namespace std;
 
+
+// ##### EmuInput methods #####
+
+EmuInput::~EmuInput()
+{
+    if (m_setFunc)
+        delete m_setFunc;
+}
+
+
+void EmuInput::setValue(int index, uint32_t value)
+{
+    if (m_setFuncIndexed)
+        (*m_setFuncIndexed)(index, value);
+}
+
+
+void EmuInput::setValue(uint32_t value)
+{
+    if (m_setFunc)
+        (*m_setFunc)(value);
+}
+
+
+// ##### EmuOutput methods #####
+
+void EmuOutput::addConnection(EmuConnection connection)
+{
+    m_connections.push_back(connection);
+}
+
+
+void EmuOutput::setValue(uint32_t value)
+{
+    for (auto& conn: m_connections) {
+        if (conn.params.indexed)
+            conn.input->setValue(conn.params.index, ((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift);
+        else
+            conn.input->setValue(((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift);
+    }
+}
+
+
+// ##### EmuObject methods #####
+
 EmuObject::EmuObject()
 {
     if (g_emulation)
@@ -32,6 +77,12 @@ EmuObject::EmuObject()
 
 EmuObject::~EmuObject()
 {
+    for (auto& inputItem: m_inputMap)
+        delete inputItem.second;
+
+    for (auto& outputItem: m_outputMap)
+        delete outputItem.second;
+
     if (this != g_emulation)
         g_emulation->removeObject(this);
 }
@@ -80,6 +131,70 @@ string EmuObject::getPropertyStringValue(const string& propertyName)
 EmuObject* EmuObject::findObj(const std::string& objName)
 {
     return g_emulation->findObject(objName);
+}
+
+
+EmuOutput* EmuObject::registerOutput(const std::string outputName)
+{
+    EmuOutput* output = new EmuOutput();
+    m_outputMap.insert(make_pair(outputName, output));
+    return output;
+}
+
+
+EmuInput* EmuObject::registerInput(const std::string inputName, SetFunc* setFunc)
+{
+    EmuInput* input = new EmuInput(setFunc);
+    m_inputMap.insert(make_pair(inputName, input));
+    return input;
+}
+
+
+EmuInput* EmuObject::registerIndexedInput(const std::string inputName, SetFuncIndexed* setFuncIndexed)
+{
+    EmuInput* input = new EmuInput(setFuncIndexed);
+    m_inputMap.insert(make_pair(inputName, input));
+    return input;//m_curInputId;
+}
+
+
+EmuInput* EmuObject::getInputByName(const std::string& inputName)
+{
+    if (m_inputMap.find(inputName) == m_inputMap.end())
+        return nullptr; // input not found
+
+    return m_inputMap[inputName];
+}
+
+
+bool EmuObject::connect(const std::string& outputName, EmuObject* targetObject, const std::string& inputName, EmuConnectionParams params)
+{
+    if (m_outputMap.find(outputName) == m_outputMap.end())
+        return false; // output not found
+    EmuOutput* output = m_outputMap[outputName];
+
+    EmuInput* input = targetObject->getInputByName(inputName);
+    if (!input)
+        return false;
+
+    EmuConnection conn;
+    conn.input = input;
+    conn.params = params;
+
+    // for future use
+    //conn.inputObj = targetObject;
+    //conn.inputName = inputName;
+
+    output->addConnection(conn);
+
+    return true;
+}
+
+
+bool EmuObject::connect(const std::string& outputName, EmuObject* targetObject, const std::string& inputName)
+{
+    EmuConnectionParams params;
+    return connect(outputName, targetObject, inputName, params);
 }
 
 

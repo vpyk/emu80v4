@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*#include <iostream>
-#include <algorithm>
+#include <iostream>
+/*#include <algorithm>
 #include <cctype>
 #include <locale>*/
 
-#include <fstream>
+//#include <fstream>
 #include <sstream>
 
-#include <string.h>
+//#include <string.h>
 
 #include "Pal.h"
 
@@ -143,6 +143,8 @@ static const char* DELIM_DOTSPACE = " \t.=";
 static const char* DELIM_COMMA = ",\"";
 static const char* DELIM_QUOT = "\"";
 static const char* DELIM_SPACE = " \t";
+static const char* DELIM_DOT = ".";
+static const char* DELIM_BRACKETS = "[]()-";
 
 static string getToken(string &s, string delimeters)
 {
@@ -161,6 +163,13 @@ static string getToken(string &s, string delimeters)
     string res;
 
     string::size_type pos = s.find_first_of(delimeters);
+    string::size_type arrPos = s.find("->");
+
+    if (arrPos == 0) {
+        s = s.substr(arrPos + 2);
+        trim(s);
+        return "->";
+    }
 
     if (pos == string::npos) {
         // остаток строки
@@ -173,6 +182,14 @@ static string getToken(string &s, string delimeters)
         // одиночный символ
         res = s.substr(0, 1);
         s.erase(0, 1);
+        trim(s);
+        return res;
+    }
+
+    if (arrPos < pos) {
+        res = s.substr(0, arrPos);
+        trim(res);
+        s = s.substr(arrPos);
         trim(s);
         return res;
     }
@@ -238,6 +255,162 @@ void ConfigReader::stop()
         m_configFileName = crs.configFileName;
         m_curLine = crs.curLine;
         m_inputStream = crs.inputStream;
+    }
+}
+
+
+void ConfigReader::parseConnect(string s, string token)
+{
+    bool inv = false;
+
+    string o1 = token;
+    if (o1.substr(0, 1) == "~") {
+        o1 = token.substr(1);
+        inv = true;
+    }
+
+    token = getToken(s, DELIM_DOTSPACE);
+    if (token != ".") {
+        logPrefix();
+        emuLog << "output name expected" << "\n";
+        return;
+    }
+
+    token = getToken(s, DELIM_DOT);
+    string p1 = token;
+
+    token = getToken(s, DELIM_DOT);
+    if (token != "->") {
+        logPrefix();
+        emuLog << "invalid connect syntax" << "\n";
+        return;
+    }
+    token = getToken(s, DELIM_DOT);
+    string o2 = token;
+
+    token = getToken(s, DELIM_DOTSPACE);
+    if (token != ".") {
+        logPrefix();
+        emuLog << "output name expected" << "\n";
+        return;
+    }
+
+    token = getToken(s, DELIM_DOT);
+    string p2 = token;
+
+    string srcOutputName = getToken(p1, DELIM_BRACKETS);
+    string sSrcRangeFirst;
+    string sSrcRangeLast;
+    token = getToken(p1, DELIM_BRACKETS);
+    if (token == "[") {
+        sSrcRangeFirst = getToken(p1, DELIM_BRACKETS);
+        token = getToken(p1, DELIM_BRACKETS);
+        if (token != "]") {
+            if (!token.empty())
+                sSrcRangeLast = getToken(p1, DELIM_BRACKETS);
+            string rbr = getToken(p1, DELIM_BRACKETS);
+            if (rbr != "]") {
+                logPrefix();
+                emuLog << "systax error" << "\n";
+                return;
+            }
+        }
+    }
+
+    string sIndex;
+    string dstInputName = getToken(p2, DELIM_BRACKETS);
+    token = getToken(p2, DELIM_BRACKETS);
+    if (token == "(") {
+        sIndex = getToken(p2, DELIM_BRACKETS);
+        token = getToken(p2, DELIM_BRACKETS);
+        if (token != ")") {
+            logPrefix();
+            emuLog << "systax error" << "\n";
+            return;
+        }
+    }
+
+    string srcObjectName = m_prefix + o1;
+    string dstObjectName= m_prefix + o2;
+
+    EmuObject* src = findObj(srcObjectName);
+    if (!src) {
+        logPrefix();
+        emuLog << "object " << srcObjectName << " not found!" << "\n";
+        return;
+    }
+
+    EmuObject* dst = findObj(dstObjectName);
+    if (!dst) {
+        logPrefix();
+        emuLog << "object " << dstObjectName << " not found!" << "\n";
+        return;
+    }
+
+    int srcRangeFirst = -1;
+    int srcRangeLast = -1;
+    int index = -1;
+
+    if (!sIndex.empty())
+        try {
+            istringstream iss(sIndex);
+            iss >> index;
+        } catch (...) {
+            logPrefix();
+            emuLog << sIndex << " is not valid value!" << "\n";
+            return;
+        }
+
+    if (!sSrcRangeFirst.empty())
+        try {
+            istringstream iss(sSrcRangeFirst);
+            iss >> srcRangeFirst;
+        } catch (...) {
+            logPrefix();
+            emuLog << sSrcRangeFirst << " is not valid value!" << "\n";
+            return;
+        }
+
+    if (!sSrcRangeLast.empty())
+        try {
+            istringstream iss(sSrcRangeLast);
+            iss >> srcRangeLast;
+        } catch (...) {
+            logPrefix();
+            emuLog << sSrcRangeLast << " is not valid value!" << "\n";
+            return;
+        }
+
+    if (srcRangeFirst >= 0 && srcRangeLast < 0)
+        srcRangeLast = srcRangeFirst;
+
+    if (srcRangeLast < srcRangeFirst) {
+        logPrefix();
+        emuLog << "invalid range!" << "\n";
+        return;
+    }
+
+    EmuConnectionParams params;
+
+    if (srcRangeFirst >= 0) {
+        int bits = srcRangeLast - srcRangeFirst + 1;
+        uint32_t mask = ((1 << bits) - 1) << srcRangeFirst;
+        params.andMask = mask;
+        params.xorMask = inv ? mask : 0;
+        params.shift = srcRangeFirst;
+    }
+
+    params.indexed = !sIndex.empty();
+    if (params.indexed)
+        params.index = index;
+
+    //cout << srcObjectName << " " << srcOutputName << " " << sSrcRangeFirst << " " << sSrcRangeLast << " "  << dstObjectName << " "<< dstInputName << " " << sIndex << " " << inv << endl;
+    //cout << params.indexed << " " << params.index << " " << params.andMask << " " << params.xorMask << " " << params.shift << endl;
+
+    if (!src->connect(srcOutputName, dst, dstInputName, params)) {
+        logPrefix();
+        emuLog << "connection error!" << "\n";
+        return;
     }
 }
 
@@ -413,6 +586,9 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
                 s = s.substr(0, sharpPos);
             m_varMap[varName] = s;
             continue;
+        } else if (first == "connect") {
+            parseConnect(s, token);
+            continue;
         } else if (token == ".") {
             // присвоение значения
             token = getToken(s, DELIM_DOTSPACE);
@@ -479,6 +655,7 @@ void ConfigReader::logPrefix()
 {
     emuLog << "File " << m_configFileName << ", line " << m_curLine << " : ";
 }
+
 
 bool ConfigReader::processConfigFile(ParentObject* parent)
 {

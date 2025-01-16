@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,8 +24,60 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <map>
+#include <functional>
 
 #include "Parameters.h"
+
+
+typedef std::function<void(uint32_t)> SetFunc;
+typedef std::function<void(int, uint32_t)> SetFuncIndexed;
+
+class EmuObject;
+
+
+class EmuInput {
+public:
+    EmuInput(SetFunc* setFunc) : m_setFunc(setFunc) {}
+    EmuInput(SetFuncIndexed* setFuncIndexed) : m_setFuncIndexed(setFuncIndexed) {}
+    ~EmuInput();
+
+    void setValue(uint32_t value);
+    void setValue(int index, uint32_t value);
+
+private:
+    SetFunc* m_setFunc = nullptr;
+    SetFuncIndexed* m_setFuncIndexed = nullptr;
+};
+
+
+struct EmuConnectionParams {
+    bool indexed = false;
+    int index = 0;
+    uint32_t andMask = 0xFFFFFFFF;
+    uint32_t xorMask = 0;
+    int shift = 0;
+};
+
+
+struct EmuConnection {
+    EmuInput* input = nullptr;
+    EmuConnectionParams params;
+
+    // for future use
+    //EmuObject* inputObj;
+    //std::string inputName;
+};
+
+
+class EmuOutput {
+public:
+    void addConnection(EmuConnection connection);
+    void setValue(uint32_t value);
+
+private:
+    std::vector<EmuConnection> m_connections;
+};
 
 
 class Platform;
@@ -35,6 +87,13 @@ class EmuObject
     public:
         EmuObject();
         virtual ~EmuObject();
+
+        EmuInput* getInputByName(const std::string& inputName);
+
+        bool connect(const std::string& outputName, EmuObject* targetObject, const std::string& inputName, EmuConnectionParams params);
+        bool connect(const std::string& outputName, EmuObject* targetObject, const std::string& inputName);
+
+        virtual void initConnections() {}
 
         void setName(std::string name);
         std::string getName();
@@ -57,13 +116,25 @@ class EmuObject
         virtual void notify(EmuObject* /*sender*/, int /*data*/) {}
 
     protected:
+        EmuOutput* registerOutput(const std::string outputName);
+
+        EmuInput* registerInput(const std::string inputName, SetFunc* setFunc);
+        EmuInput* registerIndexedInput(const std::string inputName, SetFuncIndexed* setFuncIndexed);
+
         int m_kDiv = 1;
         Platform* m_platform = nullptr;
         static EmuObject* findObj(const std::string& objName);
 
     private:
         std::string m_name;
+
+        std::map<std::string, EmuOutput*> m_outputMap;
+        std::map<std::string, EmuInput*> m_inputMap;
 };
+
+
+#define REG_INPUT(name, func) registerInput(name, new SetFunc(std::bind(&func, this, std::placeholders::_1)));
+#define REG_INDEXED_INPUT(name, func) registerIndexedInput(name, new SetFuncIndexed(std::bind(&func, this, std::placeholders::_1, std::placeholders::_2)));
 
 
 class AddressableDevice : public EmuObject

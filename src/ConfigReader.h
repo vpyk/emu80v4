@@ -61,6 +61,7 @@ class ConfigReader : public EmuObject
         EmuObject* createObject(std::string typeName, std::string objName, const EmuValuesList& parameters = ::emptyValues);
         void logPrefix();
         void stop();
+        void parseConnect(std::string s, std::string token);
 };
 
 #endif // CONFIG_H
