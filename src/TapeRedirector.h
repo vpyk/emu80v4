@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -53,9 +53,10 @@ class TapeRedirector : public EmuObject
         bool isOpen();
         bool isCancelled();
         bool isLvt();
-        bool isTsx();
+        bool isTzx();
+        bool isTap();
         void switchToNextLvt();
-        void advanceToNextBlock();
+        int advanceToNextBlock();
 
         static EmuObject* create(const EmuValuesList&) {return new TapeRedirector();}
 
@@ -69,7 +70,8 @@ class TapeRedirector : public EmuObject
         bool m_isOpen = false;
         bool m_cancelled = false;
         bool m_lvt = false;
-        bool m_tsx = false;
+        bool m_tzx = false;
+        bool m_tap = false;
         //bool m_read = false;
 
         WavWriter* m_wavWriter = nullptr;

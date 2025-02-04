@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -109,12 +109,12 @@ Rom::Rom()
 
 
 
-Rom::Rom(unsigned memSize, string fileName)
+Rom::Rom(unsigned memSize, string fileName, unsigned offset)
 {
     m_buf = new uint8_t [memSize];
     memset(m_buf, 0xFF, memSize);
     m_size = memSize;
-    if (palReadFromFile(fileName, 0, memSize, m_buf) == 0/*!= memSize*/) {
+    if (palReadFromFile(fileName, offset, memSize, m_buf) == 0/*!= memSize*/) {
         delete[] m_buf;
         m_buf = nullptr;
     }

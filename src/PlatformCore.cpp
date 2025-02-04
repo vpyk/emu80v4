@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,13 @@ PlatformCore::~PlatformCore()
     //dtor
 }
 
+
+void PlatformCore::initConnections()
+{
+    EmuObject::initConnections();
+
+    REG_INPUT("tapeOut", PlatformCore::tapeOut);
+}
 
 
 void PlatformCore::attachWindow(EmuWindow* win)

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -67,7 +67,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(onQuit()));
 
-    //setWindowFlags(windowFlags() |= Qt::WindowMaximizeButtonHint);
+#ifdef _WIN32
+    m_shiftF10shortcut = new QShortcut(this);
+    m_shiftF10shortcut->setKey(Qt::SHIFT | Qt::Key_F10);
+    connect(m_shiftF10shortcut, SIGNAL(activated()), this, SLOT(onShiftF10()));
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -1687,12 +1691,12 @@ void MainWindow::tuneMenu()
 
     m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "lvov");
 
-    m_loadMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria");
+    m_loadMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria" && platformGroup != "zx");
     m_loadRunMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria");
 
     m_pasteAction->setVisible(!emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".kbdTapper", "pasting").empty());
 
-            m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
+    m_platformConfigAction->setVisible(PlatformConfigDialog::hasConfig(QString::fromUtf8(getPlatformObjectName().c_str())));
 
     updateLastFiles();
 
@@ -2159,6 +2163,12 @@ void MainWindow::dropEvent(QDropEvent *event)
         QString qFileName = event->mimeData()->urls().begin()->toLocalFile();
         emuDropFile(m_palWindow, qFileName.toUtf8().constData());
     }
+}
+
+
+void MainWindow::onShiftF10()
+{
+    emuKeyboard(m_palWindow, PK_F10, true, 0);
 }
 
 

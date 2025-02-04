@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1162,7 +1162,7 @@ EmuKey Pk8000KbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
+EmuKey Pk8000KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang, bool& /*ctrl*/)
 {
     if (keyCode == PK_KP_MUL || keyCode == PK_KP_DIV || keyCode == PK_KP_MINUS)
         return EK_NONE;

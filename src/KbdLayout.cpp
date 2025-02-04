@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,36 +34,48 @@ void KbdLayout::resetKeys()
     m_lastPalKeyPressedCode = PK_NONE;
     m_shiftSet.clear();
     m_langSet.clear();
+    m_ctrlSet.clear();
 }
 
 
 void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey)
 {
-    if (isPressed && processSpecialKeys(keyCode))
+    if (isPressed && processSpecialKeys(keyCode, isPressed))
         return;
 
     Keyboard* kbd = m_platform->getKeyboard();
 
-    EmuKey emuKey;
+    EmuKey emuKey = EK_NONE;
+    EmuKey emuKey2 = EK_NONE;
 
     switch (m_mode) {
         case KLM_QWERTY:
         case KLM_JCUKEN:
-            emuKey = translateKey(keyCode);
-            kbd->processKey(emuKey, isPressed);
+            if (!translateKeyEx(keyCode, emuKey, emuKey2))
+                emuKey = translateKey(keyCode);
+            if (emuKey != EK_NONE)
+                kbd->processKey(emuKey, isPressed);
+            if (emuKey2 != EK_NONE)
+                kbd->processKey(emuKey2, isPressed);
             break;
         case KLM_SMART:
             bool shift;
             bool lang;
-            emuKey = translateUnicodeKey(unicodeKey, keyCode != PK_NONE ? keyCode : m_lastPalKeyPressedCode, shift, lang);
+            bool ctrl;
+            shift = false;
+            lang = false;
+            ctrl = false;
+            emuKey = translateUnicodeKey(unicodeKey, keyCode != PK_NONE ? keyCode : m_lastPalKeyPressedCode, shift, lang, ctrl);
             if (emuKey == EK_NONE) {
                 emuKey = translateKey(keyCode);
                 if (emuKey == EK_SHIFT)
                     m_shiftPressed = isPressed;
                 else if (emuKey == EK_LANG)
                     m_langPressed = isPressed;
+                else if (emuKey == EK_CTRL)
+                    m_ctrlPressed = isPressed;
                 kbd->processKey(emuKey, isPressed);
-                if (isPressed && emuKey != EK_SHIFT && emuKey != EK_LANG) {// SDL issue, see below
+                if (isPressed && emuKey != EK_SHIFT && emuKey != EK_LANG && emuKey != EK_CTRL) {// SDL issue, see below
                     m_lastNonUnicodeKey = emuKey;
                     m_lastPalKeyPressedCode = keyCode;
                 }
@@ -87,6 +99,20 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
                     kbd->processKey(EK_SHIFT, true);
                 else if (s1 > 0 && s2 == 0)
                     kbd->processKey(EK_SHIFT, false);
+
+                s1 = m_ctrlSet.size();
+                if (ctrl && isPressed)
+                    m_ctrlSet.insert(emuKey);
+                else if (ctrl && !isPressed)
+                    m_ctrlSet.erase(emuKey);
+                s2 = m_ctrlSet.size();
+
+                if (m_ctrlPressed && !ctrl)
+                    kbd->processKey(EK_CTRL, !isPressed);
+                else if (s1 == 0 && s2 > 0)
+                    kbd->processKey(EK_CTRL, true);
+                else if (s1 > 0 && s2 == 0)
+                    kbd->processKey(EK_CTRL, false);
 
                 s1 = m_langSet.size();
                 if (lang && isPressed)
@@ -120,7 +146,6 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
         default:
             emuKey = EK_NONE; // normally this never occurs
     }
-
 }
 
 
@@ -169,6 +194,13 @@ string KbdLayout::getPropertyStringValue(const string& propertyName)
     }
 
     return "";
+}
+
+
+EmuKey KbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode /*key*/, bool& shift, bool& lang, bool& ctrl)
+{
+    ctrl = false;
+    return translateCommonUnicodeKeys(unicodeKey, shift, lang);
 }
 
 
@@ -895,7 +927,7 @@ EmuKey RkKbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& shift, bool& lang)
+EmuKey RkKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& shift, bool& lang, bool& /*ctrl*/)
 {
     if (unicodeKey == L'_') {
         lang = false;
@@ -974,7 +1006,7 @@ EmuKey KrKbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey KrKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
+EmuKey KrKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang, bool& ctrl)
 {
     /*if (keyCode == PK_KP_PLUS || keyCode == PK_KP_MINUS || keyCode == PK_KP_DIV)
         return EK_NONE;*/
@@ -982,7 +1014,7 @@ EmuKey KrKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode,
     if (unicodeKey == L'_')
         return EK_UNDSCR;
 
-    return RkKbdLayout::translateUnicodeKey(unicodeKey, keyCode, shift, lang);
+    return RkKbdLayout::translateUnicodeKey(unicodeKey, keyCode, shift, lang, ctrl);
 }
 
 

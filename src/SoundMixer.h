@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -62,6 +62,8 @@ class GeneralSoundSource : public SoundSource
     public:
         // derived from SoundSOurce
         int calcValue() override;
+
+        void initConnections() override;
 
         // Установка текущего значения источника звука
         void setValue(int value);

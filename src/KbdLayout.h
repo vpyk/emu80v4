@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -212,8 +212,9 @@ class KbdLayout : public EmuObject
         bool m_separateRusLat = false;
 
         virtual EmuKey translateKey(PalKeyCode keyCode) {return translateCommonKeys(keyCode);}
-        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode /*key*/, bool& shift, bool& lang) {return translateCommonUnicodeKeys(unicodeKey, shift, lang);}
-        virtual bool processSpecialKeys(PalKeyCode) {return false;}
+        virtual EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode /*key*/, bool& shift, bool& lang, bool& ctrl);
+        virtual bool processSpecialKeys(PalKeyCode, bool /*pressed*/) {return false;}
+        virtual bool translateKeyEx(PalKeyCode /*keyCode*/, EmuKey& /*key1*/, EmuKey& /*key2*/) {return false;}
 
         EmuKey translateCommonKeys(PalKeyCode keyCode);
         EmuKey translateCommonUnicodeKeys(unsigned unicodeKey, bool& shift, bool& lang);
@@ -221,12 +222,14 @@ class KbdLayout : public EmuObject
     private:
         bool m_shiftPressed = false;
         bool m_langPressed = false;
+        bool m_ctrlPressed = false;
         bool m_prevLang = false;
         EmuKey m_lastNonUnicodeKey = EK_NONE;
         PalKeyCode m_lastPalKeyPressedCode = PK_NONE;
 
         std::set<EmuKey> m_shiftSet;
         std::set<EmuKey> m_langSet;
+        std::set<EmuKey> m_ctrlSet;
 
         KbdLayoutHelper* m_helper = nullptr;
 
@@ -240,7 +243,7 @@ class RkKbdLayout : public KbdLayout
 {
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang, bool& /*ctrl*/) override;
 
     public:
         static EmuObject* create(const EmuValuesList&) {return new RkKbdLayout();}
@@ -256,7 +259,7 @@ class KrKbdLayout : public RkKbdLayout
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang, bool& /*ctrl*/) override;
 };
 
 

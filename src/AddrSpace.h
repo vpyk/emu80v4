@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -85,6 +85,8 @@ class AddrSpaceMapper : public AddressableDevice
 
         void attachPage(int page, AddressableDevice* as);
         void setCurPage(int page);
+
+        void initConnections() override;
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;

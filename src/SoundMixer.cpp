@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -207,4 +207,12 @@ int GeneralSoundSource::calcValue()
     initClock = g_emulation->getCurClock();
 
     return res * m_ampFactor;
+}
+
+
+void GeneralSoundSource::initConnections()
+{
+    SoundSource::initConnections();
+
+    REG_INPUT("input", GeneralSoundSource::setValue);
 }

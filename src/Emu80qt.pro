@@ -111,6 +111,7 @@ SOURCES += \
     Vector.cpp \
     WavReader.cpp \
     WavWriter.cpp \
+    Zx.cpp \
     qt/qtAboutDialog.cpp \
     qt/qtAudioDevice.cpp \
     qt/qtChoosePlatformDialog.cpp \
@@ -211,6 +212,7 @@ HEADERS  += \
     Version.h \
     WavReader.h \
     WavWriter.h \
+    Zx.h \
     qt/qtAboutDialog.h \
     qt/qtAudioDevice.h \
     qt/qtChoosePlatformDialog.h \

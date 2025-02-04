@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -80,7 +80,8 @@ void TapeRedirector::openFile()
     }
 
     ext = ext.substr(0, 4);
-    m_tsx = (ext == ".tsx" || ext == ".TSX");
+    m_tap = (ext == ".tap" || ext == ".TAP");
+    m_tzx = (ext == ".tzx" || ext == ".TZX" || ext == ".tsx" || ext == ".TSX");
     ext = ext.substr(0, 3);
     m_lvt = (ext == ".lv" || ext == ".LV");
 
@@ -129,7 +130,7 @@ void TapeRedirector::setFilePos(unsigned pos)
 
 uint8_t TapeRedirector::readByte()
 {
-    if (m_tsx && m_isOpen && !m_bytesLeftInBlock)
+    if ((m_tzx || m_tap) && m_isOpen && !m_bytesLeftInBlock)
         advanceToNextBlock();
 
     if (!m_isOpen && !m_cancelled)
@@ -146,7 +147,7 @@ uint8_t TapeRedirector::readByte()
         }
     }
 
-    if (m_tsx)
+    if (m_tzx || m_tap)
         --m_bytesLeftInBlock;
 
     updateTimer();
@@ -336,9 +337,15 @@ bool TapeRedirector::isLvt()
 }
 
 
-bool TapeRedirector::isTsx()
+bool TapeRedirector::isTzx()
 {
-    return m_tsx;
+    return m_tzx;
+}
+
+
+bool TapeRedirector::isTap()
+{
+    return m_tap;
 }
 
 
@@ -389,10 +396,11 @@ void TapeRedirector::readBuffer(uint8_t* buf, int n)
 
 static const uint8_t tsxHeader[8] = {0x5A, 0x58, 0x54, 0x61, 0x70, 0x65, 0x21, 0x1A};
 
-void TapeRedirector::advanceToNextBlock()
+// returns block size
+int TapeRedirector::advanceToNextBlock()
 {
-    if (!m_tsx)
-        return;
+    if (!m_tzx && !m_tap)
+        return 0;
 
     if (m_bytesLeftInBlock) {
         skipBytes(m_bytesLeftInBlock);
@@ -400,7 +408,18 @@ void TapeRedirector::advanceToNextBlock()
     }
 
     if (isEof())
-        return;
+        return 0;
+
+    if (m_tap) {
+        if (!bytesAvailable(2)) {
+            closeFile();
+            return 0;
+        }
+
+        m_bytesLeftInBlock = m_file.read16();
+
+        return m_bytesLeftInBlock;
+    }
 
     while (!m_bytesLeftInBlock) {
         uint8_t blockId = m_file.read8();
@@ -409,7 +428,7 @@ void TapeRedirector::advanceToNextBlock()
             // TZX Header or Glue block
             if (!bytesAvailable(9)) {
                 closeFile();
-                return;
+                return 0;
             }
             uint8_t buf[7];
 
@@ -417,7 +436,7 @@ void TapeRedirector::advanceToNextBlock()
 
             if (memcmp(buf, tsxHeader + 1, 6)) {
                 closeFile();
-                return;
+                return 0;
             }
             skipBytes(2); // version: 2 bytes
             break;
@@ -426,12 +445,12 @@ void TapeRedirector::advanceToNextBlock()
             // Archive info block
             if (!bytesAvailable(2)) {
                 closeFile();
-                return;
+                return 0;
             }
             uint16_t blockSize = m_file.read16();
             if (!bytesAvailable(blockSize)) {
                 closeFile();
-                return;
+                return 0;
             }
             skipBytes(blockSize);
             break;
@@ -440,13 +459,13 @@ void TapeRedirector::advanceToNextBlock()
             // Custom info block
             if (!bytesAvailable(20)) {
                 closeFile();
-                return;
+                return 0;
             }
             skipBytes(16);
             uint32_t blockSize = m_file.read32();
             if (!bytesAvailable(blockSize)) {
                 closeFile();
-                return;
+                return 0;
             }
             skipBytes(blockSize);
             break;
@@ -455,12 +474,12 @@ void TapeRedirector::advanceToNextBlock()
             // Text description
             if (!bytesAvailable(1)) {
                 closeFile();
-                return;
+                return 0;
             }
             uint8_t blockSize = m_file.read8();
             if (!bytesAvailable(blockSize)) {
                 closeFile();
-                return;
+                return 0;
             }
             skipBytes(blockSize);
             break;
@@ -469,12 +488,12 @@ void TapeRedirector::advanceToNextBlock()
             // Kansas City (MSX) block
             if (!bytesAvailable(4)) {
                 closeFile();
-                return;
+                return 0;
             }
             uint32_t blockSize = m_file.read32();
             if (!bytesAvailable(blockSize)) {
                 closeFile();
-                return;
+                return 0;
             }
 
             skipBytes(12);
@@ -487,10 +506,31 @@ void TapeRedirector::advanceToNextBlock()
 
             break;
         }
+        case 0x10: {
+            // Standard Speed Data Block
+            if (!bytesAvailable(4)) {
+                closeFile();
+                return 0;
+            }
+
+            skipBytes(2);
+
+            uint16_t blockSize = m_file.read16();
+            if (!bytesAvailable(blockSize)) {
+                closeFile();
+                return 0;
+            }
+
+            m_bytesLeftInBlock = blockSize;
+
+            break;
+        }
         default:
             // unknown block, close file
             closeFile();
-            return;
+            return 0;
         }
     }
+
+    return m_bytesLeftInBlock;
 }

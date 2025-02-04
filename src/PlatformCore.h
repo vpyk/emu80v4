@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ class PlatformCore : public EmuObject
     public:
         PlatformCore();
         virtual ~PlatformCore();
+
+        void initConnections() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@ class CpuZ80 : public Cpu8080Compatible
         CpuZ80();
 
         CpuType getType() override {return Cpu::CPU_Z80;}
+
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void operate() override;
         void reset() override;
@@ -113,6 +115,8 @@ class CpuZ80 : public Cpu8080Compatible
         unsigned cb_prefix(unsigned adr);
         unsigned dfd_prefix(uint16_t& IXY);
         unsigned simz80();
+
+        bool m_16bitPorts = false;
 };
 
 #endif // CPUZ80_H

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  Based on original code by:
  *  Frank D. Cringle (YAZE project, GPL v.2 licence)
@@ -1930,7 +1930,11 @@ unsigned CpuZ80::simz80()
         JPC(!TSTFLAG(C));
         break;
     case 0xD3:          /* OUT (nn),A */
-        io_output(GetBYTE(PC), hreg(AF)); ++PC;
+        if (!m_16bitPorts)
+            io_output(GetBYTE(PC), hreg(AF));
+        else
+            io_output(GetBYTE(PC) + (hreg(AF) << 8), hreg(AF));
+        ++PC;
         break;
     case 0xD4:          /* CALL NC,nnnn */
         CALLC(!TSTFLAG(C));
@@ -1962,7 +1966,11 @@ unsigned CpuZ80::simz80()
         JPC(TSTFLAG(C));
         break;
     case 0xDB:          /* IN A,(nn) */
-        Sethreg(AF, io_input(GetBYTE(PC))); ++PC;
+        if (!m_16bitPorts)
+            Sethreg(AF, io_input(GetBYTE(PC)));
+        else
+            Sethreg(AF, io_input((hreg(AF) << 8) + GetBYTE(PC)));
+        ++PC;
         break;
     case 0xDC:          /* CALL C,nnnn */
         CALLC(TSTFLAG(C));
@@ -2032,14 +2040,20 @@ unsigned CpuZ80::simz80()
         cycles = cc_ed[op];
         switch (op) {
         case 0x40:          /* IN B,(C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Sethreg(BC, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x41:          /* OUT (C),B */
-            io_output(lreg(BC), hreg(BC));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), hreg(BC));
+            else
+                io_output(BC, hreg(BC));
             break;
         case 0x42:          /* SBC HL,BC */
             HL &= 0xffff;
@@ -2075,14 +2089,20 @@ unsigned CpuZ80::simz80()
             ir = (ir & 255) | (AF & ~255);
             break;
         case 0x48:          /* IN C,(C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Setlreg(BC, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x49:          /* OUT (C),C */
-            io_output(lreg(BC), lreg(BC));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), lreg(BC));
+            else
+                io_output(BC, lreg(BC));
             break;
         case 0x4A:          /* ADC HL,BC */
             HL &= 0xffff;
@@ -2108,14 +2128,20 @@ unsigned CpuZ80::simz80()
             ir = (ir & ~255) | ((AF >> 8) & 255);
             break;
         case 0x50:          /* IN D,(C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Sethreg(DE, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x51:          /* OUT (C),D */
-            io_output(lreg(BC), hreg(DE));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), hreg(DE));
+            else
+                io_output(BC, hreg(DE));
             break;
         case 0x52:          /* SBC HL,DE */
             HL &= 0xffff;
@@ -2134,20 +2160,26 @@ unsigned CpuZ80::simz80()
             PC += 2;
             break;
         case 0x56:          /* IM 1 */
-            IM = 1;
+                IM = 1;
             break;
         case 0x57:          /* LD A,I */
             AF = (AF & 0x29) | (ir & ~255) | ((ir >> 8) & 0x80) | (((ir & ~255) == 0) << 6) | ((IFF & 2) << 1);
             break;
         case 0x58:          /* IN E,(C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Setlreg(DE, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x59:          /* OUT (C),E */
-            io_output(lreg(BC), lreg(DE));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), lreg(DE));
+            else
+                io_output(BC, lreg(DE));
             break;
         case 0x5A:          /* ADC HL,DE */
             HL &= 0xffff;
@@ -2172,14 +2204,20 @@ unsigned CpuZ80::simz80()
             AF = (AF & 0x29) | ((ir & 255) << 8) | (ir & 0x80) | (((ir & 255) == 0) << 6) | ((IFF & 2) << 1);
             break;
         case 0x60:          /* IN H,(C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Sethreg(HL, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x61:          /* OUT (C),H */
-            io_output(lreg(BC), hreg(HL));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), hreg(HL));
+            else
+                io_output(BC, hreg(HL));
             break;
         case 0x62:          /* SBC HL,HL */
             HL &= 0xffff;
@@ -2205,14 +2243,20 @@ unsigned CpuZ80::simz80()
                 partab[acu] | (AF & 1);
             break;
         case 0x68:          /* IN L,(C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Setlreg(HL, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x69:          /* OUT (C),L */
-            io_output(lreg(BC), lreg(HL));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), lreg(HL));
+            else
+                io_output(BC, lreg(HL));
             break;
         case 0x6A:          /* ADC HL,HL */
             HL &= 0xffff;
@@ -2238,14 +2282,20 @@ unsigned CpuZ80::simz80()
                 partab[acu] | (AF & 1);
             break;
         case 0x70:          /* IN (C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Setlreg(temp, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x71:          /* OUT (C),0 */
-            io_output(lreg(BC), lreg(0));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), lreg(0));
+            else
+                io_output(BC, lreg(0));
             break;
         case 0x72:          /* SBC HL,SP */
             HL &= 0xffff;
@@ -2264,14 +2314,20 @@ unsigned CpuZ80::simz80()
             PC += 2;
             break;
         case 0x78:          /* IN A,(C) */
-            temp = io_input(lreg(BC));
+            if (!m_16bitPorts)
+                temp = io_input(lreg(BC));
+            else
+                temp = io_input(BC);
             Sethreg(AF, temp);
             AF = (AF & ~0xfe) | (temp & 0xa8) |
                 (((temp & 0xff) == 0) << 6) |
                 parity(temp);
             break;
         case 0x79:          /* OUT (C),A */
-            io_output(lreg(BC), hreg(AF));
+            if (!m_16bitPorts)
+                io_output(lreg(BC), hreg(AF));
+            else
+                io_output(BC, hreg(AF));
             break;
         case 0x7A:          /* ADC HL,SP */
             HL &= 0xffff;
@@ -2309,15 +2365,23 @@ unsigned CpuZ80::simz80()
                 AF &= ~8;
             break;
         case 0xA2:          /* INI */
-            PutBYTE(HL, io_input(lreg(BC))); ++HL;
+            if(!m_16bitPorts)
+                PutBYTE(HL, io_input(lreg(BC)));
+            else
+                PutBYTE(HL, io_input(BC));
+            ++HL;
             SETFLAG(N, 1);
             Sethreg(BC, lreg(BC) - 1);
             SETFLAG(Z, lreg(BC) == 0);
             break;
         case 0xA3:          /* OUTI */
-            io_output(lreg(BC), GetBYTE(HL)); ++HL;
-            SETFLAG(N, 1);
             Sethreg(BC, lreg(BC) - 1);
+            if (!m_16bitPorts)
+                io_output(lreg(BC), GetBYTE(HL));
+            else
+                io_output(BC, GetBYTE(HL));
+            ++HL;
+            SETFLAG(N, 1);
             SETFLAG(Z, lreg(BC) == 0);
             break;
         case 0xA8:          /* LDD */
@@ -2340,15 +2404,23 @@ unsigned CpuZ80::simz80()
                 AF &= ~8;
             break;
         case 0xAA:          /* IND */
-            PutBYTE(HL, io_input(lreg(BC))); --HL;
+            if(!m_16bitPorts)
+                PutBYTE(HL, io_input(lreg(BC)));
+            else
+                PutBYTE(HL, io_input(BC));
+            --HL;
             SETFLAG(N, 1);
             Sethreg(BC, lreg(BC) - 1);
             SETFLAG(Z, lreg(BC) == 0);
             break;
         case 0xAB:          /* OUTD */
-            io_output(lreg(BC), GetBYTE(HL)); --HL;
-            SETFLAG(N, 1);
             Sethreg(BC, lreg(BC) - 1);
+            if (!m_16bitPorts)
+                io_output(lreg(BC), GetBYTE(HL));
+            else
+                io_output(BC, GetBYTE(HL));
+            --HL;
+            SETFLAG(N, 1);
             SETFLAG(Z, lreg(BC) == 0);
             break;
         case 0xB0:          /* LDIR */
@@ -2381,7 +2453,10 @@ unsigned CpuZ80::simz80()
         }
             break;
         case 0xB2:          /* INIR */
-            PutBYTE(HL++, io_input(lreg(BC)));
+            if(!m_16bitPorts)
+                PutBYTE(HL++, io_input(lreg(BC)));
+            else
+                PutBYTE(HL++, io_input(BC));
             BC -= 0x100;
             SETFLAG(N, 1);
             SETFLAG(Z, 1);
@@ -2393,7 +2468,11 @@ unsigned CpuZ80::simz80()
         case 0xB3:          /* OTIR */
             temp = hreg(BC);
             do {
-                io_output(lreg(BC), GetBYTE(HL)); ++HL;
+                if (!m_16bitPorts)
+                    io_output(lreg(BC), GetBYTE(HL));
+                else
+                    io_output(lreg(BC) + (temp << 8) - 0x100, GetBYTE(HL));
+                ++HL;
             } while (--temp);
             Sethreg(BC, 0);
             SETFLAG(N, 1);
@@ -2429,7 +2508,10 @@ unsigned CpuZ80::simz80()
         }
             break;
         case 0xBA:          /* INDR */
-            PutBYTE(HL--, io_input(lreg(BC)));
+            if(!m_16bitPorts)
+                PutBYTE(HL--, io_input(lreg(BC)));
+            else
+                PutBYTE(HL--, io_input(BC));
             BC -= 0x100;
             SETFLAG(N, 1);
             SETFLAG(Z, 1);
@@ -2441,7 +2523,11 @@ unsigned CpuZ80::simz80()
         case 0xBB:          /* OTDR */
             temp = hreg(BC);
             do {
-                io_output(lreg(BC), GetBYTE(HL)); --HL;
+                if (!m_16bitPorts)
+                    io_output(lreg(BC), GetBYTE(HL));
+                else
+                    io_output(lreg(BC) + (temp << 8) - 0x100, GetBYTE(HL));
+                --HL;
             } while (--temp);
             Sethreg(BC, 0);
             SETFLAG(N, 1);
@@ -2608,15 +2694,16 @@ void CpuZ80::intRst(int vect)
             m_curClock = g_emulation->getCurClock();
         }
         PUSH(PC);
-        if (IM != 2)
+        if (IM != 2) {
             PC = vect * 8;
-        else {
+            m_curClock += m_kDiv * 13; // 11 rst + 2 additional
+        } else {
             PC = GetWORD((ir | 0xFF)); // r is ignored
             m_curClock += m_kDiv * 19;
             /*if (m_waits)
                 m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xE3, 19);*/ // similar to xthl
         }
-        m_curClock += m_kDiv * 11; // revise!
+        m_curClock += m_kDiv * 2; // ?
     }
 }
 
@@ -2799,4 +2886,19 @@ void CpuZ80::setIY(uint16_t value)
 void CpuZ80::setIFF(bool iff)
 {
     IFF = iff ? 3 : 0;
+}
+
+
+bool CpuZ80::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (Cpu8080Compatible::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "16bitPorts")
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_16bitPorts = values[0].asString() == "yes";
+            return true;
+        }
+
+    return false;
 }

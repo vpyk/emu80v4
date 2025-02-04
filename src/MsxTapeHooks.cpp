@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ bool MsxTapeInHook::hookProc()
         af |= 0x0001; // set C
 
     //int pos = m_file->getPos();
-    if (!m_file->isTsx() && m_apogeyFix && m_file && m_file->getPos() == 24)
+    if (!m_file->isTzx() && m_apogeyFix && m_file && m_file->getPos() == 24)
         m_file->waitForSequence(headerSeq, 8); // читаем короткий заголовок после заголовка файла
 
     if (m_file) {
@@ -171,7 +171,7 @@ bool MsxTapeInHook::hookProc()
                     inByte = m_file->readByte();
             } else
                 inByte = m_file->readByte();
-        } else if (m_file->isTsx()) {
+        } else if (m_file->isTzx()) {
             // TSX
             inByte = m_file->readByte();
         } else {
@@ -249,7 +249,7 @@ bool MsxTapeInHeaderHook::hookProc()
             // LVT
             if (m_file->getPos() == 0)
                 m_file->skipSeq(lvtHeaderSeq, 9);
-        } else if (m_file->isTsx()) {
+        } else if (m_file->isTzx()) {
             // TSX
             m_file->advanceToNextBlock();
         } else {

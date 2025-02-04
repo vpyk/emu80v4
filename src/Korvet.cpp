@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -880,7 +880,7 @@ EmuKey KorvetKbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey KorvetKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang)
+EmuKey KorvetKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang, bool& /*ctrl*/)
 {
     if (keyCode == PK_KP_MUL || keyCode == PK_KP_DIV || keyCode == PK_KP_MINUS)
         return EK_NONE;
@@ -910,8 +910,11 @@ EmuKey KorvetKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyC
 }
 
 
-bool KorvetKbdLayout::processSpecialKeys(PalKeyCode keyCode)
+bool KorvetKbdLayout::processSpecialKeys(PalKeyCode keyCode, bool pressed)
 {
+    if (!pressed)
+        return false;
+
     if (keyCode == PK_F11) {
         m_platform->getKeyboard()->disableKeysReset();
         m_platform->reset();

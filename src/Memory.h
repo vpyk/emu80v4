@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class Rom : public AddressableDevice
 {
     public:
         Rom();
-        Rom(unsigned memSize, std::string fileName);
+        Rom(unsigned memSize, std::string fileName, unsigned offset = 0);
         virtual ~Rom();
         void writeByte(int, uint8_t)  override {}
         uint8_t readByte(int addr) override;
@@ -62,7 +62,7 @@ class Rom : public AddressableDevice
         virtual const uint8_t* getDataPtr() {return m_buf;}
         virtual const uint8_t& operator[](int nAddr) {return m_buf[nAddr];} // no check for borders, use with caution
 
-        static EmuObject* create(const EmuValuesList& parameters) {return parameters[1].isInt() ? new Rom(parameters[1].asInt(), parameters[0].asString()) : nullptr;}
+        static EmuObject* create(const EmuValuesList& parameters) {return parameters[1].isInt() ? new Rom(parameters[1].asInt(), parameters[0].asString(), parameters[2].asInt()) : nullptr;}
 
     protected:
         int m_size;

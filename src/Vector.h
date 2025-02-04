@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -348,7 +348,7 @@ class VectorKbdLayout : public RkKbdLayout
         static EmuObject* create(const EmuValuesList&) {return new VectorKbdLayout();}
 
     protected:
-        bool processSpecialKeys(PalKeyCode keyCode) override;
+        bool processSpecialKeys(PalKeyCode keyCode, bool pressed) override;
 };
 
 

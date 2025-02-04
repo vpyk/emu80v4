@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -401,7 +401,7 @@ class Pk8000KbdLayout : public KbdLayout
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang, bool& /*ctrl*/) override;
 };
 
 

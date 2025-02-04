@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -696,7 +696,7 @@ EmuKey SpecKbdLayout::translateKey(PalKeyCode keyCode)
 }
 
 
-EmuKey SpecKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& shift, bool& lang)
+EmuKey SpecKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode, bool& shift, bool& lang, bool& /*ctrl*/)
 {
     EmuKey key = translateCommonUnicodeKeys(unicodeKey, shift, lang);
 
@@ -792,15 +792,15 @@ bool Sp580FileLoader::loadFile(const std::string& fileName, bool run)
     if (!buf)
         return false;
 
-    MsxFileParser parser(buf, fileSize);
+    TapeFileParser parser(buf, fileSize);
 
     switch (parser.getFormat()) {
-    case MsxFileParser::Format::MF_UNKNOWN: {
+    case TapeFileParser::Format::MF_UNKNOWN: {
         bool res = SpecFileLoader::loadMemFile(buf, fileSize, fileName, run);
         delete[] buf;
         return res; }
-    case MsxFileParser::Format::MF_CAS:
-    case MsxFileParser::Format::MF_TSX: {
+    case TapeFileParser::Format::MF_CAS:
+    case TapeFileParser::Format::MF_TZX: {
         int pos, len;
         if (!parser.getNextBlock(pos, len)) {
             delete[] buf;
@@ -860,8 +860,10 @@ bool Sp580FileLoader::loadFile(const std::string& fileName, bool run)
                 cpu->setPC(startAddr);
             }
         }
-
+        return true;
         }
+    default:
+        return false;
     }
 
     return true;

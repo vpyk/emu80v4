@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -393,8 +393,8 @@ class KorvetKbdLayout : public KbdLayout
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
-        bool processSpecialKeys(PalKeyCode keyCode) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang, bool& /*ctrl*/) override;
+        bool processSpecialKeys(PalKeyCode keyCode, bool pressed) override;
 
     private:
         bool m_downAsNumpad5 = false;

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -67,16 +67,17 @@ class RkFileLoader : public FileLoader
 };
 
 
-class MsxFileParser
+class TapeFileParser
 {
 public:
     enum class Format {
         MF_UNKNOWN,
         MF_CAS,
-        MF_TSX
+        MF_TZX,
+        MF_TAP
     };
 
-    MsxFileParser(uint8_t* data, int len);
+    TapeFileParser(uint8_t* data, int len);
 
     Format getFormat() {return m_format;}
     int getCurrentPos() {return m_size;}
@@ -87,7 +88,7 @@ private:
     int m_size = 0;
     int m_curPos = 0;
     Format m_format = Format::MF_UNKNOWN;
-    int m_nextTsxBlockPos = 0;
+    int m_nextBlockPos = 0;
 };
 
 

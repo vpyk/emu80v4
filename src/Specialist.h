@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -272,7 +272,7 @@ class SpecKbdLayout : public RkKbdLayout
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode, bool& shift, bool& lang, bool& /*ctrl*/) override;
 };
 
 

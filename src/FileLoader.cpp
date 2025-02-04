@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -214,24 +214,27 @@ bool RkFileLoader::loadFile(const std::string& fileName, bool run)
 
 
 static const uint8_t casHeader[8] = {0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74};
-static const uint8_t tsxHeader[8] = {0x5A, 0x58, 0x54, 0x61, 0x70, 0x65, 0x21, 0x1A};
+static const uint8_t tzxHeader[8] = {0x5A, 0x58, 0x54, 0x61, 0x70, 0x65, 0x21, 0x1A};
+static const uint8_t tapHeader[2] = {0x13, 0x00};
 
 
-MsxFileParser::MsxFileParser(uint8_t* data, int size) :
+TapeFileParser::TapeFileParser(uint8_t* data, int size) :
     m_data(data), m_size(size)
 {
     if (m_size < 8)
         m_format = Format::MF_UNKNOWN;
-    else if (!memcmp(data, casHeader, 8))
+    else if (!memcmp(data, casHeader, sizeof(casHeader)))
         m_format = Format::MF_CAS;
-    else if (!memcmp(data, tsxHeader, 8))
-        m_format = Format::MF_TSX;
+    else if (!memcmp(data, tzxHeader, sizeof(tzxHeader)))
+        m_format = Format::MF_TZX;
+    else if (!memcmp(data, tapHeader, sizeof(tapHeader)))
+        m_format = Format::MF_TAP;
     else
         m_format = Format::MF_UNKNOWN;
 }
 
 
-bool MsxFileParser::getNextBlock(int& pos, int& size)
+bool TapeFileParser::getNextBlock(int& pos, int& size)
 {
     // returns false if no block found
     // pos - block offset
@@ -240,6 +243,8 @@ bool MsxFileParser::getNextBlock(int& pos, int& size)
     // default return values if no next block
     pos = m_size;
     size = 0;
+
+    unsigned curPos;
 
     switch (m_format) {
 
@@ -274,8 +279,8 @@ bool MsxFileParser::getNextBlock(int& pos, int& size)
         m_curPos = nextPos;
         return true; }
 
-    case Format::MF_TSX:
-        unsigned curPos = m_nextTsxBlockPos;
+    case Format::MF_TZX:
+        curPos = m_nextBlockPos;
         while(true) {
             if (int(curPos) >= m_size)
                 return false;
@@ -285,7 +290,7 @@ bool MsxFileParser::getNextBlock(int& pos, int& size)
                 // TZX Header or Glue block
                 if (m_size - curPos < 10)
                     return false;
-                if (memcmp(m_data + curPos, tsxHeader, 8))
+                if (memcmp(m_data + curPos, tzxHeader, 8))
                     return false;
                 curPos += 10;
                 break;
@@ -333,11 +338,24 @@ bool MsxFileParser::getNextBlock(int& pos, int& size)
                     return false;
                 pos = curPos + 12;
                 size = blockSize - 12;
-                m_nextTsxBlockPos = curPos + blockSize;
+                m_nextBlockPos = curPos + blockSize;
                 return true;
             }
             }
         }
+        return false; // this should never occur
+    case Format::MF_TAP:
+        curPos = m_nextBlockPos;
+        while(true) {
+            if (int(curPos) >= m_size - 2)
+                return false;
+            uint16_t blockSize = m_data[curPos] + (m_data[curPos + 1] << 8);
+            if (m_size - curPos < blockSize)
+                return false;
+            curPos += 2;
+            m_nextBlockPos = curPos + blockSize;
+                return true;
+            }
         return false; // this should never occur
     }
     return false; // this should never occur

@@ -233,6 +233,8 @@
         <Unit filename="WavReader.h" />
         <Unit filename="WavWriter.cpp" />
         <Unit filename="WavWriter.h" />
+        <Unit filename="Zx.cpp" />
+        <Unit filename="Zx.h" />
         <Unit filename="lite/litePal.cpp">
             <Option target="Lite-Debug" />
             <Option target="Lite-Release" />

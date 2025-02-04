@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@
 #include "Korvet.h"
 #include "Palmira.h"
 #include "Bashkiria.h"
+#include "Zx.h"
 #include "KbdTapper.h"
 
 #include "EmuConfig.h"
@@ -280,6 +281,15 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Bashkiria2mKbdMem);
     REG_EMU_CLASS(Bashkiria2mPit8253SoundSource);
     REG_EMU_CLASS(Bashkiria2mSpi8251);
+    REG_EMU_CLASS(ZxCore);
+    REG_EMU_CLASS(ZxRenderer);
+    REG_EMU_CLASS(ZxPorts);
+    REG_EMU_CLASS(ZxKeyboard);
+    REG_EMU_CLASS(ZxKbdLayout);
+    REG_EMU_CLASS(ZxTapeInHook);
+    REG_EMU_CLASS(ZxTapeOutHook);
+    REG_EMU_CLASS(ZxFileLoader);
+    //REG_EMU_CLASS(ZxCpuWaits);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
@@ -299,7 +309,11 @@ void ObjectFactory::reg(const string& objectClassName, CreateObjectFunc pfnCreat
 EmuObject* ObjectFactory::createObject(const string& objectClassName, const EmuValuesList& parameters)
 {
     auto it = m_objectMap.find(objectClassName);
-    if (it != m_objectMap.end())
-        return it->second(parameters);
+    if (it != m_objectMap.end()) {
+        EmuObject* obj = it->second(parameters);
+        obj->initConnections();
+        return obj;
+    }
+
     return nullptr;
 }

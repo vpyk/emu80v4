@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -935,8 +935,11 @@ int VectorZ80CpuWaits::getCpuWaitStates(int, int opcode, int normalClocks)
 }
 
 
-bool VectorKbdLayout::processSpecialKeys(PalKeyCode keyCode)
+bool VectorKbdLayout::processSpecialKeys(PalKeyCode keyCode, bool pressed)
 {
+    if (!pressed)
+        return false;
+
     if (keyCode == PK_F11) {
         //m_platform->getKeyboard()->disableKeysReset();
         //m_platform->reset();

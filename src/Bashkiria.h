@@ -1,7 +1,7 @@
 ﻿/*
  *  bashkiria-2m for Emu80 v. 4.x
  *  © Dmitry Tselikov <bashkiria-2m.narod.ru>, 2022
- *  © Viktor Pykhonin <pyk@mail.ru>, 2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2024-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ class Bashkiria2mKbdLayout : public KbdLayout
 
     protected:
         EmuKey translateKey(PalKeyCode keyCode) override;
-        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang) override;
+        EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang, bool& /*ctrl*/) override;
 
     private:
         bool m_upAsNumpad5 = false;

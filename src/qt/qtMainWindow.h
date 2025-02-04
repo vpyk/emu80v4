@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QMap>
+#include <QShortcut>
 
 #include "../PalKeys.h"
 #include "../EmuTypes.h"
@@ -213,6 +214,8 @@ private slots:
     void onDbgFlags();
     void onDbgAddr();
     void onDbgEdit();
+
+    void onShiftF10();
 
 private:
     PaintWidget* m_paintWidget;
@@ -431,6 +434,8 @@ private:
     QAction* m_edd2LastFilesActions[LAST_FILES_QTY];
 
     QAction* m_lastPlatformsActions[LAST_PLATFORMS_QTY];
+
+    QShortcut* m_shiftF10shortcut;
 };
 
 
