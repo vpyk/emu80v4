@@ -3491,7 +3491,7 @@ void MainWindow::updateLastPlatforms(QString platform)
             break;
         }
 
-    for (int i = LAST_PLATFORMS_QTY - 1; i >= 0; i--) {
+    for (int i = LAST_PLATFORMS_QTY - 1; i > 0; i--) {
         m_lastPlatformsActions[i]->setData(m_lastPlatformsActions[i - 1]->data().toString());
         m_lastPlatformsActions[i]->setText(m_lastPlatformsActions[i - 1]->text());
         m_lastPlatformsActions[i]->setVisible(m_lastPlatformsActions[i - 1]->isVisible());
