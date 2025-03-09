@@ -420,6 +420,7 @@ void SettingsDialog::fillControlValues()
     val = m_options["window.fieldsMixing"];
     ui->mixingOffRadioButton->setChecked(val == "none");
     ui->mixingMixRadioButton->setChecked(val == "mix");
+    ui->mixingAverageRadioButton->setChecked(val == "average");
     ui->mixingInterlaceRadioButton->setChecked(val == "interlace");
     ui->mixingScanlineRadioButton->setChecked(val == "scanline");
 
@@ -848,6 +849,8 @@ void SettingsDialog::on_applyPushButton_clicked()
             val = "none";
         else if (ui->mixingMixRadioButton->isChecked())
             val = "mix";
+        else if (ui->mixingAverageRadioButton->isChecked())
+            val = "average";
         else if (ui->mixingInterlaceRadioButton->isChecked())
             val = "interlace";
         else if (ui->mixingScanlineRadioButton->isChecked())

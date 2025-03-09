@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>547</width>
-    <height>557</height>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1164,6 +1164,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QRadioButton" name="mixingAverageRadioButton">
+            <property name="text">
+             <string>Average (old method)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QRadioButton" name="mixingInterlaceRadioButton">
             <property name="text">
              <string>Interlace</string>
@@ -1661,6 +1668,7 @@
   <tabstop>color2RadioButton</tabstop>
   <tabstop>mixingOffRadioButton</tabstop>
   <tabstop>mixingMixRadioButton</tabstop>
+  <tabstop>mixingAverageRadioButton</tabstop>
   <tabstop>mixingInterlaceRadioButton</tabstop>
   <tabstop>mixingScanlineRadioButton</tabstop>
   <tabstop>smoothingNearestRadioButton</tabstop>

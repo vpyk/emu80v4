@@ -343,6 +343,31 @@ void EmuWindow::interlaceFields(EmuPixelData frame)
 }
 
 
+void EmuWindow::mixFields(EmuPixelData frame)
+{
+    int requiredSize = frame.height * frame.width;
+    if (requiredSize > m_interlacedImageSize) {
+        if (m_interlacedImage)
+            delete m_interlacedImage;
+        m_interlacedImage = new uint32_t[requiredSize];
+        m_interlacedImageSize = requiredSize;
+    }
+
+    uint32_t* p = m_interlacedImage;
+    uint32_t* p1 = frame.pixelData;
+    uint32_t* p2 = frame.prevPixelData;
+
+    for (int i = 0; i < frame.height * frame.width; i++) {
+        uint32_t c1 = *p1++;
+        uint32_t c2 = *p2++;
+        *p++ = c_linear2srgbTbl[(c_srgb2linearTbl[c1 & 0xFF] + c_srgb2linearTbl[c2 & 0xFF]) >> 1] |
+               (c_linear2srgbTbl[(c_srgb2linearTbl[(c1 >> 8) & 0xFF] + c_srgb2linearTbl[(c2 >> 8) & 0xFF]) >> 1] << 8) |
+               (c_linear2srgbTbl[(c_srgb2linearTbl[(c1 >> 16) & 0xFF] + c_srgb2linearTbl[(c2 >> 16) & 0xFF]) >> 1] << 16) |
+               (c_linear2srgbTbl[(c_srgb2linearTbl[c1 >> 24] + c_srgb2linearTbl[c2 >> 24]) >> 1] << 24);
+    }
+}
+
+
 void EmuWindow::prepareScanline(EmuPixelData frame)
 {
     int requiredSize = frame.height * 2 * frame.width;
@@ -404,9 +429,9 @@ void EmuWindow::drawFrame(EmuPixelData frame)
 
     drawFill(0x282828);
 
-    if (m_fieldsMixing != FM_INTERLACE && m_fieldsMixing != FM_SCANLINE) {
+    if (m_fieldsMixing != FM_INTERLACE && m_fieldsMixing != FM_SCANLINE && m_fieldsMixing != FM_MIX) {
         drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, false, false);
-        if (m_fieldsMixing == FM_MIX && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) {
+        if (m_fieldsMixing == FM_AVERAGE && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) {
             drawImage((uint32_t*)frame.prevPixelData, frame.prevWidth, frame.prevHeight, frame.prevAspectRatio, true, false);
         }
     } else if (m_fieldsMixing == FM_INTERLACE && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) { // FM_INTERLACE
@@ -414,9 +439,12 @@ void EmuWindow::drawFrame(EmuPixelData frame)
             interlaceFields(frame);
         if (m_interlacedImage)
             drawImage(m_interlacedImage, frame.width, frame.height * 2, frame.aspectRatio, false, false);
-    } else { // if (m_fieldsMixing == FM_SCANLINE)
+    } else if (m_fieldsMixing == FM_SCANLINE) {
         prepareScanline(frame);
         drawImage(m_interlacedImage, frame.width, frame.height * 2, frame.aspectRatio, false, false);
+    } else if (m_fieldsMixing == FM_MIX && frame.prevPixelData && frame.prevHeight == frame.height && frame.prevWidth == frame.width) {
+        mixFields(frame);
+        drawImage(m_interlacedImage, frame.width, frame.height, frame.aspectRatio, false, false);
     }
 }
 
@@ -433,7 +461,7 @@ void EmuWindow::drawOverlay(EmuPixelData frame)
 
     drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, true, true);
 
-/*    if (m_fieldsMixing == FM_MIX && frame.prevPixelData) {
+/*    if (m_fieldsMixing == FM_AVERAGE && frame.prevPixelData) {
         drawImage((uint32_t*)frame.prevPixelData, frame.prevWidth, frame.prevHeight, m_dstX, m_dstY, m_dstWidth, m_dstHeight, true, true);
     }*/
 }
@@ -664,6 +692,9 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
         } else if (values[0].asString() == "mix") {
             setFieldsMixing(FM_MIX);
             return true;
+        } else if (values[0].asString() == "average") {
+            setFieldsMixing(FM_AVERAGE);
+            return true;
         } else if (values[0].asString() == "interlace") {
             setFieldsMixing(FM_INTERLACE);
             return true;
@@ -807,6 +838,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
                 return "none";
             case FM_MIX:
                 return "mix";
+            case FM_AVERAGE:
+                return "average";
             case FM_INTERLACE:
                 return "interlace";
             case FM_SCANLINE:

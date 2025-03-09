@@ -60,6 +60,7 @@ configTab.addControl = 2, &cropSelector
 ConfigRadioSelector mixSelector = &window, fieldsMixing, "Смешивание полукадров"
 mixSelector.addItem = none, "Выкл."
 mixSelector.addItem = mix, "Вкл."
+mixSelector.addItem = average, "Усреднять (старый метод)"
 mixSelector.addItem = interlace, "Чередование"
 mixSelector.addItem = scanline, "Имитация линий растра"
 configTab.addControl = 2, &mixSelector
