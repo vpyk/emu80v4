@@ -941,11 +941,11 @@ bool VectorKbdLayout::processSpecialKeys(PalKeyCode keyCode, bool pressed)
         return false;
 
     if (keyCode == PK_F11) {
-        //m_platform->getKeyboard()->disableKeysReset();
-        //m_platform->reset();
-        //m_platform->getKeyboard()->enableKeysReset();
+        m_platform->getKeyboard()->disableKeysReset();
+        m_platform->reset();
+        m_platform->getKeyboard()->enableKeysReset();
         static_cast<VectorAddrSpace*>(m_platform->getCpu()->getAddrSpace())->enableRom();
-        static_cast<Cpu8080Compatible*>(m_platform->getCpu())->setPC(0);
+        //static_cast<Cpu8080Compatible*>(m_platform->getCpu())->setPC(0);
         return true;
     } else if (keyCode == PK_F12) {
         m_platform->getKeyboard()->disableKeysReset();
