@@ -699,7 +699,7 @@ bool ZxTapeInHook::hookProc()
 
     uint16_t addr = cpu->getIX();
     uint16_t len = cpu->getDE();
-    bool verify = !cpu->getAF() & 1;
+    bool verify = !(cpu->getAF2() & 1);
 
     uint16_t af = cpu->getAF2() & ~1; // clear C (error)
 
