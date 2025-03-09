@@ -53,5 +53,6 @@
         <file>icons/25x.png</file>
         <file>icons/gray.png</file>
         <file>icons/full_throttle.png</file>
+        <file>icons/shader.png</file>
     </qresource>
 </RCC>

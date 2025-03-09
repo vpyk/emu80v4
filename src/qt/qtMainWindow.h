@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -90,6 +90,9 @@ public:
     std::string getPlatformObjectName() {return m_platformName;}
     std::string getPlatformGroupName() {return m_platformGroupName;}
 
+    void setSmoothingAndShader(SmoothingType smoothing, const std::string& shaderName);
+    const QStringList& getShaderList() {return m_shaderList;}
+
 protected:
     void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent* evt) override;
@@ -161,6 +164,7 @@ private slots:
     void onFont();
     void onSmoothing();
     void onSmoothingSelect();
+    void onShaderSelect();
     void onPlatform();
     void onPlatformConfig();
     void onPlatformSelect();
@@ -234,6 +238,7 @@ private:
     QLabel* m_pasteLabel;
     void createActions();
     void fillPlatformListMenu();
+    void fillShaderListMenu();
     void tuneMenu();
     void createDebugActions();
     PalKeyCode translateKey(QKeyEvent* evt);
@@ -242,6 +247,9 @@ private:
     void updateLastFiles();
     void updateLastPlatforms(QString platform);
     void updateMountToolTip(QAction* action, const QString& fileName);
+    void updateSmoothing();
+
+    QStringList m_shaderList;
 
     LastFileList m_loaderLastFiles = LastFileList("loader");
     LastFileList m_fddLastFiles = LastFileList("fdd");
@@ -297,6 +305,7 @@ private:
     QIcon m_15xIcon                 = QIcon(":/icons/15x.png");
     QIcon m_25xIcon                 = QIcon(":/icons/25x.png");
     QIcon m_resizableIcon           = QIcon(":/icons/resizable.png");
+    QIcon m_shaderIcon              = QIcon(":/icons/shader.png");
 
     QMenu* m_loadRunMenu = nullptr;
     QMenu* m_loadMenu = nullptr;
@@ -311,6 +320,7 @@ private:
     QMenu* m_hddMenu = nullptr;
     QMenu* m_eddMenu = nullptr;
     QMenu* m_edd2Menu = nullptr;
+    QMenu* m_shaderListMenu = nullptr;
 
     QMenuBar* m_menuBar = nullptr;
     QToolBar* m_toolBar = nullptr;
@@ -403,6 +413,7 @@ private:
     QAction* m_smoothingAction;
     QAction* m_smoothingNearestAction;
     QAction* m_smoothingBilinearAction;
+    QAction* m_smoothingShaderAction;
     QAction* m_smoothingSharpAction;
     QAction* m_presetAction;
     QAction* m_preset1xAction;

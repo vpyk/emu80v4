@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+#include <cstring>
+
 #include "sdlPalWindow.h"
 #include "sdlGlExt.h"
+
+#include "sdlPal.h"
 
 #ifdef PAL_WASM
 #include "../wasm/wasmEmuCalls.h"
 #endif
 
- #include "../lite/litePal.h"
 
 using namespace std;
 
@@ -53,6 +57,12 @@ PalWindow::~PalWindow()
         PalWindow::m_windowsMap.erase(SDL_GetWindowID(m_window));
         SDL_DestroyWindow(m_window);
     }
+
+    if (m_program)
+        glDeleteProgram(m_program);
+
+    if (m_glContext)
+        SDL_GL_DeleteContext(m_glContext);
 }
 
 
@@ -107,6 +117,15 @@ void PalWindow::applyParams()
 
     if (m_params.title != m_prevParams.title)
         SDL_SetWindowTitle(m_window, m_params.title.c_str());
+
+    if (m_params.smoothing != m_prevParams.smoothing || m_params.shader != m_prevParams.shader) {
+        string shaderFileName;
+        if (!m_params.shader.empty() && m_params.shader != "none")
+            shaderFileName = palMakeFullFileName("shaders/" + m_params.shader + ".glsl");
+        m_needToRecreateProgram = m_needToRecreateProgram || (shaderFileName != m_shaderFileName) || (m_params.smoothing != m_smoothing);
+        m_smoothing = m_params.smoothing;
+        m_shaderFileName = shaderFileName;
+    }
 
     m_prevParams.style = m_params.style;
     m_prevParams.title = m_params.title;
@@ -290,6 +309,11 @@ void PalWindow::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, dou
 
 void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
+    recreateProgramIfNeeded();
+
+    if (!m_shaderValid)
+        return;
+
     SDL_GL_MakeCurrent(m_window, m_glContext);
 
     int outWidth, outHeight;
@@ -298,19 +322,24 @@ void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, d
     if (!blend && !useAlpha)
         calcDstRect(imageWidth, imageHeight, aspectRatio, outWidth, outHeight, m_dstWidth, m_dstHeight, m_dstX, m_dstY);
 
-    glViewport(0, 0, outWidth, outHeight);
+    glViewport(m_dstX, m_dstY, m_dstWidth, m_dstHeight);
 
     int sharpLocation = glGetUniformLocation(m_program, "sharp");
     glUniform1i(sharpLocation, m_params.smoothing == ST_SHARP);
 
-    int texSizeLocation = glGetUniformLocation(m_program, "textureSize");
+    int texSizeLocation = glGetUniformLocation(m_program, "TextureSize");
     glUniform2f(texSizeLocation, float(imageWidth), float(imageHeight));
 
-    int outSizeLocation = glGetUniformLocation(m_program, "outputSize");
+    int outSizeLocation = glGetUniformLocation(m_program, "OutputSize");
     glUniform2f(outSizeLocation, float(outWidth), float(outHeight));
 
-    int dstSizeLocation = glGetUniformLocation(m_program, "destSize");
-    glUniform2f(dstSizeLocation, float(m_dstWidth), float(m_dstHeight));
+    int inpSizeLocation = glGetUniformLocation(m_program, "InputSize");
+    if (inpSizeLocation >= 0)
+        glUniform2f(inpSizeLocation, float(imageWidth), float(imageHeight));
+
+    int mvpMatrixLocation = glGetUniformLocation(m_program, "MVPMatrix");
+    if (mvpMatrixLocation >= 0)
+        glUniformMatrix4fv(mvpMatrixLocation, 1, false, c_mvpMatrix);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -444,20 +473,121 @@ void PalWindow::createGlContext()
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(c_vertices), c_vertices, GL_STATIC_DRAW);
 
-    GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &c_vShader, NULL);
-    glCompileShader(vertex);
+    m_needToRecreateProgram = true;
+    recreateProgramIfNeeded();
 
-    GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &c_fShader, NULL);
-    glCompileShader(fragment);
+    return;
+}
+
+
+void PalWindow::recreateProgramIfNeeded()
+{
+    if (!m_needToRecreateProgram)
+        return;
+
+    m_needToRecreateProgram = false;
+
+    if (m_program) {
+        glDeleteProgram(m_program);
+        m_program = 0;
+    }
+
+    GLuint vertex;
+    GLuint fragment;
+
+    if (m_smoothing == ST_CUSTOM) {
+        int fileLen;
+
+        string version;
+        string shaderSrc;
+
+        char* shaderFileData = reinterpret_cast<char*>(palReadFile(m_shaderFileName, fileLen, true));
+        if (!shaderFileData) {
+            m_shaderValid = false;
+            return;
+        }
+
+        char* shaderFileStr = new char[fileLen + 1];
+        memcpy(shaderFileStr, shaderFileData, fileLen);
+        shaderFileStr[fileLen] = 0;
+        delete[] shaderFileData;
+
+        stringstream shaderFileStream(shaderFileStr);
+        delete[] shaderFileStr;
+
+        string s;
+
+        while (getline(shaderFileStream, s)) {
+            if (s.rfind("#version", 0) == 0)
+                version = s + "\n";
+            else {
+                shaderSrc += s;
+                shaderSrc += "\n";
+            }
+        }
+
+        if (version.empty())
+            version = "#version 130\n";
+
+        string fullShaderSrc(version + "#define VERTEX\n" + shaderSrc);
+        const char* cFullShaderSrc = fullShaderSrc.c_str();
+
+        GLint res;
+
+        vertex = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertex, 1, &cFullShaderSrc, NULL);
+        glCompileShader(vertex);
+
+        glGetShaderiv(vertex, GL_COMPILE_STATUS, &res);
+        if (res == GL_FALSE) {
+            /*char buf[1000];
+            memset(buf,0,1000);
+            int len;
+            glGetShaderInfoLog(vertex, 1000, &len, buf);
+            cout << buf;*/
+
+            glDeleteShader(vertex);
+            m_shaderValid = false;
+            return;
+        }
+
+        fullShaderSrc = version + "#define FRAGMENT\n" + shaderSrc;
+        cFullShaderSrc = fullShaderSrc.c_str();
+
+        fragment = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragment, 1, &cFullShaderSrc, NULL);
+        glCompileShader(fragment);
+        glGetShaderiv(fragment, GL_COMPILE_STATUS, &res);
+        if (res == GL_FALSE) {
+            /*char buf[1000];
+            memset(buf,0,1000);
+            int len;
+            glGetShaderInfoLog(fragment, 1000, &len, buf);
+            cout << buf;*/
+
+            glDeleteShader(fragment);
+            m_shaderValid = false;
+            return;
+        }
+
+    } else {
+        vertex = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertex, 1, &c_vShader, NULL);
+        glCompileShader(vertex);
+
+        fragment = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragment, 1, &c_fShader, NULL);
+        glCompileShader(fragment);
+    }
+
+    m_shaderValid = true;
 
     m_program = glCreateProgram();
     glAttachShader(m_program, vertex);
     glAttachShader(m_program, fragment);
 
-    glBindAttribLocation(m_program, PROGRAM_VERTEX_ATTRIBUTE, "vertCoord");
-    glBindAttribLocation(m_program, PROGRAM_TEXCOORD_ATTRIBUTE, "texCoord");
+    glBindAttribLocation(m_program, PROGRAM_VERTEX_ATTRIBUTE, "VertCoord");
+    glBindAttribLocation(m_program, PROGRAM_TEXCOORD_ATTRIBUTE, "TexCoord");
 
     glLinkProgram(m_program);
 
@@ -471,8 +601,6 @@ void PalWindow::createGlContext()
 
     glVertexAttribPointer(PROGRAM_TEXCOORD_ATTRIBUTE, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(PROGRAM_TEXCOORD_ATTRIBUTE);
-
-    return;
 }
 
 

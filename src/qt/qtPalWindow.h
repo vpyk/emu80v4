@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,11 +40,12 @@ class PalWindow
     struct PalWindowParams {
         PalWindowStyle style;
         SmoothingType smoothing;
-        bool vsync;
+        //bool vsync;
         bool visible;
         int width;
         int height;
         std::string title;
+        std::string shader;
     };
 
         PalWindow();

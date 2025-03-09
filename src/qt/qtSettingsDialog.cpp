@@ -46,6 +46,9 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::initConfig()
 {
+    ui->shaderComboBox->addItem("- None -");
+    ui->shaderComboBox->addItems(m_mainWindow->getShaderList());
+
     clearConfig();
     readRunningConfig();
     writeInitialSavedConfig();
@@ -137,6 +140,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("emulation.debugResetKeys");
     loadRunningConfigValue("window.windowStyle");
     loadRunningConfigValue("window.frameScale");
+    loadRunningConfigValue("window.shader");
     loadRunningConfigValue("window.smoothing");
     loadRunningConfigValue("window.aspectCorrection");
     loadRunningConfigValue("window.squarePixels");
@@ -352,8 +356,16 @@ void SettingsDialog::fillControlValues()
     // Smoothing
     val = m_options["window.smoothing"];
     ui->smoothingNearestRadioButton->setChecked(val == "nearest");
-    ui->smoothingSharpRadioButton->setChecked(val == "sharp");
     ui->smoothingBilinearRadioButton->setChecked(val == "bilinear");
+    ui->smoothingSharpRadioButton->setChecked(val == "sharp");
+    ui->smoothingCustomRadioButton->setChecked(val == "custom");
+
+    // Shader
+    val = m_options["window.shader"];
+    int index = ui->shaderComboBox->findText(val, Qt::MatchExactly);
+    if (index < 0)
+        index = 0;
+    ui->shaderComboBox->setCurrentIndex(index);
 
     // Aspect ratio
     val = m_options["window.aspectCorrection"];
@@ -768,13 +780,24 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "bestFit";
     m_options["window.frameScale"] = val;
 
+    if (ui->shaderComboBox->currentIndex() == 0) {
+        // no shader
+        val = "none";
+        if (ui->smoothingCustomRadioButton->isChecked())
+            ui->smoothingSharpRadioButton->setChecked(true);
+    } else
+        val = ui->shaderComboBox->currentText();
+    m_options["window.shader"] = val;
+
     val = "";
     if (ui->smoothingNearestRadioButton->isChecked())
         val = "nearest";
-    else if (ui->smoothingSharpRadioButton->isChecked())
-        val = "sharp";
     else if (ui->smoothingBilinearRadioButton->isChecked())
         val = "bilinear";
+    else if (ui->smoothingSharpRadioButton->isChecked())
+        val = "sharp";
+    else if (ui->smoothingCustomRadioButton->isChecked())
+        val = "custom";
     if (val != "")
         m_options["window.smoothing"] = val;
 
@@ -1055,14 +1078,31 @@ void SettingsDialog::on_smoothingNearestRadioButton_toggled(bool checked)
         adjustPresetComboBoxState();
 }
 
+void SettingsDialog::on_smoothingBilinearRadioButton_toggled(bool checked)
+{
+    if (checked)
+        adjustPresetComboBoxState();
+}
+
 void SettingsDialog::on_smoothingSharpRadioButton_toggled(bool checked)
 {
     if (checked)
         adjustPresetComboBoxState();
 }
 
-void SettingsDialog::on_smoothingBilinearRadioButton_toggled(bool checked)
+void SettingsDialog::on_smoothingCustomRadioButton_toggled(bool checked)
 {
     if (checked)
         adjustPresetComboBoxState();
+}
+
+void SettingsDialog::on_shaderComboBox_currentIndexChanged(int index)
+{
+    if (index == 0) {
+        ui->smoothingCustomRadioButton->setEnabled(false);
+        ui->smoothingSharpRadioButton->setChecked(true);
+    } else {
+        ui->smoothingCustomRadioButton->setEnabled(true);
+        ui->smoothingCustomRadioButton->setChecked(true);
+    }
 }

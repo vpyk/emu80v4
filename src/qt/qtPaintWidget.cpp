@@ -46,6 +46,14 @@ PaintWidget::~PaintWidget()
     if (m_image2)
         delete m_image2;
 
+    delete m_standardVShader;
+    delete m_standardFShader;
+
+    if (m_customVShader)
+        delete m_customVShader;
+    if (m_customFShader)
+        delete m_customFShader;
+
     delete m_program;
 }
 
@@ -107,42 +115,26 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
 }
 
 
-void PaintWidget::initializeGL()
-{
-    initializeOpenGLFunctions();
-
-    m_vbo.create();
-    m_vbo.bind();
-    m_vbo.allocate(c_vertices, 16 * sizeof(float));
-
-    QOpenGLShader *vShader = new QOpenGLShader(QOpenGLShader::Vertex);
-    QOpenGLShader *fShader = new QOpenGLShader(QOpenGLShader::Fragment);
-
-    if (!vShader->compileSourceCode(R"(
-        attribute highp vec2 vertCoord;
-        attribute highp vec2 texCoord;
+const char* vShaderSrc = R"(
+        attribute highp vec2 VertexCoord;
+        attribute highp vec2 TexCoord;
 
         varying highp vec2 vTexCoord;
         varying vec2 prescale;
 
-        uniform highp vec2 textureSize;
-        uniform highp vec2 outputSize;
-        uniform highp vec2 destSize;
-        //uniform highp vec2 destPos;
+        uniform highp vec2 TextureSize;
+        uniform highp vec2 OutputSize;
 
         void main()
         {
-            mediump vec2 scale = destSize / outputSize;
-            gl_Position = vec4(vertCoord * scale, 0.0, 1.0);
-            vTexCoord = texCoord * textureSize;
-            prescale = ceil(outputSize / textureSize);
-        })")) {
-        qDebug() << vShader->log();
-    }
+            gl_Position = vec4(VertexCoord, 0.0, 1.0);
+            vTexCoord  = TexCoord * TextureSize;
+            prescale = ceil(OutputSize / TextureSize);
+        })";
 
-    if (!fShader->compileSourceCode(R"(
+const char* fShaderSrc = R"(
         uniform sampler2D texture1;
-        uniform highp vec2 textureSize;
+        uniform highp vec2 TextureSize;
         uniform bool sharp;
 
         varying highp vec2 vTexCoord;
@@ -159,30 +151,66 @@ void PaintWidget::initializeGL()
                 highp vec2 center_dist = s - halfp;
                 highp vec2 f = (center_dist - clamp(center_dist, -region_range, region_range)) * prescale + halfp;
 
-                highp vec2 mod_texel = min(texel_floored + f, textureSize-halfp);
-                gl_FragColor = texture2D(texture1, mod_texel / textureSize);
+                highp vec2 mod_texel = min(texel_floored + f, TextureSize - halfp);
+                gl_FragColor = texture2D(texture1, mod_texel / TextureSize);
             } else
-                gl_FragColor = texture2D(texture1, (vTexCoord + 0.002) / textureSize);
-        })")) {
-        qDebug() << fShader->log();
-    }
+                gl_FragColor = texture2D(texture1, vTexCoord / TextureSize);
+        })";
+
+
+
+void PaintWidget::initializeGL()
+{
+    initializeOpenGLFunctions();
+
+    m_vbo.create();
+    m_vbo.bind();
+    m_vbo.allocate(c_vertices, 16 * sizeof(float));
+
+    m_standardVShader = new QOpenGLShader(QOpenGLShader::Vertex);
+    m_standardFShader = new QOpenGLShader(QOpenGLShader::Fragment);
+
+    // create standard internal shaders
+    if (!m_standardVShader->compileSourceCode(vShaderSrc))
+        qDebug() << m_standardVShader->log();
+    if (!m_standardFShader->compileSourceCode(fShaderSrc))
+            qDebug() << m_standardVShader->log();
+
+    m_mvpMatrix.setToIdentity();
+
+    createProgram(m_standardVShader, m_standardFShader);
+    m_useCustomShader = false;
+}
+
+
+bool PaintWidget::createProgram(QOpenGLShader* vShader, QOpenGLShader* fShader)
+{
+    if (m_program)
+        delete m_program;
 
     m_program = new QOpenGLShaderProgram;
     m_program->addShader(vShader);
     m_program->addShader(fShader);
-    m_program->bindAttributeLocation("vertCoord", PROGRAM_VERTEX_ATTRIBUTE);
-    m_program->bindAttributeLocation("texCoord", PROGRAM_TEXCOORD_ATTRIBUTE);
-    m_program->link();
+
+    m_program->bindAttributeLocation("VertexCoord", PROGRAM_VERTEX_ATTRIBUTE);
+    m_program->bindAttributeLocation("TexCoord", PROGRAM_TEXCOORD_ATTRIBUTE);
+
+    bool res = m_program->link();
+    if (!res) {
+        qDebug() << m_program->log();
+        return false;
+    }
 
     m_program->bind();
-    //m_program->setUniformValue("texture1", 0);
     m_program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
     m_program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
+
     m_program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 2, sizeof(float) * 4);
     m_program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, sizeof(float) * 2, 2, sizeof(float) * 4);
 
-    delete vShader;
-    delete fShader;
+    m_program->setUniformValue("MVPMatrix", m_mvpMatrix);
+
+    return true;
 }
 
 
@@ -198,9 +226,14 @@ void PaintWidget::paintImageGL(QImage* img/*, double aspectRatio*/)
     palWindow->calcDstRect(m_image->width(), m_image->height(), m_img1aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
     m_dstRect.setRect(dstX, dstY, dstWidth, dstHeight);
 
-    m_program->setUniformValue("sharp", m_smoothing == ST_SHARP);
-    m_program->setUniformValue("textureSize", img->size());
-    m_program->setUniformValue("destSize", QSize(dstWidth, dstHeight));
+    glViewport(dstX, dstY, dstWidth, dstHeight);
+    m_program->setUniformValue("TextureSize", img->size());
+    m_program->setUniformValue("InputSize", img->size());
+    m_program->setUniformValue("OutputSize", QSize(dstWidth, dstHeight));
+
+    if (!m_useCustomShader) {
+        m_program->setUniformValue("sharp", m_smoothing == ST_SHARP);
+    }
 
     QOpenGLTexture* texture = new QOpenGLTexture(*img, QOpenGLTexture::DontGenerateMipMaps);
     texture->setMagnificationFilter(m_smoothing != ST_NEAREST ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);
@@ -216,8 +249,13 @@ void PaintWidget::paintImageGL(QImage* img/*, double aspectRatio*/)
 
 void PaintWidget::paintGL()
 {
+    recreateProgramIfNeeded();
+
     glClearColor(m_fillColor.red() / 255.0, m_fillColor.green() / 255.0, m_fillColor.blue() / 255.0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    if (!m_shaderValid)
+        return;
 
     m_vbo.bind();
     m_program->bind();
@@ -244,9 +282,74 @@ void PaintWidget::paintGL()
 }
 
 
-void PaintWidget::resizeGL(int w, int h)
+void PaintWidget::setSmoothingAndShaderFile(SmoothingType smoothing, const QString& shaderFileName)
 {
-    m_program->setUniformValue("outputSize", QSize(w, h));
+    m_needToRecreateProgram = m_needToRecreateProgram || (shaderFileName != m_shaderFileName) || (smoothing != m_smoothing);
+
+    m_smoothing = smoothing;
+    m_shaderFileName = shaderFileName;
+}
+
+
+void PaintWidget::recreateProgramIfNeeded()
+{
+    if (!m_needToRecreateProgram)
+        return;
+
+    m_needToRecreateProgram = false;
+
+    if (m_customVShader)
+        delete m_customVShader;
+    if (m_customFShader)
+        delete m_customFShader;
+
+    if (m_smoothing != ST_CUSTOM) {
+        m_useCustomShader = false;
+        m_customVShader = nullptr;
+        m_customFShader = nullptr;
+        createProgram(m_standardVShader, m_standardFShader);
+        m_shaderValid = true;
+        return;
+    }
+
+    m_useCustomShader = true;
+
+    m_customVShader = new QOpenGLShader(QOpenGLShader::Vertex);
+    m_customFShader = new QOpenGLShader(QOpenGLShader::Fragment);
+
+    QFile shaderFile(m_shaderFileName);
+
+    bool success = shaderFile.open(QFile::ReadOnly | QFile::Text);
+
+    QString shaderSrc = "";
+    QString versionStr = "";
+
+    if (success) {
+        while (!shaderFile.atEnd()) {
+            QString line = shaderFile.readLine();
+            if (line.startsWith("#version"))
+                versionStr = line;
+            else {
+                shaderSrc += line;
+            }
+        }
+    }
+
+    if (success && !m_customVShader->compileSourceCode(versionStr + "#define VERTEX\n" + shaderSrc)) {
+        qDebug() << m_customVShader->log();
+        success = false;
+    }
+
+    if (success && !m_customFShader->compileSourceCode(versionStr + "#define FRAGMENT\n" + shaderSrc)) {
+        qDebug() << m_customFShader->log();
+        success = false;
+    }
+
+    if (success)
+        success = createProgram(m_customVShader, m_customFShader);
+
+    m_useCustomShader = success;
+    m_shaderValid = success;
 }
 
 

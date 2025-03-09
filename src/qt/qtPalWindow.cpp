@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ void PalWindow::initPalWindow()
 
         // default parameters
         m_qtWindow->setClientSize(0, 0);
-        m_qtWindow->getPaintWidget()->setSmoothing(ST_SHARP);
+        m_qtWindow->getPaintWidget()->setSmoothingAndShaderFile(ST_SHARP, "");
         m_qtWindow->setPalWindow(this);
     }
 }
@@ -113,11 +113,8 @@ void PalWindow::applyParams()
     if (m_params.title != m_prevParams.title)
         m_qtWindow->setWindowTitle(m_params.title.c_str());
 
-    if (m_params.smoothing != m_prevParams.smoothing)
-        m_qtWindow->getPaintWidget()->setSmoothing(m_params.smoothing);
-
-    /*if (m_params.vsync != m_prevParams.vsync)
-        m_qtWindow->getPaintWidget()->setVsync(m_params.vsync);*/
+    if (m_params.smoothing != m_prevParams.smoothing || m_params.shader != m_prevParams.shader)
+        m_qtWindow->setSmoothingAndShader(m_params.smoothing, m_params.shader);
 
     if (m_params.visible != m_prevParams.visible)
         m_params.visible ? m_qtWindow->showWindow() : m_qtWindow->hideWindow();

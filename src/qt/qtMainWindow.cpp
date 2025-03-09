@@ -33,6 +33,7 @@
 #include <QWindow>
 #include <QScreen>
 #include <QSettings>
+#include <QDir>
 
 #include <string>
 
@@ -100,7 +101,9 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         // first emulation window
         createActions();
         fillPlatformListMenu();
+        fillShaderListMenu();
     }
+
     m_palWindow = palWindow;
 
     m_platformName = m_palWindow->getPlatformObjectName();
@@ -479,6 +482,36 @@ void MainWindow::fillPlatformListMenu()
         }
     }
     settings.endGroup();
+}
+
+
+void MainWindow::fillShaderListMenu()
+{
+    QDir dir(QString::fromUtf8(palMakeFullFileName("shaders").c_str()));
+    QStringList filter;
+    filter << "*.glsl";
+    dir.setNameFilters(filter);
+    dir.setSorting(QDir::Name);
+    QStringList shaderFiles = dir.entryList();
+
+    QAction* action = new QAction(tr("Off"), m_shaderListMenu);
+    m_shaderListMenu->addAction(action);
+    action->setData("none");
+    action->setCheckable(true);
+    m_shaderListMenu->addSeparator();
+    connect(action, SIGNAL(triggered()), this, SLOT(onShaderSelect()));
+
+    foreach (QString shaderName, shaderFiles) {
+        action = new QAction(m_shaderListMenu);
+        //action->setData("shaders/" + shaderName);
+        shaderName.truncate(shaderName.lastIndexOf("."));
+        action->setData(shaderName);
+        action->setText(shaderName);
+        action->setCheckable(true);
+        m_shaderListMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(onShaderSelect()));
+        m_shaderList.append(shaderName);
+    }
 }
 
 
@@ -1306,12 +1339,26 @@ void MainWindow::createActions()
     smoothingGroup->addAction(m_smoothingBilinearAction);
     connect(m_smoothingBilinearAction, SIGNAL(triggered()), this, SLOT(onSmoothingSelect()));
 
+    m_smoothingShaderAction = new QAction(m_shaderIcon, tr("Custom shader"), this);
+    m_smoothingShaderAction->setCheckable(true);
+    m_smoothingShaderAction->setData("custom");
+    m_smoothingMenu->addAction(m_smoothingShaderAction);
+    smoothingGroup->addAction(m_smoothingShaderAction);
+    connect(m_smoothingShaderAction, SIGNAL(triggered()), this, SLOT(onSmoothingSelect()));
+
     m_smoothingMenu->setIcon(QIcon(":/icons/smooth.png"));
     m_smoothingAction = m_smoothingMenu->menuAction();
     m_smoothingAction->setToolTip(tr("Smoothing mode (Alt-S)"));
     addAction(m_smoothingAction);
     m_toolBar->addAction(m_smoothingAction);
     settingsMenu->addAction(m_smoothingAction);
+
+    m_shaderListMenu = new QMenu(tr("Custom shaders"), m_smoothingMenu);
+    m_shaderListMenu->menuAction()->setCheckable(true);
+    m_shaderListMenu->setIcon(m_shaderIcon);
+    m_smoothingMenu->addSeparator();
+    m_smoothingMenu->addMenu(m_shaderListMenu);
+    smoothingGroup->addAction(m_shaderListMenu->menuAction());
 
     QList<QKeySequence> smoothingKeyList;
     ADD_HOTKEY(smoothingKeyList, Qt::Key_S);
@@ -2743,6 +2790,30 @@ void MainWindow::onSmoothingSelect()
 }
 
 
+void MainWindow::setSmoothingAndShader(SmoothingType smoothing, const std::string& shaderName)
+{
+    QString shaderFileName;
+    if (!shaderName.empty() && shaderName != "none") {
+        QString shaderWithDir = "shaders/" + QString::fromUtf8(shaderName.c_str()) + ".glsl";
+        shaderFileName = QString::fromUtf8(palMakeFullFileName(shaderWithDir.toUtf8().constData()).c_str());
+    }
+
+    m_paintWidget->setSmoothingAndShaderFile(smoothing, shaderFileName);
+}
+
+
+void MainWindow::onShaderSelect()
+{
+    QAction* action = (QAction*)sender();
+    QString shaderName = action->data().toString();
+
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".window", "shader", shaderName.toUtf8().constData());
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".window", "smoothing", shaderName != "none" ? "custom" : "sharp");
+    updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onPlatformSelect()
 {
     QAction* action = (QAction*)sender();
@@ -3377,14 +3448,33 @@ void MainWindow::updateActions()
     if (val == "nearest") {
         m_smoothingNearestAction->setChecked(true);
         m_smoothingMenu->setIcon(m_smoothingNearestIcon);
+        m_shaderListMenu->menuAction()->setChecked(false);
     } else if (val == "bilinear") {
         m_smoothingBilinearAction->setChecked(true);
         m_smoothingMenu->setIcon(m_smoothingBilinearIcon);
+        m_shaderListMenu->menuAction()->setChecked(false);
     } else if (val == "sharp") {
         m_smoothingSharpAction->setChecked(true);
         m_smoothingMenu->setIcon(m_smoothingSharpIcon);
+        m_shaderListMenu->menuAction()->setChecked(false);
+    } else if (val == "custom") {
+        m_smoothingShaderAction->setChecked(true);
+        m_smoothingMenu->setIcon(m_shaderIcon);
     } else
         m_smoothingMenu->setVisible(false);
+
+    QString qVal = QString::fromUtf8(emuGetPropertyValue(platform + "window", "shader").c_str());
+    auto actions = m_shaderListMenu->actions();
+    foreach(auto action, actions)
+        action->setChecked(action->data().toString() == qVal);
+
+    if (qVal != "none") {
+        m_smoothingShaderAction->setText(tr("Shader") + ": " + qVal);
+        m_smoothingShaderAction->setEnabled(true);
+    } else {
+        m_smoothingShaderAction->setText(tr("Shader"));
+        m_smoothingShaderAction->setEnabled(false);
+    }
 
     val = emuGetPropertyValue(platform + "tapeGrp", "enabled");
     if (val == "")

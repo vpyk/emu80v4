@@ -70,8 +70,10 @@ private slots:
     void on_volumeSlider_valueChanged(int value);
     void on_fixedScaleComboBox_currentIndexChanged(int index);
     void on_smoothingNearestRadioButton_toggled(bool checked);
-    void on_smoothingSharpRadioButton_toggled(bool checked);
     void on_smoothingBilinearRadioButton_toggled(bool checked);
+    void on_smoothingSharpRadioButton_toggled(bool checked);
+    void on_smoothingCustomRadioButton_toggled(bool checked);
+    void on_shaderComboBox_currentIndexChanged(int index);
 
 private:
     Ui::SettingsDialog *ui;

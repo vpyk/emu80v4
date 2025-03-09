@@ -121,7 +121,8 @@ enum EmuWindowType {
 enum SmoothingType {
     ST_NEAREST,
     ST_BILINEAR,
-    ST_SHARP
+    ST_SHARP,
+    ST_CUSTOM
 };
 
 struct PlatformInfo

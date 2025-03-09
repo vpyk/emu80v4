@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ EmuWindow::EmuWindow()
     m_params.width = m_defWindowWidth;
     m_params.height = m_defWindowHeight;
     m_params.title = "";
-    m_params.vsync = g_emulation->getVsync();
+    //m_params.vsync = g_emulation->getVsync();
     m_params.smoothing = ST_SHARP;
 
     applyParams();
@@ -549,7 +549,11 @@ void EmuWindow::sysReq(SysReq sr)
                     setSmoothing(ST_BILINEAR);
                     break;
                 case ST_BILINEAR:
+                    setSmoothing(m_shader == "none" ? ST_NEAREST : ST_CUSTOM);
+                    break;
+                case ST_CUSTOM:
                     setSmoothing(ST_NEAREST);
+                    break;
             }
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
@@ -686,13 +690,23 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
         if (values[0].asString() == "nearest") {
             setSmoothing(ST_NEAREST);
             return true;
-        } else if (values[0].asString() == "bilinear") {
-            setSmoothing(ST_BILINEAR);
-            return true;
         } else if (values[0].asString() == "sharp") {
             setSmoothing(ST_SHARP);
             return true;
+        } else if (values[0].asString() == "bilinear") {
+            setSmoothing(ST_BILINEAR);
+            return true;
+        } else if (values[0].asString() == "custom") {
+            setSmoothing(ST_CUSTOM);
+            return true;
         }
+    } else if (propertyName == "shader") {
+        m_shader = values[0].asString();
+        if (m_shader.empty())
+            m_shader = "none";
+        m_params.shader = m_shader;
+        applyParams();
+        return true;
     } else if (propertyName == "fullscreen") {
         if (values[0].asString() == "yes") {
             setFullScreen(true);
@@ -802,11 +816,15 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
         switch (m_smoothing) {
             case ST_NEAREST:
                 return "nearest";
-            case ST_BILINEAR:
-                return "bilinear";
             case ST_SHARP:
                 return "sharp";
+            case ST_BILINEAR:
+                return "bilinear";
+            case ST_CUSTOM:
+                return "custom";
         }
+    } else if (propertyName == "shader") {
+        return m_shader;
     } else if (propertyName == "aspectCorrection") {
         return m_aspectCorrection ? "yes" : "no";
     } else if (propertyName == "squarePixels") {

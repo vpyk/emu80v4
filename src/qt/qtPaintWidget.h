@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void screenshot(const QString& ssFileName);
         void setHideCursor(bool hide);
 
-        void setSmoothing(SmoothingType smoothing) {m_smoothing = smoothing;}
+        void setSmoothingAndShaderFile(SmoothingType smoothing, const QString& shaderFileName);
         //void setVsync(bool vsync);
 
         int getImageWidth() {return m_dstRect.width();}
@@ -56,7 +56,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void wheelEvent(QWheelEvent *event) override;
 
         void initializeGL() override;
-        void resizeGL(int w, int h) override;
+        //void resizeGL(int w, int h) override;
         void paintGL() override;
 
     private slots:
@@ -66,6 +66,19 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void paintImageGL(QImage* img/*, double aspectRatio*/);
 
         void mouseDrag(int x, int y);
+
+        bool m_useCustomShader = false;
+        QString m_shaderFileName;
+        bool m_needToRecreateProgram = true;
+        bool m_shaderValid = false;
+
+        QOpenGLShader* m_standardVShader = nullptr;
+        QOpenGLShader* m_standardFShader = nullptr;
+        QOpenGLShader* m_customVShader = nullptr;
+        QOpenGLShader* m_customFShader = nullptr;
+
+        void recreateProgramIfNeeded();
+        bool createProgram(QOpenGLShader* vShader, QOpenGLShader* fShader);
 
         QImage* m_image = nullptr;
         QImage* m_image2 = nullptr;
@@ -84,7 +97,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         QTimer m_hideCursorTimer;
         bool m_cursorHidden = false;
 
-        QOpenGLShaderProgram* m_program;
+        QOpenGLShaderProgram* m_program = nullptr;
         QOpenGLBuffer m_vbo;
 
         QOpenGLTexture* m_texture = nullptr;
@@ -95,6 +108,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
            -1.0,  1.0,  0.0, 0.0,
             1.0,  1.0,  1.0, 0.0
         };
+
+        QMatrix4x4 m_mvpMatrix;
 };
 
 

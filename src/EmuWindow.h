@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -125,6 +125,7 @@ class EmuWindow : public EmuObject, public PalWindow
         WindowStyle m_windowStyle = WS_AUTOSIZE;
         SmoothingType m_smoothing = ST_SHARP;
         double m_scaleY;
+        std::string m_shader = "none";
 
         int m_curImgWidth = 0;
         int m_curImgHeight = 0;

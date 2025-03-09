@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>530</width>
-    <height>527</height>
+    <width>547</width>
+    <height>557</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -1183,7 +1183,7 @@
        <item>
         <widget class="QGroupBox" name="smoothingGroupBox">
          <property name="title">
-          <string>Smoothing</string>
+          <string>Smoothing / post-processing</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_20">
           <item>
@@ -1207,6 +1207,33 @@
             </property>
            </widget>
           </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_15">
+            <item>
+             <widget class="QRadioButton" name="smoothingCustomRadioButton">
+              <property name="text">
+               <string>Custom shader:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="shaderComboBox"/>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_16">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1228,6 +1255,9 @@
         <spacer name="verticalSpacer_6">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1636,6 +1666,8 @@
   <tabstop>smoothingNearestRadioButton</tabstop>
   <tabstop>smoothingSharpRadioButton</tabstop>
   <tabstop>smoothingBilinearRadioButton</tabstop>
+  <tabstop>smoothingCustomRadioButton</tabstop>
+  <tabstop>shaderComboBox</tabstop>
   <tabstop>altFontCheckBox</tabstop>
   <tabstop>cropCheckBox</tabstop>
   <tabstop>wavChannelComboBox</tabstop>
