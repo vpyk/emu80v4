@@ -325,16 +325,22 @@ void Pk8000Renderer::renderLine(int nLine)
     int row = nLine / 8;
     int line = nLine % 8;
 
+    uint8_t bt;
+
     switch (m_mode) {
     case 0:
         for (int pos = 0; pos < 40; pos++) {
             uint8_t chr = m_screenMemoryBanks[m_bank][(m_txtBase & ~0x0400) + row * 64 + pos];
-            uint8_t bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
+            bt = m_screenMemoryBanks[m_bank][m_sgBase + chr * 8 + line];
             for (int i = 0; i < 6; i++) {
                 uint32_t color = (bt & 0x80 ? m_fgScanlinePixels : m_bgScanlinePixels)[59 + m_offsetX + pos * 6 + i];
                 *linePtr++ = color;
                 bt <<= 1;
             }
+        }
+        if (m_showBorder) {
+            *linePtr++ = (bt & 0x80 ? m_fgScanlinePixels : m_bgScanlinePixels)[59 + m_offsetX + 39 * 6 + 1];
+            *linePtr++ = (bt & 0x40 ? m_fgScanlinePixels : m_bgScanlinePixels)[59 + m_offsetX + 39 * 6 + 2];
         }
         break;
     case 1:
@@ -404,7 +410,7 @@ void Pk8000Renderer::prepareFrame()
         m_sizeY = 192;
         m_aspectRatio = 576.0 * 9 / 704 / 5;
     } else {
-        m_offsetX = (m_mode == 0) ? 21 : 5;
+        m_offsetX = (m_mode == 0) ? 19 : 5;
         m_sizeX = 261;
         m_sizeY = 288;
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
