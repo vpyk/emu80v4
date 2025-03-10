@@ -141,6 +141,8 @@ const char* fShaderSrc = R"(
         varying highp vec2 vTexCoord;
         varying highp vec2 prescale;
 
+        precision highp float;
+
         float toGrayscale(highp vec3 rgb)
         {
             float r, g, b;
