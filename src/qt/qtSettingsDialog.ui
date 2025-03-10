@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>547</width>
-    <height>583</height>
+    <height>609</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1248,6 +1248,13 @@
             </item>
            </layout>
           </item>
+          <item>
+           <widget class="QCheckBox" name="desaturateCheckBox">
+            <property name="text">
+             <string>Desaturate</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1684,6 +1691,7 @@
   <tabstop>smoothingBilinearRadioButton</tabstop>
   <tabstop>smoothingCustomRadioButton</tabstop>
   <tabstop>shaderComboBox</tabstop>
+  <tabstop>desaturateCheckBox</tabstop>
   <tabstop>altFontCheckBox</tabstop>
   <tabstop>cropCheckBox</tabstop>
   <tabstop>wavChannelComboBox</tabstop>

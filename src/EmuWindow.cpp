@@ -783,9 +783,21 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
     } else if (propertyName == "grayBackground") {
         if (values[0].asString() == "no") {
             m_params.grayBackground = false;
+            //applyParams();
             return true;
         } else if (values[0].asString() == "yes") {
             m_params.grayBackground = true;
+            //applyParams();
+            return true;
+        }
+    } else if (propertyName == "desaturate") {
+        if (values[0].asString() == "no") {
+            m_params.desaturate = false;
+            applyParams();
+            return true;
+        } else if (values[0].asString() == "yes") {
+            m_params.desaturate = true;
+            applyParams();
             return true;
         }
     }
@@ -892,6 +904,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
         return res;
     } else if (propertyName == "grayBackground") {
         return m_params.grayBackground ? "yes" : "no";
+    } else if (propertyName == "desaturate") {
+        return m_params.desaturate ? "yes" : "no";
     }
 
     return "";

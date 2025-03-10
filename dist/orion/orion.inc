@@ -28,6 +28,9 @@ window.smoothing = sharp
 # Custom image shader: "shader name" or none (default = none)
 #window.shader = crt-hyllian
 
+# Convert image to grayscale
+#window.desaturate = yes
+
 # Aspect correction (default = no)
 window.aspectCorrection = no
 #window.aspectCorrection = yes

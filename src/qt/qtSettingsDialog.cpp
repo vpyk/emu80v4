@@ -150,6 +150,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("window.defaultWindowWidth");
     loadRunningConfigValue("window.defaultWindowHeight");
     loadRunningConfigValue("window.grayBackground");
+    loadRunningConfigValue("window.desaturate");
     loadRunningConfigValue("cpu.debugOnHalt");
     loadRunningConfigValue("cpu.debugOnIllegalCmd");
     loadRunningConfigValue("crtRenderer.colorMode");
@@ -388,6 +389,10 @@ void SettingsDialog::fillControlValues()
     // Gray background
     val = m_options["window.grayBackground"];
     ui->grayBackgroundCheckBox->setChecked(val == "yes");
+
+    // Desaturate
+    val = m_options["window.desaturate"];
+    ui->desaturateCheckBox->setChecked(val == "yes");
 
     // Debug on HLT
     val = m_options["cpu.debugOnHalt"];
@@ -823,6 +828,8 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     m_options["window.grayBackground"] = ui->grayBackgroundCheckBox->isChecked() ? "yes" : "no";
 
+    m_options["window.desaturate"] = ui->desaturateCheckBox->isChecked() ? "yes" : "no";
+
     m_options["crtRenderer.visibleArea"] = ui->cropCheckBox->isChecked() ? "yes" : "no";
 
     m_options["cpu.debugOnHalt"] = ui->debugHltCheckBox->isChecked() ? "yes" : "no";
@@ -1104,6 +1111,7 @@ void SettingsDialog::on_smoothingCustomRadioButton_toggled(bool checked)
 {
     if (checked)
         adjustPresetComboBoxState();
+    ui->desaturateCheckBox->setEnabled(!checked);
 }
 
 void SettingsDialog::on_shaderComboBox_currentIndexChanged(int index)

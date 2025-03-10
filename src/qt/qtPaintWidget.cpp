@@ -136,9 +136,23 @@ const char* fShaderSrc = R"(
         uniform sampler2D texture1;
         uniform highp vec2 TextureSize;
         uniform bool sharp;
+        uniform bool grayscale;
 
         varying highp vec2 vTexCoord;
         varying highp vec2 prescale;
+
+        float toGrayscale(highp vec3 rgb)
+        {
+            float r, g, b;
+            if (rgb.r <= 0.04045) r = rgb.r / 12.92; else r = pow(((rgb.r + 0.055)/1.055), 2.4);
+            if (rgb.g <= 0.04045) g = rgb.g / 12.92; else g = pow(((rgb.g + 0.055)/1.055), 2.4);
+            if (rgb.b <= 0.04045) b = rgb.b / 12.92; else b = pow(((rgb.b + 0.055)/1.055), 2.4);
+            float y = 0.212655 * r + 0.715158 * g + 0.072187 * b;
+            if (y <= 0.0031308)
+                return y * 12.92;
+            else
+                return 1.055 * pow(y, 1.0/2.4) - 0.055;
+        }
 
         void main()
         {
@@ -155,6 +169,8 @@ const char* fShaderSrc = R"(
                 gl_FragColor = texture2D(texture1, mod_texel / TextureSize);
             } else
                 gl_FragColor = texture2D(texture1, vTexCoord / TextureSize);
+            if (grayscale)
+                gl_FragColor = vec4(vec3(toGrayscale(gl_FragColor.rgb)), gl_FragColor.a);
         })";
 
 
@@ -234,6 +250,8 @@ void PaintWidget::paintImageGL(QImage* img/*, double aspectRatio*/)
     if (!m_useCustomShader) {
         m_program->setUniformValue("sharp", m_smoothing == ST_SHARP);
     }
+
+    m_program->setUniformValue("grayscale", m_desaturate);
 
     QOpenGLTexture* texture = new QOpenGLTexture(*img, QOpenGLTexture::DontGenerateMipMaps);
     texture->setMagnificationFilter(m_smoothing != ST_NEAREST ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest);

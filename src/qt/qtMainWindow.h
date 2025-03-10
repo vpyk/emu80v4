@@ -165,6 +165,7 @@ private slots:
     void onSmoothing();
     void onSmoothingSelect();
     void onShaderSelect();
+    void onDesaturate();
     void onPlatform();
     void onPlatformConfig();
     void onPlatformSelect();
@@ -415,6 +416,7 @@ private:
     QAction* m_smoothingBilinearAction;
     QAction* m_smoothingShaderAction;
     QAction* m_smoothingSharpAction;
+    QAction* m_desaturateAction;
     QAction* m_presetAction;
     QAction* m_preset1xAction;
     QAction* m_preset2xAction;

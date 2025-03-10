@@ -34,6 +34,7 @@ PalWindow::PalWindow()
     m_params.visible = m_prevParams.visible = false;
     m_params.title = m_prevParams.title = "";
     m_params.grayBackground = m_prevParams.grayBackground = false;
+    m_params.desaturate = m_prevParams.desaturate = false;
 }
 
 
@@ -117,6 +118,9 @@ void PalWindow::applyParams()
     if (m_params.smoothing != m_prevParams.smoothing || m_params.shader != m_prevParams.shader)
         m_qtWindow->setSmoothingAndShader(m_params.smoothing, m_params.shader);
 
+    if (m_params.desaturate != m_prevParams.desaturate)
+        m_qtWindow->getPaintWidget()->setDesaturate(m_params.desaturate);
+
     if (m_params.visible != m_prevParams.visible)
         m_params.visible ? m_qtWindow->showWindow() : m_qtWindow->hideWindow();
 
@@ -124,6 +128,8 @@ void PalWindow::applyParams()
     m_prevParams.title = m_params.title;
     m_prevParams.visible = m_params.visible;
     m_prevParams.smoothing = m_params.smoothing;
+    m_prevParams.shader = m_params.shader;
+    m_prevParams.desaturate = m_params.desaturate;
     //m_prevParams.vsync = m_params.vsync;
     if (m_params.style != PWS_FULLSCREEN) {
         m_prevParams.width = m_params.width;

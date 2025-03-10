@@ -47,6 +47,7 @@ class PalWindow
         std::string title;
         std::string shader;
         bool grayBackground;
+        bool desaturate;
     };
 
         PalWindow();

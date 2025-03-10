@@ -40,6 +40,7 @@ PalWindow::PalWindow()
     m_params.visible = m_prevParams.visible = false;
     m_params.title = m_prevParams.title = "";
     m_params.grayBackground = m_prevParams.grayBackground = false;
+    m_params.desaturate = m_prevParams.desaturate = false;
 
     m_lastX = SDL_WINDOWPOS_UNDEFINED;
     m_lastY = SDL_WINDOWPOS_UNDEFINED;
@@ -328,6 +329,9 @@ void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, d
     int sharpLocation = glGetUniformLocation(m_program, "sharp");
     glUniform1i(sharpLocation, m_params.smoothing == ST_SHARP);
 
+    int desaturateLocation = glGetUniformLocation(m_program, "grayscale");
+    glUniform1i(desaturateLocation, m_params.desaturate);
+
     int texSizeLocation = glGetUniformLocation(m_program, "TextureSize");
     glUniform2f(texSizeLocation, float(imageWidth), float(imageHeight));
 
@@ -480,7 +484,7 @@ void PalWindow::createGlContext()
     return;
 }
 
-
+#include <iostream>
 void PalWindow::recreateProgramIfNeeded()
 {
     if (!m_needToRecreateProgram)

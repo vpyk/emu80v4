@@ -1315,7 +1315,7 @@ void MainWindow::createActions()
     settingsMenu->addAction(m_wideScreenAction);
 
     // Smoothing
-    m_smoothingMenu = new QMenu(tr("Smoothing"), this);
+    m_smoothingMenu = new QMenu(tr("Smoothing / postprocessing"), this);
     QActionGroup* smoothingGroup = new QActionGroup(m_smoothingMenu);
 
     m_smoothingNearestAction = new QAction(m_smoothingNearestIcon, tr("Nearest"), this);
@@ -1345,6 +1345,13 @@ void MainWindow::createActions()
     m_smoothingMenu->addAction(m_smoothingShaderAction);
     smoothingGroup->addAction(m_smoothingShaderAction);
     connect(m_smoothingShaderAction, SIGNAL(triggered()), this, SLOT(onSmoothingSelect()));
+
+    m_smoothingMenu->addSeparator();
+
+    m_desaturateAction = new QAction(/*m_desaturateIcon,*/ tr("Desaturate"), this);
+    m_desaturateAction->setCheckable(true);
+    m_smoothingMenu->addAction(m_desaturateAction);
+    connect(m_desaturateAction, SIGNAL(triggered()), this, SLOT(onDesaturate()));
 
     m_smoothingMenu->setIcon(QIcon(":/icons/smooth.png"));
     m_smoothingAction = m_smoothingMenu->menuAction();
@@ -2814,6 +2821,14 @@ void MainWindow::onShaderSelect()
 }
 
 
+void MainWindow::onDesaturate()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".window", "desaturate", m_desaturateAction->isChecked() ? "yes" : "no");
+    updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onPlatformSelect()
 {
     QAction* action = (QAction*)sender();
@@ -3449,17 +3464,21 @@ void MainWindow::updateActions()
         m_smoothingNearestAction->setChecked(true);
         m_smoothingMenu->setIcon(m_smoothingNearestIcon);
         m_shaderListMenu->menuAction()->setChecked(false);
+        m_desaturateAction->setEnabled(true);
     } else if (val == "bilinear") {
         m_smoothingBilinearAction->setChecked(true);
         m_smoothingMenu->setIcon(m_smoothingBilinearIcon);
         m_shaderListMenu->menuAction()->setChecked(false);
+        m_desaturateAction->setEnabled(true);
     } else if (val == "sharp") {
         m_smoothingSharpAction->setChecked(true);
         m_smoothingMenu->setIcon(m_smoothingSharpIcon);
         m_shaderListMenu->menuAction()->setChecked(false);
+        m_desaturateAction->setEnabled(true);
     } else if (val == "custom") {
         m_smoothingShaderAction->setChecked(true);
         m_smoothingMenu->setIcon(m_shaderIcon);
+        m_desaturateAction->setEnabled(false);
     } else
         m_smoothingMenu->setVisible(false);
 
@@ -3475,6 +3494,9 @@ void MainWindow::updateActions()
         m_smoothingShaderAction->setText(tr("Shader"));
         m_smoothingShaderAction->setEnabled(false);
     }
+
+    val = emuGetPropertyValue(platform + "window", "desaturate");
+    m_desaturateAction->setChecked(val == "yes");
 
     val = emuGetPropertyValue(platform + "tapeGrp", "enabled");
     if (val == "")

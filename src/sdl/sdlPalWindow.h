@@ -47,7 +47,8 @@ class PalWindow
         int height;
         std::string title;
         std::string shader;
-        bool grayBackground = true;
+        bool grayBackground;
+        bool desaturate;
     };
 
         PalWindow();
@@ -168,9 +169,23 @@ class PalWindow
          R"(uniform sampler2D texture1;
             uniform vec2 TextureSize;
             uniform bool sharp;
+            uniform bool grayscale;
 
             varying vec2 vTexCoord;
             varying vec2 prescale;
+
+            float toGrayscale(vec3 rgb)
+            {
+                float r, g, b;
+                if (rgb.r <= 0.04045) r = rgb.r / 12.92; else r = pow(((rgb.r + 0.055)/1.055), 2.4);
+                if (rgb.g <= 0.04045) g = rgb.g / 12.92; else g = pow(((rgb.g + 0.055)/1.055), 2.4);
+                if (rgb.b <= 0.04045) b = rgb.b / 12.92; else b = pow(((rgb.b + 0.055)/1.055), 2.4);
+                float y = 0.212655 * r + 0.715158 * g + 0.072187 * b;
+                if (y <= 0.0031308)
+                    return y * 12.92;
+                else
+                    return 1.055 * pow(y, 1.0/2.4) - 0.055;
+            }
 
             void main()
             {
@@ -187,6 +202,8 @@ class PalWindow
                     gl_FragColor = texture2D(texture1, mod_texel / TextureSize);
                 } else
                     gl_FragColor = texture2D(texture1, (vTexCoord + 0.002) / TextureSize);
+                if (grayscale)
+                    gl_FragColor = vec4(vec3(toGrayscale(gl_FragColor.rgb)), gl_FragColor.a);
             })";
 
 };

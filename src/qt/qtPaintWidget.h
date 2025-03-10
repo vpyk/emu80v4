@@ -44,6 +44,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void setHideCursor(bool hide);
 
         void setSmoothingAndShaderFile(SmoothingType smoothing, const QString& shaderFileName);
+        void setDesaturate(bool desaturate) {m_desaturate = desaturate;}
         //void setVsync(bool vsync);
 
         int getImageWidth() {return m_dstRect.width();}
@@ -92,6 +93,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         QRect m_dstRect;
 
         SmoothingType m_smoothing = ST_SHARP;
+        bool m_desaturate = false;
 
         bool m_hideCursor = true;
         QTimer m_hideCursorTimer;
