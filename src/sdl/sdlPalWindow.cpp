@@ -39,6 +39,7 @@ PalWindow::PalWindow()
     m_params.height = m_prevParams.height = 600;
     m_params.visible = m_prevParams.visible = false;
     m_params.title = m_prevParams.title = "";
+    m_params.grayBackground = m_prevParams.grayBackground = false;
 
     m_lastX = SDL_WINDOWPOS_UNDEFINED;
     m_lastY = SDL_WINDOWPOS_UNDEFINED;

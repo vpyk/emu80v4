@@ -149,6 +149,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("window.fieldsMixing");
     loadRunningConfigValue("window.defaultWindowWidth");
     loadRunningConfigValue("window.defaultWindowHeight");
+    loadRunningConfigValue("window.grayBackground");
     loadRunningConfigValue("cpu.debugOnHalt");
     loadRunningConfigValue("cpu.debugOnIllegalCmd");
     loadRunningConfigValue("crtRenderer.colorMode");
@@ -383,6 +384,10 @@ void SettingsDialog::fillControlValues()
     // Screen format
     val = m_options["window.customScreenFormat"];
     ui->customFormatLineEdit->setText(val);
+
+    // Gray background
+    val = m_options["window.grayBackground"];
+    ui->grayBackgroundCheckBox->setChecked(val == "yes");
 
     // Debug on HLT
     val = m_options["cpu.debugOnHalt"];
@@ -815,6 +820,8 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["window.wideScreen"] = ui->wideComboBox->currentIndex() == 1 ? "yes" : ui->wideComboBox->currentIndex() == 2 ? "custom" : "no";
 
     m_options["window.customScreenFormat"] = ui->customFormatLineEdit->text();
+
+    m_options["window.grayBackground"] = ui->grayBackgroundCheckBox->isChecked() ? "yes" : "no";
 
     m_options["crtRenderer.visibleArea"] = ui->cropCheckBox->isChecked() ? "yes" : "no";
 

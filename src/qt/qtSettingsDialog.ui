@@ -924,6 +924,13 @@
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="grayBackgroundCheckBox">
+         <property name="text">
+          <string>Gray background</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1654,6 +1661,7 @@
   <tabstop>customFormatLineEdit</tabstop>
   <tabstop>adaptArRadioButton</tabstop>
   <tabstop>sqrArRadioButton</tabstop>
+  <tabstop>grayBackgroundCheckBox</tabstop>
   <tabstop>debugHltCheckBox</tabstop>
   <tabstop>debugIllegalCheckBox</tabstop>
   <tabstop>upper8080checkBox</tabstop>

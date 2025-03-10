@@ -47,6 +47,7 @@ class PalWindow
         int height;
         std::string title;
         std::string shader;
+        bool grayBackground = true;
     };
 
         PalWindow();

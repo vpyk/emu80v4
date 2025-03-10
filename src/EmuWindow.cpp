@@ -427,7 +427,7 @@ void EmuWindow::drawFrame(EmuPixelData frame)
         applyParams();
     }
 
-    drawFill(0x282828);
+    drawFill(m_params.grayBackground ? 0x282828 : 0);
 
     if (m_fieldsMixing != FM_INTERLACE && m_fieldsMixing != FM_SCANLINE && m_fieldsMixing != FM_MIX) {
         drawImage((uint32_t*)frame.pixelData, frame.width, frame.height, frame.aspectRatio, false, false);
@@ -780,6 +780,14 @@ bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& val
             setSquarePixels(true);
             return true;
         }
+    } else if (propertyName == "grayBackground") {
+        if (values[0].asString() == "no") {
+            m_params.grayBackground = false;
+            return true;
+        } else if (values[0].asString() == "yes") {
+            m_params.grayBackground = true;
+            return true;
+        }
     }
 
     return false;
@@ -882,6 +890,8 @@ string EmuWindow::getPropertyStringValue(const string& propertyName)
         stringStream << setprecision(4) << m_customScreenFormat;
         stringStream >> res;
         return res;
+    } else if (propertyName == "grayBackground") {
+        return m_params.grayBackground ? "yes" : "no";
     }
 
     return "";

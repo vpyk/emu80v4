@@ -33,6 +33,7 @@ PalWindow::PalWindow()
     m_params.height = m_prevParams.height = 0;
     m_params.visible = m_prevParams.visible = false;
     m_params.title = m_prevParams.title = "";
+    m_params.grayBackground = m_prevParams.grayBackground = false;
 }
 
 
