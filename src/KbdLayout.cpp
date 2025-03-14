@@ -68,9 +68,14 @@ void KbdLayout::processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeK
             emuKey = translateUnicodeKey(unicodeKey, keyCode != PK_NONE ? keyCode : m_lastPalKeyPressedCode, shift, lang, ctrl);
             if (emuKey == EK_NONE) {
                 emuKey = translateKey(keyCode);
-                if (emuKey == EK_SHIFT)
+                if (emuKey == EK_SHIFT) {
+                    if (!isPressed && m_shiftPressed && !m_shiftSet.empty()) {
+                        for (auto& k: m_shiftSet)
+                            kbd->processKey(k, false);
+                        m_shiftSet.clear();
+                    }
                     m_shiftPressed = isPressed;
-                else if (emuKey == EK_LANG)
+                } else if (emuKey == EK_LANG)
                     m_langPressed = isPressed;
                 else if (emuKey == EK_CTRL)
                     m_ctrlPressed = isPressed;
