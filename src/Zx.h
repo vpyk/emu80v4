@@ -29,6 +29,11 @@
 
 class GeneralSoundSource;
 
+enum ZxModel {
+    ZM_48k,
+    ZM_128k
+};
+
 class ZxRenderer : public CrtRenderer, public IActive
 {
     const uint32_t zxPalette[16] = {
@@ -66,7 +71,11 @@ public:
         bool m_colorMode = true;
         uint8_t m_borderColor = 0;
 
-        bool m_128kMode = false;
+        int m_lineChars = 56;
+        int m_linePixels = 448;
+        int m_visibleScanLine = 64;
+        int m_bottomBorderScanLine = 256;
+        int m_scanLines = 312;
 
         EmuOutput* m_intOutput = nullptr;
 
@@ -79,6 +88,8 @@ public:
 
         void advanceTo(uint64_t clocks);
         void drawLine(int line, int from, int to);
+
+        void setModel(ZxModel model);
 };
 
 
@@ -99,6 +110,8 @@ class ZxCore : public PlatformCore
         CrtRenderer* m_crtRenderer = nullptr;
         bool m_intReq = false;
         void setInt(int);
+
+        void setZxModel(ZxModel model);
 };
 
 
