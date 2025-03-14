@@ -74,7 +74,6 @@ bool ZxCore::setProperty(const string& propertyName, const EmuValuesList& values
         attachCrtRenderer(static_cast<ZxRenderer*>(g_emulation->findObject(values[0].asString())));
         return true;
     }
-
     return false;
 }
 
@@ -204,8 +203,8 @@ ZxRenderer::ZxRenderer()
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
 
-    m_fullFrame = new uint32_t[312 * 456];
-    memset(m_fullFrame, 0, 312 * 456 * sizeof(uint32_t));
+    m_fullFrame = new uint32_t[312 * 448];
+    memset(m_fullFrame, 0, 312 * 448 * sizeof(uint32_t));
 
     m_ticksPerByte = g_emulation->getFrequency() * 8 / 7000000;
 }
@@ -228,7 +227,7 @@ void ZxRenderer::renderFrame()
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
 
         for (int i = 0; i < 288; i++)
-            memcpy(m_pixelData + m_sizeX * i, m_fullFrame + (i + /*24*/m_visibleScanLine - 40) * m_linePixels - 50/*73*/, m_sizeX * 4);
+            memcpy(m_pixelData + m_sizeX * i, m_fullFrame + (i + 24) * 448 - 50/*73*/, m_sizeX * 4);
 
     } else {
         m_sizeX = 256;
@@ -236,7 +235,7 @@ void ZxRenderer::renderFrame()
         m_aspectRatio = 576.0 * 9 / 704 / 7;
 
         for (int i = 0; i < 192; i++)
-            memcpy(m_pixelData + m_sizeX * i, m_fullFrame + ((i + m_visibleScanLine) * m_linePixels), m_sizeX * 4);
+            memcpy(m_pixelData + m_sizeX * i, m_fullFrame + ((i + 64) * 448), m_sizeX * 4);
     }
 }
 
@@ -244,7 +243,7 @@ void ZxRenderer::renderFrame()
 void ZxRenderer::operate()
 {
     advanceTo(m_curClock + 2 * m_ticksPerByte);
-    m_curScanLine = (m_curScanLine + 1) % m_scanLines;
+    m_curScanLine = (m_curScanLine + 1) % 312;
 
     if (m_curScanLine == 0) {
         m_intOutput->setValue(true);
@@ -253,7 +252,7 @@ void ZxRenderer::operate()
         g_emulation->screenUpdateReq();
     }
 
-    m_curClock += m_ticksPerByte * m_lineChars;
+    m_curClock += m_ticksPerByte * 56;
 }
 
 
@@ -264,19 +263,19 @@ void ZxRenderer::advanceTo(uint64_t clocks)
     if (toFrameByte <= m_curFrameByte)
         return;
 
-    int scanLine = m_curFrameByte / m_lineChars;
-    int toByte = (toFrameByte + m_lineChars - 1) % m_lineChars;
-    int fromByte = m_curFrameByte % m_lineChars;
+    int scanLine = m_curFrameByte / 56;
+    int toByte = (toFrameByte + 55) % 56;
+    int fromByte = m_curFrameByte % 56;
 
     if (fromByte <= toByte)
         drawLine(scanLine, fromByte, toByte);
     else {
-        drawLine(scanLine, fromByte, m_lineChars - 1);
-        if (scanLine != m_scanLines - 1)
+        drawLine(scanLine, fromByte, 55);
+        if (scanLine != 311)
             drawLine(scanLine + 1, 0, toByte);
     }
 
-    m_curFrameByte = toFrameByte % (m_lineChars * m_scanLines);
+    m_curFrameByte = toFrameByte % (56 * 312);
 }
 
 
@@ -287,12 +286,12 @@ void ZxRenderer::drawLine(int scanLine, int fromByte, int toByte)
     uint32_t bgColor = 0;
 
     for (int col = fromByte; col <= toByte; col++) {
-        if (scanLine < m_visibleScanLine || scanLine >= m_bottomBorderScanLine || col >= 32) {
+        if (scanLine < 64 || scanLine >= 256 || col >= 32) {
             // border
             bt = 0;
             bgColor = zxPalette[m_borderColor];
         } else {
-            int row = scanLine - m_visibleScanLine;
+            int row = scanLine - 64;
             int addr = (((row & 0xC0) << 5) | ((row & 0x07) << 8) | ((row & 0x38) << 2)) + col;
             bt = m_screenMemory[m_screenPage][addr];
             uint8_t attr = m_screenMemory[m_screenPage][0x1800 + (row / 8 * 32) + col];
@@ -302,7 +301,7 @@ void ZxRenderer::drawLine(int scanLine, int fromByte, int toByte)
 
         for (int p = 0; p < 8; p++) {
             uint32_t color = (bt & 0x80) ? fgColor : bgColor;
-            m_fullFrame[scanLine * m_linePixels + col * 8 + p] = color;
+            m_fullFrame[scanLine * 448 + col * 8 + p] = color;
             bt <<= 1;
         }
     }
@@ -346,29 +345,6 @@ void ZxRenderer::toggleCropping()
 }
 
 
-void ZxRenderer::setModel(ZxModel model)
-{
-    switch (model) {
-    case ZM_48k:
-        m_lineChars = 56;
-        m_linePixels = 448;
-        m_scanLines = 312;
-        m_visibleScanLine = 64;
-        m_bottomBorderScanLine = 256;
-        break;
-    case ZM_128k:
-        m_lineChars = 57;
-        m_linePixels = 456;
-        m_scanLines = 311;
-        m_visibleScanLine = 63;
-        m_bottomBorderScanLine = 255;
-        break;
-    default:
-        break;
-    }
-}
-
-
 bool ZxRenderer::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (CrtRenderer::setProperty(propertyName, values))
@@ -387,13 +363,11 @@ bool ZxRenderer::setProperty(const string& propertyName, const EmuValuesList& va
             return true;
         }
     } else if (propertyName == "mode") {
-        if (values[0].asString() == "48k")
-            setModel(ZM_48k);
-        else if (values[0].asString() == "128k")
-            setModel(ZM_128k);
-        else
-            return false;
-        return true;
+        if (values[0].asString() == "128k" || values[0].asString() == "48k") {
+            m_128kMode = values[0].asString() == "128k";
+            return true;
+        }
+        return false;
     } else if (propertyName == "colorMode") {
         if (values[0].asString() == "mono")
             m_colorMode = false;
