@@ -21,6 +21,7 @@
 #include <QMouseEvent>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QFile>
 
 #include "qtPaintWidget.h"
 
