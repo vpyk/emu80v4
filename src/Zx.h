@@ -83,6 +83,8 @@ public:
         int m_curScanLine = 0;
         int m_curFrameByte = 0;
 
+        bool m_intActive = false;
+
         uint32_t* m_fullFrame = nullptr;
 
         void advanceTo(uint64_t clocks);
@@ -108,7 +110,7 @@ class ZxCore : public PlatformCore
     private:
         CrtRenderer* m_crtRenderer = nullptr;
         bool m_intReq = false;
-        void setInt(int);
+        void setInt(bool state);
 
         void setZxModel(ZxModel model);
 };

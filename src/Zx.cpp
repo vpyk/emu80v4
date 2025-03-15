@@ -40,10 +40,16 @@ void ZxCore::draw()
 }
 
 
-void ZxCore::setInt(int)
+void ZxCore::setInt(bool state)
 {
+    // todo: transfer to CPU implementation
+    m_intReq = state;
+
+    if (!state)
+        return;
+
     CpuZ80* cpu = static_cast<CpuZ80*>(m_platform->getCpu());
-    m_intReq = true;
+
     if (cpu->getInte()) {
         m_intReq = false;
         cpu->intRst(7);
@@ -243,13 +249,24 @@ void ZxRenderer::renderFrame()
 void ZxRenderer::operate()
 {
     advanceTo(m_curClock + 2 * m_ticksPerByte);
+
+    if (m_intActive) {
+        m_intActive = false;
+        m_intOutput->setValue(false);
+        m_curClock += m_ticksPerByte * (m_lineChars - 8);
+        return;
+    }
+
     m_curScanLine = (m_curScanLine + 1) % m_scanLines;
 
     if (m_curScanLine == 0) {
+        m_intActive = true;
         m_intOutput->setValue(true);
         m_curFrameClock = m_curClock;
+        m_curClock += m_ticksPerByte * 8;
         renderFrame();
         g_emulation->screenUpdateReq();
+        return;
     }
 
     m_curClock += m_ticksPerByte * m_lineChars;
