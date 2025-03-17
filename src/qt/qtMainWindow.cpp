@@ -494,8 +494,11 @@ void MainWindow::fillShaderListMenu()
     dir.setSorting(QDir::Name);
     QStringList shaderFiles = dir.entryList();
 
+    QActionGroup* shaderListGroup = new QActionGroup(m_shaderListMenu);
+
     QAction* action = new QAction(tr("Off"), m_shaderListMenu);
     m_shaderListMenu->addAction(action);
+    shaderListGroup->addAction(action);
     action->setData("none");
     action->setCheckable(true);
     m_shaderListMenu->addSeparator();
@@ -509,6 +512,7 @@ void MainWindow::fillShaderListMenu()
         action->setText(shaderName);
         action->setCheckable(true);
         m_shaderListMenu->addAction(action);
+        shaderListGroup->addAction(action);
         connect(action, SIGNAL(triggered()), this, SLOT(onShaderSelect()));
         m_shaderList.append(shaderName);
     }
