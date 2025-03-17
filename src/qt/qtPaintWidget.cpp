@@ -202,8 +202,10 @@ void PaintWidget::initializeGL()
 
     m_mvpMatrix.setToIdentity();
 
-    createProgram(m_standardVShader, m_standardFShader);
-    m_useCustomShader = false;
+    //createProgram(m_standardVShader, m_standardFShader);
+    //m_useCustomShader = false;
+
+    recreateProgramIfNeeded();
 }
 
 
@@ -275,8 +277,6 @@ void PaintWidget::paintImageGL(QImage* img/*, double aspectRatio*/)
 
 void PaintWidget::paintGL()
 {
-    recreateProgramIfNeeded();
-
     glClearColor(m_fillColor.red() / 255.0, m_fillColor.green() / 255.0, m_fillColor.blue() / 255.0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -314,13 +314,17 @@ void PaintWidget::setSmoothingAndShaderFile(SmoothingType smoothing, const QStri
 
     m_smoothing = smoothing;
     m_shaderFileName = shaderFileName;
+
+    recreateProgramIfNeeded();
 }
 
 
 void PaintWidget::recreateProgramIfNeeded()
 {
-    if (!m_needToRecreateProgram)
+    if (!m_needToRecreateProgram || !isValid())
         return;
+
+    makeCurrent();
 
     m_needToRecreateProgram = false;
 

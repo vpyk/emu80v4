@@ -484,7 +484,7 @@ void PalWindow::createGlContext()
     return;
 }
 
-#include <iostream>
+
 void PalWindow::recreateProgramIfNeeded()
 {
     if (!m_needToRecreateProgram)
