@@ -117,14 +117,17 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
 
 
 const char* vShaderSrc = R"(
-        attribute highp vec2 VertexCoord;
-        attribute highp vec2 TexCoord;
+#ifdef GL_ES
+precision mediump float;
+#endif
+        attribute vec2 VertexCoord;
+        attribute vec2 TexCoord;
 
-        varying highp vec2 vTexCoord;
+        varying vec2 vTexCoord;
         varying vec2 prescale;
 
-        uniform highp vec2 TextureSize;
-        uniform highp vec2 OutputSize;
+        uniform vec2 TextureSize;
+        uniform vec2 OutputSize;
 
         void main()
         {
@@ -134,17 +137,19 @@ const char* vShaderSrc = R"(
         })";
 
 const char* fShaderSrc = R"(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
         uniform sampler2D texture1;
-        uniform highp vec2 TextureSize;
+        uniform vec2 TextureSize;
         uniform bool sharp;
         uniform bool grayscale;
 
-        varying highp vec2 vTexCoord;
-        varying highp vec2 prescale;
+        varying vec2 vTexCoord;
+        varying vec2 prescale;
 
-        precision highp float;
-
-        float toGrayscale(highp vec3 rgb)
+        float toGrayscale(vec3 rgb)
         {
             float r, g, b;
             if (rgb.r <= 0.04045) r = rgb.r / 12.92; else r = pow(((rgb.r + 0.055)/1.055), 2.4);
@@ -160,18 +165,18 @@ const char* fShaderSrc = R"(
         void main()
         {
             if (sharp) {
-                const mediump vec2 halfp = vec2(0.5);
-                highp vec2 texel_floored = floor(vTexCoord);
-                highp vec2 s = fract(vTexCoord);
-                highp vec2 region_range = halfp - halfp / prescale;
+                const vec2 halfp = vec2(0.5);
+                vec2 texel_floored = floor(vTexCoord);
+                vec2 s = fract(vTexCoord);
+                vec2 region_range = halfp - halfp / prescale;
 
-                highp vec2 center_dist = s - halfp;
-                highp vec2 f = (center_dist - clamp(center_dist, -region_range, region_range)) * prescale + halfp;
+                vec2 center_dist = s - halfp;
+                vec2 f = (center_dist - clamp(center_dist, -region_range, region_range)) * prescale + halfp;
 
-                highp vec2 mod_texel = min(texel_floored + f, TextureSize - halfp);
+                vec2 mod_texel = min(texel_floored + f, TextureSize - halfp);
                 gl_FragColor = texture2D(texture1, mod_texel / TextureSize);
             } else
-                gl_FragColor = texture2D(texture1, vTexCoord / TextureSize);
+                gl_FragColor = texture2D(texture1, ((vTexCoord + 0.002) / TextureSize));
             if (grayscale)
                 gl_FragColor = vec4(vec3(toGrayscale(gl_FragColor.rgb)), gl_FragColor.a);
         })";

@@ -190,7 +190,7 @@ class PalWindow
             void main()
             {
                 if (sharp) {
-                    const /*mediump*/ vec2 halfp = vec2(0.5);
+                    const vec2 halfp = vec2(0.5);
                     vec2 texel_floored = floor(vTexCoord);
                     vec2 s = fract(vTexCoord);
                     vec2 region_range = halfp - halfp / prescale;
