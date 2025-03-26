@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>176</height>
+    <width>413</width>
+    <height>198</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -108,6 +108,13 @@
          </property>
          <property name="openExternalLinks">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sysinfoLabel">
+         <property name="text">
+          <string notr="true">sysinfo</string>
          </property>
         </widget>
        </item>

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,5 +39,6 @@ AboutDialog::~AboutDialog()
 void AboutDialog::execute()
 {
     ui->nameLabel->setText("Emu80 v. " VERSION);
+    ui->sysinfoLabel->setText("Qt " QT_VERSION_STR " / " + QSysInfo::kernelType() + " / " + QSysInfo::buildCpuArchitecture() + " / " + QGuiApplication::platformName());
     exec();
 }
