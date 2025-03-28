@@ -281,7 +281,7 @@ void MainWindow::showWindow()
         // workaround for X Window and Wayland
         // wait for window to show
         if (QGuiApplication::platformName() == "xcb" || QGuiApplication::platformName() == "wayland")
-            for (int i = 0 ; i < 10 ; i++)
+            for (int i = 0 ; i < 60 ; i++)
                 qApp->processEvents();
 #endif
 
