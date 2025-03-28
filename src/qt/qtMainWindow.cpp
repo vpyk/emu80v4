@@ -280,8 +280,9 @@ void MainWindow::showWindow()
 #ifdef Q_OS_UNIX
         // workaround for X Window
         // wait for window to show
-        for (int i = 0 ; i < 10 ; i++)
-            qApp->processEvents();
+        if (QGuiApplication::platformName() == "xcb")
+            for (int i = 0 ; i < 10 ; i++)
+                qApp->processEvents();
 #endif
 
         if (m_windowType == EWT_EMULATION) {
@@ -329,7 +330,8 @@ void MainWindow::showWindow()
 
             if (top != prevTop && left != prevLeft) {
 #ifdef Q_OS_UNIX
-                move(-1000, -1000); // workaround for X Window
+                if (QGuiApplication::platformName() == "xcb")
+                    move(-1000, -1000); // workaround for X Window
 #endif
                 move(left, top);
             }
@@ -338,7 +340,8 @@ void MainWindow::showWindow()
         //int top = frameGeometry().top();
         //int left = frameGeometry().left();
 #ifdef Q_OS_UNIX
-        move(-1000, -1000); // workaround for X Window
+        if (QGuiApplication::platformName() == "xcb")
+            move(-1000, -1000); // workaround for X Window
 #endif
         show();
         //move(left, top);
@@ -381,12 +384,14 @@ void MainWindow::setFullScreen(bool fullscreen)
 #ifdef Q_OS_UNIX
         // workaround for X Window
         // wait for window to show
-        for (int i = 0 ; i < 20 ; i++)
-            qApp->processEvents();
-        if (pos() != m_savedWindowPos)
-            move(m_savedWindowPos);
-        if (size() != m_savedWindowSize)
-            resize(m_savedWindowSize);
+        if (QGuiApplication::platformName() == "xcb") {
+            for (int i = 0 ; i < 20 ; i++)
+                qApp->processEvents();
+            if (pos() != m_savedWindowPos)
+                move(m_savedWindowPos);
+            if (size() != m_savedWindowSize)
+                resize(m_savedWindowSize);
+        }
 #endif
     }
     m_fullscreenMode = fullscreen;
