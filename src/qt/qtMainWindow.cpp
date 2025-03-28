@@ -278,9 +278,9 @@ void MainWindow::showWindow()
 
         show();
 #ifdef Q_OS_UNIX
-        // workaround for X Window
+        // workaround for X Window and Wayland
         // wait for window to show
-        if (QGuiApplication::platformName() == "xcb")
+        if (QGuiApplication::platformName() == "xcb" || QGuiApplication::platformName() == "wayland")
             for (int i = 0 ; i < 10 ; i++)
                 qApp->processEvents();
 #endif
