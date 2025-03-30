@@ -86,8 +86,10 @@ MainWindow::~MainWindow()
 void MainWindow::setPalWindow(PalWindow* palWindow)
 {
     if (!palWindow) {
-        if (m_windowType == EWT_EMULATION)
+        if (m_windowType == EWT_EMULATION) {
             savePosition();
+            m_disableResizing = true;
+        }
 
         m_windowType = EWT_UNDEFINED;
         m_platformName = "";
@@ -178,6 +180,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         m_settingsDialog->initConfig();
         updateConfig(); // немного избыточно
 
+        m_disableResizing = false;
+
         {
             bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
             if (resizable) {
@@ -205,6 +209,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         createDebugActions();
         getPaintWidget()->setHideCursor(false);
         //getPaintWidget()->setVsync(false);
+
+        m_disableResizing = false;
         break;
     default:
         break;
@@ -236,7 +242,7 @@ void MainWindow::setClientSize(int width, int height)
             }
         } else
             if (!preserveSize)
-            savePosition();
+                savePosition();
     }
 
     m_clientWidth = width;
@@ -248,6 +254,9 @@ void MainWindow::setClientSize(int width, int height)
 
 void MainWindow::adjustClientSize()
 {
+    if (m_disableResizing)
+        return;
+
     bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
 
     if (resizable || m_fullscreenMode) {
@@ -261,10 +270,22 @@ void MainWindow::adjustClientSize()
     } else {
         m_paintWidget->setFixedSize(m_clientWidth, m_clientHeight);
         layout()->setSizeConstraint(QLayout::SetFixedSize);
+        adjustSize();
     }
 
     if (m_statusBar)
         m_statusBar->setSizeGripEnabled(resizable);
+}
+
+
+void MainWindow::checkIfWindowIsVisible()
+{
+    if (!isVisible() && !m_disableResizing) {
+        adjustClientSize();
+        show();
+
+        HelpDialog::activate();
+    }
 }
 
 
@@ -276,15 +297,6 @@ void MainWindow::showWindow()
     if (m_showFirstTime) {
         m_showFirstTime = false;
 
-        show();
-#ifdef Q_OS_UNIX
-        // workaround for X Window and Wayland
-        // wait for window to show
-        if (QGuiApplication::platformName() == "xcb" || QGuiApplication::platformName() == "wayland")
-            for (int i = 0 ; i < 60 ; i++)
-                qApp->processEvents();
-#endif
-
         if (m_windowType == EWT_EMULATION) {
             // place main window, not debug one
             QSettings settings;
@@ -292,7 +304,8 @@ void MainWindow::showWindow()
             if (settings.contains("left") && settings.contains("top")) {
                 int left = settings.value("left").toInt();
                 int top = settings.value("top").toInt();
-                move(left, top);
+                if (left == 0) left = 16;
+                if (top == 0) top = 32;
                 bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
                 if (resizable && settings.contains("width") && settings.contains("height")) {
                     int width = settings.value("width").toInt();
@@ -304,6 +317,7 @@ void MainWindow::showWindow()
                     layout()->setSizeConstraint(QLayout::SetNoConstraint);
                     setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
                 }
+                setGeometry(left, top, geometry().width(), geometry().height());
             } else {
                 QRect screenRec = QGuiApplication::primaryScreen()->availableGeometry();
                 QRect frameRec = frameGeometry();
@@ -311,41 +325,23 @@ void MainWindow::showWindow()
             }
             settings.endGroup();
 
-            HelpDialog::activate();
         }
         else { //if (m_windowType == EWT_DEBUG) {
-            // place debug window within current screen rect
-            QRect rec = windowHandle()->screen()->availableGeometry();
-
-            int top = frameGeometry().top();
-            int left = frameGeometry().left();
-
-            int prevLeft = left;
-            int prevTop = top;
-
-            if (frameGeometry().bottom() > rec.bottom())
-                top = top + rec.bottom() - frameGeometry().bottom();
-            if (frameGeometry().right() > rec.right())
-                left = left + rec.right() - frameGeometry().right();
-
-            if (top != prevTop && left != prevLeft) {
-#ifdef Q_OS_UNIX
-                if (QGuiApplication::platformName() == "xcb")
-                    move(-1000, -1000); // workaround for X Window
-#endif
-                move(left, top);
-            }
+            show();
         }
     } else {
-        //int top = frameGeometry().top();
-        //int left = frameGeometry().left();
-#ifdef Q_OS_UNIX
-        if (QGuiApplication::platformName() == "xcb")
-            move(-1000, -1000); // workaround for X Window
-#endif
-        show();
-        //move(left, top);
-        move(m_hiddenWindowPos);
+        if (m_hiddenWindowGeometry != QRect(0, 0, 0, 0)) {
+            if (QGuiApplication::platformName() == "xcb") {
+                // workaround for X Window (KDE, LXDE and XFCE does not restore window pos after hiding)
+                setGeometry(m_hiddenWindowGeometry.adjusted(1, 0, 0, 0));
+                show();
+                setGeometry(m_hiddenWindowGeometry);
+            } else {
+                setGeometry(m_hiddenWindowGeometry);
+                show();
+            }
+        } else
+            show();
     }
 }
 
@@ -355,7 +351,7 @@ void MainWindow::MainWindow::hideWindow()
     if (!isVisible())
         return;
 
-    m_hiddenWindowPos = pos();
+    m_hiddenWindowGeometry = geometry();
     hide();
 }
 
@@ -370,29 +366,14 @@ void MainWindow::setFullScreen(bool fullscreen)
     if (m_toolBar)
         m_toolBar->setVisible(visible);
     if (fullscreen) {
-        m_savedWindowPos = pos();
-        if (m_savedWindowPos.x() < 0)
-            m_savedWindowPos.rx() = 0;
-        if (m_savedWindowPos.y() < 0)
-            m_savedWindowPos.ry() = 0;
-        m_savedWindowSize = size();
+        m_savedGeometry = geometry();
         layout()->setSizeConstraint(QLayout::SetNoConstraint);
         setFixedSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         showFullScreen();
     } else {
         showNormal();
-#ifdef Q_OS_UNIX
-        // workaround for X Window
-        // wait for window to show
-        if (QGuiApplication::platformName() == "xcb") {
-            for (int i = 0 ; i < 20 ; i++)
-                qApp->processEvents();
-            if (pos() != m_savedWindowPos)
-                move(m_savedWindowPos);
-            if (size() != m_savedWindowSize)
-                resize(m_savedWindowSize);
-        }
-#endif
+        if (m_savedGeometry != geometry())
+            setGeometry(m_savedGeometry);
     }
     m_fullscreenMode = fullscreen;
     adjustClientSize();
@@ -1857,7 +1838,7 @@ void MainWindow::onFpsTimer()
         fileName = emuGetPropertyValue(platform + "tapeOutFile", "currentFile");
         if (fileName != "")
             labelText = tr("Writing RK file:");
-         else {
+        else {
             fileName = emuGetPropertyValue(platform + "msxTapeInFile", "currentFile");
             if (fileName != "")
                 labelText = tr("Reading MSX file:");
@@ -2089,7 +2070,7 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
         return PK_F4;
     case Qt::Key_F5:
         return PK_F5;
-    case Qt::Key_F6:                       
+    case Qt::Key_F6:
         return PK_F6;
     case Qt::Key_F7:
         return PK_F7;
@@ -2152,7 +2133,7 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
     case Qt::Key_Menu:
         return PK_MENU;
 
-    /*case SDL_SCANCODE_RCTRL:
+        /*case SDL_SCANCODE_RCTRL:
         return PK_RCTRL;
     case SDL_SCANCODE_RSHIFT:
         return PK_RSHIFT;
@@ -3417,7 +3398,7 @@ void MainWindow::updateActions()
     } else
         noPreset = true;
 
-     if (noPreset) {
+    if (noPreset) {
         m_presetFitAction->setChecked(false);
         m_preset1xAction->setChecked(false);
         m_preset2xAction->setChecked(false);
@@ -3568,8 +3549,10 @@ void MainWindow::savePosition()
 
     QSettings settings;
     settings.beginGroup("window");
-    settings.setValue("left", x());
-    settings.setValue("top", y());
+    if (geometry().topLeft() != QPoint(0, 0)) { // don't save incorrect position
+        settings.setValue("left", geometry().x());
+        settings.setValue("top", geometry().y());
+    }
 
     bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
     if (resizable || m_settingsDialog->getOptionValue("preserveSize") != "yes") {

@@ -77,6 +77,8 @@ public:
     PalWindow* getPalWindow() {return m_windowType != EWT_UNDEFINED ? m_palWindow : nullptr;}
     void showWindow();
     void hideWindow();
+    void checkIfWindowIsVisible();
+
     void mouseClick(int x, int y, PalMouseKey key);
     void mouseDrag(int x, int y);
 
@@ -272,11 +274,11 @@ private:
     int m_clientWidth = 1;
     int m_clientHeight = 1;
 
+    bool m_disableResizing = true;
     bool m_showFirstTime = true;
-    QPoint m_hiddenWindowPos = {0, 0};
+    QRect m_hiddenWindowGeometry = {0, 0, 0, 0};
 
-    QPoint m_savedWindowPos = {0, 0};
-    QSize m_savedWindowSize = {0, 0};
+    QRect m_savedGeometry = {0, 0, 0, 0};
 
     SettingsDialog* m_settingsDialog = nullptr;
 

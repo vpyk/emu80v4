@@ -73,8 +73,8 @@ HelpDialog* HelpDialog::execute(QString helpFile, bool showHint)
     m_instance->ui->showNextTimeCheckBox->setVisible(showHint);
     m_instance->ui->hintLabel->setVisible(showHint);
 
-    m_instance->show();
-    m_instance->activateWindow();
+    //m_instance->show();
+    //m_instance->activateWindow();
 
     return m_instance;
 }
@@ -82,6 +82,8 @@ HelpDialog* HelpDialog::execute(QString helpFile, bool showHint)
 
 void HelpDialog::activate()
 {
-    if (m_instance)
+    if (m_instance) {
+        m_instance->show();
         m_instance->activateWindow();
+    }
 }

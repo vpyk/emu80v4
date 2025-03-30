@@ -147,6 +147,10 @@ void PalWindow::focusChanged(bool)
 
 void PalWindow::drawFill(uint32_t color)
 {
+    // drawFill is called before drowing, let this check be be here
+    if (m_qtWindow)
+        m_qtWindow->checkIfWindowIsVisible();
+
     uint8_t red = (color & 0xFF0000) >> 16;
     uint8_t green = (color & 0xFF00) >> 8;
     uint8_t blue = color & 0xFF;
