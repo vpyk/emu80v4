@@ -19,10 +19,17 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VER_STR "4.0.512"
-#define VER_COMMA_SEP 4,0,512,0
+#define XSTR(s) STR(s)
+#define STR(s) #s
 
-#define VI_FILE_DESCR "Emu80 executable"
+#define VER_MAJOR 4
+#define VER_MINOR 0
+#define VER_BUILD 512
+
+#define VER_STR XSTR(VER_MAJOR) "." XSTR(VER_MINOR) "." XSTR(VER_BUILD)
+#define VER_COMMA_SEP VER_MAJOR,VER_MINOR,VER_BUILD
+
+#define VI_FILE_DESCR "Emu80 emulator"
 #define VI_COPYRIGHT "Copyright © Viktor Pykhonin, 2016-2025"
 #define VI_FILE_NAME "Emu80qt.exe"
 #define VI_PRODUCT "Emu80"
