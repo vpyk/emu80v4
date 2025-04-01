@@ -39,6 +39,6 @@ AboutDialog::~AboutDialog()
 void AboutDialog::execute()
 {
     ui->nameLabel->setText("Emu80 v. " VERSION);
-    ui->sysinfoLabel->setText("Qt " QT_VERSION_STR " / " + QSysInfo::kernelType() + " / " + QSysInfo::buildCpuArchitecture() + " / " + QGuiApplication::platformName());
+    ui->sysinfoLabel->setText("Qt " QT_VERSION_STR " / " COMPILER " / " + QSysInfo::kernelType() + " / " + QSysInfo::buildCpuArchitecture() + " / " + QGuiApplication::platformName());
     exec();
 }
