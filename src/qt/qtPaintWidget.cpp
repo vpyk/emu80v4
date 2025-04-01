@@ -248,11 +248,10 @@ void PaintWidget::paintImageGL(QImage* img/*, double aspectRatio*/)
     if (!palWindow)
         return;
 
-    //palWindow->calcDstRect(img->width(), img->height(), aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
     palWindow->calcDstRect(m_image->width(), m_image->height(), m_img1aspectRatio, width(), height(), dstWidth, dstHeight, dstX, dstY);
-    m_dstRect.setRect(dstX, dstY, dstWidth, dstHeight);
+    m_dstRect.setRect(qRound(dstX * devicePixelRatioF()), qRound(dstY * devicePixelRatioF()), qRound(dstWidth * devicePixelRatioF()), qRound(dstHeight * devicePixelRatioF()));
 
-    glViewport(dstX, dstY, dstWidth, dstHeight);
+    glViewport(m_dstRect.left(), m_dstRect.top(), m_dstRect.width(), m_dstRect.height());
     m_program->setUniformValue("TextureSize", img->size());
     m_program->setUniformValue("InputSize", img->size());
     m_program->setUniformValue("OutputSize", QSize(dstWidth, dstHeight));
