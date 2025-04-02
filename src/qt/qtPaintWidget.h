@@ -42,6 +42,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void colorFill(QColor color);
         void screenshot(const QString& ssFileName);
         void setHideCursor(bool hide);
+        void pauseCursorTimer(bool paused);
 
         void setSmoothingAndShaderFile(SmoothingType smoothing, const QString& shaderFileName);
         void setDesaturate(bool desaturate) {m_desaturate = desaturate;}
@@ -98,6 +99,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         bool m_hideCursor = true;
         QTimer m_hideCursorTimer;
         bool m_cursorHidden = false;
+        bool m_cursorTimerPaused = false;
 
         QOpenGLShaderProgram* m_program = nullptr;
         QOpenGLBuffer m_vbo;

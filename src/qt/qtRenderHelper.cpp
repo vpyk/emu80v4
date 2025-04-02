@@ -71,6 +71,9 @@ void RenderHelper::pause()
 {
     m_paused = true;
     m_timer->stop();
+
+    for (auto it = m_windowList.begin(); it != m_windowList.end(); it++)
+        (*it)->getPaintWidget()->pauseCursorTimer(true);
 }
 
 
@@ -78,6 +81,9 @@ void RenderHelper::resume()
 {
     m_paused = false;
     m_timer->start();
+
+    for (auto it = m_windowList.begin(); it != m_windowList.end(); it++)
+        (*it)->getPaintWidget()->pauseCursorTimer(false);
 }
 
 

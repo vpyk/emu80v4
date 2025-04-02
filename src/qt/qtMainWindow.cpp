@@ -2912,7 +2912,9 @@ void MainWindow::onPlatformHelp()
 void MainWindow::onAbout()
 {
     AboutDialog* dialog = new AboutDialog(this);
+    m_paintWidget->pauseCursorTimer(true);
     dialog->execute();
+    m_paintWidget->pauseCursorTimer(false);
     delete dialog;
 }
 

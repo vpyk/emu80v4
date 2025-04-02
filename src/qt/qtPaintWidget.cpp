@@ -33,6 +33,7 @@ PaintWidget::PaintWidget(QWidget *parent) :
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_dstRect.setRect(0, 0, width(), height()); // на всякий случай
 
+    m_cursorTimerPaused = false;
     m_hideCursorTimer.setInterval(3500);
     connect(&m_hideCursorTimer, SIGNAL(timeout()), this, SLOT(onHideCursorTimer()));
     m_hideCursorTimer.start();
@@ -409,7 +410,7 @@ void PaintWidget::mouseMoveEvent(QMouseEvent* event)
     if (event->buttons() & Qt::LeftButton)
         mouseDrag(event->POS_X(), event->POS_Y());
 
-    if (!m_hideCursor)
+    if (!m_hideCursor || m_cursorTimerPaused)
         return;
 
     if (m_cursorHidden) {
@@ -460,4 +461,17 @@ void PaintWidget::setHideCursor(bool hide)
         setCursor(Qt::ArrowCursor);
         m_cursorHidden = false;
     }
+}
+
+
+void PaintWidget::pauseCursorTimer(bool paused)
+{
+    m_cursorTimerPaused = paused;
+
+    if (paused) {
+        m_hideCursorTimer.stop();
+        setCursor(Qt::ArrowCursor);
+        m_cursorHidden = false;
+    } else
+        m_hideCursorTimer.start();
 }
