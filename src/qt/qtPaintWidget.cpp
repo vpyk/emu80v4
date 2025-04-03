@@ -443,6 +443,20 @@ void PaintWidget::wheelEvent(QWheelEvent *event)
 }
 
 
+void PaintWidget::enterEvent(QEnterEvent* /*event*/)
+{
+    if (m_cursorTimerPaused)
+        pauseCursorTimer(false);
+}
+
+
+void PaintWidget::leaveEvent(QEvent* /*event*/)
+{
+    if (!m_cursorTimerPaused)
+        pauseCursorTimer(true);
+}
+
+
 void PaintWidget::onHideCursorTimer()
 {
     m_hideCursorTimer.stop();

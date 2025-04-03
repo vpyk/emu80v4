@@ -29,7 +29,11 @@
 #include "qtMainWindow.h"
 #include "qtPalWindow.h"
 
-//class GrWidget : public QWidget
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #define QEnterEvent QEvent
+#endif
+
+
 class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
         Q_OBJECT
@@ -56,6 +60,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void mousePressEvent(QMouseEvent *event) override;
         void mouseDoubleClickEvent(QMouseEvent *event) override;
         void wheelEvent(QWheelEvent *event) override;
+        void enterEvent(QEnterEvent *event) override;
+        void leaveEvent(QEvent *event) override;
 
         void initializeGL() override;
         //void resizeGL(int w, int h) override;
