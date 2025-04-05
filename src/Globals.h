@@ -35,10 +35,10 @@
 
 #define VERSION VER_STR TARGET
 
-#if defined(__GNUC__)
-    #define COMPILER "gcc" " " XSTR(__GNUC__)
-#elif defined(__clang__)
+#if defined(__clang__)
     #define COMPILER "clang" " " XSTR(__clang_major__)
+#elif defined(__GNUC__)
+    #define COMPILER "gcc" " " XSTR(__GNUC__)
 #elif defined(_MSC_VER)
     #define COMPILER "msvc"
 #else
