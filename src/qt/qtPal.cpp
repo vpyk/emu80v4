@@ -116,7 +116,8 @@ bool palQtInit(int& argc, char** argv)
     static int one = 1;
     application = new QApplication(one, argv); // suppress passing additional arguments
 
-    QString p = QCoreApplication::applicationDirPath() + "/_settings/" + "emu80.ini";
+    //application->setStyle("Fusion");
+
     QDir settingsDir(QCoreApplication::applicationDirPath() + "/_settings");
     if (settingsDir.exists()) {
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());

@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QStyle>
+
 #include "qtAboutDialog.h"
 #include "ui_qtAboutDialog.h"
 
@@ -39,6 +41,9 @@ AboutDialog::~AboutDialog()
 void AboutDialog::execute()
 {
     ui->nameLabel->setText("Emu80 v. " VERSION);
-    ui->sysinfoLabel->setText("Qt " QT_VERSION_STR " / " COMPILER " / " + QSysInfo::kernelType() + " / " + QSysInfo::buildCpuArchitecture() + " / " + QGuiApplication::platformName());
+    QString info = "Qt " QT_VERSION_STR " / " COMPILER " / " + QSysInfo::kernelType() + " / " +
+                   QSysInfo::buildCpuArchitecture() + " / " + QGuiApplication::platformName() + " / " + qApp->style()->objectName();
+    ui->sysinfoLabel->setText(info);
+
     exec();
 }

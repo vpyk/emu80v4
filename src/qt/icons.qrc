@@ -54,5 +54,25 @@
         <file>icons/gray.png</file>
         <file>icons/full_throttle.png</file>
         <file>icons/shader.png</file>
+        <file>icons/2x-dark.png</file>
+        <file>icons/1x-dark.png</file>
+        <file>icons/3x-dark.png</file>
+        <file>icons/4x-dark.png</file>
+        <file>icons/5x-dark.png</file>
+        <file>icons/15x-dark.png</file>
+        <file>icons/25x-dark.png</file>
+        <file>icons/aspect-dark.png</file>
+        <file>icons/crop-dark.png</file>
+        <file>icons/resizable-dark.png</file>
+        <file>icons/keyboard-dark.png</file>
+        <file>icons/sm_nearest-dark.png</file>
+        <file>icons/sm_bilinear-dark.png</file>
+        <file>icons/sm_sharp-dark.png</file>
+        <file>icons/shader-dark.png</file>
+        <file>icons/mute-dark.png</file>
+        <file>icons/debug-dark.png</file>
+        <file>icons/preset-dark.png</file>
+        <file>icons/wide-dark.png</file>
+        <file>icons/font-dark.png</file>
     </qresource>
 </RCC>

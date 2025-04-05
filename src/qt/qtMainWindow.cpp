@@ -68,6 +68,25 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(onQuit()));
 
+    // determine light or dark theme used
+    QPalette palette = qApp->palette();
+    QColor bgColor = palette.color(QPalette::Window);
+    m_darkTheme = qGray(bgColor.rgb()) < 128;
+
+    m_1xIcon = QIcon(m_darkTheme ? ":/icons/1x-dark.png" : ":/icons/1x.png");
+    m_2xIcon = QIcon(m_darkTheme ? ":/icons/2x-dark.png" : ":/icons/2x.png");
+    m_3xIcon = QIcon(m_darkTheme ? ":/icons/3x-dark.png" : ":/icons/3x.png");
+    m_4xIcon = QIcon(m_darkTheme ? ":/icons/4x-dark.png" : ":/icons/4x.png");
+    m_5xIcon = QIcon(m_darkTheme ? ":/icons/5x-dark.png" : ":/icons/5x.png");
+    m_15xIcon = QIcon(m_darkTheme ? ":/icons/15x-dark.png" : ":/icons/15x.png");
+    m_25xIcon = QIcon(m_darkTheme ? ":/icons/25x-dark.png" : ":/icons/25x.png");
+    m_resizableIcon = QIcon(m_darkTheme ? ":/icons/resizable-dark.png" : ":/icons/resizable.png");
+    m_smoothingNearestIcon = QIcon(m_darkTheme ? ":/icons/sm_nearest-dark.png" : ":/icons/sm_nearest.png");
+    m_smoothingSharpIcon = QIcon(m_darkTheme ? ":/icons/sm_sharp-dark.png" : ":/icons/sm_sharp.png");
+    m_smoothingBilinearIcon = QIcon(m_darkTheme ? ":/icons/sm_bilinear-dark.png" : ":/icons/sm_bilinear.png");
+    m_shaderIcon = QIcon(m_darkTheme ? ":/icons/shader-dark.png" : ":/icons/shader.png");
+    m_presetIcon = QIcon(m_darkTheme ? ":/icons/preset-dark.png" : ":/icons/preset.png");
+
 #ifdef _WIN32
     m_shiftF10shortcut = new QShortcut(this);
     m_shiftF10shortcut->setKey(Qt::SHIFT | Qt::Key_F10);
@@ -148,7 +167,10 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             m_prnLabel->setToolTip(tr("Text pasting"));
 
             m_statusBar = statusBar();
-            m_statusBar->setStyleSheet("QStatusBar::item { border: 1px inset #B0B0B0;}");
+            if (m_darkTheme)
+                m_statusBar->setStyleSheet("QStatusBar::item { border: 1px inset #383838;}");
+            else
+                m_statusBar->setStyleSheet("QStatusBar::item { border: 1px inset #B0B0B0;}");
             m_statusBar->addWidget(m_fpsLabel);
             m_statusBar->addWidget(m_speedLabel);
             m_statusBar->addWidget(m_kbdLabel);
@@ -1045,7 +1067,7 @@ void MainWindow::createActions()
     platformMenu->addSeparator();
 
     // Debug
-    m_debugAction = new QAction(QIcon(":/icons/debug.png"), tr("Debug..."), this);
+    m_debugAction = new QAction(QIcon(m_darkTheme ? ":/icons/debug-dark.png" : ":/icons/debug.png"), tr("Debug..."), this);
     m_debugAction->setToolTip(tr("Debug (Alt-D)"));
     QList<QKeySequence> debugKeysList;
     ADD_HOTKEY(debugKeysList, Qt::Key_D);
@@ -1170,7 +1192,7 @@ void MainWindow::createActions()
     m_layoutButton = new QToolButtonWA(this);
     m_layoutButton->setFocusPolicy(Qt::NoFocus);
     //m_layoutButton->setText("Qwerty ");
-    m_layoutButton->setIcon(QIcon(":/icons/keyboard.png"));
+    m_layoutButton->setIcon(QIcon(m_darkTheme ? ":/icons/keyboard-dark.png" : ":/icons/keyboard.png"));
     m_layoutButton->setToolTip(tr("Keyboard layout"));
     m_layoutButton->setMenu(layoutMenu);
     m_layoutButton->setPopupMode(QToolButton::InstantPopup);
@@ -1263,7 +1285,7 @@ void MainWindow::createActions()
     connect(m_colorMenuAction, SIGNAL(triggered()), this, SLOT(onColorMode()));
 
     // Crop
-    m_cropAction = new QAction(QIcon(":/icons/crop.png"), tr("Visible area"), this);
+    m_cropAction = new QAction(QIcon(m_darkTheme ? ":/icons/crop-dark.png" : ":/icons/crop.png"), tr("Visible area"), this);
     m_cropAction->setCheckable(true);
     m_cropAction->setToolTip(tr("Show only visible area (Alt-V)"));
     QList<QKeySequence> cropKeysList;
@@ -1277,7 +1299,7 @@ void MainWindow::createActions()
     settingsMenu->addAction(m_cropAction);
 
     // Aspect
-    m_aspectAction = new QAction(QIcon(":/icons/aspect.png"), tr("Aspect"), this);
+    m_aspectAction = new QAction(QIcon(m_darkTheme ? ":/icons/aspect-dark.png" : ":/icons/aspect.png"), tr("Aspect"), this);
     m_aspectAction->setCheckable(true);
     m_aspectAction->setToolTip(tr("Original aspect ratio (Alt-R)"));
     QList<QKeySequence> aspectKeysList;
@@ -1291,7 +1313,7 @@ void MainWindow::createActions()
     settingsMenu->addAction(m_aspectAction);
 
     // Wide screen
-    m_wideScreenAction = new QAction(QIcon(":/icons/wide.png"), tr("Wide screen (16:9)"), this);
+    m_wideScreenAction = new QAction(QIcon(m_darkTheme ? ":/icons/wide-dark.png" : ":/icons/wide.png"), tr("Wide screen (16:9)"), this);
     m_wideScreenAction->setCheckable(true);
     m_wideScreenAction->setToolTip(tr("Wide screen (16:9) (Alt-N)"));
     QList<QKeySequence> wideScreenKeysList;
@@ -1365,7 +1387,7 @@ void MainWindow::createActions()
     connect(m_smoothingAction, SIGNAL(triggered()), this, SLOT(onSmoothing()));
 
     // Font
-    m_fontAction = new QAction(QIcon(":/icons/font.png"), tr("Font"), this);
+    m_fontAction = new QAction(QIcon(m_darkTheme ? ":/icons/font-dark.png" : ":/icons/font.png"), tr("Font"), this);
     m_fontAction->setCheckable(true);
     m_fontAction->setToolTip(tr("Advanced font (Alt-F)"));
     QList<QKeySequence> fontKeysList;
@@ -1394,7 +1416,7 @@ void MainWindow::createActions()
     connect(m_fastResetAction, SIGNAL(triggered()), this, SLOT(onFastReset()));
 
     // Mute
-    m_muteAction = new QAction(QIcon(":/icons/mute.png"), tr("Mute"), this);
+    m_muteAction = new QAction(QIcon(m_darkTheme ? ":/icons/mute-dark.png" : ":/icons/mute.png"), tr("Mute"), this);
     m_muteAction->setCheckable(true);
     m_muteAction->setToolTip(tr("Mute (Alt-M)"));
     QList<QKeySequence> muteKeysList;

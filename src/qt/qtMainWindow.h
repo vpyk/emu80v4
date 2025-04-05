@@ -282,6 +282,8 @@ private:
 
     SettingsDialog* m_settingsDialog = nullptr;
 
+    bool m_darkTheme = false;
+
     QIcon m_diskAOnIcon             = QIcon(":/icons/disk_a.png");
     QIcon m_diskAOffIcon            = QIcon(":/icons/disk_a_off.png");
     QIcon m_diskBOnIcon             = QIcon(":/icons/disk_b.png");
@@ -296,19 +298,19 @@ private:
     QIcon m_eddOffIcon              = QIcon(":/icons/edd.png");
     QIcon m_edd2OnIcon              = QIcon(":/icons/edd2_on.png");
     QIcon m_edd2OffIcon             = QIcon(":/icons/edd2.png");
-    QIcon m_smoothingNearestIcon    = QIcon(":/icons/sm_nearest.png");
-    QIcon m_smoothingBilinearIcon   = QIcon(":/icons/sm_bilinear.png");
-    QIcon m_smoothingSharpIcon      = QIcon(":/icons/sm_sharp.png");
-    QIcon m_presetIcon              = QIcon(":/icons/preset.png");
-    QIcon m_1xIcon                  = QIcon(":/icons/1x.png");
-    QIcon m_2xIcon                  = QIcon(":/icons/2x.png");
-    QIcon m_3xIcon                  = QIcon(":/icons/3x.png");
-    QIcon m_4xIcon                  = QIcon(":/icons/4x.png");
-    QIcon m_5xIcon                  = QIcon(":/icons/5x.png");
-    QIcon m_15xIcon                 = QIcon(":/icons/15x.png");
-    QIcon m_25xIcon                 = QIcon(":/icons/25x.png");
-    QIcon m_resizableIcon           = QIcon(":/icons/resizable.png");
-    QIcon m_shaderIcon              = QIcon(":/icons/shader.png");
+    QIcon m_smoothingNearestIcon;
+    QIcon m_smoothingBilinearIcon;
+    QIcon m_smoothingSharpIcon;
+    QIcon m_presetIcon;
+    QIcon m_1xIcon;
+    QIcon m_2xIcon;
+    QIcon m_3xIcon;
+    QIcon m_4xIcon;
+    QIcon m_5xIcon;
+    QIcon m_15xIcon;
+    QIcon m_25xIcon;
+    QIcon m_resizableIcon;
+    QIcon m_shaderIcon;
 
     QMenu* m_loadRunMenu = nullptr;
     QMenu* m_loadMenu = nullptr;
