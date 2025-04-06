@@ -74,6 +74,7 @@ void SettingsDialog::saveConfig()
 void SettingsDialog::execute()
 {
     updateConfig();
+    //adjustSize();
     show();
 }
 
@@ -404,26 +405,72 @@ void SettingsDialog::fillControlValues()
 
     // Color mode
     val = m_options.value("crtRenderer.colorMode", "");
-    ui->colorGroupBox->setVisible(m_platformGroup == "apogey" || m_platformGroup == "rk86" || m_platformGroup == "spec" || m_platformGroup == "sp580");
+    ui->colorGroupBox->setVisible(m_platformGroup == "apogey" || m_platformGroup == "rk86" || m_platformGroup == "spec" || m_platformGroup == "sp580" || m_platformGroup == "kr04");
     if (m_platformGroup == "apogey") {
+        ui->color1RadioButton->setVisible(true);
         ui->color1RadioButton->setText(tr("Color"));
-        ui->color2RadioButton->setVisible(false);
-        ui->bwRadioButton->setChecked(val == "mono");
         ui->color1RadioButton->setChecked(val == "color");
+
+        ui->color2RadioButton->setVisible(false);
+        ui->color3RadioButton->setVisible(false);
+
+        ui->bwRadioButton->setVisible(true);
+        ui->bwRadioButton->setChecked(val == "mono");
+        ui->bwRadioButton->setText(tr("Black && white"));
+
+        ui->bw2RadioButton->setVisible(true);
+        ui->bw2RadioButton->setChecked(val == "grayscale");
+        ui->bw2RadioButton->setText(tr("Grayscale"));
     } else if (m_platformGroup == "rk86") {
+        ui->color1RadioButton->setVisible(true);
         ui->color1RadioButton->setText(tr("Color mode 1 (Tolkalin)"));
+        ui->color1RadioButton->setChecked(val == "color1");
+
         ui->color2RadioButton->setVisible(true);
         ui->color2RadioButton->setText(tr("Color mode 2 (Akimenko)"));
-        ui->bwRadioButton->setChecked(val == "mono");
-        ui->color1RadioButton->setChecked(val == "color1");
         ui->color2RadioButton->setChecked(val == "color2");
+
+        ui->color3RadioButton->setVisible(true);
+        ui->color3RadioButton->setText(tr("Color mode 3 (Apogey)"));
+        ui->color3RadioButton->setChecked(val == "color3");
+
+        ui->bwRadioButton->setVisible(true);
+        ui->bwRadioButton->setText(tr("Black && while (original)"));
+        ui->bwRadioButton->setChecked(val == "original");
+
+        ui->bw2RadioButton->setVisible(true);
+        ui->bw2RadioButton->setText(tr("Black && white"));
+        ui->bw2RadioButton->setChecked(val == "mono");
     } else if (m_platformGroup == "spec" || m_platformGroup == "sp580") {
+        ui->color1RadioButton->setVisible(true);
         ui->color1RadioButton->setText(tr("4-color mode"));
+        ui->color1RadioButton->setChecked(val == "4color");
+
         ui->color2RadioButton->setVisible(true);
         ui->color2RadioButton->setText(tr("8-color mode"));
-        ui->bwRadioButton->setChecked(val == "mono");
-        ui->color1RadioButton->setChecked(val == "4color");
         ui->color2RadioButton->setChecked(val == "8color");
+
+        ui->bwRadioButton->setVisible(true);
+        ui->bwRadioButton->setText(tr("Black && white"));
+        ui->bwRadioButton->setChecked(val == "mono");
+
+        ui->bw2RadioButton->setVisible(false);
+        ui->color3RadioButton->setVisible(false);
+    } else if (m_platformGroup == "kr04") {
+        ui->color1RadioButton->setVisible(true);
+        ui->color1RadioButton->setText(tr("Color"));
+        ui->color1RadioButton->setChecked(val == "color");
+
+        ui->color2RadioButton->setVisible(true);
+        ui->color2RadioButton->setText(tr("Color module"));
+        ui->color2RadioButton->setChecked(val == "colorModule");
+
+        ui->bwRadioButton->setVisible(true);
+        ui->bwRadioButton->setText(tr("Black && white"));
+        ui->bwRadioButton->setChecked(val == "mono");
+
+        ui->bw2RadioButton->setVisible(false);
+        ui->color3RadioButton->setVisible(false);
     }
 
     // Fields mixing
@@ -838,20 +885,35 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     val = "";
     if (ui->colorGroupBox->isVisible()) {
-        if (ui->bwRadioButton->isChecked())
-            val = "mono";
-        else if (ui->color1RadioButton->isChecked()) {
+        if (ui->bwRadioButton->isChecked()) {
+            if (m_platformGroup == "rk86")
+                val = "original";
+            else
+                val = "mono";
+        } else if (ui->color1RadioButton->isChecked()) {
             if (m_platformGroup == "apogey")
                 val = "color";
             else if (m_platformGroup == "rk86")
                 val = "color1";
             else if (m_platformGroup == "spec" || m_platformGroup == "sp580")
                 val = "4color";
+            else if (m_platformGroup == "kr04")
+                val = "color";
         } else if (ui->color2RadioButton->isChecked()) {
             if (m_platformGroup == "rk86")
                 val = "color2";
             else if (m_platformGroup == "spec" || m_platformGroup == "sp580")
                 val = "8color";
+            else if (m_platformGroup == "kr04")
+                val = "colorModule";
+        } else if (ui->bw2RadioButton->isChecked()) {
+            if (m_platformGroup == "rk86")
+                val = "mono";
+            else if (m_platformGroup == "apogey")
+                val = "grayscale";
+        } else if (ui->color3RadioButton->isChecked()) {
+            if (m_platformGroup == "rk86")
+                val = "color3";
         }
     }
     if (val != "")

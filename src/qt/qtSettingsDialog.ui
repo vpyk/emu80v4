@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>547</width>
-    <height>609</height>
+    <width>491</width>
+    <height>606</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
@@ -20,7 +26,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -1125,25 +1131,39 @@
          <property name="title">
           <string>Color mode</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_11">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="2" column="0">
+           <widget class="QRadioButton" name="color2RadioButton">
+            <property name="text">
+             <string notr="true">Color 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QRadioButton" name="color3RadioButton">
+            <property name="text">
+             <string notr="true">Color 3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
            <widget class="QRadioButton" name="bwRadioButton">
             <property name="text">
              <string notr="true">Black &amp;&amp; white</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QRadioButton" name="color1RadioButton">
+          <item row="2" column="1">
+           <widget class="QRadioButton" name="bw2RadioButton">
             <property name="text">
-             <string notr="true">Color 1</string>
+             <string notr="true">Black &amp;&amp; white 2</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QRadioButton" name="color2RadioButton">
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="color1RadioButton">
             <property name="text">
-             <string notr="true">Color 2</string>
+             <string notr="true">Color 1</string>
             </property>
            </widget>
           </item>
@@ -1155,36 +1175,36 @@
          <property name="title">
           <string>Field mixing</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_10">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
            <widget class="QRadioButton" name="mixingOffRadioButton">
             <property name="text">
              <string>Off</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QRadioButton" name="mixingMixRadioButton">
-            <property name="text">
-             <string>Mix</string>
-            </property>
-           </widget>
-          </item>
-          <item>
+          <item row="2" column="0">
            <widget class="QRadioButton" name="mixingAverageRadioButton">
             <property name="text">
              <string>Average (old method)</string>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="mixingMixRadioButton">
+            <property name="text">
+             <string>Mix</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
            <widget class="QRadioButton" name="mixingInterlaceRadioButton">
             <property name="text">
              <string>Interlace</string>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="1" column="1">
            <widget class="QRadioButton" name="mixingScanlineRadioButton">
             <property name="text">
              <string>Scanline</string>
@@ -1678,9 +1698,11 @@
   <tabstop>rkCodePageRadioButton</tabstop>
   <tabstop>koi8CodePageRadioButton</tabstop>
   <tabstop>resetKeysCheckBox</tabstop>
-  <tabstop>bwRadioButton</tabstop>
   <tabstop>color1RadioButton</tabstop>
   <tabstop>color2RadioButton</tabstop>
+  <tabstop>color3RadioButton</tabstop>
+  <tabstop>bwRadioButton</tabstop>
+  <tabstop>bw2RadioButton</tabstop>
   <tabstop>mixingOffRadioButton</tabstop>
   <tabstop>mixingMixRadioButton</tabstop>
   <tabstop>mixingAverageRadioButton</tabstop>
