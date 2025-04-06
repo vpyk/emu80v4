@@ -62,7 +62,8 @@ class Rk86Renderer : public Crt8275Renderer
             RCM_MONO_ORIG,
             RCM_MONO,
             RCM_COLOR1,
-            RCM_COLOR2
+            RCM_COLOR2,
+            RCM_COLOR3
         };
 
         const uint8_t* getCurFontPtr(bool gpa0, bool gpa1, bool hglt) override;

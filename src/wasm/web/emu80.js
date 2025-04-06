@@ -498,7 +498,8 @@ const rkColorModes = [
     ["original", "Ч/б ориг"],
     ["mono", "Ч/б"],
     ["color1", "Цв. (Толкалин)"],
-    ["color2", "Цв. (Акименко)"]
+    ["color2", "Цв. (Акименко)"],
+    ["color3", "Цв. (Апогей)"]
 ];
 
 const kr04ColorModes = [

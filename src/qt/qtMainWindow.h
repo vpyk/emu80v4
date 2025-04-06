@@ -408,6 +408,7 @@ private:
     QAction* m_colorGrayscaleAction;
     QAction* m_colorColor1Action;
     QAction* m_colorColor2Action;
+    QAction* m_colorColor3Action;
     QAction* m_bwAction;
     QAction* m_cropAction;
     QAction* m_aspectAction;

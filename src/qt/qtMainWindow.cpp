@@ -1261,6 +1261,13 @@ void MainWindow::createActions()
     colorModeGroup->addAction(m_colorColor2Action);
     connect(m_colorColor2Action, SIGNAL(triggered()), this, SLOT(onColorSelect()));
 
+    m_colorColor3Action = new QAction(QIcon(":/icons/color.png"),"Color 3", this);
+    m_colorColor3Action->setCheckable(true);
+    //m_colorColor3Action->setData("color2");
+    m_colorModeMenu->addAction(m_colorColor3Action);
+    colorModeGroup->addAction(m_colorColor3Action);
+    connect(m_colorColor3Action, SIGNAL(triggered()), this, SLOT(onColorSelect()));
+
     m_colorGrayscaleAction = new QAction(QIcon(":/icons/gray.png"), tr("Grayscale"), this);
     m_colorGrayscaleAction->setCheckable(true);
     m_colorGrayscaleAction->setData("grayscale");
@@ -1639,6 +1646,9 @@ void MainWindow::tuneMenu()
 
     m_speedLabel->setVisible(false);
 
+    m_colorColor3Action->setVisible(false);
+    m_colorColor3Action->setEnabled(false);
+
     if (platformGroup == "rk86") {
         hasColor = true;
         m_colorLabel->setVisible(false);
@@ -1661,6 +1671,11 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("Color (Akimenko)"));
         m_colorColor2Action->setData("color2");
+
+        m_colorColor3Action->setVisible(true);
+        m_colorColor3Action->setEnabled(true);
+        m_colorColor3Action->setText(tr("Color (Apogey)"));
+        m_colorColor3Action->setData("color3");
     } else if (platformGroup == "apogey") {
         hasColor = true;
 

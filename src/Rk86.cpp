@@ -101,6 +101,8 @@ uint32_t Rk86Renderer::getCurFgColor(bool gpa0, bool gpa1, bool hglt)
              }
         case RCM_COLOR2:
             return (gpa0 ? 0 : 0xFF0000) | (gpa1 ? 0: 0x00FF00) | (hglt ? 0: 0x0000FF);
+        case RCM_COLOR3:
+            return (gpa0 ? 0 : 0x0000FF) | (gpa1 ? 0 : 0x00FF00) | (hglt ? 0 : 0xFF0000);
         //case RCM_MONO:
         default:
             return 0xC0C0C0;
@@ -136,6 +138,8 @@ void Rk86Renderer::setColorMode(Rk86ColorMode mode) {
     m_colorMode = mode;
     m_dashedLten = mode == RCM_MONO_ORIG;
     m_useRvv = mode != RCM_MONO_ORIG;
+    m_hgltOffset = mode != RCM_COLOR3;
+    m_gpaOffset  = mode != RCM_COLOR3;
 }
 
 
@@ -148,6 +152,8 @@ void Rk86Renderer::toggleColorMode()
     else if (m_colorMode == RCM_COLOR1)
         setColorMode(RCM_COLOR2);
     else if (m_colorMode == RCM_COLOR2)
+        setColorMode(RCM_COLOR3);
+    else if (m_colorMode == RCM_COLOR3)
         setColorMode(RCM_MONO_ORIG);
 }
 
@@ -166,6 +172,8 @@ bool Rk86Renderer::setProperty(const string& propertyName, const EmuValuesList& 
             setColorMode(RCM_COLOR1);
         else if (values[0].asString() == "color2")
             setColorMode(RCM_COLOR2);
+        else if (values[0].asString() == "color3")
+            setColorMode(RCM_COLOR3);
         else
             return false;
         return true;
@@ -193,6 +201,8 @@ string Rk86Renderer::getPropertyStringValue(const string& propertyName)
                 return "color1";
             case RCM_COLOR2:
                 return "color2";
+            case RCM_COLOR3:
+                return "color3";
         }
     }
 
