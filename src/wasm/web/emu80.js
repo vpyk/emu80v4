@@ -39,16 +39,8 @@ let files = []
 
 
 iframe.addEventListener("load", () => {
-        const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-        const canvas = innerDoc.getElementById("canvas");
-
-        iframe.contentWindow.addEventListener("focus", () => {
-            iframe.style.borderColor = "#888";
-        })
-
-        iframe.contentWindow.addEventListener("blur", () => {
-            iframe.style.borderColor = "#eee";
-        })
+        iframe.contentWindow.addEventListener("focus", updateBorderColor);
+        iframe.contentWindow.addEventListener("blur", updateBorderColor);
 
         curPlatform = platformSelect.value;
 
@@ -109,6 +101,15 @@ fetch("catalog/platforms.json")
     .then(data => fillPlatformsFromJson(data))
     .catch(error => console.error("Error reading platform list: ", error))
     .finally(() => processParams());
+
+
+function updateBorderColor() {
+    const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+        iframe.style.borderColor = iframe.contentDocument.hasFocus() ? "#999" : "#444";
+    else
+        iframe.style.borderColor = iframe.contentDocument.hasFocus() ? "#888" : "#ddd";
+}
 
 
 function fillPlatformsFromJson(data) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="light" lang="ru">
+<html lang="ru">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <link rel="stylesheet" type="text/css" href="emu80.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-collapsible@1.0.4/dist/css/bulma-collapsible.min.css">
+    <style>
+      @media (prefers-color-scheme: light) {
+        a { color: #280090; }
+      }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-collapsible@1.0.4/dist/js/bulma-collapsible.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js"></script>
     <script src="const.js"></script>
@@ -75,13 +80,13 @@
               </select>
             </div>
             <button id="visibleAreaButton" class="button is-small" onClick="emuSysReq(SR_CROPTOVISIBLE)" title="Видимая область (Alt-V)">
-              <img src="icons/crop.png" alt="">&nbsp;
+              <img id="cropIcon" src="icons/crop.png" alt="">&nbsp;
             </button>
             <button id="parButton" class="button is-small" onClick="emuSysReq(SR_ASPECTCORRECTION)" title="Учитывать PAR (Alt-R)">
-              <img src="icons/aspect.png" alt="">&nbsp;
+              <img id="aspectIcon" src="icons/aspect.png" alt="">&nbsp;
             </button>
             <button id="wideButton" class="button is-small" onClick="emuSysReq(SR_WIDESCREEN)" title="Переключить широкоэкранный режим (Alt-N)">
-              <img src="icons/wide.png" alt="">&nbsp;
+              <img id="wideIcon" src="icons/wide.png" alt="">&nbsp;
             </button>
             <!--<button id="smoothingButton" class="button is-small" onClick="emuSysReq(SR_SMOOTHING)" title="Переключить режим сглаживания (Alt-S)">
               <img src="icons/sm_sharp.png">&nbsp;
@@ -109,10 +114,10 @@
               <img src="icons/color.png" alt="">&nbsp;
             </button>-->
             <button id="fontButton" class="button is-small" onClick="emuSysReq(SR_FONT)" title="Переключить пользовательский шрифт (Alt-F)">
-              <img src="icons/font.png" alt="">&nbsp;
+              <img id="fontIcon" src="icons/font.png" alt="">&nbsp;
             </button>
             <button id="muteButton" class="button is-small" onClick="onMute(this)" title="Отключить звук (Alt-M)">
-              <img src="icons/mute.png" alt="">&nbsp;
+              <img id="muteIcon" src="icons/mute.png" alt="">&nbsp;
             </button>
             &nbsp;&nbsp;
             <button id="infoButton" class="button is-small" onClick="onInfo(this)" title="Показать техническую информацию">
@@ -186,7 +191,7 @@
               The <a href="https://github.com/vpyk/emu80v4">source code</a> is licensed under
               <a href="https://opensource.org/license/gpl-3-0">GPL v.3</a> open source license.
             </p>
-            <p>Последнее обновление 30.12.2024</p>
+            <p>Последнее обновление 07.04.2025</p>
           </div>
         </footer>    
 
@@ -194,10 +199,33 @@
 
     
     </section>
+    <script src="emu80.js"></script>
     <script>
-      document.documentElement.style.setProperty('--bulma-link-text', '#280090');
+      const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function updateColorsAndIcons() {
+        if (darkModeMediaQuery.matches) {
+          document.getElementById("muteIcon").src = "icons/mute-dark.png";
+          document.getElementById("fontIcon").src = "icons/font-dark.png";
+          document.getElementById("aspectIcon").src = "icons/aspect-dark.png";
+          document.getElementById("wideIcon").src = "icons/wide-dark.png";
+          document.getElementById("cropIcon").src = "icons/crop-dark.png";
+        } else {
+          document.getElementById("muteIcon").src = "icons/mute.png";
+          document.getElementById("fontIcon").src = "icons/font.png";
+          document.getElementById("aspectIcon").src = "icons/aspect.png";
+          document.getElementById("wideIcon").src = "icons/wide.png";
+          document.getElementById("cropIcon").src = "icons/crop.png";
+        }
+        updateBorderColor();
+      }
+
+      darkModeMediaQuery.addEventListener('change', updateColorsAndIcons);
+
+      if (darkModeMediaQuery.matches)
+        updateColorsAndIcons();
+
       bulmaCollapsible.attach();
     </script>
-    <script src="emu80.js"></script>
   </body>
 </html>
