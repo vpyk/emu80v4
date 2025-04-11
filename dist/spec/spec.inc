@@ -61,8 +61,28 @@ AddrSpace addrSpace
 addrSpace.range = &ram,      0x0000, 0x8FFF
 addrSpace.range = &videoRam, 0x9000, 0xBFFF
 addrSpace.range = &rom,      0xC000, @ROM_END
-addrSpace.range = &ppi1,     0xF000, 0xF7FF
 addrSpace.range = &ppi2,     0xF800, 0xFFFF
+
+ifndef SDOS
+  addrSpace.range = &ppi1,     0xF000, 0xF7FF
+endif
+
+ifdef SDOS
+  Rom sdos = @SDOS_ROM, 0xA00
+  addrSpace.range = &sdos,     0xD000, 0xD9FF
+
+  Ram sdosRam = 0x600
+  addrSpace.range = &sdosRam, 0xDA00, 0xDFFF
+
+  SdCard sdCard
+  sdCard.imageFile = @CFG_SD_IMG
+
+  SdAdapter sdAdapter
+  sdAdapter.type = hwmpvv
+  sdAdapter.sdCard = &sdCard
+
+  addrSpace.range = &sdAdapter, 0xF000, 0xF7FF
+endif
 
 SpecRenderer crtRenderer
 crtRenderer.screenMemory = &videoRam
