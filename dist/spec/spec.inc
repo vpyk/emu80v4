@@ -84,6 +84,12 @@ ifdef SDOS
   addrSpace.range = &sdAdapter, 0xF000, 0xF7FF
 endif
 
+ifdef SD_CARD
+  RkSdController sdCard = @CFG_SD_DIR
+  sdCard.model = spec
+  ppi1.circuit = &sdCard
+endif
+
 SpecRenderer crtRenderer
 crtRenderer.screenMemory = &videoRam
 crtRenderer.colorMode = 8color

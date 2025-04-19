@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ RkSdController::RkSdController(std::string sdDir)
     m_romBuffer = new uint8_t[c_romBufferSize];
     memset(m_romBuffer, 0xFF, 128);
 
-    palReadFromFile(m_sdDir + "BOOT/BOOT.RK", 0, c_romBufferSize, m_romBuffer);
+    palReadFromFile(m_sdDir + (m_specModel ? "BOOT/BOOT.RKS" : "BOOT/BOOT.RK"), 0, c_romBufferSize, m_romBuffer);
 
     m_inBuffer = new uint8_t[c_inBufferSize];
 }
@@ -58,21 +58,48 @@ RkSdController::~RkSdController()
 }
 
 
+void RkSdController::reset()
+{
+    resetState();
+}
+
+
 uint8_t RkSdController::getPortA()
 {
-    return m_outValue;
+    return m_specModel ? 0xFF : m_outValue;
+}
+
+
+uint8_t RkSdController::getPortC()
+{
+    return m_specModel ? m_outValue : 0xFF;
 }
 
 
 void RkSdController::setPortA(uint8_t value)
 {
-    m_inValue = value;
+    if (!m_specModel)
+        m_inValue = value;
+}
+
+
+void RkSdController::setPortC(uint8_t value)
+{
+    if (m_specModel)
+        m_inValue = value;
 }
 
 
 void RkSdController::setPortB(uint8_t value)
 {
     m_outValue = m_romBuffer[value & 0x7F];
+
+    if (!m_specModel && m_stage !=CS_WAIT0 && m_stage !=CS_WAIT40 && value == 0x44) {
+        resetState();
+        return;
+    }
+
+    uint8_t strobeBit = m_specModel ? 0x80 : 0x20;
 
     switch (m_stage) {
     case CS_WAIT40:
@@ -81,34 +108,64 @@ void RkSdController::setPortB(uint8_t value)
         break;
     case CS_WAIT0:
         if (value == 0) {
+            m_inBufferPos = 0;
+            m_subStage = 0;
             m_stage = CS_START;
         } else
             resetState();
         break;
+    case CS_WAIT13:
+        if (m_prevValue & strobeBit && !(value & strobeBit) && m_inValue == 0x13)
+            m_stage = CS_WAITB4;
+        break;
+    case CS_WAITB4:
+        if (m_prevValue & strobeBit && !(value & strobeBit))
+            m_stage = m_inValue == 0xB4 ? CS_WAIT57 : CS_WAIT13;
+        break;
+    case CS_WAIT57:
+        if (m_prevValue & strobeBit && !(value & strobeBit)) {
+            m_stage = m_inValue == 0x57 ? CS_CMD : CS_WAIT13;
+        }
+        break;
+    case CS_CMD:
+        if (m_prevValue & strobeBit && !(value & strobeBit)) {
+            m_cmd = m_inValue;
+            m_inBuffer[0] = m_inValue;
+            m_inBufferPos = 1;
+            m_stage = CS_START;
+            m_subStage = 0;
+            m_multiStageCmdPending = false;
+        }
+        break;
     case CS_START:
-        if (m_prevValue & 0x20 && !(value & 0x20)) {
+        if (m_prevValue & strobeBit && !(value & strobeBit)) {
             m_stage = CS_OKDISK;
+            if (m_specModel && m_cmd == 0 && cmd()) {
+                m_stage = CS_ANSWER;
+                m_outBufferPos = 0;
+                m_outValue = m_outBuffer[0];
+            }
             m_outValue = ERR_START;
-        } else if (value & 0x1F)
-            resetState();
+        }
         break;
     case CS_OKDISK:
-        if (m_prevValue & 0x20 && !(value & 0x20)) {
+        if (m_prevValue & strobeBit && !(value & strobeBit)) {
             m_outValue = ERR_OK_DISK;
             m_stage = CS_PREPARE;
-            m_subStage = 0;
-            m_inBufferPos = 0;
-        } else if (value & 0x1F)
-            resetState();
+        }
         break;
     case CS_PREPARE:
-        if (m_prevValue & 0x20 && !(value & 0x20)) {
+        if (m_prevValue & strobeBit && !(value & strobeBit)) {
             m_stage = CS_REQUEST;
-        } else if (value & 0x1F)
-            resetState();
+            if (m_specModel && cmd()) {
+                m_stage = CS_ANSWER;
+                m_outBufferPos = 0;
+                m_outValue = m_outBuffer[0];
+            }
+        }
         break;
     case CS_REQUEST:
-        if (m_prevValue & 0x20 && !(value & 0x20)) {
+        if (m_prevValue & strobeBit && !(value & strobeBit)) {
             if (m_inBufferPos < c_inBufferSize) {
                 m_inBuffer[m_inBufferPos++] = m_inValue;
             } else {
@@ -122,19 +179,17 @@ void RkSdController::setPortB(uint8_t value)
                 m_outBufferPos = 0;
                 m_outValue = m_outBuffer[0];
             }
-        } else if (value & 0x1F)
-            resetState();
+        }
         break;
     case CS_ANSWER:
-        if (m_prevValue & 0x20 && !(value & 0x20) && m_outBufferPos < m_outBufferSize) {
+        if (m_prevValue & strobeBit && !(value & strobeBit) && m_outBufferPos < m_outBufferSize) {
             m_outValue = m_outBuffer[m_outBufferPos++];
             if (m_outBufferPos == m_outBufferSize) {
-                m_stage = CS_PREPARE;
+                m_stage = m_specModel && !m_multiStageCmdPending ? CS_WAIT13 : CS_PREPARE;
                 m_inBufferPos = 0;
                 m_subStage++;
             }
-        } else if (value & 0x1F)
-            resetState();
+        }
         break;
     }
 
@@ -144,9 +199,11 @@ void RkSdController::setPortB(uint8_t value)
 
 void RkSdController::resetState()
 {
-    m_stage = CS_WAIT40;
+    m_stage = m_specModel ? CS_WAIT13 : CS_WAIT40;
     m_subStage = 0;
+    m_multiStageCmdPending = false;
     m_prevValue = 0;
+    m_inBufferPos = 0;
 }
 
 
@@ -181,14 +238,14 @@ bool RkSdController::loadRkFile(const std::string& fileName)
         fileSize--;
     }
 
-    m_progBegAddr = (m_progPtr[0] << 8) | m_progPtr[1];
-    uint16_t progEndAddr = (m_progPtr[2] << 8) | m_progPtr[3];
+    m_progBegAddr = m_specModel ? ((m_progPtr[1] << 8) | m_progPtr[0]) : ((m_progPtr[0] << 8) | m_progPtr[1]);
+    uint16_t progEndAddr = m_specModel ? ((m_progPtr[3] << 8) | m_progPtr[2]) : ((m_progPtr[2] << 8) | m_progPtr[3]);
     m_progPtr += 4;
     fileSize -= 4;
 
     m_progLen = progEndAddr - m_progBegAddr + 1;
 
-    if (m_progBegAddr == 0xE6E6 || m_progBegAddr == 0xD3D3 || fileSize < m_progLen + 2) {
+    if (m_progBegAddr == 0xE6E6 || m_progBegAddr == 0xD3D3 || fileSize < m_progLen /*+ 2*/) {
         // Basic or EDM File
         delete[] m_execFileBuffer;
         return false;
@@ -199,29 +256,30 @@ bool RkSdController::loadRkFile(const std::string& fileName)
 
 bool RkSdController::cmd()
 {
-        switch (m_cmd) {
-        case CMD_BOOT:
-            return cmdBoot();
-        case CMD_VER:
-            return cmdVer();
-        case CMD_EXEC:
-            return cmdExec();
-        case CMD_FIND:
-            return cmdFind();
-        case CMD_OPEN:
-            return cmdOpen();
-        case CMD_LSEEK:
-            return cmdLseek();
-        case CMD_READ:
-            return cmdRead();
-        case CMD_WRITE:
-            return cmdWrite();
-        case CMD_MOVE:
-            return cmdMove();
-        default:
-            m_outValue = ERR_INVALID_COMMAND;
-            resetState();
-        }
+    switch (m_cmd) {
+    case CMD_BOOT:
+        return cmdBoot();
+    case CMD_VER:
+        return cmdVer();
+    case CMD_EXEC:
+        return cmdExec();
+    case CMD_FIND:
+        return cmdFind();
+    case CMD_OPEN:
+        return cmdOpen();
+    case CMD_LSEEK:
+        return cmdLseek();
+    case CMD_READ:
+        return cmdRead();
+    case CMD_WRITE:
+        return cmdWrite();
+    case CMD_MOVE:
+        return cmdMove();
+    default:
+        m_outValue = ERR_INVALID_COMMAND;
+        resetState();
+    }
+
     return false;
 }
 
@@ -230,14 +288,14 @@ bool RkSdController::cmdBoot()
 {
     int pos = 0;
 
-    if (loadRkFile(m_sdDir + "BOOT/SDBIOS.RK")) {
+    if (loadRkFile(m_sdDir + (m_specModel ? "BOOT/SDBIOS.RKS" : "BOOT/SDBIOS.RK"))) {
         if (m_outBuffer)
             delete[] m_outBuffer;
-        m_outBuffer = new uint8_t[m_progLen + 7];
+        m_outBuffer = new uint8_t[m_progLen + 7 + 1];
         m_outBuffer[pos++] = ERR_OK_ADDR;
         m_outBuffer[pos++] = m_progBegAddr & 0xFF;
         m_outBuffer[pos++] = (m_progBegAddr & 0xFF00) >> 8;
-        m_outBuffer[pos++] = ERR_OK_BLOCK;
+        m_outBuffer[pos++] = m_specModel ? 0 : ERR_OK_BLOCK;
         m_outBuffer[pos++] = m_progLen & 0xFF;
         m_outBuffer[pos++] = (m_progLen & 0xFF00) >> 8;
         memcpy(m_outBuffer + pos, m_progPtr, m_progLen);
@@ -259,7 +317,7 @@ bool RkSdController::cmdVer()
     int pos = 0;
     if (m_outBuffer)
         delete[] m_outBuffer;
-    m_outBuffer = new uint8_t[17];
+    m_outBuffer = new uint8_t[17 + 3];
     m_outBuffer[pos++] = 1;
     memcpy(m_outBuffer + pos, m_version, 16);
     pos += 16;
@@ -279,11 +337,11 @@ bool RkSdController::cmdExec()
     if (loadRkFile(m_sdDir + (char*)(m_inBuffer + 1))) {
         if (m_outBuffer)
             delete[] m_outBuffer;
-        m_outBuffer = new uint8_t[m_progLen + 7];
+        m_outBuffer = new uint8_t[m_progLen + 7 + 2];
         m_outBuffer[pos++] = ERR_OK_ADDR;
         m_outBuffer[pos++] = m_progBegAddr & 0xFF;
         m_outBuffer[pos++] = (m_progBegAddr & 0xFF00) >> 8;
-        m_outBuffer[pos++] = ERR_OK_BLOCK;
+        m_outBuffer[pos++] = m_specModel ? 0 : ERR_OK_BLOCK;
         m_outBuffer[pos++] = m_progLen & 0xFF;
         m_outBuffer[pos++] = (m_progLen & 0xFF00) >> 8;
         memcpy(m_outBuffer + pos, m_progPtr, m_progLen);
@@ -548,7 +606,7 @@ bool RkSdController::cmdRead()
 
     unsigned pos = 0;
 
-    m_outBuffer[pos++] = ERR_OK_BLOCK;
+    m_outBuffer[pos++] = m_specModel ? 0 : ERR_OK_BLOCK;
     m_outBuffer[pos++] = bytesToRead & 0xFF;
     m_outBuffer[pos++] = (uint8_t)(bytesToRead >> 8);
 
@@ -577,6 +635,8 @@ bool RkSdController::cmdWrite()
     }
 
     if (m_subStage == 0) {
+        m_multiStageCmdPending = true;
+
         if (m_inBufferPos < 3)
             return false;
 
@@ -607,6 +667,7 @@ bool RkSdController::cmdWrite()
     }
 
     if (!m_bytesToWrite) {
+        m_multiStageCmdPending = false;
         createErrorAnswer(ERR_OK_CMD);
         return true;
     }
@@ -632,6 +693,8 @@ bool RkSdController::cmdMove()
     }
 
     if (m_subStage == 0) {
+        m_multiStageCmdPending = true;
+
         if (m_inBufferPos < 3 || m_inBuffer[m_inBufferPos - 1] != 0)
             return false;
         m_srcDir = (char*)(m_inBuffer + 1);
@@ -640,8 +703,29 @@ bool RkSdController::cmdMove()
         if (m_inBufferPos < 2 || m_inBuffer[m_inBufferPos - 1] != 0)
             return false;
         bool res = PalFile::moveRename(m_sdDir + m_srcDir, m_sdDir + (char*)(m_inBuffer));
+        m_multiStageCmdPending = false;
         createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH);
     }
 
     return true;
+}
+
+
+bool RkSdController::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "model") {
+        if (values[0].asString() == "rk")
+            m_specModel = false;
+        else if (values[0].asString() == "spec")
+            m_specModel = true;
+        else
+            return false;
+        return true;
+    }
+
+    return false;
+
 }

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,14 +35,15 @@ class RkSdController : public Ppi8255Circuit
         RkSdController(std::string sdDir);
         ~RkSdController() override;
 
-        //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        void reset() override;
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         uint8_t getPortA() override;
         uint8_t getPortB() override {return 0xff;}
-        uint8_t getPortC() override {return 0xff;}
+        uint8_t getPortC() override;
         void setPortA(uint8_t value) override;
         void setPortB(uint8_t value) override;
-        void setPortC(uint8_t) override {}
+        void setPortC(uint8_t value) override;
 
         static EmuObject* create(const EmuValuesList& parameters) {return new RkSdController(parameters[0].asString());}
 
@@ -51,8 +52,12 @@ class RkSdController : public Ppi8255Circuit
     enum CommandStage {
         CS_WAIT40,
         CS_WAIT0,
+        CS_WAIT13,
+        CS_WAITB4,
+        CS_WAIT57,
         CS_START,  // ERR_START
         CS_OKDISK, // ERR_OK_DISK
+        CS_CMD,
         CS_PREPARE,
         CS_REQUEST,
         CS_ANSWER
@@ -97,10 +102,13 @@ class RkSdController : public Ppi8255Circuit
         ERR_OK_BLOCK = 0x4F
     };
 
+        bool m_specModel = false;
+
         bool m_readOnly = false;
 
         CommandStage m_stage = CS_WAIT40;
         int m_subStage = 0;
+        bool m_multiStageCmdPending = false;
         int m_cmd;
         std::string m_sdDir;
         uint8_t m_prevValue = 0;
