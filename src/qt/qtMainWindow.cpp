@@ -2943,6 +2943,7 @@ void MainWindow::onPlatformHelp()
 {
     std::string helpFile = palMakeFullFileName(emuGetPropertyValue(m_palWindow->getPlatformObjectName(), "helpFile"));
     HelpDialog::execute(QString::fromUtf8(helpFile.c_str()), false);
+    HelpDialog::activate();
 }
 
 
