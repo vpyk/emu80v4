@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -346,6 +346,17 @@ uint8_t* palReadFile(const string& fileName, int &fileSize, bool useBasePath)
 }
 
 #endif
+
+
+string palMakeCaseInsensitivePath(string basePath, const std::string caseInsensitivePath)
+{
+    // just concatente paths for now
+    if (!basePath.empty() && basePath.back() != '/')
+        basePath += '/';
+
+    return basePath + caseInsensitivePath;
+
+}
 
 
 static PalKeyCode TranslateScanCode(SDL_Scancode scanCode)

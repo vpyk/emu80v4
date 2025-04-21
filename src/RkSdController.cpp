@@ -34,12 +34,13 @@ const unsigned c_inBufferSize = 512 + 2;
 RkSdController::RkSdController(std::string sdDir)
 {
     m_sdDir = palMakeFullFileName(sdDir);
-    if (m_sdDir[m_sdDir.size() - 1] != '/' && m_sdDir[m_sdDir.size() - 1] != '\\')
-        m_sdDir += "/";
+    /*if (m_sdDir[m_sdDir.size() - 1] != '/' && m_sdDir[m_sdDir.size() - 1] != '\\')
+        m_sdDir += "/";*/
     m_romBuffer = new uint8_t[c_romBufferSize];
     memset(m_romBuffer, 0xFF, 128);
 
-    palReadFromFile(m_sdDir + (m_specModel ? "BOOT/BOOT.RKS" : "BOOT/BOOT.RK"), 0, c_romBufferSize, m_romBuffer);
+    string bootFileName = palMakeCaseInsensitivePath(m_sdDir, m_specModel ? "BOOT/BOOT.RKS" : "BOOT/BOOT.RK");
+    palReadFromFile(bootFileName, 0, c_romBufferSize, m_romBuffer);
 
     m_inBuffer = new uint8_t[c_inBufferSize];
 }
@@ -288,7 +289,8 @@ bool RkSdController::cmdBoot()
 {
     int pos = 0;
 
-    if (loadRkFile(m_sdDir + (m_specModel ? "BOOT/SDBIOS.RKS" : "BOOT/SDBIOS.RK"))) {
+    string sdBiosFileName = palMakeCaseInsensitivePath(m_sdDir, m_specModel ? "BOOT/SDBIOS.RKS" : "BOOT/SDBIOS.RK");
+    if (loadRkFile(sdBiosFileName)) {
         if (m_outBuffer)
             delete[] m_outBuffer;
         m_outBuffer = new uint8_t[m_progLen + 7 + 1];
@@ -334,7 +336,8 @@ bool RkSdController::cmdExec()
 
     int pos = 0;
 
-    if (loadRkFile(m_sdDir + (char*)(m_inBuffer + 1))) {
+    string fileName = palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 1));
+    if (loadRkFile(fileName)) {
         if (m_outBuffer)
             delete[] m_outBuffer;
         m_outBuffer = new uint8_t[m_progLen + 7 + 2];
@@ -373,7 +376,7 @@ bool RkSdController::cmdFind()
         for (auto it = m_fileList.begin(); it != m_fileList.end(); it++)
             delete (*it);
         m_fileList.clear();
-        dir = m_sdDir + dir;
+        dir = palMakeCaseInsensitivePath(m_sdDir, dir);
         palGetDirContent(dir, m_fileList);
     }
 
@@ -464,7 +467,7 @@ bool RkSdController::cmdOpen()
 
     switch (mode) {
     case O_OPEN: {
-        m_curFileName = m_sdDir + (char*)(m_inBuffer + 2);
+        m_curFileName = palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 2));
         m_curFileMode = m_readOnly ? "r" : "r+";
         m_curFileSize = 0;
         bool res = m_file.open(m_curFileName, m_curFileMode);
@@ -481,7 +484,7 @@ bool RkSdController::cmdOpen()
             createErrorAnswer(ERR_DISK_ERR);
             return false;
         }
-        m_curFileName = m_sdDir + (char*)(m_inBuffer + 2);
+        m_curFileName = palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 2));
         m_curFileMode = "rw";
         m_curFileSize = 0;
         bool res = PalFile::create(m_curFileName);
@@ -494,7 +497,7 @@ bool RkSdController::cmdOpen()
                 createErrorAnswer(ERR_DISK_ERR);
                 return false;
             }
-            string dirName = m_sdDir + (char*)(m_inBuffer + 2);
+            string dirName = palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 2));
             bool res = PalFile::mkDir(dirName);
             m_fileIsOpen = false;
             createErrorAnswer(res ? ERR_OK_CMD : ERR_FILE_EXISTS); }
@@ -504,7 +507,7 @@ bool RkSdController::cmdOpen()
             createErrorAnswer(ERR_DISK_ERR);
             return false;
         }
-        string fileName = m_sdDir + (char*)(m_inBuffer + 2);
+        string fileName = palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 2));
         bool res = PalFile::del(fileName);
         createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH); }
         break;
@@ -702,7 +705,7 @@ bool RkSdController::cmdMove()
     } else {
         if (m_inBufferPos < 2 || m_inBuffer[m_inBufferPos - 1] != 0)
             return false;
-        bool res = PalFile::moveRename(m_sdDir + m_srcDir, m_sdDir + (char*)(m_inBuffer));
+        bool res = PalFile::moveRename(palMakeCaseInsensitivePath(m_sdDir, m_srcDir), palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer)));
         m_multiStageCmdPending = false;
         createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH);
     }

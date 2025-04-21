@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -483,6 +483,49 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
     settings.endGroup();
     emuResetKeys(window);
     return fileName.toUtf8().constData();
+}
+
+
+std::string palMakeCaseInsensitivePath(const std::string& basePath, const std::string caseInsensitivePath)
+{
+    QString qBasePath = QString::fromUtf8(basePath.c_str());
+    QString qPath = QString::fromUtf8(caseInsensitivePath.c_str());
+
+    QStringList pathElements = qPath.split('/');
+
+    QString newPath = qBasePath;
+    if (newPath.right(1) == '/')
+        newPath.chop(1);
+
+    bool stopTrying = false;
+    foreach(auto& pathElement, pathElements) {
+        if (!stopTrying) {
+            QFileInfo fi(newPath + '/' + pathElement);
+            if (fi.exists()) {
+                newPath = newPath + '/' + pathElement;
+                continue;
+            }
+
+            QString elementCandidate = pathElement.toLower();
+            fi.setFile(newPath + '/' + elementCandidate);
+            if (fi.exists()) {
+                newPath = newPath + '/' + elementCandidate;
+                continue;
+            }
+
+            elementCandidate = pathElement.toUpper();
+            fi.setFile(newPath + '/' + elementCandidate);
+            if (fi.exists()) {
+                newPath = newPath + '/' + elementCandidate;
+                stopTrying = true;
+                continue;
+            }
+        }
+
+        newPath = newPath + '/' + pathElement;
+    }
+
+    return newPath.toUtf8().constData();
 }
 
 

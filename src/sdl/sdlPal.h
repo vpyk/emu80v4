@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ bool palSetVsync(bool vsync);
 std::string palMakeFullFileName(std::string fileName);
 int palReadFromFile(const std::string& fileName, int first, int size, uint8_t* buffer, bool useBasePath = true);
 uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePath = true);
+std::string palMakeCaseInsensitivePath(std::string basePath, const std::string caseInsensitivePath);
 
 #ifndef PAL_WASM
 void palRequestForQuit();
