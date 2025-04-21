@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new KorvetConfigWidget();
     else if (platformName == "vector")
         widget = new VectorConfigWidget();
-    else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha" || platformName == "mikro80" || platformName == "ut8880")
+    else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha" || platformName == "mikro80" || platformName == "ut88")
     widget = new ApogeyConfigWidget();
 
     widget->m_platform = platformName;
@@ -134,9 +134,16 @@ void ApogeyConfigWidget::tune()
 {
     ui->sdEnableCheckBox->setVisible(m_platform == "kr04");
     ui->romDiskEnableCheckBox->setVisible(m_platform == "mikrosha");
-    ui->sdosGroupBox->setVisible(m_platform == "rk86");
-    ui->romDiskGroupBox->setVisible(m_platform != "kr04" && m_platform != "partner");
+    ui->sdosGroupBox->setVisible(m_platform == "rk86" || m_platform == "spec");
+    ui->romDiskGroupBox->setVisible(m_platform != "kr04" && m_platform != "partner" && m_platform != "spec");
     ui->sdGroupBox->setVisible(m_platform != "mikrosha" && m_platform != "mikro80" && m_platform != "ut88");
+
+    if (m_platform == "spec") {
+        ui->hwmPvvVv55RadioButton->setEnabled(false);
+        ui->n8vemRadioButton->setEnabled(false);
+        ui->n8vemVv55RadioButton->setEnabled(false);
+        ui->msxRadioButton->setEnabled(false);
+    }
 }
 
 
@@ -160,8 +167,12 @@ void ApogeyConfigWidget::loadConfig()
         m_defValues["CFG_SD_DIR"] = "partner/sdcard";
     } else if (m_platform == "mikro80") {
         m_defValues["CFG_ROMDISK_FILE"] = "mikro80/romdisk.bin";
-    } else { // if (m_platform == "ut88") {
+    } else if (m_platform == "ut88") {
         m_defValues["CFG_ROMDISK_FILE"] = "ut88/romdisk.bin";
+    } else if (m_platform == "spec") {
+        m_defValues["CFG_SD_DIR"] = "spec/sdcard";
+        m_defValues["CFG_SD_IMG"] = "spec/sd_spec.img";
+        m_defValues["CFG_SD_TYPE"] = "HWMPVV";
     }
 
     optBegin();
