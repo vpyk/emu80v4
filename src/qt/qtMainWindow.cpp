@@ -614,7 +614,7 @@ void MainWindow::createActions()
     m_loadWavAction->setShortcuts(loadWavKeysList);
     addAction(m_loadWavAction);
     fileMenu->addAction(m_loadWavAction);
-    m_toolBar->addAction(m_loadWavAction);
+    //m_toolBar->addAction(m_loadWavAction);
     connect(m_loadWavAction, SIGNAL(triggered()), this, SLOT(onLoadWav()));
 
     fileMenu->addSeparator();
@@ -1215,7 +1215,7 @@ void MainWindow::createActions()
     m_printerCaptureAction->setShortcuts(printerCaptureKeyList);
     addAction(m_printerCaptureAction);
     settingsMenu->addAction(m_printerCaptureAction);
-    m_toolBar->addAction(m_printerCaptureAction);
+    //m_toolBar->addAction(m_printerCaptureAction);
     connect(m_printerCaptureAction, SIGNAL(triggered()), this, SLOT(onPrinterCapture()));
 
     // Tape hook on/off
