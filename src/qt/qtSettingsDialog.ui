@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
-    <height>606</height>
+    <width>530</width>
+    <height>588</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,7 +26,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="systemTab">
       <attribute name="title">
@@ -392,6 +392,29 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="uiGroupBox">
+         <property name="title">
+          <string>User interface</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <widget class="QCheckBox" name="selectedPlatformsCheckBox">
+            <property name="text">
+             <string>Show selected platforms only*</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="platformsListWidget">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>* Options marked by &quot;*&quot; take effect after emulator restart</string>
@@ -409,7 +432,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>286</width>
-           <height>60</height>
+           <height>10</height>
           </size>
          </property>
         </spacer>
@@ -1668,6 +1691,8 @@
   <tabstop>muteCheckBox</tabstop>
   <tabstop>volumeSpinBox</tabstop>
   <tabstop>volumeSlider</tabstop>
+  <tabstop>selectedPlatformsCheckBox</tabstop>
+  <tabstop>platformsListWidget</tabstop>
   <tabstop>autoSaveCheckBox</tabstop>
   <tabstop>okPushButton</tabstop>
   <tabstop>cancelPushButton</tabstop>

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,6 +49,8 @@ void SettingsDialog::initConfig()
     ui->shaderComboBox->addItem("- None -");
     ui->shaderComboBox->addItems(m_mainWindow->getShaderList());
 
+    //fillEnabledPlatformList();
+
     clearConfig();
     readRunningConfig();
     writeInitialSavedConfig();
@@ -58,10 +60,61 @@ void SettingsDialog::initConfig()
 }
 
 
+void SettingsDialog::fillEnabledPlatformList()
+{
+    const std::vector<PlatformInfo>* platformList = emuGetPlatforms();
+
+    ui->platformsListWidget->clear();
+    for (auto it = platformList->begin(); it != platformList->end(); it++) {
+        std::string platform = (*it).objName;
+        if (platform.find(".") == std::string::npos) {
+            QString platformName = QString::fromUtf8(it->platformName.c_str());
+            platformName = platformName.left(platformName.indexOf("("));
+            QString objName = QString::fromUtf8(platform.c_str());
+            auto item = new QListWidgetItem(platformName, ui->platformsListWidget);
+            item->setData(Qt::UserRole, objName);
+            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+            item->setCheckState(Qt::Unchecked);
+        }
+    }
+
+    QSettings settings;
+
+    settings.beginGroup("system");
+    QStringList platforms = settings.value("enabledPlatforms").toStringList();
+    settings.endGroup();
+
+    for (int i = 0; i < ui->platformsListWidget->count(); i++) {
+        QListWidgetItem* item = ui->platformsListWidget->item(i);
+        if (/*platforms.isEmpty() ||*/ platforms.contains(item->data(Qt::UserRole).toString()))
+            item->setCheckState(Qt::Checked);
+    }
+}
+
+
+void SettingsDialog::saveEnabledPlatformList()
+{
+    QStringList platforms;
+    for (int i = 0; i < ui->platformsListWidget->count(); i++) {
+        QListWidgetItem* item = ui->platformsListWidget->item(i);
+        if (item->checkState() == Qt::Checked)
+            platforms += item->data(Qt::UserRole).toString();
+    }
+
+    QSettings settings;
+
+    settings.beginGroup("system");
+    settings.setValue("enabledPlatforms", platforms);
+    settings.endGroup();
+}
+
+
 void SettingsDialog::updateConfig()
 {
     readRunningConfig();
     fillControlValues();
+
+    fillEnabledPlatformList();
 }
 
 
@@ -228,6 +281,7 @@ void SettingsDialog::loadSavedConfig()
     m_options["sampleRate"] = settings.value("sampleRate").toString();
     m_options["showHelp"] = settings.value("showHelp", "yes").toString();
     m_options["preserveSize"] = settings.value("preserveSize", "yes").toString();
+    m_options["selectedPlatformsOnly"] = settings.value("selectedPlatformsOnly", "no").toString();
     settings.endGroup();
 
     settings.beginGroup(m_platformGroup);
@@ -265,6 +319,9 @@ void SettingsDialog::fillControlValues()
 
     // Preserve size
     ui->preserveSizeCheckBox->setChecked(m_options["preserveSize"] == "yes");
+
+    // Preserve size
+    ui->selectedPlatformsCheckBox->setChecked(m_options["selectedPlatformsOnly"] == "yes");
 
     // OpenGL driver
     /*val = m_options["glDriver"];
@@ -764,6 +821,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["preserveSize"] = ui->preserveSizeCheckBox->isChecked() ? "yes" : "no";
     m_options["limitFps"] = ui->limitFpsCheckBox->isChecked() ? "true" : "false";
     m_options["maxFps"] = QString::number(ui->fpsSpinBox->value());
+    m_options["selectedPlatformsOnly"] = ui->selectedPlatformsCheckBox->isChecked() ? "yes" : "no";
 
     val = ui->vsyncCheckBox->isChecked() ? "yes" : "no";
     if (val != m_options["vsync"]) {
@@ -1008,6 +1066,8 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "eureka";
     m_options["keyboard.matrix"] = val;
 
+    saveEnabledPlatformList();
+
     saveRunningConfig();
     saveStoredConfig();
 
@@ -1030,7 +1090,8 @@ void SettingsDialog::saveRunningConfig()
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
         if (value != "" && option != "locale" && option != "showHelp" && option != "maxFps" &&
-                           option != "limitFps" && option != "sampleRate" && option != "vsync" && option != "preserveSize") {
+                           option != "limitFps" && option != "sampleRate" && option != "vsync" &&
+                           option != "preserveSize" && option != "selectedPlatformsOnly") {
             setRunningConfigValue(option, value);
         } else if (option == "maxFps") {
             setRunningConfigValue("emulation.maxFps", m_options.value("limitFps") == "true" ? value : 0);
@@ -1049,7 +1110,8 @@ void SettingsDialog::saveStoredConfig()
     for (const auto& option: m_options.keys()) {
         QString value = m_options.value(option);
         if (option.left(10) != "emulation." /*&& value != ""*/ && option != "locale" && option != "showHelp" &&
-                option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync" && option != "preserveSize")
+                option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync" &&
+                option != "preserveSize" && option != "selectedPlatformsOnly")
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -1058,7 +1120,8 @@ void SettingsDialog::saveStoredConfig()
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
         if (option.left(10) != "emulation." && value != "" && (option == "locale" || option == "showHelp" || option == "maxFps" ||
-                                                               option == "limitFps" || option == "sampleRate" || option == "vsync" || option == "preserveSize"))
+                                                               option == "limitFps" || option == "sampleRate" || option == "vsync" ||
+                                                               option == "preserveSize" || option == "selectedPlatformsOnly"))
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -1151,11 +1214,13 @@ void SettingsDialog::onResetShowHelp()
     saveConfig();
 }
 
+
 void SettingsDialog::on_smoothingNearestRadioButton_toggled(bool checked)
 {
     if (checked)
         adjustPresetComboBoxState();
 }
+
 
 void SettingsDialog::on_smoothingBilinearRadioButton_toggled(bool checked)
 {
@@ -1163,11 +1228,13 @@ void SettingsDialog::on_smoothingBilinearRadioButton_toggled(bool checked)
         adjustPresetComboBoxState();
 }
 
+
 void SettingsDialog::on_smoothingSharpRadioButton_toggled(bool checked)
 {
     if (checked)
         adjustPresetComboBoxState();
 }
+
 
 void SettingsDialog::on_smoothingCustomRadioButton_toggled(bool checked)
 {
@@ -1175,6 +1242,7 @@ void SettingsDialog::on_smoothingCustomRadioButton_toggled(bool checked)
         adjustPresetComboBoxState();
     ui->desaturateCheckBox->setEnabled(!checked);
 }
+
 
 void SettingsDialog::on_shaderComboBox_currentIndexChanged(int index)
 {
@@ -1185,4 +1253,10 @@ void SettingsDialog::on_shaderComboBox_currentIndexChanged(int index)
         ui->smoothingCustomRadioButton->setEnabled(true);
         ui->smoothingCustomRadioButton->setChecked(true);
     }
+}
+
+
+void SettingsDialog::on_selectedPlatformsCheckBox_toggled(bool checked)
+{
+    ui->platformsListWidget->setEnabled(checked);
 }

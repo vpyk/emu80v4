@@ -404,6 +404,12 @@ void MainWindow::setFullScreen(bool fullscreen)
 
 void MainWindow::fillPlatformListMenu()
 {
+    QSettings settings;
+    settings.beginGroup("system");
+    bool selectedPlatformsOnly = settings.value("selectedPlatformsOnly").toString() == "yes";
+    QStringList selectedPlatforms = settings.value("enabledPlatforms").toStringList();
+    settings.endGroup();
+
     QMenu* recentPlatformsMenu = new QMenu(tr("Recent"), m_platformListMenu);
     m_platformListMenu->addMenu(recentPlatformsMenu);
     m_platformListMenu->addSeparator();
@@ -427,7 +433,8 @@ void MainWindow::fillPlatformListMenu()
         std::string platform = (*it).objName;
         std::string::size_type dotPos = platform.find(".",0);
         QString group = QString::fromUtf8(platform.substr(0, dotPos).c_str());
-        groups[group]++;
+        if (!selectedPlatformsOnly || selectedPlatforms.contains(group))
+            groups[group]++;
     }
 
     QMap<QString, QMenu*> groupMenus;
@@ -439,6 +446,8 @@ void MainWindow::fillPlatformListMenu()
         QString platform = QString::fromUtf8(sPlatform.c_str());
         QString platformName = QString::fromUtf8((*it).platformName.c_str());
         m_platformNames[platform] = platformName;
+        if (selectedPlatformsOnly && !selectedPlatforms.contains(group))
+            continue;
         if (groups[group] == 1) {
             // single platform
             QAction* action = new QAction(platformName, m_platformListMenu);
@@ -460,7 +469,7 @@ void MainWindow::fillPlatformListMenu()
             QAction* action = new QAction(platformName, m_platformListMenu);
             action->setData(platform);
             if (!platform.contains(".")) {
-                menu->setTitle(platformName);
+                menu->setTitle(platformName.left(platformName.indexOf("(")));
                 QFont font = action->font();
                 font.setBold(true);
                 action->setFont(font);
@@ -470,7 +479,6 @@ void MainWindow::fillPlatformListMenu()
         }
     }
 
-    QSettings settings;
     settings.beginGroup("Last_platforms");
 
     for (int i = 0; i < LAST_PLATFORMS_QTY; i++) {

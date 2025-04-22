@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2019
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,17 +39,43 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
 {
     Q_UNUSED(runFileName)
     Q_UNUSED(setDef)
+
+    QSettings settings;
+    settings.beginGroup("system");
+    bool selectedPlatformsOnly = settings.value("selectedPlatformsOnly").toString() == "yes";
+    QStringList selectedPlatforms = settings.value("enabledPlatforms").toStringList();
+    settings.endGroup();
+
+    bool notEmpty = false;
+
     //ui->defaultCheckBox->setChecked(setDef);
     for (auto it = pi.begin(); it != pi.end(); it++) {
         QString s = QString::fromUtf8((*it).platformName.c_str());
+
         QListWidgetItem* item = new QListWidgetItem(s);
         ui->platformListWidget->addItem(item);
+
+        if (selectedPlatformsOnly) {
+            QString platform = QString::fromUtf8((*it).objName.c_str());
+            QString platformGroup = platform.left(platform.indexOf("."));
+            if (!selectedPlatforms.contains(platformGroup))
+                item->setHidden(true);
+            else
+                notEmpty = true;
+        }
+
         if ((*it).objName.find(".") == std::string::npos) {
             QFont font = item->font();
             font.setBold(true);
             item->setFont(font);
         }
     }
+
+    if (!notEmpty) {
+        ui->okPushButton->setEnabled(false);
+        ui->defaultCheckBox->setEnabled(false);
+    }
+
     ui->platformListWidget->setCurrentRow(pos);
     if (exec() == QDialog::Accepted) {
         pos = ui->platformListWidget->currentRow();
