@@ -46,7 +46,7 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
     QStringList selectedPlatforms = settings.value("enabledPlatforms").toStringList();
     settings.endGroup();
 
-    bool notEmpty = false;
+    bool empty = true;
 
     //ui->defaultCheckBox->setChecked(setDef);
     for (auto it = pi.begin(); it != pi.end(); it++) {
@@ -61,7 +61,7 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
             if (!selectedPlatforms.contains(platformGroup))
                 item->setHidden(true);
             else
-                notEmpty = true;
+                empty = false;
         }
 
         if ((*it).objName.find(".") == std::string::npos) {
@@ -71,7 +71,7 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
         }
     }
 
-    if (!notEmpty) {
+    if (selectedPlatformsOnly && empty) {
         ui->okPushButton->setEnabled(false);
         ui->defaultCheckBox->setEnabled(false);
     }
