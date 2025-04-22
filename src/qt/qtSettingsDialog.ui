@@ -1694,6 +1694,7 @@
   <tabstop>configTabWidget</tabstop>
   <tabstop>langComboBox</tabstop>
   <tabstop>showHelpCheckBox</tabstop>
+  <tabstop>fusionCheckBox</tabstop>
   <tabstop>limitFpsCheckBox</tabstop>
   <tabstop>fpsSpinBox</tabstop>
   <tabstop>vsyncCheckBox</tabstop>
