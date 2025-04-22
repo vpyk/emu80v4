@@ -503,7 +503,7 @@ std::string palMakeCaseInsensitivePath(const std::string& basePath, const std::s
     QStringList pathElements = qPath.split('/');
 
     QString newPath = qBasePath;
-    if (newPath.right(1) == '/')
+    if (newPath.right(1) == "/")
         newPath.chop(1);
 
     bool stopTrying = false;
