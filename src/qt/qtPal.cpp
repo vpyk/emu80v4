@@ -75,6 +75,8 @@ static QElapsedTimer timer;
 static QApplication* application;
 static QTranslator* translator;
 
+static bool fusionStyle = false;
+
 QApplication* getApplication() {return application;};
 
 
@@ -115,8 +117,6 @@ bool palQtInit(int& argc, char** argv)
 
     static int one = 1;
     application = new QApplication(one, argv); // suppress passing additional arguments
-
-    //application->setStyle("Fusion");
 
     QDir settingsDir(QCoreApplication::applicationDirPath() + "/_settings");
     if (settingsDir.exists()) {
@@ -169,7 +169,16 @@ bool palQtInit(int& argc, char** argv)
     else
         sampleRate = settings.value("sampleRate").toInt();
 
+    fusionStyle = false;
+    if (!settings.contains("fusionStyle"))
+        settings.setValue("fusionStyle", fusionStyle ? "yes" : "no");
+    else
+        fusionStyle = settings.value("fusionStyle") == "yes";
+
     settings.endGroup();
+
+    if (fusionStyle)
+        application->setStyle("Fusion");
 
     QSurfaceFormat format;
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);

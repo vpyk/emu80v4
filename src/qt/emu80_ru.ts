@@ -1271,7 +1271,7 @@
         <translation>Показывать подсказку по платформе при запуске</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="103"/>
+        <location filename="qtSettingsDialog.ui" line="113"/>
         <source>Video</source>
         <translation>Видео</translation>
     </message>
@@ -1288,48 +1288,48 @@
         <translation type="vanished">Вкл.</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="215"/>
+        <location filename="qtSettingsDialog.ui" line="225"/>
         <source>Sound</source>
         <translation>Звук</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="224"/>
+        <location filename="qtSettingsDialog.ui" line="234"/>
         <source>Sample rate* :</source>
         <oldsource>Sample Rate* :</oldsource>
         <translation>Частота дискретизации* :</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="282"/>
+        <location filename="qtSettingsDialog.ui" line="292"/>
         <source>Volume:</source>
         <translation>Громкость:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="294"/>
+        <location filename="qtSettingsDialog.ui" line="304"/>
         <source>Mute</source>
         <translation>Без звука</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="372"/>
+        <location filename="qtSettingsDialog.ui" line="382"/>
         <source>Not recommended!</source>
         <translation>Не рекомендуется!</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="420"/>
+        <location filename="qtSettingsDialog.ui" line="430"/>
         <source>* Options marked by &quot;*&quot; take effect after emulator restart</source>
         <translation>Настройки, помеченные &quot;*&quot; вступят в силу после перезапуска эмулятора</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="444"/>
+        <location filename="qtSettingsDialog.ui" line="454"/>
         <source>Window</source>
         <translation>Окно</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="463"/>
+        <location filename="qtSettingsDialog.ui" line="473"/>
         <source>Window preset:</source>
         <translation>Предустановки:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="477"/>
+        <location filename="qtSettingsDialog.ui" line="487"/>
         <source>- None -</source>
         <translation>- Нет -</translation>
     </message>
@@ -1379,47 +1379,47 @@
         <translation type="vanished">Вписать, изменяемый размер, ориг. соотн. сторон, сглаживание</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="534"/>
+        <location filename="qtSettingsDialog.ui" line="544"/>
         <source>Window size</source>
         <translation>Размер окна</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="540"/>
+        <location filename="qtSettingsDialog.ui" line="550"/>
         <source>Auto size</source>
         <translation>Автоматически устанавливаемый</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="555"/>
+        <location filename="qtSettingsDialog.ui" line="565"/>
         <source>User-changeable</source>
         <translation>Изменяемый пользователем</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="611"/>
+        <location filename="qtSettingsDialog.ui" line="621"/>
         <source>Fixed:</source>
         <translation>Фиксированный:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="640"/>
+        <location filename="qtSettingsDialog.ui" line="650"/>
         <source>Width:</source>
         <translation>Ширина:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="676"/>
+        <location filename="qtSettingsDialog.ui" line="686"/>
         <source>Height:</source>
         <translation>Высота:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="714"/>
+        <location filename="qtSettingsDialog.ui" line="724"/>
         <source>Scaling</source>
         <translation>Масштабирование</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="722"/>
+        <location filename="qtSettingsDialog.ui" line="732"/>
         <source>Fixed scale:</source>
         <translation>Фиксированный масштаб:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="786"/>
+        <location filename="qtSettingsDialog.ui" line="796"/>
         <source>Stretch to window</source>
         <translation>Растянуть во все окно</translation>
     </message>
@@ -1429,7 +1429,7 @@
         <translation type="vanished">Вписать в окно</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="793"/>
+        <location filename="qtSettingsDialog.ui" line="803"/>
         <source>Fit to window with integer scale factor</source>
         <translation>Вписать в окно с целым масштабом</translation>
     </message>
@@ -1442,27 +1442,27 @@
         <translation type="vanished">Оригинальное соотношение сторон</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="833"/>
+        <location filename="qtSettingsDialog.ui" line="843"/>
         <source>Screen format:</source>
         <translation>Формат экрана:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="851"/>
+        <location filename="qtSettingsDialog.ui" line="861"/>
         <source>Custom</source>
         <translation>Пользовательский</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="892"/>
+        <location filename="qtSettingsDialog.ui" line="902"/>
         <source>Custom format:</source>
         <translation>Пользовательский формат:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1314"/>
+        <location filename="qtSettingsDialog.ui" line="1324"/>
         <source>Show visible area</source>
         <translation>Отображать видимую область</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="517"/>
+        <location filename="qtSettingsDialog.ui" line="527"/>
         <source>Resizable</source>
         <oldsource>Sizeable</oldsource>
         <translation>Изменяемый</translation>
@@ -1484,407 +1484,412 @@
         <translation type="vanished">FPS без ограничений*</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="120"/>
+        <location filename="qtSettingsDialog.ui" line="130"/>
         <source>Limit FPS to:</source>
         <translation>Ограничение FPS:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="578"/>
+        <location filename="qtSettingsDialog.ui" line="588"/>
         <source>Preserve user-changeable size</source>
         <translation>Сохранять выбранный размер</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="810"/>
+        <location filename="qtSettingsDialog.ui" line="820"/>
         <source>Exact original aspect ratio</source>
         <translation>Точное соотношение сторон</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="825"/>
+        <location filename="qtSettingsDialog.ui" line="835"/>
         <source>Exact aspect ratio ON mode settings</source>
         <translation>Вкл. режим точного соотношения сторон</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="933"/>
+        <location filename="qtSettingsDialog.ui" line="943"/>
         <source>Exact aspect ratio OFF mode settings</source>
         <translation>Выкл. режим точного соотношения сторон</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="939"/>
+        <location filename="qtSettingsDialog.ui" line="949"/>
         <source>Adaptive AR (integer scale)</source>
         <translation>Адаптивный режим (целочисл.)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="946"/>
+        <location filename="qtSettingsDialog.ui" line="956"/>
         <source>Square pixels (1:1)</source>
         <translation>Квадратные пиксели</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="958"/>
+        <location filename="qtSettingsDialog.ui" line="968"/>
         <source>Gray background</source>
         <translation>Серый фон</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="982"/>
+        <location filename="qtSettingsDialog.ui" line="992"/>
         <source>Debugger</source>
         <translation>Отладчик</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="988"/>
+        <location filename="qtSettingsDialog.ui" line="998"/>
         <source>Debug on</source>
         <translation>Выйти в отладчик по</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1000"/>
+        <location filename="qtSettingsDialog.ui" line="1010"/>
         <source>HLT</source>
         <translation>команде HLT</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1013"/>
+        <location filename="qtSettingsDialog.ui" line="1023"/>
         <source>Illegal 8080 instructions</source>
         <oldsource>Illegal 8080 instruction</oldsource>
         <translation>недокументированным командам ВМ80</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1032"/>
+        <location filename="qtSettingsDialog.ui" line="1042"/>
         <source>Mnemonics (all platforms)</source>
         <translation>Мнемоники (все платформы)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1047"/>
+        <location filename="qtSettingsDialog.ui" line="1057"/>
         <source>8080 upper case mnemonics</source>
         <oldsource>8080 Upper case mnemonics</oldsource>
         <translation>Мнемоники 8080 в верхнем регистре</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1063"/>
+        <location filename="qtSettingsDialog.ui" line="1073"/>
         <source>Z80 upper case mnemonics</source>
         <oldsource>Z80 Upper case mnemonics</oldsource>
         <translation>Мнемоники Z80 в верхнем регистре</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1070"/>
+        <location filename="qtSettingsDialog.ui" line="1080"/>
         <source>Use Z80 mnemonics for 8080</source>
         <translation>Использовать мнемоники Z80 для 8080</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1080"/>
+        <location filename="qtSettingsDialog.ui" line="1090"/>
         <source>Control (all platforms)</source>
         <translation>Управление (все платформы)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1086"/>
+        <location filename="qtSettingsDialog.ui" line="1096"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use F5 for &amp;quot;Run&amp;quot; and F9 for &amp;quot;Set breakpoint&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;F5 – &amp;quot;Run&amp;quot;, F9 – &amp;quot;Точка останова&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1089"/>
+        <location filename="qtSettingsDialog.ui" line="1099"/>
         <source>Swap F5 and F9 (VS like)</source>
         <translation>F5 и F9 наоброт (как в VS)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1099"/>
+        <location filename="qtSettingsDialog.ui" line="1109"/>
         <source>Code page</source>
         <translation>Таблица символов</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1105"/>
+        <location filename="qtSettingsDialog.ui" line="1115"/>
         <source>RK-86</source>
         <translation>РК-86</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1112"/>
+        <location filename="qtSettingsDialog.ui" line="1122"/>
         <source>KOI-8</source>
         <translation>КОИ-8</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1122"/>
+        <location filename="qtSettingsDialog.ui" line="1132"/>
         <source>Reset pressed keys on leaving debugger</source>
         <translation>Сброс нажатых клавиш при покидании отладчика</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1149"/>
+        <location filename="qtSettingsDialog.ui" line="1159"/>
         <source>Screen</source>
         <translation>Экран</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1155"/>
+        <location filename="qtSettingsDialog.ui" line="1165"/>
         <source>Color mode</source>
         <translation>Режим цвета</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1199"/>
+        <location filename="qtSettingsDialog.ui" line="1209"/>
         <source>Field mixing</source>
         <translation>Смешивать полукадры</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1205"/>
+        <location filename="qtSettingsDialog.ui" line="1215"/>
         <source>Off</source>
         <translation>Выкл.</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1219"/>
-        <location filename="qtSettingsDialog.ui" line="1364"/>
+        <location filename="qtSettingsDialog.ui" line="1229"/>
+        <location filename="qtSettingsDialog.ui" line="1374"/>
         <source>Mix</source>
         <translation>Смешивать</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1212"/>
+        <location filename="qtSettingsDialog.ui" line="1222"/>
         <source>Average (old method)</source>
         <translation>Усреднять (старый метод)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="397"/>
+        <location filename="qtSettingsDialog.ui" line="97"/>
+        <source>Fusion UI style (may be necessary for dark theme)*</source>
+        <translation>Стиль Fusion (может быть необходим для темной темы)*</translation>
+    </message>
+    <message>
+        <location filename="qtSettingsDialog.ui" line="407"/>
         <source>User interface</source>
         <translation>Интерфейс пользователя</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="403"/>
+        <location filename="qtSettingsDialog.ui" line="413"/>
         <source>Show selected platforms only*</source>
         <translation>Отображать только выбранные платформы*</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1226"/>
+        <location filename="qtSettingsDialog.ui" line="1236"/>
         <source>Interlace</source>
         <translation>Чересстрочное отображение</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1233"/>
+        <location filename="qtSettingsDialog.ui" line="1243"/>
         <source>Scanline</source>
         <translation>Эмуляция линий растра</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1243"/>
+        <location filename="qtSettingsDialog.ui" line="1253"/>
         <source>Smoothing / post-processing</source>
         <translation>Сглаживание / постобработка</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1249"/>
+        <location filename="qtSettingsDialog.ui" line="1259"/>
         <source>Nearest</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1256"/>
+        <location filename="qtSettingsDialog.ui" line="1266"/>
         <source>Sharp (smooth pixel edges)</source>
         <translation>Границы пикселей (рекомендуется)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1263"/>
+        <location filename="qtSettingsDialog.ui" line="1273"/>
         <source>Bilinear</source>
         <translation>Билинейное</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1272"/>
+        <location filename="qtSettingsDialog.ui" line="1282"/>
         <source>Custom shader:</source>
         <translation>Шейдер</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1297"/>
+        <location filename="qtSettingsDialog.ui" line="1307"/>
         <source>Desaturate</source>
         <translation>Убрать цвет</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1307"/>
+        <location filename="qtSettingsDialog.ui" line="1317"/>
         <source>Alternate font (8×16, 8×12, 8×8)</source>
         <translation>Альтернативный шрифт (8×16, 8×12, 8×8)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1338"/>
+        <location filename="qtSettingsDialog.ui" line="1348"/>
         <source>Tape</source>
         <translation>Магнитофон</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1346"/>
+        <location filename="qtSettingsDialog.ui" line="1356"/>
         <source>WAV file channel:</source>
         <translation>Канал стерео-wav-файла:</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1354"/>
+        <location filename="qtSettingsDialog.ui" line="1364"/>
         <source>Left</source>
         <translation>Левый</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1359"/>
+        <location filename="qtSettingsDialog.ui" line="1369"/>
         <source>Right</source>
         <translation>Правый</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1389"/>
+        <location filename="qtSettingsDialog.ui" line="1399"/>
         <source>Speed up while playing wav, times</source>
         <translation>Ускорение работы при воспроизведении wav, раз</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1427"/>
+        <location filename="qtSettingsDialog.ui" line="1437"/>
         <source>Redirect tape calls to file</source>
         <translation>Перенаправлять обращения к магнитофону в файл</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1434"/>
+        <location filename="qtSettingsDialog.ui" line="1444"/>
         <source>Mute tape output</source>
         <translation>Не воспроизводить звук магнитофона</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1441"/>
+        <location filename="qtSettingsDialog.ui" line="1451"/>
         <source>Suppress file opening on reset</source>
         <translation>Подавлять запрос файла по сбросу</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1448"/>
+        <location filename="qtSettingsDialog.ui" line="1458"/>
         <source>Load multiblock files</source>
         <translation>Загружать мультиблочные файлы</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1469"/>
+        <location filename="qtSettingsDialog.ui" line="1479"/>
         <source>Keyboard</source>
         <translation>Клавиатура</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1475"/>
+        <location filename="qtSettingsDialog.ui" line="1485"/>
         <source>Layout</source>
         <translation>Раскладка</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1488"/>
+        <location filename="qtSettingsDialog.ui" line="1498"/>
         <source>Jcuken</source>
         <translation>Йцукен</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1495"/>
+        <location filename="qtSettingsDialog.ui" line="1505"/>
         <source>&quot;Smart&quot; layout</source>
         <translation>«Умная» раскладка</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1505"/>
+        <location filename="qtSettingsDialog.ui" line="1515"/>
         <source>Keyboard type</source>
         <translation>Тип клавиатуры «Специалиста»</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1511"/>
+        <location filename="qtSettingsDialog.ui" line="1521"/>
         <source>Original</source>
         <translation>Оригинальная</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1525"/>
+        <location filename="qtSettingsDialog.ui" line="1535"/>
         <source>Lik</source>
         <translation>Лик</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1542"/>
+        <location filename="qtSettingsDialog.ui" line="1552"/>
         <source>Joystick only assigned to arrow keys, 5 and Ins on the numpad instead of combining with keyboard arrows, Space and Enter</source>
         <translation>Не совмещать джойстик с клавиатурой (стрелки, пробел, Enter), назначить на джойстик только клавиши доп. цифровой клавиатуры (стрелки, 5, Ins)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1545"/>
+        <location filename="qtSettingsDialog.ui" line="1555"/>
         <source>Joystick on numpad only</source>
         <translation>Джойстик только на доп. цифровой клавиатуре</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1552"/>
+        <location filename="qtSettingsDialog.ui" line="1562"/>
         <source>Down key acts as Numpad 5 (Menu)</source>
         <translation>Клавиша Вниз вместо Numpad 5 (Меню)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1559"/>
+        <location filename="qtSettingsDialog.ui" line="1569"/>
         <source>Up key acts as Numpad 5 (Menu)</source>
         <translation>Клавиша Вверх вместо Numpad 5 (Меню)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1583"/>
+        <location filename="qtSettingsDialog.ui" line="1593"/>
         <source>Misc.</source>
         <translation>Разное</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1589"/>
+        <location filename="qtSettingsDialog.ui" line="1599"/>
         <source>Fast reset</source>
         <translation>Быстрый сброс</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1596"/>
+        <location filename="qtSettingsDialog.ui" line="1606"/>
         <source>AY stereo mode (ABC)</source>
         <translation>Режим стерео AY (ABC)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1632"/>
+        <location filename="qtSettingsDialog.ui" line="1642"/>
         <source>Auto save</source>
         <translation>Автоматически сохранять настройки</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1655"/>
+        <location filename="qtSettingsDialog.ui" line="1665"/>
         <source>Ok</source>
         <translation>Ок</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1675"/>
+        <location filename="qtSettingsDialog.ui" line="1685"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1668"/>
+        <location filename="qtSettingsDialog.ui" line="1678"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="468"/>
-        <location filename="qtSettingsDialog.cpp" line="518"/>
+        <location filename="qtSettingsDialog.cpp" line="472"/>
+        <location filename="qtSettingsDialog.cpp" line="522"/>
         <source>Color</source>
         <translation>Цветной</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="480"/>
+        <location filename="qtSettingsDialog.cpp" line="484"/>
         <source>Grayscale</source>
         <translation>Градации серого</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="483"/>
+        <location filename="qtSettingsDialog.cpp" line="487"/>
         <source>Color mode 1 (Tolkalin)</source>
         <translation>Цветной (схема Толкалина)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="487"/>
+        <location filename="qtSettingsDialog.cpp" line="491"/>
         <source>Color mode 2 (Akimenko)</source>
         <translatorcomment>Цветной (схема Апогея)</translatorcomment>
         <translation>Цветной (схема Акименко)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="476"/>
-        <location filename="qtSettingsDialog.cpp" line="499"/>
-        <location filename="qtSettingsDialog.cpp" line="511"/>
-        <location filename="qtSettingsDialog.cpp" line="526"/>
+        <location filename="qtSettingsDialog.cpp" line="480"/>
+        <location filename="qtSettingsDialog.cpp" line="503"/>
+        <location filename="qtSettingsDialog.cpp" line="515"/>
+        <location filename="qtSettingsDialog.cpp" line="530"/>
         <source>Black &amp;&amp; white</source>
         <translation>Черно-белый</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="495"/>
+        <location filename="qtSettingsDialog.cpp" line="499"/>
         <source>Black &amp;&amp; while (original)</source>
         <translation>Черно-белый ориг.</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="491"/>
+        <location filename="qtSettingsDialog.cpp" line="495"/>
         <source>Color mode 3 (Apogey)</source>
         <translation>Цветной (схема Апогея)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="503"/>
+        <location filename="qtSettingsDialog.cpp" line="507"/>
         <source>4-color mode</source>
         <translation>4-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="507"/>
+        <location filename="qtSettingsDialog.cpp" line="511"/>
         <source>8-color mode</source>
         <translation>8-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="522"/>
+        <location filename="qtSettingsDialog.cpp" line="526"/>
         <source>Color module</source>
         <translation>Блок цветности</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="1078"/>
+        <location filename="qtSettingsDialog.cpp" line="1088"/>
         <source>Emu80: warning</source>
         <oldsource>Warning</oldsource>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="1079"/>
+        <location filename="qtSettingsDialog.cpp" line="1089"/>
         <source>Some settings will take effect after emulator restart</source>
         <translation>Некоторые настройки вступят в силу после перезапуска эмулятора</translation>
     </message>

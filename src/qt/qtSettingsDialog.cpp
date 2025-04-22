@@ -260,7 +260,7 @@ void SettingsDialog::writeInitialSavedConfig()
         QString value = m_options.value(option);
         if (/*value != "" &&*/ option.left(10) != "emulation." && option != "locale" && option != "showHelp" &&
                 option != "maxFps" && option != "sampleRate" && option != "vsync" && option != "limitFps" &&
-                !settings.contains(option))
+                option != "fusionStyle" &&  !settings.contains(option))
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -282,6 +282,7 @@ void SettingsDialog::loadSavedConfig()
     m_options["showHelp"] = settings.value("showHelp", "yes").toString();
     m_options["preserveSize"] = settings.value("preserveSize", "yes").toString();
     m_options["selectedPlatformsOnly"] = settings.value("selectedPlatformsOnly", "no").toString();
+    m_options["fusionStyle"] = settings.value("fusionStyle", "no").toString();
     settings.endGroup();
 
     settings.beginGroup(m_platformGroup);
@@ -320,8 +321,11 @@ void SettingsDialog::fillControlValues()
     // Preserve size
     ui->preserveSizeCheckBox->setChecked(m_options["preserveSize"] == "yes");
 
-    // Preserve size
+    // Selected platforms
     ui->selectedPlatformsCheckBox->setChecked(m_options["selectedPlatformsOnly"] == "yes");
+
+    // Fusion style
+    ui->fusionCheckBox->setChecked(m_options["fusionStyle"] == "yes");
 
     // OpenGL driver
     /*val = m_options["glDriver"];
@@ -823,6 +827,12 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["maxFps"] = QString::number(ui->fpsSpinBox->value());
     m_options["selectedPlatformsOnly"] = ui->selectedPlatformsCheckBox->isChecked() ? "yes" : "no";
 
+    val = ui->fusionCheckBox->isChecked() ? "yes" : "no";
+    if (val != m_options["fusionStyle"]) {
+        m_options["fusionStyle"] = val;
+        rebootFlag = true;
+    }
+
     val = ui->vsyncCheckBox->isChecked() ? "yes" : "no";
     if (val != m_options["vsync"]) {
         m_options["vsync"] = val;
@@ -1091,7 +1101,7 @@ void SettingsDialog::saveRunningConfig()
         QString value = m_options.value(option);
         if (value != "" && option != "locale" && option != "showHelp" && option != "maxFps" &&
                            option != "limitFps" && option != "sampleRate" && option != "vsync" &&
-                           option != "preserveSize" && option != "selectedPlatformsOnly") {
+                           option != "preserveSize" && option != "selectedPlatformsOnly" && option != "fusionStyle") {
             setRunningConfigValue(option, value);
         } else if (option == "maxFps") {
             setRunningConfigValue("emulation.maxFps", m_options.value("limitFps") == "true" ? value : 0);
@@ -1111,7 +1121,7 @@ void SettingsDialog::saveStoredConfig()
         QString value = m_options.value(option);
         if (option.left(10) != "emulation." /*&& value != ""*/ && option != "locale" && option != "showHelp" &&
                 option != "maxFps" && option != "limitFps" && option != "sampleRate" && option != "vsync" &&
-                option != "preserveSize" && option != "selectedPlatformsOnly")
+                option != "preserveSize" && option != "selectedPlatformsOnly" && option != "fusionStyle")
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -1121,7 +1131,7 @@ void SettingsDialog::saveStoredConfig()
         QString value = m_options.value(option);
         if (option.left(10) != "emulation." && value != "" && (option == "locale" || option == "showHelp" || option == "maxFps" ||
                                                                option == "limitFps" || option == "sampleRate" || option == "vsync" ||
-                                                               option == "preserveSize" || option == "selectedPlatformsOnly"))
+                                                               option == "preserveSize" || option == "selectedPlatformsOnly" || option == "fusionStyle"))
             settings.setValue(option, value);
     }
     settings.endGroup();
