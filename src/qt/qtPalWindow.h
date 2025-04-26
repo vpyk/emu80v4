@@ -40,7 +40,7 @@ class PalWindow
     struct PalWindowParams {
         PalWindowStyle style;
         SmoothingType smoothing;
-        //bool vsync;
+        bool vsync;
         bool visible;
         int width;
         int height;

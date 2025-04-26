@@ -42,7 +42,7 @@ EmuWindow::EmuWindow()
     m_params.width = m_defWindowWidth;
     m_params.height = m_defWindowHeight;
     m_params.title = "";
-    //m_params.vsync = g_emulation->getVsync();
+    m_params.vsync = g_emulation->getVsync();
     m_params.smoothing = ST_SHARP;
 
     applyParams();
