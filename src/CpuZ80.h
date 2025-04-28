@@ -116,6 +116,8 @@ class CpuZ80 : public Cpu8080Compatible
         unsigned dfd_prefix(uint16_t& IXY);
         unsigned simz80();
 
+        inline void incR() {ir = (ir & 0xff80) | ((ir + 1) & 0x7f);}
+
         bool m_16bitPorts = false;
 };
 

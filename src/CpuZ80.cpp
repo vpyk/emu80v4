@@ -217,6 +217,7 @@ unsigned CpuZ80::cb_prefix(unsigned adr)
 
         op = GetBYTE(PC);
         unsigned cycles = cc_cb[op];
+        incR();
 
         switch (op & 7) {
         case 0: ++PC; acu = hreg(BC); break;
@@ -305,6 +306,7 @@ unsigned CpuZ80::dfd_prefix(uint16_t& IXY)
         op = GetBYTE(PC);
         ++PC;
         unsigned cycles = cc_xy[op];
+        incR();
 
         switch (op) {
         case 0x09:          /* ADD IXY,BC */
@@ -787,6 +789,7 @@ unsigned CpuZ80::simz80()
     op = GetBYTE(PC);
     ++PC;
     cycles = cc_op[op];
+    incR();
 
     switch(op) {
     case 0x00:          /* NOP */
@@ -2038,6 +2041,7 @@ unsigned CpuZ80::simz80()
         op = GetBYTE(PC);
         ++PC;
         cycles = cc_ed[op];
+        incR();
         switch (op) {
         case 0x40:          /* IN B,(C) */
             if (!m_16bitPorts)
