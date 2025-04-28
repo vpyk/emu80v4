@@ -78,7 +78,7 @@ uint8_t SdAdapter::readByte(int addr)
     if (addr == 0)
         return readDataPort();
     else
-        return 0xFF;
+        return m_type == SDA_HWMPVV ? 0 : 0xFF;
 }
 
 
