@@ -110,7 +110,7 @@ cpu.addrSpace = &addrSpace
 cpu.core = &core
 
 GeneralSoundSource tapeSoundSource
-#tapeSoundSource.muted = yes
+tapeSoundSource.muted = yes
 GeneralSoundSource beepSoundSource
 
 SpecKbdLayout kbdLayout
