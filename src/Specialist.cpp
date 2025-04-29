@@ -776,7 +776,7 @@ bool SpecFileLoader::loadMemFile(uint8_t* data, int fileSize, const std::string&
         m_platform->reset();
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (cpu) {
-            g_emulation->exec(int64_t(cpu->getKDiv()) * 2000000, true);
+            g_emulation->exec(int64_t(cpu->getKDiv()) * 200000, true);
             cpu->setPC(begAddr);
         }
     }
