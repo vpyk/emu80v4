@@ -213,6 +213,8 @@ ZxRenderer::ZxRenderer()
     memset(m_fullFrame, 0, 312 * 456 * sizeof(uint32_t));
 
     m_ticksPerByte = g_emulation->getFrequency() * 8 / 7000000;
+
+    m_flashCnt = 0;
 }
 
 
@@ -243,6 +245,8 @@ void ZxRenderer::renderFrame()
         for (int i = 0; i < 192; i++)
             memcpy(m_pixelData + m_sizeX * i, m_fullFrame + ((i + m_visibleScanLine) * m_linePixels), m_sizeX * 4);
     }
+
+    m_flashCnt = (m_flashCnt + 1) & 0x1F;
 }
 
 
@@ -312,8 +316,14 @@ void ZxRenderer::drawLine(int scanLine, int fromByte, int toByte)
             int addr = (((row & 0xC0) << 5) | ((row & 0x07) << 8) | ((row & 0x38) << 2)) + col;
             bt = m_screenMemory[m_screenPage][addr];
             uint8_t attr = m_screenMemory[m_screenPage][0x1800 + (row / 8 * 32) + col];
-            fgColor = zxPalette[(attr & 7) + ((attr & 0x40) >> 3)];
-            bgColor = zxPalette[((attr & 0x38) >> 3) + ((attr & 0x40) >> 3)];
+            bool inv = (attr & 0x80) && (m_flashCnt & 0x10);
+            if (!inv) {
+                fgColor = zxPalette[(attr & 7) + ((attr & 0x40) >> 3)];
+                bgColor = zxPalette[((attr & 0x38) >> 3) + ((attr & 0x40) >> 3)];
+            } else {
+                bgColor = zxPalette[(attr & 7) + ((attr & 0x40) >> 3)];
+                fgColor = zxPalette[((attr & 0x38) >> 3) + ((attr & 0x40) >> 3)];
+            }
         }
 
         for (int p = 0; p < 8; p++) {

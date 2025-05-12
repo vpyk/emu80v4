@@ -70,6 +70,7 @@ public:
         bool m_showBorder = false;
         bool m_colorMode = true;
         uint8_t m_borderColor = 0;
+        int m_flashCnt = 0;
 
         int m_lineChars = 56;
         int m_linePixels = 448;
