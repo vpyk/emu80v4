@@ -1013,7 +1013,7 @@ int KorvetPit8253SoundSource::calcValue()
     for (int i = 0; i < 3; i++)
         m_pit->getCounter(i)->resetStats();
 
-    return res * m_ampFactor;
+    return res;
 }
 
 

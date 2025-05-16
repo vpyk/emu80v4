@@ -1120,7 +1120,7 @@ int SpecMxPit8253SoundSource::calcValue()
     m_sumClocksTotal = 0;
     m_sumClocksHi = 0;
 
-    return res * m_ampFactor;
+    return res;
 }
 
 

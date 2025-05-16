@@ -424,5 +424,5 @@ WavSoundSource::WavSoundSource(WavReader* wavReader) : SoundSource()
 
 int WavSoundSource::calcValue()
 {
-    return m_wavReader->getCurValue() ? MAX_SND_AMP / 2 * m_ampFactor : 0;
+    return m_wavReader->getCurValue() ? MAX_SND_AMP / 2 : 0;
 }

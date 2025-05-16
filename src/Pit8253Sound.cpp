@@ -44,7 +44,7 @@ int Pit8253SoundSource::calcValue()
         }
     }
 
-    return res * m_ampFactor;
+    return res;
 }
 
 
@@ -95,5 +95,5 @@ int RkPit8253SoundSource::calcValue()
         m_pit->getCounter(2)->resetStats();
     }
 
-    return res * m_ampFactor;
+    return res;
 }

@@ -715,7 +715,7 @@ int Bashkiria2mPit8253SoundSource::calcValue()
         cnt1->resetStats();
     }
 
-    return res * m_ampFactor;
+    return res;
 }
 
 

@@ -134,7 +134,9 @@ void SoundSource::updateAmpFactor()
 
 void SoundSource::getSample(int& left, int& right)
 {
-    int val = calcValue();
+    int val = calcValue() * m_ampFactor;
+    if (m_muffled)
+        val = val /2;
     left = right = val;
 }
 
@@ -147,6 +149,11 @@ bool SoundSource::setProperty(const std::string& propertyName, const EmuValuesLi
     if (propertyName == "muted") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
             setMuted(values[0].asString() == "yes");
+            return true;
+        }
+    } else if (propertyName == "muffled") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_muffled = values[0].asString() == "yes";
             return true;
         }
     } else if (propertyName == "polarity") {
@@ -206,7 +213,7 @@ int GeneralSoundSource::calcValue()
     sumVal = 0;
     initClock = g_emulation->getCurClock();
 
-    return res * m_ampFactor;
+    return res;
 }
 
 

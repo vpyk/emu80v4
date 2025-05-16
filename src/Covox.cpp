@@ -63,5 +63,5 @@ int Covox::calcValue()
     m_sumVal = 0;
     m_initClock = g_emulation->getCurClock();
 
-    return res * m_ampFactor;
+    return res;
 }

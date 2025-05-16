@@ -239,7 +239,7 @@ void Psg3910::getOutputs(uint16_t* outputs)
 int Psg3910SoundSource::calcValue()
 {
     // not used since getSample is implemented
-    return 0; //m_psg ? m_psg->getOutput() * m_ampFactor : 0;
+    return 0; //m_psg ? m_psg->getOutput() : 0;
 }
 
 
@@ -260,13 +260,18 @@ void Psg3910SoundSource::getSample(int& left, int& right)
         // Stereo ABC
         // L = 1/2*A + 1/3*B + 1/6*C
         // R = 1/6*A + 1/3*B + 1/2*C
-        left =  m_ampFactor * (outputs[0] * 3 / 2 + outputs[1] + outputs[2] / 2);
-        right = m_ampFactor * (outputs[0] / 2 + outputs[1] + outputs[2] * 3 / 2);
+        left =  (outputs[0] * 3 / 2 + outputs[1] + outputs[2] / 2) * m_ampFactor;
+        right = (outputs[0] / 2 + outputs[1] + outputs[2] * 3 / 2) * m_ampFactor;
     } else {
         // Mono
         // L = 1/3*A + 1/3*B + 1/3*C
         // R = 1/3*A + 1/3*B + 1/3*C
-        left = right = m_ampFactor * (outputs[0] + outputs[1] + outputs[2]);
+        left = right = (outputs[0] + outputs[1] + outputs[2]) * m_ampFactor;
+    }
+
+    if (m_muffled) {
+        left = left / 2;
+        right = right / 2;
     }
 }
 

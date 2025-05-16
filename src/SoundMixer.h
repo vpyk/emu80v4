@@ -47,6 +47,7 @@ class SoundSource : public EmuObject
 
     protected:
         int m_ampFactor = 1;
+        bool m_muffled = false;
 
     private:
         bool m_muted = false;

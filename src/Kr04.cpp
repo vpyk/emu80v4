@@ -364,7 +364,7 @@ int Kr04Pit8253SoundSource::calcValue()
         m_pit->getCounter(2)->resetStats();
     }
 
-    return res * m_ampFactor;
+    return res;
 }
 
 
