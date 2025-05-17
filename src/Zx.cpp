@@ -138,18 +138,27 @@ void ZxPorts::writeByte(int addr, uint8_t value)
         m_portFEOutput->setValue(value);
     } else if (!(addr & 2)) {
         // port FD
-        if (!m_ay[m_curAy])
-            return;
+
         addr >>= 8;
-        if (addr == 0xFF) {
+
+        if ((addr & 0xC0) == 0x40) {
+            // 128K FD register
+            if (m_128kMode)
+                m_port7FFDOutput->setValue(value);
+        } else if (addr == 0xFF) {
+            // AY address reg
             if (m_ay[1] && (value & 0xFE) == 0xFE)
+                // select AY #
                 m_curAy = value & 1;
-            else
-                m_ay[m_curAy]->writeByte(1, value);
-        } else if (addr == 0xFC || addr == 0xBF)
-            m_ay[m_curAy]->writeByte(0, value);
-        else if (m_128kMode && addr == 0x7F)
-            m_port7FFDOutput->setValue(value);
+            else {
+                if (m_ay[m_curAy])
+                    m_ay[m_curAy]->writeByte(1, value);
+            }
+        } else if (addr == 0xFC || addr == 0xBF) {
+            // AY data register
+            if (m_ay[m_curAy])
+                m_ay[m_curAy]->writeByte(0, value);
+        }
         /*if (m_128kMode && (addr & 0x20)) {
             // 48K mode
             m_ramPageOutput->setValue(0); // ?
@@ -158,7 +167,6 @@ void ZxPorts::writeByte(int addr, uint8_t value)
             m_128kMode = false;
         }*/
     }
-
 }
 
 
