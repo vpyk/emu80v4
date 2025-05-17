@@ -24,6 +24,7 @@
 #include "ui_qtApogeyConfig.h"
 #include "ui_qtKorvetConfig.h"
 #include "ui_qtVectorConfig.h"
+#include "ui_qtZxConfig.h"
 
 #include "../Pal.h"
 
@@ -44,6 +45,8 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new KorvetConfigWidget();
     else if (platformName == "vector")
         widget = new VectorConfigWidget();
+    else if (platformName == "zx")
+        widget = new ZxConfigWidget();
     else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha" || platformName == "mikro80" || platformName == "ut88")
     widget = new ApogeyConfigWidget();
 
@@ -342,3 +345,42 @@ void VectorConfigWidget::setDefaults()
     ui->edd1RadioButton->setChecked(m_defValues["CFG_EDD"] == "EDD");
 }
 
+
+// ######## Zx config widget ########
+
+ZxConfigWidget::ZxConfigWidget(QWidget *parent) :
+    ConfigWidget(parent),
+    ui(new Ui::ZxConfigWidget)
+{
+    ui->setupUi(this);
+}
+
+
+void ZxConfigWidget::loadConfig()
+{
+    m_defValues["CFG_AY_48K"] = "ON";
+    m_defValues["CFG_AY_TS"] = "ON";
+
+    optBegin();
+
+    ui->ay48kCheckBox->setChecked(optLoad("CFG_AY_48K").toString() == "ON");
+    ui->tsCheckBox->setChecked(optLoad("CFG_AY_TS").toString() == "ON");
+
+    optEnd();
+}
+
+void ZxConfigWidget::saveConfig()
+{
+    optBegin();
+
+    optSave("CFG_AY_48K", ui->ay48kCheckBox->isChecked() ? "ON" : "OFF");
+    optSave("CFG_AY_TS", ui->tsCheckBox->isChecked() ? "ON" : "OFF");
+
+    optEnd();
+}
+
+void ZxConfigWidget::setDefaults()
+{
+    ui->ay48kCheckBox->setChecked(m_defValues["CFG_AY_48K"] == "ON");
+    ui->tsCheckBox->setChecked(m_defValues["CFG_AY_TS"] == "ON");
+}

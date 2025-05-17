@@ -60,6 +60,7 @@ namespace Ui {
     class ApogeyConfigWidget;
     class KorvetConfigWidget;
     class VectorConfigWidget;
+    class ZxConfigWidget;
 }
 
 class ApogeyConfigWidget : public ConfigWidget
@@ -117,6 +118,22 @@ public:
 
 private:
     Ui::VectorConfigWidget *ui;
+};
+
+
+class ZxConfigWidget : public ConfigWidget
+{
+    Q_OBJECT
+
+public:
+    explicit ZxConfigWidget(QWidget *parent = nullptr);
+
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private:
+    Ui::ZxConfigWidget *ui;
 };
 
 

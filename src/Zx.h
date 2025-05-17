@@ -122,6 +122,8 @@ class Psg3910;
 class ZxPorts : public AddressableDevice
 {
 public:
+    void reset() override;
+
     void initConnections() override;
 
     void writeByte(int addr, uint8_t value) override;
@@ -134,7 +136,8 @@ public:
 private:
     int m_kbdMatrixData = 0;
 
-    Psg3910* m_ay = nullptr;
+    Psg3910* m_ay[2] = {nullptr, nullptr};
+    int m_curAy = 0;
 
     EmuOutput* m_kbdMaskOutput = nullptr;
     EmuOutput* m_portFEOutput = nullptr;

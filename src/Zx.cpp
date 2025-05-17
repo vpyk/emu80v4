@@ -84,6 +84,12 @@ bool ZxCore::setProperty(const string& propertyName, const EmuValuesList& values
 }
 
 
+void ZxPorts::reset()
+{
+    m_curAy = 0;
+}
+
+
 void ZxPorts::initConnections()
 {
     AddressableDevice::initConnections();
@@ -112,11 +118,11 @@ uint8_t ZxPorts::readByte(int addr)
         return (m_kbdMatrixData & 0x1F) + (g_emulation->getWavReader()->getCurValue() ? 0x40 : 0x00);
     } else if (!(addr & 2)) {
         // port FD
-        if (!m_ay)
+        if (!m_ay[m_curAy])
             return 0xFF;
         addr >>= 8;
         if (addr == 0xFF)
-            return m_ay->readByte(0);
+            return m_ay[m_curAy]->readByte(0);
         else
             return 0xFF;
     }
@@ -132,13 +138,16 @@ void ZxPorts::writeByte(int addr, uint8_t value)
         m_portFEOutput->setValue(value);
     } else if (!(addr & 2)) {
         // port FD
-        if (!m_ay)
+        if (!m_ay[m_curAy])
             return;
         addr >>= 8;
-        if (addr == 0xFF)
-            m_ay->writeByte(1, value);
-        else if (addr == 0xFC || addr == 0xBF)
-            m_ay->writeByte(0, value);
+        if (addr == 0xFF) {
+            if (m_ay[1] && (value & 0xFE) == 0xFE)
+                m_curAy = value & 1;
+            else
+                m_ay[m_curAy]->writeByte(1, value);
+        } else if (addr == 0xFC || addr == 0xBF)
+            m_ay[m_curAy]->writeByte(0, value);
         else if (m_128kMode && addr == 0x7F)
             m_port7FFDOutput->setValue(value);
         /*if (m_128kMode && (addr & 0x20)) {
@@ -149,6 +158,7 @@ void ZxPorts::writeByte(int addr, uint8_t value)
             m_128kMode = false;
         }*/
     }
+
 }
 
 
@@ -158,7 +168,10 @@ bool ZxPorts::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
 
     if (propertyName == "ay") {
-        m_ay = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
+        m_ay[0] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "ay2") {
+        m_ay[1] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "mode") {
         if (values[0].asString() == "128k" || values[0].asString() == "48k") {

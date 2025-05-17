@@ -59,22 +59,22 @@
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="247"/>
+        <location filename="qtConfigWidget.cpp" line="250"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="247"/>
+        <location filename="qtConfigWidget.cpp" line="250"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="253"/>
+        <location filename="qtConfigWidget.cpp" line="256"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="259"/>
+        <location filename="qtConfigWidget.cpp" line="262"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -105,7 +105,7 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="qtConfigWidget.cpp" line="84"/>
+        <location filename="qtConfigWidget.cpp" line="87"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -1828,68 +1828,68 @@
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="472"/>
-        <location filename="qtSettingsDialog.cpp" line="522"/>
+        <location filename="qtSettingsDialog.cpp" line="476"/>
+        <location filename="qtSettingsDialog.cpp" line="526"/>
         <source>Color</source>
         <translation>Цветной</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="484"/>
+        <location filename="qtSettingsDialog.cpp" line="488"/>
         <source>Grayscale</source>
         <translation>Градации серого</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="487"/>
+        <location filename="qtSettingsDialog.cpp" line="491"/>
         <source>Color mode 1 (Tolkalin)</source>
         <translation>Цветной (схема Толкалина)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="491"/>
+        <location filename="qtSettingsDialog.cpp" line="495"/>
         <source>Color mode 2 (Akimenko)</source>
         <translatorcomment>Цветной (схема Апогея)</translatorcomment>
         <translation>Цветной (схема Акименко)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="480"/>
-        <location filename="qtSettingsDialog.cpp" line="503"/>
-        <location filename="qtSettingsDialog.cpp" line="515"/>
-        <location filename="qtSettingsDialog.cpp" line="530"/>
+        <location filename="qtSettingsDialog.cpp" line="484"/>
+        <location filename="qtSettingsDialog.cpp" line="507"/>
+        <location filename="qtSettingsDialog.cpp" line="519"/>
+        <location filename="qtSettingsDialog.cpp" line="534"/>
         <source>Black &amp;&amp; white</source>
         <translation>Черно-белый</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="499"/>
+        <location filename="qtSettingsDialog.cpp" line="503"/>
         <source>Black &amp;&amp; while (original)</source>
         <translation>Черно-белый ориг.</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="495"/>
+        <location filename="qtSettingsDialog.cpp" line="499"/>
         <source>Color mode 3 (Apogey)</source>
         <translation>Цветной (схема Апогея)</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="507"/>
+        <location filename="qtSettingsDialog.cpp" line="511"/>
         <source>4-color mode</source>
         <translation>4-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="511"/>
+        <location filename="qtSettingsDialog.cpp" line="515"/>
         <source>8-color mode</source>
         <translation>8-цветный</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="526"/>
+        <location filename="qtSettingsDialog.cpp" line="530"/>
         <source>Color module</source>
         <translation>Блок цветности</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="1088"/>
+        <location filename="qtSettingsDialog.cpp" line="1092"/>
         <source>Emu80: warning</source>
         <oldsource>Warning</oldsource>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.cpp" line="1089"/>
+        <location filename="qtSettingsDialog.cpp" line="1093"/>
         <source>Some settings will take effect after emulator restart</source>
         <translation>Некоторые настройки вступят в силу после перезапуска эмулятора</translation>
     </message>
@@ -1916,6 +1916,20 @@
         <source>2 EDDs, Barkar scheme (ports 10h, 11h)</source>
         <oldsource>2 EDDs, Barkar scheme (ports 10, 11)</oldsource>
         <translation>2 EDD, схема Баркаря (порты 10h, 11h)</translation>
+    </message>
+</context>
+<context>
+    <name>ZxConfigWidget</name>
+    <message>
+        <location filename="qtZxConfig.ui" line="41"/>
+        <source>AY in 48K configuration</source>
+        <translation>AY в конфигурации 48К</translation>
+    </message>
+    <message>
+        <location filename="qtZxConfig.ui" line="48"/>
+        <source>2 AYs (NedoPC Turbo Sound)</source>
+        <oldsource>2 AYs (Turbo Sound)</oldsource>
+        <translation>2 AY (схема NedoPC Turbo Sound)</translation>
     </message>
 </context>
 </TS>

@@ -162,6 +162,10 @@ void SettingsDialog::setRunningConfigValue(QString option, QString value)
         obj = m_platform;
 
     emuSetPropertyValue(obj, prop, val);
+
+    if (obj == m_platform + ".psgSoundSource") {
+        emuSetPropertyValue(obj + "2", prop, val);
+    }
 }
 
 
