@@ -30,8 +30,9 @@
 class GeneralSoundSource;
 
 enum ZxModel {
-    ZM_48k,
-    ZM_128k
+    ZM_48K,
+    ZM_128K,
+    ZM_PENTAGON
 };
 
 class ZxRenderer : public CrtRenderer, public IActive
@@ -76,6 +77,8 @@ public:
         int m_linePixels = 448;
         int m_visibleScanLine = 64;
         int m_scanLines = 312;
+        int m_bias = 0;
+        int m_vOffset = 24;
 
         EmuOutput* m_intOutput = nullptr;
 

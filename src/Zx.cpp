@@ -174,8 +174,8 @@ bool ZxPorts::setProperty(const string& propertyName, const EmuValuesList& value
         m_ay[1] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "mode") {
-        if (values[0].asString() == "128k" || values[0].asString() == "48k") {
-            m_128kMode = values[0].asString() == "128k";
+        if (values[0].asString() == "128k" || values[0].asString() == "48k" || values[0].asString() == "pentagon") {
+            m_128kMode = values[0].asString() != "48k";
             return true;
         }
         return false;
@@ -222,8 +222,8 @@ ZxRenderer::ZxRenderer()
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
 
-    m_fullFrame = new uint32_t[312 * 456];
-    memset(m_fullFrame, 0, 312 * 456 * sizeof(uint32_t));
+    m_fullFrame = new uint32_t[320 * 456];
+    memset(m_fullFrame, 0, 320 * 456 * sizeof(uint32_t));
 
     m_ticksPerByte = g_emulation->getFrequency() * 8 / 7000000;
 
@@ -248,7 +248,7 @@ void ZxRenderer::renderFrame()
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
 
         for (int i = 0; i < 288; i++)
-            memcpy(m_pixelData + m_sizeX * i, m_fullFrame + (i + /*24*/m_visibleScanLine - 40) * m_linePixels - 50/*73*/, m_sizeX * 4);
+            memcpy(m_pixelData + m_sizeX * i, m_fullFrame + (i + m_vOffset /*m_visibleScanLine - 40*/) * m_linePixels - 50/*73*/, m_sizeX * 4);
 
     } else {
         m_sizeX = 256;
@@ -292,7 +292,7 @@ void ZxRenderer::operate()
 
 void ZxRenderer::advanceTo(uint64_t clocks)
 {
-    int toFrameByte = (int64_t(clocks) - int64_t(m_curFrameClock)) / m_ticksPerByte/* + bias*/;
+    int toFrameByte = (int64_t(clocks) - int64_t(m_curFrameClock)) / m_ticksPerByte + m_bias;
 
     if (toFrameByte <= m_curFrameByte)
         return;
@@ -388,17 +388,29 @@ void ZxRenderer::toggleCropping()
 void ZxRenderer::setModel(ZxModel model)
 {
     switch (model) {
-    case ZM_48k:
+    case ZM_48K:
         m_lineChars = 56;
         m_linePixels = 448;
         m_scanLines = 312;
         m_visibleScanLine = 64;
+        m_bias = 0;
+        m_vOffset = 24;
         break;
-    case ZM_128k:
+    case ZM_128K:
         m_lineChars = 57;
         m_linePixels = 456;
         m_scanLines = 311;
         m_visibleScanLine = 63;
+        m_bias = 0;
+        m_vOffset = 23;
+        break;
+    case ZM_PENTAGON:
+        m_lineChars = 56;
+        m_linePixels = 448;
+        m_scanLines = 320;
+        m_visibleScanLine = 81;
+        m_bias = 40;
+        m_vOffset = 32;
         break;
     default:
         break;
@@ -425,9 +437,11 @@ bool ZxRenderer::setProperty(const string& propertyName, const EmuValuesList& va
         }
     } else if (propertyName == "mode") {
         if (values[0].asString() == "48k")
-            setModel(ZM_48k);
+            setModel(ZM_48K);
         else if (values[0].asString() == "128k")
-            setModel(ZM_128k);
+            setModel(ZM_128K);
+        else if (values[0].asString() == "pentagon")
+            setModel(ZM_PENTAGON);
         else
             return false;
         return true;
