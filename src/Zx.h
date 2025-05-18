@@ -147,7 +147,7 @@ private:
     EmuOutput* m_portFEOutput = nullptr;
     EmuOutput* m_port7FFDOutput = nullptr;
 
-    bool m_128kMode = false;
+    bool m_128kMode = true;
 
     void setKbdMatrixData(int data);
 };
