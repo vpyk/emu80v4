@@ -73,7 +73,8 @@ public:
         uint8_t m_borderColor = 0;
         int m_flashCnt = 0;
 
-        int m_lineChars = 56;
+        ZxModel m_model = ZM_128K;
+        int m_lineTStates = 224;
         int m_linePixels = 448;
         int m_visibleScanLine = 64;
         int m_scanLines = 312;
@@ -82,17 +83,17 @@ public:
 
         EmuOutput* m_intOutput = nullptr;
 
-        unsigned m_ticksPerByte;
+        unsigned m_ticksPerTState;
         uint64_t m_curFrameClock = 0;
         int m_curScanLine = 0;
-        int m_curFrameByte = 0;
+        int m_curFrameTState = 0;
 
         bool m_intActive = false;
 
         uint32_t* m_fullFrame = nullptr;
 
         void advanceTo(uint64_t clocks);
-        void drawLine(int line, int from, int to);
+        void drawLine(int line, int fromTState, int toTState);
 
         void setModel(ZxModel model);
 };

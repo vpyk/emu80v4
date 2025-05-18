@@ -233,7 +233,7 @@ ZxRenderer::ZxRenderer()
     m_fullFrame = new uint32_t[320 * 456];
     memset(m_fullFrame, 0, 320 * 456 * sizeof(uint32_t));
 
-    m_ticksPerByte = g_emulation->getFrequency() * 8 / 7000000;
+    m_ticksPerTState = g_emulation->getFrequency() * 2 / 7000000;
 
     m_flashCnt = 0;
 }
@@ -273,12 +273,12 @@ void ZxRenderer::renderFrame()
 
 void ZxRenderer::operate()
 {
-    advanceTo(m_curClock + 2 * m_ticksPerByte);
+    advanceTo(m_curClock + 8 * m_ticksPerTState);
 
     if (m_intActive) {
         m_intActive = false;
         m_intOutput->setValue(false);
-        m_curClock += m_ticksPerByte * (m_lineChars - 8);
+        m_curClock += m_ticksPerTState * (m_lineTStates - 32);
         return;
     }
 
@@ -288,41 +288,44 @@ void ZxRenderer::operate()
         m_intActive = true;
         m_intOutput->setValue(true);
         m_curFrameClock = m_curClock;
-        m_curClock += m_ticksPerByte * 8;
+        m_curClock += m_ticksPerTState * 32;
         renderFrame();
         g_emulation->screenUpdateReq();
         return;
     }
 
-    m_curClock += m_ticksPerByte * m_lineChars;
+    m_curClock += m_ticksPerTState * m_lineTStates;
 }
 
 
 void ZxRenderer::advanceTo(uint64_t clocks)
 {
-    int toFrameByte = (int64_t(clocks) - int64_t(m_curFrameClock)) / m_ticksPerByte + m_bias;
+    int toFrameTState = (int64_t(clocks) - int64_t(m_curFrameClock)) / m_ticksPerTState + m_bias;
 
-    if (toFrameByte <= m_curFrameByte)
+    if (toFrameTState <= m_curFrameTState)
         return;
 
-    int scanLine = m_curFrameByte / m_lineChars;
-    int toByte = (toFrameByte + m_lineChars - 1) % m_lineChars;
-    int fromByte = m_curFrameByte % m_lineChars;
+    int scanLine = m_curFrameTState / m_lineTStates;
+    int toTState = (toFrameTState + m_lineTStates - 1) % m_lineTStates;
+    int fromTState = m_curFrameTState % m_lineTStates;
 
-    if (fromByte <= toByte)
-        drawLine(scanLine, fromByte, toByte);
+    if (fromTState <= toTState)
+        drawLine(scanLine, fromTState, toTState);
     else {
-        drawLine(scanLine, fromByte, m_lineChars - 1);
+        drawLine(scanLine, fromTState, m_lineTStates - 1);
         if (scanLine != m_scanLines - 1)
-            drawLine(scanLine + 1, 0, toByte);
+            drawLine(scanLine + 1, 0, toTState);
     }
 
-    m_curFrameByte = toFrameByte % (m_lineChars * m_scanLines);
+    m_curFrameTState = toFrameTState % (m_lineTStates * m_scanLines);
 }
 
 
-void ZxRenderer::drawLine(int scanLine, int fromByte, int toByte)
+void ZxRenderer::drawLine(int scanLine, int fromTState, int toTState)
 {
+    int fromByte = fromTState / 4;
+    int toByte = toTState / 4;
+
     uint8_t bt = 0;
     uint32_t fgColor = 0;
     uint32_t bgColor = 0;
@@ -347,7 +350,10 @@ void ZxRenderer::drawLine(int scanLine, int fromByte, int toByte)
             }
         }
 
-        for (int p = 0; p < 8; p++) {
+        int p1 = col == fromByte && m_model == ZM_PENTAGON ? fromTState % 4 * 2 : 0;
+        int p2 = col == toByte  && m_model == ZM_PENTAGON ? toTState % 4 * 2 + 1 : 7;
+
+        for (int p = p1; p <= p2; p++) {
             uint32_t color = (bt & 0x80) ? fgColor : bgColor;
             m_fullFrame[scanLine * m_linePixels + col * 8 + p] = color;
             bt <<= 1;
@@ -369,7 +375,7 @@ void ZxRenderer::initConnections()
 
 void ZxRenderer::setBorderColor(uint8_t color)
 {
-    advanceTo(g_emulation->getCurClock() + 2 * m_ticksPerByte);
+    advanceTo(g_emulation->getCurClock() + 8 * m_ticksPerTState);
     m_borderColor = color;
 }
 
@@ -395,9 +401,11 @@ void ZxRenderer::toggleCropping()
 
 void ZxRenderer::setModel(ZxModel model)
 {
+    m_model = model;
+
     switch (model) {
     case ZM_48K:
-        m_lineChars = 56;
+        m_lineTStates = 224;
         m_linePixels = 448;
         m_scanLines = 312;
         m_visibleScanLine = 64;
@@ -405,7 +413,7 @@ void ZxRenderer::setModel(ZxModel model)
         m_vOffset = 24;
         break;
     case ZM_128K:
-        m_lineChars = 57;
+        m_lineTStates = 228;
         m_linePixels = 456;
         m_scanLines = 311;
         m_visibleScanLine = 63;
@@ -413,11 +421,11 @@ void ZxRenderer::setModel(ZxModel model)
         m_vOffset = 23;
         break;
     case ZM_PENTAGON:
-        m_lineChars = 56;
+        m_lineTStates = 224;
         m_linePixels = 448;
         m_scanLines = 320;
         m_visibleScanLine = 81;
-        m_bias = 40;
+        m_bias = 160;
         m_vOffset = 32;
         break;
     default:
@@ -490,7 +498,7 @@ string ZxRenderer::getDebugInfo()
 {
     uint64_t clocks = g_emulation->getCurClock();
     //uint64_t clocks = m_platform->getCpu()->getClock();
-    advanceTo(clocks  + 2 * m_ticksPerByte);
+    advanceTo(clocks  + 8 * m_ticksPerTState);
 
     int ticksPerTState = g_emulation->getFrequency() / 3500000;
 
