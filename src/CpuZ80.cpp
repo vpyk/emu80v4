@@ -786,7 +786,9 @@ unsigned CpuZ80::simz80()
 
     m_stackOperation = false;
 
+    m_m1Status = true;
     op = GetBYTE(PC);
+    m_m1Status = false;
     ++PC;
     cycles = cc_op[op];
     incR();
@@ -2649,7 +2651,9 @@ void CpuZ80::operate()
 
     if (m_waits) {
         int tag;
+        //m_m1Status = true;
         int opcode = m_addrSpace->readByteEx(PC, tag) + (m_addrSpace->readByte(uint16_t(PC + 1)) << 8); // 2 bytes for z80
+        //m_m1Status = false;
         int clocks = simz80();
         m_curClock += m_kDiv * (clocks + m_waits->getCpuWaitStates(tag, opcode, clocks));
     } else
@@ -2685,6 +2689,8 @@ void CpuZ80::reset() {
 
     IFF = 0;
     m_core->inte(false);
+
+    m_m1Status = false;
 }
 
 

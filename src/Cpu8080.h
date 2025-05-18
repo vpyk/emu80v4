@@ -97,6 +97,7 @@ class Cpu8080 : public Cpu8080Compatible
 
         bool getInte() override;
         bool checkForStackOperation() override {return m_statusWord & 0x04;}
+        //bool getM1Status() override {return m_statusWord & 0x20;} // not implemented yet
 
         /*int getA() override;
         int getB() override;

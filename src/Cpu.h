@@ -130,6 +130,7 @@ class Cpu8080Compatible : public Cpu
 
         virtual bool getInte() = 0;
         virtual bool checkForStackOperation() = 0;
+        //virtual bool getM1Status() = 0; // not implemented yet
 
     protected:
         int io_input(int port);
