@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
     switch(addr) {
         case 0:
             // command register
+            m_irq = false;
             m_lastCommand = (value & 0xF0) >> 4;
             switch (m_lastCommand) {
                 case 0:
@@ -216,6 +217,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                     m_indexDataCnt = 0;
                     m_writeTrackCnt = 0;
                     m_status = 0x03;
+                    generateInt();
                     break;
             }
             break;
@@ -251,6 +253,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                         else {
                             m_accessMode = FAM_WAITING;
                             m_status = 0x00;
+                            generateInt();
                         }
                     }
                 }
@@ -436,6 +439,7 @@ uint8_t Fdc1793::readByte(int addr)
                     if (m_addressIdCnt == 0) {
                         m_accessMode = FAM_WAITING;
                         m_status = 0x00;
+                        generateInt();
                     }
                 } else if (m_images[m_disk]) {
                     m_data = m_images[m_disk]->readNextByte();
@@ -447,6 +451,7 @@ uint8_t Fdc1793::readByte(int addr)
                         else {
                             m_accessMode = FAM_WAITING;
                             m_status = 0x00;
+                            generateInt();
                         }
                     }
                 }
