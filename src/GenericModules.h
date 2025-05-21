@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -124,5 +124,34 @@ class Translator : public AddressableDevice
         unsigned m_addrAddValue  = 0x0000;
         unsigned m_addrSubValue  = 0x0000;
 };
+
+
+class Register : public AddressableDevice
+{
+public:
+    void reset() override;
+
+    void initConnections() override;
+
+    void writeByte(int addr, uint8_t value) override;
+    uint8_t readByte(int addr) override;
+
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new Register();}
+private:
+    bool m_latching = false;
+    uint8_t m_defaultInputValue = 0;
+    uint8_t m_defaultOutputValue = 0;
+
+    uint8_t m_curInputValue = 0;
+    uint8_t m_curOutputValue = 0;
+
+    EmuOutput* m_output = nullptr;
+
+    void setInput(uint8_t value);
+    void setInputBit(int nBit, int value);
+};
+
 
 #endif // GENERICMODULES_H

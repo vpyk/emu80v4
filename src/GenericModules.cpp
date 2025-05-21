@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -267,5 +267,75 @@ bool Translator::setProperty(const string& propertyName, const EmuValuesList& va
         m_readSubValue = values[0].asInt();
         return true;
     }
+    return false;
+}
+
+
+void Register::initConnections()
+{
+    AddressableDevice::initConnections();
+
+    m_output = registerOutput("output");
+    REG_INPUT("input", Register::setInput);
+    REG_INDEXED_INPUT("inputBit", Register::setInputBit);
+}
+
+
+void Register::reset()
+{
+    m_curInputValue = m_latching ? m_defaultOutputValue : m_defaultInputValue;
+    m_curOutputValue = m_defaultOutputValue;
+    m_output->setValue(m_curOutputValue); // ?
+}
+
+
+void Register::writeByte(int /*addr*/, uint8_t value)
+{
+    m_curOutputValue = value;
+    if (m_latching)
+        m_curInputValue = value;
+    m_output->setValue(m_curOutputValue);
+}
+
+
+uint8_t Register::readByte(int /*addr*/)
+{
+    return m_curInputValue;
+}
+
+
+void Register::setInput(uint8_t value)
+{
+    m_curInputValue = value;
+}
+
+
+void Register::setInputBit(int nBit, int value)
+{
+    uint32_t mask = 1 << nBit;
+    m_curInputValue &= ~mask;
+    if (value & 1)
+        m_curInputValue |= mask;
+}
+
+
+bool Register::setProperty(const std::string &propertyName, const EmuValuesList &values)
+{
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "latching") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_latching = values[0].asString() == "yes";
+        return true;
+        }
+    } else if (propertyName == "defaultInput") {
+        m_defaultInputValue = values[0].asInt();
+        return true;
+    } else if (propertyName == "defaultOutput") {
+        m_defaultOutputValue = values[0].asInt();
+        return true;
+    }
+
     return false;
 }
