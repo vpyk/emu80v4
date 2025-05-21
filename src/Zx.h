@@ -19,13 +19,13 @@
 #ifndef ZX_H
 #define ZX_H
 
-#include "Memory.h"
+#include "AddrSpace.h"
 #include "CrtRenderer.h"
 #include "PlatformCore.h"
 #include "Keyboard.h"
 #include "FileLoader.h"
 #include "CpuHook.h"
-#include "CpuWaits.h"
+//#include "CpuWaits.h"
 
 class GeneralSoundSource;
 
@@ -74,12 +74,12 @@ public:
         int m_flashCnt = 0;
 
         ZxModel m_model = ZM_128K;
-        int m_lineTStates = 224;
-        int m_linePixels = 448;
-        int m_visibleScanLine = 64;
-        int m_scanLines = 312;
+        int m_lineTStates = 228;
+        int m_linePixels = 456;
+        int m_visibleScanLine = 63;
+        int m_scanLines = 311;
         int m_bias = 0;
-        int m_vOffset = 24;
+        int m_vOffset = 23;
 
         EmuOutput* m_intOutput = nullptr;
 
@@ -122,6 +122,8 @@ class ZxCore : public PlatformCore
 
 
 class Psg3910;
+class Fdc1793;
+class Register;
 
 class ZxPorts : public AddressableDevice
 {
@@ -143,6 +145,10 @@ private:
     Psg3910* m_ay[2] = {nullptr, nullptr};
     int m_curAy = 0;
 
+    Fdc1793* m_fdc = nullptr;
+    Register* m_fddRegister = nullptr;
+    bool m_bdiActive = false;
+
     EmuOutput* m_kbdMaskOutput = nullptr;
     EmuOutput* m_portFEOutput = nullptr;
     EmuOutput* m_port7FFDOutput = nullptr;
@@ -150,6 +156,32 @@ private:
     bool m_128kMode = true;
 
     void setKbdMatrixData(int data);
+    void setBdiActive(int active) {m_bdiActive = active;}
+};
+
+
+class CpuZ80;
+
+class ZxBdiAddrSpace : public AddrSpace
+{
+public:
+    ZxBdiAddrSpace() : m_bdiActive(false) {}
+
+    void initConnections() override;
+
+    void reset() override;
+    uint8_t readByte(int addr) override;
+
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new ZxBdiAddrSpace();}
+
+private:
+    CpuZ80* m_cpu = nullptr;
+
+    bool m_bdiActive = false;
+
+    EmuOutput* m_bdiActiveOutput = nullptr;
 };
 
 

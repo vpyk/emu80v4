@@ -20,14 +20,17 @@
 #include <sstream>
 
 #include "Globals.h"
+#include "Memory.h"
 #include "Zx.h"
 #include "Emulation.h"
 #include "EmuWindow.h"
 #include "Platform.h"
 #include "CpuZ80.h"
 #include "Psg3910.h"
+#include "Fdc1793.h"
 #include "TapeRedirector.h"
 #include "CpuHook.h"
+#include "GenericModules.h"
 #include "WavReader.h"
 
 using namespace std;
@@ -87,6 +90,7 @@ bool ZxCore::setProperty(const string& propertyName, const EmuValuesList& values
 void ZxPorts::reset()
 {
     m_curAy = 0;
+    m_bdiActive = false;
 }
 
 
@@ -95,6 +99,7 @@ void ZxPorts::initConnections()
     AddressableDevice::initConnections();
 
     REG_INPUT("kbdMatrixData", ZxPorts::setKbdMatrixData);
+    REG_INPUT("bdiActive", ZxPorts::setBdiActive);
 
     m_kbdMaskOutput = registerOutput("kbdMatrixMask");
     m_portFEOutput = registerOutput("portFE");
@@ -125,6 +130,13 @@ uint8_t ZxPorts::readByte(int addr)
             return m_ay[m_curAy]->readByte(0);
         else
             return 0xFF;
+    } else {
+        if (m_bdiActive && m_fdc && (addr & 3) == 3) {
+            if (addr & 0x80)
+                return m_fddRegister->readByte((addr >> 5) & 3);
+            else
+                return m_fdc->readByte((addr >> 5) & 3);
+        }
     }
 
     return 0xff;
@@ -166,6 +178,13 @@ void ZxPorts::writeByte(int addr, uint8_t value)
             m_screenPageOutput->setValue(0);
             m_128kMode = false;
         }*/
+    } else {
+        if (m_bdiActive && m_fdc && (addr & 3) == 3) {
+            if (addr & 0x80)
+                m_fddRegister->writeByte((addr >> 5) & 3, value);
+            else
+                m_fdc->writeByte((addr >> 5) & 3, value);
+        }
     }
 }
 
@@ -180,6 +199,12 @@ bool ZxPorts::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
     } else if (propertyName == "ay2") {
         m_ay[1] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "fdc") {
+        m_fdc = static_cast<Fdc1793*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "fddRegister") {
+        m_fddRegister = static_cast<Register*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "mode") {
         if (values[0].asString() == "128k" || values[0].asString() == "48k" || values[0].asString() == "pentagon") {
@@ -513,6 +538,49 @@ string ZxRenderer::getDebugInfo()
     ss << "L:" << scanLine;
     ss << " P:" << pos << "\n";
     return ss.str();
+}
+
+
+void ZxBdiAddrSpace::initConnections()
+{
+    AddrSpace::initConnections();
+    m_bdiActiveOutput = registerOutput("bdiActive");
+}
+
+
+void ZxBdiAddrSpace::reset()
+{
+    m_bdiActive = false;
+    m_bdiActiveOutput->setValue(0);
+}
+
+
+uint8_t ZxBdiAddrSpace::readByte(int addr)
+{
+    if (m_cpu->getM1Status()) {
+        if (!m_bdiActive && addr >> 8 == 0x3D) {
+            m_bdiActive = true;
+            m_bdiActiveOutput->setValue(1);
+        } else if (m_bdiActive && addr >= 0x4000) {
+            m_bdiActive = false;
+            m_bdiActiveOutput->setValue(0);
+        }
+    }
+
+    return AddrSpace::readByte(addr);
+}
+
+
+bool ZxBdiAddrSpace::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (AddrSpace::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "cpu") {
+        m_cpu = static_cast<CpuZ80*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+    return false;
 }
 
 

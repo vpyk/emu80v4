@@ -285,6 +285,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(ZxCore);
     REG_EMU_CLASS(ZxRenderer);
     REG_EMU_CLASS(ZxPorts);
+    REG_EMU_CLASS(ZxBdiAddrSpace);
     REG_EMU_CLASS(ZxKeyboard);
     REG_EMU_CLASS(ZxKbdLayout);
     REG_EMU_CLASS(ZxTapeInHook);
