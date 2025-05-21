@@ -398,7 +398,9 @@ void ConfigReader::parseConnect(string s, string token)
         params.andMask = mask;
         params.xorMask = inv ? mask : 0;
         params.shift = srcRangeFirst;
-    }
+    } else
+        params.xorMask = inv ? 0xFFFFFFFF : 0;
+
 
     params.indexed = !sIndex.empty();
     if (params.indexed)
