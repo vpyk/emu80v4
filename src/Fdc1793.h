@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -48,6 +48,8 @@ class Fdc1793 : public AddressableDevice
 public:
         Fdc1793();
         virtual ~Fdc1793();
+
+        void initConnections() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getDebugInfo() override;
@@ -106,6 +108,14 @@ public:
         bool writeTrackByte(uint8_t val);
 
         void generateInt();
+
+        EmuOutput* m_drqOutput = nullptr;
+        EmuOutput* m_intOutput = nullptr;
+
+        bool m_resetInput = false;
+        void setReset(bool rst);
+
+        void updateOutputs();
 };
 
 

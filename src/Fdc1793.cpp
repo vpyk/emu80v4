@@ -54,6 +54,16 @@ Fdc1793::~Fdc1793()
 }
 
 
+void Fdc1793::initConnections()
+{
+    REG_INPUT("drive", Fdc1793::setDrive);
+    REG_INPUT("head", Fdc1793::setHead);
+    REG_INPUT("reset", Fdc1793::setReset);
+    m_drqOutput = registerOutput("drq");
+    m_intOutput = registerOutput("int");
+}
+
+
 void Fdc1793::attachFdImage(int driveNum, FdImage* image)
 {
     if (driveNum < MAX_DRIVES)
@@ -260,6 +270,8 @@ void Fdc1793::writeByte(int addr, uint8_t value)
             }
             break;
     }
+
+        updateOutputs();
 }
 
 
@@ -421,6 +433,7 @@ uint8_t Fdc1793::readByte(int addr)
                     }
                     break;
             }
+            updateOutputs();
             return res;
         }
         case 1:
@@ -457,6 +470,7 @@ uint8_t Fdc1793::readByte(int addr)
                 }
 
             }
+            updateOutputs();
             return m_data;
     }
     return 0xFF; // normally this not occurs
@@ -468,6 +482,23 @@ void Fdc1793::generateInt()
     m_irq = true;
     // call core.inte()
 }
+
+void Fdc1793::setReset(bool rst)
+{
+    if (rst && !m_resetInput) {
+        reset();
+    }
+
+    m_resetInput = rst;
+}
+
+
+void Fdc1793::updateOutputs()
+{
+    m_intOutput->setValue(m_irq);
+    m_drqOutput->setValue(m_accessMode != FAM_WAITING);
+}
+
 
 bool Fdc1793::getDrq()
 {
