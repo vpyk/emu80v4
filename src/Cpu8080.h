@@ -97,6 +97,7 @@ class Cpu8080 : public Cpu8080Compatible
 
         bool getInte() override;
         bool checkForStackOperation() override {return m_statusWord & 0x04;}
+        int getCurIoInstructionDuration() override {return m_curIoInstructionDuration;}
         //bool getM1Status() override {return m_statusWord & 0x20;} // not implemented yet
 
         /*int getA() override;
@@ -128,6 +129,8 @@ private:
 
         uint8_t m_statusWord;
         int m_iffPendingCnt = 0;
+
+        int m_curIoInstructionDuration = 10;
 };
 
 

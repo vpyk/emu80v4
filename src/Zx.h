@@ -28,6 +28,7 @@
 //#include "CpuWaits.h"
 
 class GeneralSoundSource;
+class CpuZ80;
 
 enum ZxModel {
     ZM_48K,
@@ -66,6 +67,8 @@ public:
         static EmuObject* create(const EmuValuesList&) {return new ZxRenderer();}
 
     private:
+        CpuZ80* m_cpu = 0;
+
         const uint8_t* m_screenMemory[2] = {nullptr, nullptr};
         int m_screenPage = 0;
         bool m_showBorder = false;

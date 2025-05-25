@@ -90,6 +90,7 @@ class CpuZ80 : public Cpu8080Compatible
         uint8_t  getIFF();
 
         bool checkForStackOperation() override {return m_stackOperation;}
+        int getCurIoInstructionDuration() override {return m_curIoInstructionDuration;}
         bool getM1Status() /*override*/ {return m_m1Status;}
 
         static EmuObject* create(const EmuValuesList&) {return new CpuZ80();}
@@ -121,6 +122,8 @@ class CpuZ80 : public Cpu8080Compatible
         inline void incR() {ir = (ir & 0xff80) | ((ir + 1) & 0x7f);}
 
         bool m_16bitPorts = false;
+
+        int m_curIoInstructionDuration = 0;
 };
 
 #endif // CPUZ80_H

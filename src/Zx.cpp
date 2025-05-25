@@ -378,6 +378,8 @@ void ZxRenderer::drawLine(int scanLine, int fromTState, int toTState)
         int p1 = col == fromByte && m_model == ZM_PENTAGON ? fromTState % 4 * 2 : 0;
         int p2 = col == toByte  && m_model == ZM_PENTAGON ? toTState % 4 * 2 + 1 : 7;
 
+        bt <<= p1;
+
         for (int p = p1; p <= p2; p++) {
             uint32_t color = (bt & 0x80) ? fgColor : bgColor;
             m_fullFrame[scanLine * m_linePixels + col * 8 + p] = color;
@@ -385,7 +387,6 @@ void ZxRenderer::drawLine(int scanLine, int fromTState, int toTState)
         }
     }
 }
-
 
 
 void ZxRenderer::initConnections()
@@ -400,7 +401,8 @@ void ZxRenderer::initConnections()
 
 void ZxRenderer::setBorderColor(uint8_t color)
 {
-    advanceTo(g_emulation->getCurClock() + 8 * m_ticksPerTState);
+    int shift = m_cpu->getCurIoInstructionDuration() - 4;
+    advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
     m_borderColor = color;
 }
 
@@ -494,7 +496,11 @@ bool ZxRenderer::setProperty(const string& propertyName, const EmuValuesList& va
         else
             return false;
         return true;
+    } else if (propertyName == "cpu") {
+        m_cpu = static_cast<CpuZ80*>(g_emulation->findObject(values[0].asString()));
+        return true;
     }
+
     return false;
 }
 

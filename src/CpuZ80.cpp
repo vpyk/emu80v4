@@ -1956,6 +1956,7 @@ unsigned CpuZ80::simz80()
         JPC(!TSTFLAG(C));
         break;
     case 0xD3:          /* OUT (nn),A */
+        m_curIoInstructionDuration = 11;
         if (!m_16bitPorts)
             io_output(GetBYTE(PC), hreg(AF));
         else
@@ -2077,6 +2078,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x41:          /* OUT (C),B */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), hreg(BC));
             else
@@ -2126,6 +2128,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x49:          /* OUT (C),C */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), lreg(BC));
             else
@@ -2165,6 +2168,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x51:          /* OUT (C),D */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), hreg(DE));
             else
@@ -2203,6 +2207,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x59:          /* OUT (C),E */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), lreg(DE));
             else
@@ -2241,6 +2246,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x61:          /* OUT (C),H */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), hreg(HL));
             else
@@ -2280,6 +2286,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x69:          /* OUT (C),L */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), lreg(HL));
             else
@@ -2319,6 +2326,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x71:          /* OUT (C),0 */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), lreg(0));
             else
@@ -2351,6 +2359,7 @@ unsigned CpuZ80::simz80()
                 parity(temp);
             break;
         case 0x79:          /* OUT (C),A */
+            m_curIoInstructionDuration = 12;
             if (!m_16bitPorts)
                 io_output(lreg(BC), hreg(AF));
             else
@@ -2403,6 +2412,7 @@ unsigned CpuZ80::simz80()
             break;
         case 0xA3:          /* OUTI */
             Sethreg(BC, lreg(BC) - 1);
+            m_curIoInstructionDuration = 16;
             if (!m_16bitPorts)
                 io_output(lreg(BC), GetBYTE(HL));
             else
@@ -2442,6 +2452,7 @@ unsigned CpuZ80::simz80()
             break;
         case 0xAB:          /* OUTD */
             Sethreg(BC, lreg(BC) - 1);
+            m_curIoInstructionDuration = 16;
             if (!m_16bitPorts)
                 io_output(lreg(BC), GetBYTE(HL));
             else
@@ -2495,6 +2506,7 @@ unsigned CpuZ80::simz80()
         case 0xB3:          /* OTIR */
             temp = hreg(BC);
             do {
+                m_curIoInstructionDuration = 21;
                 if (!m_16bitPorts)
                     io_output(lreg(BC), GetBYTE(HL));
                 else
@@ -2550,6 +2562,7 @@ unsigned CpuZ80::simz80()
         case 0xBB:          /* OTDR */
             temp = hreg(BC);
             do {
+                m_curIoInstructionDuration = 21;
                 if (!m_16bitPorts)
                     io_output(lreg(BC), GetBYTE(HL));
                 else
