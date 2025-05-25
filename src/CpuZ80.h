@@ -114,7 +114,7 @@ class CpuZ80 : public Cpu8080Compatible
         bool m_stackOperation = false;
         bool m_m1Status = false;
 
-        unsigned cb_prefix(unsigned adr);
+        unsigned cb_prefix(unsigned adr, bool dd = false);
         unsigned dfd_prefix(uint16_t& IXY);
         unsigned simz80();
 
