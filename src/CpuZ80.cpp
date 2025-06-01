@@ -2112,6 +2112,7 @@ unsigned CpuZ80::simz80()
             POP(PC);
             break;
         case 0x46:          /* IM 0 */
+        case 0x4E:          /* IM 0/1 */
             IM = 0;
             break;
         case 0x47:          /* LD I,A */
@@ -2191,6 +2192,7 @@ unsigned CpuZ80::simz80()
             PC += 2;
             break;
         case 0x56:          /* IM 1 */
+        case 0x76:          /* IM 1 */
                 IM = 1;
             break;
         case 0x57:          /* LD A,I */
@@ -2230,6 +2232,7 @@ unsigned CpuZ80::simz80()
             PC += 2;
             break;
         case 0x5E:          /* IM 2 */
+        case 0x7E:          /* IM 2 */
             IM = 2;
             break;
         case 0x5F:          /* LD A,R */
