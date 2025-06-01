@@ -2410,11 +2410,11 @@ unsigned CpuZ80::simz80()
                 PutBYTE(HL, io_input(BC));
             ++HL;
             SETFLAG(N, 1);
-            Sethreg(BC, lreg(BC) - 1);
+            Sethreg(BC, hreg(BC) - 1);
             SETFLAG(Z, lreg(BC) == 0);
             break;
         case 0xA3:          /* OUTI */
-            Sethreg(BC, lreg(BC) - 1);
+            Sethreg(BC, hreg(BC) - 1);
             m_curIoInstructionDuration = 16;
             if (!m_16bitPorts)
                 io_output(lreg(BC), GetBYTE(HL));
