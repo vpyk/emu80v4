@@ -351,9 +351,13 @@ void ZxRenderer::drawLine(int scanLine, int fromTState, int toTState)
     int fromByte = fromTState / 4;
     int toByte = toTState / 4;
 
-    uint8_t bt = 0;
+    uint8_t bt = m_savedBt;
+    uint8_t attr = m_savedAttr;
+
     uint32_t fgColor = 0;
     uint32_t bgColor = 0;
+
+    bool firstPixel = fromTState % 4 == 0;
 
     for (int col = fromByte; col <= toByte; col++) {
         if (scanLine < m_visibleScanLine || scanLine >= m_visibleScanLine + 192 || col >= 32) {
@@ -361,10 +365,15 @@ void ZxRenderer::drawLine(int scanLine, int fromTState, int toTState)
             bt = 0;
             bgColor = zxPalette[m_borderColor];
         } else {
-            int row = scanLine - m_visibleScanLine;
-            int addr = (((row & 0xC0) << 5) | ((row & 0x07) << 8) | ((row & 0x38) << 2)) + col;
-            bt = m_screenMemory[m_screenPage][addr];
-            uint8_t attr = m_screenMemory[m_screenPage][0x1800 + (row / 8 * 32) + col];
+            if (col != fromByte || firstPixel) {
+                int row = scanLine - m_visibleScanLine;
+                int addr = (((row & 0xC0) << 5) | ((row & 0x07) << 8) | ((row & 0x38) << 2)) + col;
+                bt = m_screenMemory[m_screenPage][addr];
+                attr = m_screenMemory[m_screenPage][0x1800 + (row / 8 * 32) + col];
+                m_savedBt = bt;
+                m_savedAttr = attr;
+            }
+
             bool inv = (attr & 0x80) && (m_flashCnt & 0x10);
             if (!inv) {
                 fgColor = zxPalette[(attr & 7) + ((attr & 0x40) >> 3)];
@@ -375,8 +384,15 @@ void ZxRenderer::drawLine(int scanLine, int fromTState, int toTState)
             }
         }
 
-        int p1 = col == fromByte && m_model == ZM_PENTAGON ? fromTState % 4 * 2 : 0;
-        int p2 = col == toByte  && m_model == ZM_PENTAGON ? toTState % 4 * 2 + 1 : 7;
+        int p1 = 0;
+        int p2 = 7;
+
+        if (m_model == ZM_PENTAGON) {
+            if (col == fromByte)
+                p1 = fromTState % 4 * 2;
+            if (col == toByte)
+                p2 = toTState % 4 * 2 + 1;
+        }
 
         bt <<= p1;
 
@@ -401,7 +417,7 @@ void ZxRenderer::initConnections()
 
 void ZxRenderer::setBorderColor(uint8_t color)
 {
-    int shift = m_cpu->getCurIoInstructionDuration() - 4;
+    int shift = m_cpu->getCurIoInstructionDuration() - 1;
     advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
     m_borderColor = color;
 }
@@ -409,8 +425,20 @@ void ZxRenderer::setBorderColor(uint8_t color)
 
 void ZxRenderer::setScreenPage(int screenPage)
 {
-    if (screenPage >=0 && screenPage <= 1)
+    if (screenPage >=0 && screenPage <= 1) {
+        int shift = m_cpu->getCurIoInstructionDuration() - 1;
+        advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
         m_screenPage = screenPage;
+    }
+}
+
+
+void ZxRenderer::vidMemWriteNotify(int screenPage)
+{
+    if (screenPage == m_screenPage) {
+        int shift = 6;
+        advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
+    }
 }
 
 
@@ -452,7 +480,7 @@ void ZxRenderer::setModel(ZxModel model)
         m_linePixels = 448;
         m_scanLines = 320;
         m_visibleScanLine = 81;
-        m_bias = 160;
+        m_bias = 156;
         m_vOffset = 32;
         break;
     default:
@@ -1000,6 +1028,33 @@ bool ZxFileLoader::setProperty(const std::string& propertyName, const EmuValuesL
         return true;
 
     return false;
+}
+
+
+bool ZxVidMemAdapter::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "renderer") {
+        m_renderer = static_cast<ZxRenderer*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "mem") {
+        m_mem = static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "screenPage" && m_supportsTags && values[0].isInt()) {
+        m_screenPage = values[0].asInt();
+        return true;
+    }
+
+    return false;
+}
+
+
+void ZxVidMemAdapter::writeByte(int addr, uint8_t value)
+{
+    m_renderer->vidMemWriteNotify(m_screenPage);
+    m_mem->writeByte(addr, value);
 }
 
 

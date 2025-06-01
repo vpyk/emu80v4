@@ -64,6 +64,8 @@ public:
         void setBorderColor(uint8_t color);
         void setScreenPage(int screenPage);
 
+        void vidMemWriteNotify(int screenPage);
+
         static EmuObject* create(const EmuValuesList&) {return new ZxRenderer();}
 
     private:
@@ -94,6 +96,9 @@ public:
         bool m_intActive = false;
 
         uint32_t* m_fullFrame = nullptr;
+
+        uint8_t m_savedBt = 0;
+        uint8_t m_savedAttr = 0;
 
         void advanceTo(uint64_t clocks);
         void drawLine(int line, int fromTState, int toTState);
@@ -266,6 +271,24 @@ class ZxFileLoader : public FileLoader
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         static EmuObject* create(const EmuValuesList&) {return new ZxFileLoader();}
+};
+
+
+class ZxVidMemAdapter : public AddressableDevice
+{
+public:
+    void writeByte(int addr, uint8_t value) override;
+    uint8_t readByte(int addr) override {return m_mem->readByte(addr);}
+
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new ZxVidMemAdapter();}
+
+private:
+    AddressableDevice* m_mem = nullptr;
+    ZxRenderer* m_renderer = nullptr;
+
+    int m_screenPage = 0;
 };
 
 

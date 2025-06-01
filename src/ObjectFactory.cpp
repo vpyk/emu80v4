@@ -291,6 +291,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(ZxTapeInHook);
     REG_EMU_CLASS(ZxTapeOutHook);
     REG_EMU_CLASS(ZxFileLoader);
+    REG_EMU_CLASS(ZxVidMemAdapter);
     //REG_EMU_CLASS(ZxCpuWaits);
 
     reg("ConfigTab", &EmuConfigTab::create);

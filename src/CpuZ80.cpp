@@ -2733,21 +2733,18 @@ void CpuZ80::intRst(int vect)
     if (IFF != 0) {
         IFF = 0;
         m_core->inte(false);
-        if (GetBYTE(PC) == 0x76) {
+        if (GetBYTE(PC) == 0x76)
             PC++;
-            m_curClock = g_emulation->getCurClock();
-        }
         PUSH(PC);
         if (IM != 2) {
             PC = vect * 8;
             m_curClock += m_kDiv * 13; // 11 rst + 2 additional
         } else {
             PC = GetWORD((ir | 0xFF)); // r is ignored
-            m_curClock += m_kDiv * 19;
+            m_curClock += m_kDiv * 19; // 17 + 2
             /*if (m_waits)
                 m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xE3, 19);*/ // similar to xthl
         }
-        m_curClock += m_kDiv * 2; // ?
     }
 }
 
