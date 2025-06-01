@@ -480,6 +480,9 @@ void PaintWidget::setHideCursor(bool hide)
 
 void PaintWidget::pauseCursorTimer(bool paused)
 {
+    if (!m_hideCursor)
+        return;
+
     m_cursorTimerPaused = paused;
 
     if (paused) {
