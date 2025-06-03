@@ -436,7 +436,7 @@ void ZxRenderer::setScreenPage(int screenPage)
 void ZxRenderer::vidMemWriteNotify(int screenPage)
 {
     if (screenPage == m_screenPage) {
-        int shift = 6;
+        int shift = m_cpu->getCurIoInstructionDuration() - 1;
         advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
     }
 }
