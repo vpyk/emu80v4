@@ -594,7 +594,7 @@ string VectorRenderer::getPropertyStringValue(const string& propertyName)
 
 string VectorRenderer::getDebugInfo()
 {
-    advanceTo(g_emulation->getCurClock());
+    advanceTo(m_platform->getCpu()->getClock());
 
     // some magic
     int pixel = (m_curFramePixel + 768 * 312 - 301) % (768 * 312);

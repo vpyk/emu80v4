@@ -555,7 +555,7 @@ string ZxRenderer::getPropertyStringValue(const string& propertyName)
 
 string ZxRenderer::getDebugInfo()
 {
-    uint64_t clocks = g_emulation->getCurClock();
+    uint64_t clocks = m_cpu->getClock();
     //uint64_t clocks = m_platform->getCpu()->getClock();
     advanceTo(clocks  + 8 * m_ticksPerTState);
 
