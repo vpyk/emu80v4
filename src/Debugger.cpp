@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1557,7 +1557,7 @@ void DebugWindow::codeDraw()
         string s = int2Hex(m_codeLayout[i], 4) + ": ";
         for (int j = 0; j < len; j++)
             s = s + int2Hex(memByte(m_codeLayout[i] + j), 2) + " ";
-        while (s.size() < 17)
+        while (s.size() < (m_z80Mode ? 19 : 17))
             s += " ";
         s += cmd;
 
