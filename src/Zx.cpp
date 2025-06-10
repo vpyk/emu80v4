@@ -32,6 +32,7 @@
 #include "CpuHook.h"
 #include "GenericModules.h"
 #include "WavReader.h"
+#include "GeneralSound.h"
 
 using namespace std;
 
@@ -130,6 +131,8 @@ uint8_t ZxPorts::readByte(int addr)
             return m_ay[m_curAy]->readByte(0);
         else
             return 0xFF;
+    } else if (m_gs && (addr & 0xf7) == 0xb3) {
+        return m_gs->readByte((addr >> 3) & 1);
     } else {
         if (m_bdiActive && m_fdc && (addr & 3) == 3) {
             if (addr & 0x80)
@@ -178,6 +181,8 @@ void ZxPorts::writeByte(int addr, uint8_t value)
             m_screenPageOutput->setValue(0);
             m_128kMode = false;
         }*/
+    } else if (m_gs && (addr & 0xf7) == 0xb3) {
+        m_gs->writeByte((addr >> 3) & 1, value);
     } else {
         if (m_bdiActive && m_fdc && (addr & 3) == 3) {
             if (addr & 0x80)
@@ -205,6 +210,9 @@ bool ZxPorts::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
     } else if (propertyName == "fddRegister") {
         m_fddRegister = static_cast<Register*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "gsPorts") {
+        m_gs = static_cast<GsPorts*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "mode") {
         if (values[0].asString() == "128k" || values[0].asString() == "48k" || values[0].asString() == "pentagon") {
@@ -1042,7 +1050,7 @@ bool ZxVidMemAdapter::setProperty(const string& propertyName, const EmuValuesLis
     } else if (propertyName == "mem") {
         m_mem = static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString()));
         return true;
-    } else if (propertyName == "screenPage" && m_supportsTags && values[0].isInt()) {
+    } else if (propertyName == "screenPage" /*&& m_supportsTags*/ && values[0].isInt()) {
         m_screenPage = values[0].asInt();
         return true;
     }

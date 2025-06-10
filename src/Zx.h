@@ -132,6 +132,7 @@ class ZxCore : public PlatformCore
 class Psg3910;
 class Fdc1793;
 class Register;
+class GsPorts;
 
 class ZxPorts : public AddressableDevice
 {
@@ -152,6 +153,8 @@ private:
 
     Psg3910* m_ay[2] = {nullptr, nullptr};
     int m_curAy = 0;
+
+    GsPorts* m_gs = nullptr;
 
     Fdc1793* m_fdc = nullptr;
     Register* m_fddRegister = nullptr;

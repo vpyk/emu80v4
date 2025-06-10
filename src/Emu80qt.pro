@@ -40,6 +40,7 @@ SOURCES += \
     Covox.cpp \
     DbgCalls.cpp \
     DiskImage.cpp \
+    GeneralSound.cpp \
     KbdTapper.cpp \
     Korvet.cpp \
     Kr04.cpp \
@@ -160,6 +161,7 @@ HEADERS  += \
     Eureka.h \
     Fdc1793.h \
     FileLoader.h \
+    GeneralSound.h \
     GenericModules.h \
     Globals.h \
     KbdLayout.h \

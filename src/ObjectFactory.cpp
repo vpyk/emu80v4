@@ -70,6 +70,7 @@
 #include "Bashkiria.h"
 #include "Zx.h"
 #include "KbdTapper.h"
+#include "GeneralSound.h"
 
 #include "EmuConfig.h"
 
@@ -293,6 +294,10 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(ZxFileLoader);
     REG_EMU_CLASS(ZxVidMemAdapter);
     //REG_EMU_CLASS(ZxCpuWaits);
+    REG_EMU_CLASS(GsPorts);
+    REG_EMU_CLASS(GsInternalPorts);
+    REG_EMU_CLASS(GsSoundSource);
+    REG_EMU_CLASS(GsSoundMem);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
