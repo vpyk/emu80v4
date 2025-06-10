@@ -2415,7 +2415,7 @@ unsigned CpuZ80::simz80()
             ++HL;
             SETFLAG(N, 1);
             Sethreg(BC, hreg(BC) - 1);
-            SETFLAG(Z, lreg(BC) == 0);
+            SETFLAG(Z, hreg(BC) == 0);
             break;
         case 0xA3:          /* OUTI */
             Sethreg(BC, hreg(BC) - 1);
@@ -2426,7 +2426,7 @@ unsigned CpuZ80::simz80()
                 io_output(BC, GetBYTE(HL));
             ++HL;
             SETFLAG(N, 1);
-            SETFLAG(Z, lreg(BC) == 0);
+            SETFLAG(Z, hreg(BC) == 0);
             break;
         case 0xA8:          /* LDD */
             acu = GetBYTE(HL); --HL;
@@ -2454,8 +2454,8 @@ unsigned CpuZ80::simz80()
                 PutBYTE(HL, io_input(BC));
             --HL;
             SETFLAG(N, 1);
-            Sethreg(BC, lreg(BC) - 1);
-            SETFLAG(Z, lreg(BC) == 0);
+            Sethreg(BC, hreg(BC) - 1);
+            SETFLAG(Z, hreg(BC) == 0);
             break;
         case 0xAB:          /* OUTD */
             Sethreg(BC, lreg(BC) - 1);
@@ -2466,7 +2466,7 @@ unsigned CpuZ80::simz80()
                 io_output(BC, GetBYTE(HL));
             --HL;
             SETFLAG(N, 1);
-            SETFLAG(Z, lreg(BC) == 0);
+            SETFLAG(Z, hreg(BC) == 0);
             break;
         case 0xB0:          /* LDIR */
             acu = GetBYTE(HL++);
@@ -2602,7 +2602,8 @@ unsigned CpuZ80::simz80()
         break;
     case 0xF3:          /* DI */
         IFF = 0;
-        m_core->inte(false);
+        if (m_core)
+            m_core->inte(false);
         break;
     case 0xF4:          /* CALL P,nnnn */
         CALLC(!TSTFLAG(S));
@@ -2630,7 +2631,8 @@ unsigned CpuZ80::simz80()
     case 0xFB:          /* EI */
         m_iffPendingCnt = 2;
         IFF = 0;
-        m_core->inte(true);  // there is no INTE output in Z80 though
+        if (m_core)
+            m_core->inte(true);  // there is no INTE output in Z80 though
         break;
     case 0xFC:          /* CALL M,nnnn */
         CALLC(TSTFLAG(S));
@@ -2657,7 +2659,8 @@ unsigned CpuZ80::simz80()
     if (m_iffPendingCnt)
         if (!--m_iffPendingCnt) {
             IFF = 3;
-            m_core->inte(true);
+            if (m_core)
+                m_core->inte(true);
         }
 
     return cycles;
@@ -2729,7 +2732,8 @@ void CpuZ80::reset() {
     m_iffPendingCnt = 0;
 
     IFF = 0;
-    m_core->inte(false);
+    if (m_core)
+        m_core->inte(false);
 
     m_m1Status = false;
 }
@@ -2739,7 +2743,8 @@ void CpuZ80::intRst(int vect)
 {
     if (IFF != 0) {
         IFF = 0;
-        m_core->inte(false);
+        if (m_core)
+            m_core->inte(false);
         if (GetBYTE(PC) == 0x76)
             PC++;
         PUSH(PC);
