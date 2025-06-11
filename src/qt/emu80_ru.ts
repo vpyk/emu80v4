@@ -1921,15 +1921,19 @@
 <context>
     <name>ZxConfigWidget</name>
     <message>
-        <location filename="qtZxConfig.ui" line="41"/>
         <source>AY in 48K configuration</source>
-        <translation>AY в конфигурации 48К</translation>
+        <translation type="vanished">AY в конфигурации 48К</translation>
     </message>
     <message>
-        <location filename="qtZxConfig.ui" line="48"/>
+        <location filename="qtZxConfig.ui" line="41"/>
         <source>2 AYs (NedoPC Turbo Sound)</source>
         <oldsource>2 AYs (Turbo Sound)</oldsource>
         <translation>2 AY (схема NedoPC Turbo Sound)</translation>
+    </message>
+    <message>
+        <location filename="qtZxConfig.ui" line="55"/>
+        <source>AY &amp;&amp; GS in 48K configuration</source>
+        <translation>AY и GS в конфигурации 48K</translation>
     </message>
 </context>
 </TS>

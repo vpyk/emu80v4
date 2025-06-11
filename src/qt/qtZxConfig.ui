@@ -29,23 +29,30 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string notr="true">AY</string>
+      <string notr="true">Sound Hardware</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
        <number>6</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="ay48kCheckBox">
+       <widget class="QCheckBox" name="tsCheckBox">
         <property name="text">
-         <string>AY in 48K configuration</string>
+         <string>2 AYs (NedoPC Turbo Sound)</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="tsCheckBox">
+       <widget class="QCheckBox" name="gsCheckBox">
         <property name="text">
-         <string>2 AYs (NedoPC Turbo Sound)</string>
+         <string notr="true">General Sound</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="ay48kCheckBox">
+        <property name="text">
+         <string>AY &amp;&amp; GS in 48K configuration</string>
         </property>
        </widget>
       </item>
