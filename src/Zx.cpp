@@ -160,7 +160,7 @@ void ZxPorts::writeByte(int addr, uint8_t value)
             // 128K FD register
             if (m_128kMode)
                 m_port7FFDOutput->setValue(value);
-        } else if (addr == 0xFF) {
+        } else if ((addr & 0xC0) == 0xC0) {
             // AY address reg
             if (m_ay[1] && (value & 0xFE) == 0xFE)
                 // select AY #
@@ -169,7 +169,7 @@ void ZxPorts::writeByte(int addr, uint8_t value)
                 if (m_ay[m_curAy])
                     m_ay[m_curAy]->writeByte(1, value);
             }
-        } else if (addr == 0xFC || addr == 0xBF) {
+        } else if ((addr & 0xC0) == 0x80) {
             // AY data register
             if (m_ay[m_curAy])
                 m_ay[m_curAy]->writeByte(0, value);
