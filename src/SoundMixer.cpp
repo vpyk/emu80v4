@@ -112,6 +112,13 @@ SoundSource::~SoundSource()
 }
 
 
+void SoundSource::setVolume(int volume)
+{
+    m_volume = volume;
+    updateAmpFactor();
+}
+
+
 void SoundSource::setNegative(bool negative)
 {
     m_negative = negative;
@@ -128,15 +135,13 @@ void SoundSource::setMuted(bool muted)
 
 void SoundSource::updateAmpFactor()
 {
-    m_ampFactor = m_muted ? 0 : m_negative ? -1 : 1;
+    m_ampFactor = m_muted ? 0 : m_negative ? -m_volume : m_volume;
 }
 
 
 void SoundSource::getSample(int& left, int& right)
 {
-    int val = calcValue() * m_ampFactor;
-    if (m_muffled)
-        val = val /2;
+    int val = calcValue() * m_ampFactor / 100;
     left = right = val;
 }
 
@@ -151,11 +156,9 @@ bool SoundSource::setProperty(const std::string& propertyName, const EmuValuesLi
             setMuted(values[0].asString() == "yes");
             return true;
         }
-    } else if (propertyName == "muffled") {
-        if (values[0].asString() == "yes" || values[0].asString() == "no") {
-            m_muffled = values[0].asString() == "yes";
-            return true;
-        }
+    } else if (propertyName == "volume") {
+        setVolume(values[0].asInt());
+        return true;
     } else if (propertyName == "polarity") {
         if (values[0].asString() == "positive" || values[0].asString() == "negative") {
             setNegative(values[0].asString() == "negative");

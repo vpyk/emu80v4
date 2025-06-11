@@ -287,17 +287,11 @@ void GsSoundSource::getSample(int &left, int &right)
 
     // max amp = 2 1/2
     if (true/*m_stereo*/) {
-        left =  (outputs[0] + outputs[1] + outputs[2] / 4 + outputs[3] / 4) * m_ampFactor;
-        right =  (outputs[2] + outputs[3] + outputs[0] / 4 + outputs[1] / 4) * m_ampFactor;
+        left =  (outputs[0] + outputs[1] + outputs[2] / 4 + outputs[3] / 4) * m_ampFactor / 100;
+        right =  (outputs[2] + outputs[3] + outputs[0] / 4 + outputs[1] / 4) * m_ampFactor / 100;
     } else {
-        left = right = (outputs[0] + outputs[1] + outputs[2] + outputs[3]) * 2 * m_ampFactor;
+        left = right = (outputs[0] + outputs[1] + outputs[2] + outputs[3]) * 2 * m_ampFactor / 100;
     }
-
-    if (m_muffled) {
-        left = left / 2;
-        right = right / 2;
-    }
-
 }
 
 

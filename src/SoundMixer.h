@@ -42,12 +42,13 @@ class SoundSource : public EmuObject
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
+        void setVolume(int volume); // set sound volume in %
         void setNegative(bool negative);
         void setMuted(bool muted);
 
     protected:
-        int m_ampFactor = 1;
-        bool m_muffled = false;
+        int m_ampFactor = 100;
+        int m_volume = 100;
 
     private:
         bool m_muted = false;
