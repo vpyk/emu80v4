@@ -1226,7 +1226,7 @@
           <item row="1" column="0">
            <widget class="QRadioButton" name="mixingMixRadioButton">
             <property name="text">
-             <string>Mix</string>
+             <string>Mix (noflick)</string>
             </property>
            </widget>
           </item>

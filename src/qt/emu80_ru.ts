@@ -1622,7 +1622,6 @@
         <translation>Выкл.</translation>
     </message>
     <message>
-        <location filename="qtSettingsDialog.ui" line="1229"/>
         <location filename="qtSettingsDialog.ui" line="1374"/>
         <source>Mix</source>
         <translation>Смешивать</translation>
@@ -1646,6 +1645,11 @@
         <location filename="qtSettingsDialog.ui" line="413"/>
         <source>Show selected platforms only*</source>
         <translation>Отображать только выбранные платформы*</translation>
+    </message>
+    <message>
+        <location filename="qtSettingsDialog.ui" line="1229"/>
+        <source>Mix (noflick)</source>
+        <translation>Смешивать (режим noflick)</translation>
     </message>
     <message>
         <location filename="qtSettingsDialog.ui" line="1236"/>
