@@ -116,14 +116,15 @@ public:
     //std::string getPropertyStringValue(const std::string& propertyName) override;
 
     int calcValue() override;
-    void getSample(int& left, int& right) override;
+    StereoSample getSample() override;
+    int getMinimumSampleValue() override;
 
     static EmuObject* create(const EmuValuesList&) {return new GsSoundSource();}
 
 private:
     uint64_t m_initClock = 0;
     uint64_t m_prevClock = 0;
-    int m_curValues[4] = {0, 0, 0, 0};
+    uint8_t m_curValues[4] = {0, 0, 0, 0};
     int m_curVolumes[4] = {0, 0, 0, 0};
     int m_sumVals[4] = {0, 0, 0, 0};
 

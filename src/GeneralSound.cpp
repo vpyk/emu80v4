@@ -222,7 +222,7 @@ void GsSoundMem::writeByte(int addr, uint8_t value)
 uint8_t GsSoundMem::readByte(int addr)
 {
     uint8_t res = m_as->readByte(addr);
-    if (addr > 0x2000)
+    if (addr >= 0x2000)
         m_sampleOutputs[(addr >> 8) & 3]->setValue(res);
     return res;
 }
@@ -253,44 +253,40 @@ int GsSoundSource::calcValue()
 {
     // not used since getSample is implemented
     return 0;
-
-    /*updateStats();
-
-    int res = 0;
-
-    uint64_t ticks = g_emulation->getCurClock() - m_initClock;
-    if (ticks)
-        for (int i = 0; i < 4; i++) {
-            res += int64_t(m_sumVals[i]) * m_curVolumes[i] * MAX_SND_AMP / ticks / 16384 / 3;
-            m_sumVals[i] = 0;
-        }
-    m_initClock = g_emulation->getCurClock();
-
-    return res;*/
 }
 
 
-void GsSoundSource::getSample(int &left, int &right)
+int GsSoundSource::getMinimumSampleValue()
+{
+    return - MAX_SND_AMP * 5 / 2;
+}
+
+
+StereoSample GsSoundSource::getSample()
 {
     updateStats();
 
-    uint16_t outputs[4];
+    int16_t outputs[4];
 
-    uint64_t ticks = g_emulation->getCurClock() - m_initClock;
-    if (ticks)
-        for (int i = 0; i < 4; i++) {
-            outputs[i] = int64_t(m_sumVals[i]) * m_curVolumes[i] * MAX_SND_AMP / ticks / 16384;
-            //outputs[i] = int64_t(m_sumVals[i]) * m_curVolumes[i] * MAX_SND_AMP / ticks / 16384;
-            m_sumVals[i] = 0;
-        }
+    int64_t ticks = g_emulation->getCurClock() - m_initClock;
+    if (ticks == 0)
+        return {0, 0};
+
+    for (int i = 0; i < 4; i++) {
+        outputs[i] = (int64_t(m_sumVals[i])) * MAX_SND_AMP / ticks / 8064;
+        m_sumVals[i] = 0;
+    }
+
     m_initClock = g_emulation->getCurClock();
 
-    // max amp = 2 1/2
+    // max amp = 2.5
     if (true/*m_stereo*/) {
-        left =  (outputs[0] + outputs[1] + outputs[2] / 4 + outputs[3] / 4) * m_ampFactor / 100;
-        right =  (outputs[2] + outputs[3] + outputs[0] / 4 + outputs[1] / 4) * m_ampFactor / 100;
+        int left =  (outputs[0] + outputs[1] + outputs[2] / 4 + outputs[3] / 4) * m_ampFactor / 100;
+        int right =  (outputs[2] + outputs[3] + outputs[0] / 4 + outputs[1] / 4) * m_ampFactor / 100;
+        return {left, right};
     } else {
-        left = right = (outputs[0] + outputs[1] + outputs[2] + outputs[3]) * 2 * m_ampFactor / 100;
+        int mono = (outputs[0] + outputs[1] + outputs[2] + outputs[3]) * 5 * m_ampFactor / 8 / 100;
+        return {mono, mono};
     }
 }
 
@@ -314,8 +310,9 @@ void GsSoundSource::updateStats()
     uint64_t curClock = g_emulation->getCurClock();
 
     int clocks = curClock - m_prevClock;
-    for (int i = 0; i < 4; i++)
-        m_sumVals[i] += clocks * m_curValues[i];
+    for (int i = 0; i < 4; i++) {
+        m_sumVals[i] += clocks * (int(m_curValues[i]) - 128) * m_curVolumes[i];
+    }
 
     m_prevClock = curClock;
 }

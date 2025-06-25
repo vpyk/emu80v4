@@ -26,6 +26,12 @@
 #include "EmuObjects.h"
 
 
+struct StereoSample {
+    int left;
+    int right;
+};
+
+
 class SoundMixer;
 
 // Базовый класс источника звука
@@ -37,7 +43,8 @@ class SoundSource : public EmuObject
 
         // Получение текущего сэмпла
         virtual int calcValue() = 0;
-        virtual void getSample(int& left, int& right); // default implementation for mono sound, uses calcValue, reimplement for stereo
+        virtual StereoSample getSample(); // default implementation for mono sound, uses calcValue, reimplement for stereo
+        virtual int getMinimumSampleValue() {return 0;}
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;

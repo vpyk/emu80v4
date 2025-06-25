@@ -33,10 +33,9 @@ void SoundMixer::operate()
     int leftSample = 0;
     int rightSample = 0;
     for(auto it = m_soundSources.begin(); it != m_soundSources.end(); it++) {
-        int left, right;
-        (*it)->getSample(left, right);
-        leftSample += m_volume < 7 ? left : abs(left);
-        rightSample += m_volume < 7 ? right : abs(right);
+        StereoSample sample = (*it)->getSample();
+        leftSample += m_volume < 7 ? sample.left : abs(sample.left - (*it)->getMinimumSampleValue());
+        rightSample += m_volume < 7 ? sample.right : abs(sample.right - (*it)->getMinimumSampleValue());
     }
 
     leftSample = m_muted ? m_silenceLevel : (leftSample >> m_sampleShift) + m_silenceLevel;
@@ -139,10 +138,10 @@ void SoundSource::updateAmpFactor()
 }
 
 
-void SoundSource::getSample(int& left, int& right)
+StereoSample SoundSource::getSample()
 {
     int val = calcValue() * m_ampFactor / 100;
-    left = right = val;
+    return {val, val};
 }
 
 

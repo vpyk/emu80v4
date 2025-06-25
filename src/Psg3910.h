@@ -90,7 +90,7 @@ class Psg3910SoundSource : public SoundSource
         std::string getPropertyStringValue(const std::string& propertyName) override;
 
         int calcValue() override;
-        void getSample(int& left, int& right) override;
+        StereoSample getSample() override;
 
         void attachPsg(Psg3910* psg) {m_psg = psg;}
 

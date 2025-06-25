@@ -243,12 +243,11 @@ int Psg3910SoundSource::calcValue()
 }
 
 
-void Psg3910SoundSource::getSample(int& left, int& right)
+StereoSample Psg3910SoundSource::getSample()
 {
 
     if (!m_psg) {
-        left = right = 0;
-        return;
+        return {0, 0};
     }
 
     uint16_t outputs[3];
@@ -260,13 +259,15 @@ void Psg3910SoundSource::getSample(int& left, int& right)
         // Stereo ABC
         // L = 1/2*A + 1/3*B + 1/6*C
         // R = 1/6*A + 1/3*B + 1/2*C
-        left =  (outputs[0] * 3 / 2 + outputs[1] + outputs[2] / 2) * m_ampFactor / 100;
-        right = (outputs[0] / 2 + outputs[1] + outputs[2] * 3 / 2) * m_ampFactor / 100;
+        int left =  (outputs[0] * 3 / 2 + outputs[1] + outputs[2] / 2) * m_ampFactor / 100;
+        int right = (outputs[0] / 2 + outputs[1] + outputs[2] * 3 / 2) * m_ampFactor / 100;
+        return {left, right};
     } else {
         // Mono
         // L = 1/3*A + 1/3*B + 1/3*C
         // R = 1/3*A + 1/3*B + 1/3*C
-        left = right = (outputs[0] + outputs[1] + outputs[2]) * m_ampFactor / 100;
+        int mono = (outputs[0] + outputs[1] + outputs[2]) * m_ampFactor / 100;
+        return {mono, mono};
     }
 }
 
