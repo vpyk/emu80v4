@@ -112,8 +112,8 @@ class GsSoundSource : public SoundSource
 public:
     void initConnections() override;
 
-    //bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-    //std::string getPropertyStringValue(const std::string& propertyName) override;
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+    std::string getPropertyStringValue(const std::string& propertyName) override;
 
     int calcValue() override;
     StereoSample getSample() override;
@@ -122,6 +122,8 @@ public:
     static EmuObject* create(const EmuValuesList&) {return new GsSoundSource();}
 
 private:
+    bool m_stereo = true;
+
     uint64_t m_initClock = 0;
     uint64_t m_prevClock = 0;
     uint8_t m_curValues[4] = {0, 0, 0, 0};

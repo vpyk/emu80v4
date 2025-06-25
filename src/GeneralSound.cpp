@@ -20,6 +20,9 @@
 #include "Emulation.h"
 #include "GeneralSound.h"
 
+using namespace std;
+
+
 void GsPorts::initConnections()
 {
     AddressableDevice::initConnections();
@@ -280,7 +283,7 @@ StereoSample GsSoundSource::getSample()
     m_initClock = g_emulation->getCurClock();
 
     // max amp = 2.5
-    if (true/*m_stereo*/) {
+    if (m_stereo) {
         int left =  (outputs[0] + outputs[1] + outputs[2] / 4 + outputs[3] / 4) * m_ampFactor / 100;
         int right =  (outputs[2] + outputs[3] + outputs[0] / 4 + outputs[1] / 4) * m_ampFactor / 100;
         return {left, right};
@@ -315,4 +318,39 @@ void GsSoundSource::updateStats()
     }
 
     m_prevClock = curClock;
+}
+
+
+bool GsSoundSource::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (SoundSource::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "mixing") {
+        if (values[0].asString() == "mono")
+            m_stereo = false;
+        else if (values[0].asString() == "stereo")
+            m_stereo = true;
+        else
+            return false;
+
+        return true;
+    }
+
+    return false;
+}
+
+
+string GsSoundSource::getPropertyStringValue(const string& propertyName)
+{
+    string res;
+
+    res = SoundSource::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "mixing")
+        return m_stereo ? "stereo" : "mono";
+
+    return "";
 }

@@ -1608,6 +1608,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="gsStereoCheckBox">
+         <property name="text">
+          <string>GS Stereo mode</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_8">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

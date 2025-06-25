@@ -228,6 +228,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("platform.codePage");
     loadRunningConfigValue("platform.fastReset");
     loadRunningConfigValue("psgSoundSource.mixing");
+    loadRunningConfigValue("gsSoundSource.mixing");
     loadRunningConfigValue("diskA.readOnly");
     loadRunningConfigValue("diskB.readOnly");
     loadRunningConfigValue("diskC.readOnly");
@@ -630,6 +631,11 @@ void SettingsDialog::fillControlValues()
     val = m_options.value("psgSoundSource.mixing", "");
     ui->ayStereoCheckBox->setVisible(val != "");
     ui->ayStereoCheckBox->setChecked(val == "stereo");
+
+    // GS Stereo
+    val = m_options.value("gsSoundSource.mixing", "");
+    ui->gsStereoCheckBox->setVisible(val != "");
+    ui->gsStereoCheckBox->setChecked(val == "stereo");
 }
 
 
@@ -1059,6 +1065,9 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     if (ui->ayStereoCheckBox->isVisible())
         m_options["psgSoundSource.mixing"] = ui->ayStereoCheckBox->isChecked() ? "stereo" : "mono";
+
+    if (ui->gsStereoCheckBox->isVisible())
+        m_options["gsSoundSource.mixing"] = ui->gsStereoCheckBox->isChecked() ? "stereo" : "mono";
 
     val = "";
     if (ui->qwertyRadioButton->isChecked())
