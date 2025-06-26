@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -129,20 +129,20 @@ uint8_t Dma8257::readByte(int addr)
         m_statusReg &= 0xf0;
         return res;
     } else {
-        int ch= addr >> 1;
+        int ch = addr >> 1;
         if (addr & 1) {
-            // Address register
-            if (m_isLoByte)
-                value = (m_addr[ch] & 0xFF);
-            else
-                value = (m_addr[ch] & 0xFF00) >> 8;
-            m_isLoByte = !m_isLoByte;
-        } else {
             // Termnal count register
             if (m_isLoByte)
                 value = (m_count[ch] & 0xFF);
             else
                 value = (m_count[ch] & 0xFF00) >> 8;
+            m_isLoByte = !m_isLoByte;
+        } else {
+            // Address register
+            if (m_isLoByte)
+                value = (m_addr[ch] & 0xFF);
+            else
+                value = (m_addr[ch] & 0xFF00) >> 8;
             m_isLoByte = !m_isLoByte;
         }
     }
