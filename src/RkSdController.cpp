@@ -290,9 +290,9 @@ bool RkSdController::cmdBoot()
     int pos = 0;
 
     string sdBiosFileName = palMakeCaseInsensitivePath(m_sdDir, m_specModel ? "BOOT/SDBIOS.RKS" : "BOOT/SDBIOS.RK");
+    if (m_outBuffer)
+        delete[] m_outBuffer;
     if (loadRkFile(sdBiosFileName)) {
-        if (m_outBuffer)
-            delete[] m_outBuffer;
         m_outBuffer = new uint8_t[m_progLen + 7 + 1];
         m_outBuffer[pos++] = ERR_OK_ADDR;
         m_outBuffer[pos++] = m_progBegAddr & 0xFF;
@@ -304,8 +304,10 @@ bool RkSdController::cmdBoot()
         pos += m_progLen;
         m_outBuffer[pos++] = ERR_OK_READ;
         delete[] m_execFileBuffer;
-    } else
+    } else {
+        m_outBuffer = new uint8_t[1];
         m_outBuffer[pos++] = ERR_NO_PATH;
+    }
 
     m_outBufferSize = pos;
     m_outBufferPos = 0;
@@ -337,9 +339,9 @@ bool RkSdController::cmdExec()
     int pos = 0;
 
     string fileName = palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 1));
+    if (m_outBuffer)
+        delete[] m_outBuffer;
     if (loadRkFile(fileName)) {
-        if (m_outBuffer)
-            delete[] m_outBuffer;
         m_outBuffer = new uint8_t[m_progLen + 7 + 2];
         m_outBuffer[pos++] = ERR_OK_ADDR;
         m_outBuffer[pos++] = m_progBegAddr & 0xFF;
@@ -351,8 +353,10 @@ bool RkSdController::cmdExec()
         pos += m_progLen;
         m_outBuffer[pos++] = ERR_OK_READ;
         delete[] m_execFileBuffer;
-    } else
+    } else {
+        m_outBuffer = new uint8_t[1];
         m_outBuffer[pos++] = ERR_NO_PATH;
+    }
 
     m_outBufferSize = pos;
     m_outBufferPos = 0;
