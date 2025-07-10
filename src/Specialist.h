@@ -118,6 +118,7 @@ class SpecRenderer : public CrtRenderer, public IActive
 
     public:
         SpecRenderer();
+        ~SpecRenderer();
         void renderFrame() override;
 
         void toggleColorMode() override;
@@ -137,8 +138,17 @@ class SpecRenderer : public CrtRenderer, public IActive
         const uint8_t* m_screenMemory = nullptr;
         const uint8_t* m_colorMemory = nullptr;
 
+        uint32_t* m_frameBuf = nullptr;
+
         SpecColorMode m_colorMode = SCM_8COLOR;
         bool m_showBorder = false;
+
+        int m_curLine = 0;
+
+        int m_offsetX = 0;
+        int m_offsetY = 0;
+
+        void renderLine(int nLine);
 };
 
 
@@ -151,6 +161,8 @@ class SpecCore : public PlatformCore
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
         void draw() override;
+        void vrtc(bool isActive) override;
+        void inte(bool isActive) override;
 
         void attachCrtRenderer(CrtRenderer* crtRenderer);
 
@@ -158,6 +170,9 @@ class SpecCore : public PlatformCore
 
     private:
         CrtRenderer* m_crtRenderer = nullptr;
+
+        bool m_useInts = false;
+        bool m_intReq = false;
 };
 
 

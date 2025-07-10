@@ -46,6 +46,37 @@ void SpecCore::draw()
 }
 
 
+void SpecCore::vrtc(bool isActive)
+{
+    // actually this is not VTRC, but this proc is called onece per frame on interrupt
+
+    if (!m_useInts)
+        return;
+
+    if (isActive) {
+        Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+        m_intReq = true;
+        if (cpu->getInte()) {
+            m_intReq = false;
+            cpu->intRst(7);
+        }
+    }
+}
+
+
+void SpecCore::inte(bool isActive)
+{
+    if (!m_useInts)
+        return;
+
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    if (isActive && m_intReq && cpu->getInte()) {
+        m_intReq = false;
+        cpu->intRst(7);
+    }
+}
+
+
 void SpecCore::attachCrtRenderer(CrtRenderer* crtRenderer)
 {
     m_crtRenderer = crtRenderer;
@@ -60,6 +91,11 @@ bool SpecCore::setProperty(const string& propertyName, const EmuValuesList& valu
     if (propertyName == "crtRenderer") {
         attachCrtRenderer(static_cast<CrtRenderer*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "useInts") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_useInts = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
 }
@@ -67,6 +103,9 @@ bool SpecCore::setProperty(const string& propertyName, const EmuValuesList& valu
 
 SpecRenderer::SpecRenderer()
 {
+    m_frameBuf = new uint32_t[384 * 256];
+    memset(m_frameBuf, 0, 384 * 256 * sizeof(uint32_t));
+
     m_sizeX = m_prevSizeX = 384;
     m_sizeY = m_prevSizeY = 256;
     m_aspectRatio = m_prevAspectRatio = 576.0 * 9 / 704 / 8;
@@ -76,6 +115,12 @@ SpecRenderer::SpecRenderer()
     m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
+}
+
+
+SpecRenderer::~SpecRenderer()
+{
+    delete[] m_frameBuf;
 }
 
 
@@ -93,60 +138,75 @@ void SpecRenderer::toggleColorMode()
 }
 
 
+void SpecRenderer::renderLine(int line)
+{
+    for (int col = 0; col < 48; col++) {
+        int addr = col * 256 + line;
+        uint8_t bt = m_screenMemory[addr];
+        uint8_t colorByte = m_colorMemory[addr];
+        uint32_t fgColor;
+        uint32_t bgColor = 0;
+        switch (m_colorMode) {
+            case SCM_MONO:
+                fgColor = 0xC0C0C0;
+                break;
+            case SCM_4COLOR:
+                fgColor = spec4ColorPalette[(colorByte & 0xC0) >> 6];
+                break;
+            case SCM_8COLOR:
+                fgColor = spec8ColorPalette[((colorByte & 0xC0) >> 5) | ((colorByte & 0x10) >> 4)];
+                break;
+            case SCM_MX:
+            default:
+                fgColor = spec16ColorPalette[(colorByte & 0xF0) >> 4];
+                bgColor = spec16ColorPalette[colorByte & 0xF];
+        }
+        for (int pt = 0; pt < 8; pt++, bt <<= 1)
+            m_frameBuf[line * 384 + col * 8 + pt] = (bt & 0x80) ? fgColor : bgColor;
+    }
+}
+
+
 void SpecRenderer::renderFrame()
 {
-    swapBuffers();
-
-    int offsetX = 0;
-    int offsetY = 0;
-
     if (m_showBorder) {
         m_sizeX = 417;
         m_sizeY = 288;
-        memset(m_pixelData, 0, m_sizeX * m_sizeY * sizeof(uint32_t));
-        offsetX = 21;
-        offsetY = 10;
+        m_offsetX = 21;
+        m_offsetY = 10;
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
+
+        memset(m_pixelData, 0, m_sizeX * m_sizeY * sizeof(uint32_t));
+        for (int i = 0; i < 256; i++)
+            memcpy(m_pixelData + m_sizeX * (i + m_offsetY) + m_offsetX, m_frameBuf + i * 384, 384 * sizeof(uint32_t));
     } else {
         m_sizeX = 384;
         m_sizeY = 256;
-        offsetX = offsetY = 0;
+        m_offsetX = m_offsetY = 0;
         m_aspectRatio = 576.0 * 9 / 704 / 8;
+
+        memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     }
 
-    for (int row = 0; row < 256; row++)
-        for (int col = 0; col < 48; col++) {
-            int addr = col * 256 + row;
-            uint8_t bt = m_screenMemory[addr];
-            uint8_t colorByte = m_colorMemory[addr];
-            uint32_t fgColor;
-            uint32_t bgColor = 0;
-            switch (m_colorMode) {
-                case SCM_MONO:
-                    fgColor = 0xC0C0C0;
-                    break;
-                case SCM_4COLOR:
-                    fgColor = spec4ColorPalette[(colorByte & 0xC0) >> 6];
-                    break;
-                case SCM_8COLOR:
-                    fgColor = spec8ColorPalette[((colorByte & 0xC0) >> 5) | ((colorByte & 0x10) >> 4)];
-                    break;
-                case SCM_MX:
-                default:
-                    fgColor = spec16ColorPalette[(colorByte & 0xF0) >> 4];
-                    bgColor = spec16ColorPalette[colorByte & 0xF];
-            }
-            for (int pt = 0; pt < 8; pt++, bt <<= 1)
-                m_pixelData[(row + offsetY) * m_sizeX + col * 8 + pt + offsetX] = (bt & 0x80) ? fgColor : bgColor;
-        }
+    swapBuffers();
 }
 
 
 void SpecRenderer::operate()
 {
-    renderFrame();
-    m_curClock += g_emulation->getFrequency() * 512 * 312 / 8000000; // 8 MHz pixelclock, 312 scanlines, 512 pixels wide
-    g_emulation->screenUpdateReq(); // transfer to Core
+    if (m_curLine < 256)
+        renderLine(m_curLine);
+    else if (m_curLine == 256) {
+        m_platform->getCore()->vrtc(true);
+    } else if (m_curLine == 281) {
+        renderFrame();
+        g_emulation->screenUpdateReq();
+    }
+    if (++m_curLine == 312)
+        m_curLine = 0;
+
+    m_curClock += g_emulation->getFrequency() * 512 / 8000000;
+
 }
 
 
