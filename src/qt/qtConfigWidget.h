@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ namespace Ui {
     class KorvetConfigWidget;
     class VectorConfigWidget;
     class ZxConfigWidget;
+    class SpecConfigWidget;
 }
 
 class ApogeyConfigWidget : public ConfigWidget
@@ -134,6 +135,22 @@ public:
 
 private:
     Ui::ZxConfigWidget *ui;
+};
+
+
+class SpecConfigWidget : public ConfigWidget
+{
+    Q_OBJECT
+
+public:
+    explicit SpecConfigWidget(QWidget *parent = nullptr);
+
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private:
+    Ui::SpecConfigWidget *ui;
 };
 
 

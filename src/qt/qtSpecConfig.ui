@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZxConfigWidget</class>
- <widget class="QWidget" name="ZxConfigWidget">
+ <class>SpecConfigWidget</class>
+ <widget class="QWidget" name="SpecConfigWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,11 +17,14 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string notr="true">ApogeyConfigWidget</string>
+   <string notr="true">SpecConfigWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="ayGroupBox">
+    <widget class="QGroupBox" name="soundGroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
@@ -36,27 +39,34 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="tsCheckBox">
+       <widget class="QRadioButton" name="noneRadioButton">
         <property name="text">
-         <string>2 AYs (NedoPC Turbo Sound)</string>
+         <string>None</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="gsCheckBox">
+       <widget class="QRadioButton" name="ayRadioButton">
         <property name="text">
-         <string notr="true">General Sound</string>
+         <string notr="true">AY</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="ay48kCheckBox">
+       <widget class="QRadioButton" name="tsRadioButton">
         <property name="text">
-         <string>AY &amp;&amp; GS in 48K configuration</string>
+         <string notr="true">2 AY (Turbo Sound)</string>
         </property>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="intsCheckBox">
+     <property name="text">
+      <string>Frame interrupts</string>
+     </property>
     </widget>
    </item>
    <item>
@@ -67,13 +77,19 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>noneRadioButton</tabstop>
+  <tabstop>ayRadioButton</tabstop>
+  <tabstop>tsRadioButton</tabstop>
+  <tabstop>intsCheckBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -25,6 +25,7 @@
 #include "ui_qtKorvetConfig.h"
 #include "ui_qtVectorConfig.h"
 #include "ui_qtZxConfig.h"
+#include "ui_qtSpecConfig.h"
 
 #include "../Pal.h"
 
@@ -47,6 +48,8 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new VectorConfigWidget();
     else if (platformName == "zx")
         widget = new ZxConfigWidget();
+    else if (platformName == "spec")
+        widget = new SpecConfigWidget();
     else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha" || platformName == "mikro80" || platformName == "ut88")
     widget = new ApogeyConfigWidget();
 
@@ -387,4 +390,57 @@ void ZxConfigWidget::setDefaults()
     ui->ay48kCheckBox->setChecked(m_defValues["CFG_AY_48K"] == "ON");
     ui->tsCheckBox->setChecked(m_defValues["CFG_AY_TS"] == "ON");
     ui->gsCheckBox->setChecked(m_defValues["CFG_GS"] == "ON");
+}
+
+
+// ######## Specialist config widget ########
+
+SpecConfigWidget::SpecConfigWidget(QWidget *parent) :
+    ConfigWidget(parent),
+    ui(new Ui::SpecConfigWidget)
+{
+    ui->setupUi(this);
+}
+
+
+void SpecConfigWidget::loadConfig()
+{
+    m_defValues["CFG_INTS"] = "OFF";
+    m_defValues["CFG_AY"] = "NONE";
+
+    optBegin();
+
+    ui->intsCheckBox->setChecked(optLoad("CFG_INTS").toString() == "ON");
+    QString val = optLoad("CFG_AY").toString();
+    if (val == "NONE")
+        ui->noneRadioButton->setChecked(true);
+    else if (val == "AY")
+        ui->ayRadioButton->setChecked(true);
+    else if (val == "TS")
+        ui->tsRadioButton->setChecked(true);
+
+    optEnd();
+}
+
+void SpecConfigWidget::saveConfig()
+{
+    optBegin();
+
+    optSave("CFG_INTS", ui->intsCheckBox->isChecked() ? "ON" : "OFF");
+    QString val;
+    if (ui->noneRadioButton->isChecked())
+        val = "NONE";
+    else if (ui->ayRadioButton->isChecked())
+        val = "AY";
+    else if (ui->tsRadioButton->isChecked())
+        val = "TS";
+
+    optSave("CFG_AY", val);
+
+    optEnd();
+}
+
+void SpecConfigWidget::setDefaults()
+{
+    //
 }

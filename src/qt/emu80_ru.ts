@@ -59,22 +59,22 @@
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="250"/>
+        <location filename="qtConfigWidget.cpp" line="253"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="250"/>
+        <location filename="qtConfigWidget.cpp" line="253"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="256"/>
+        <location filename="qtConfigWidget.cpp" line="259"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="262"/>
+        <location filename="qtConfigWidget.cpp" line="265"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -105,7 +105,7 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="qtConfigWidget.cpp" line="87"/>
+        <location filename="qtConfigWidget.cpp" line="90"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -1904,6 +1904,25 @@
     </message>
 </context>
 <context>
+    <name>SpecConfigWidget</name>
+    <message>
+        <location filename="qtSpecConfig.ui" line="35"/>
+        <source>Sound hardware</source>
+        <translation>Звуковое оборудование
+</translation>
+    </message>
+    <message>
+        <location filename="qtSpecConfig.ui" line="44"/>
+        <source>None</source>
+        <translation>Нет</translation>
+    </message>
+    <message>
+        <location filename="qtSpecConfig.ui" line="68"/>
+        <source>Frame interrupts</source>
+        <translation>Кадровые прерывания</translation>
+    </message>
+</context>
+<context>
     <name>VectorConfigWidget</name>
     <message>
         <location filename="qtVectorConfig.ui" line="32"/>
@@ -1932,6 +1951,11 @@
     <message>
         <source>AY in 48K configuration</source>
         <translation type="vanished">AY в конфигурации 48К</translation>
+    </message>
+    <message>
+        <location filename="qtZxConfig.ui" line="32"/>
+        <source>Sound hardware</source>
+        <translation>Звуковое оборудование</translation>
     </message>
     <message>
         <location filename="qtZxConfig.ui" line="41"/>

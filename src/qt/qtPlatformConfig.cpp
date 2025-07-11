@@ -52,16 +52,26 @@ bool PlatformConfigDialog::hasConfig(QString platform)
 
 bool PlatformConfigDialog::configure(QString platform)
 {
-    m_configWidget = ConfigWidget::create(getGroupName(platform));
     connect(ui->defaultsButton, SIGNAL(clicked()), this, SLOT(onDefaults()));
     QSizePolicy sp;
-    sp.setVerticalPolicy(QSizePolicy::Expanding);
-    sp.setVerticalStretch(1);
-    sp.setHorizontalPolicy(QSizePolicy::Expanding);
-    sp.setHorizontalStretch(1);
-    m_configWidget->setSizePolicy(sp);
+    //sp.setVerticalPolicy(QSizePolicy::Expanding);
+    //sp.setVerticalStretch(0);
+    //sp.setHorizontalPolicy(QSizePolicy::Expanding);
+    //sp.setHorizontalStretch(1);
+
+    m_configWidget = ConfigWidget::create(getGroupName(platform));
+    //m_configWidget->setSizePolicy(sp);
+
     static_cast<QBoxLayout*>(layout())->insertWidget(0, m_configWidget);
     m_configWidget->loadConfig();
+
+    if (getGroupName(platform) == "spec") {
+        ConfigWidget* configWidget2 = ConfigWidget::create("apogey");
+        //configWidget2->setSizePolicy(sp);
+        static_cast<QBoxLayout*>(layout())->insertWidget(0, configWidget2);
+        configWidget2->loadConfig();
+    }
+
     bool res = exec() == QDialog::Accepted;
     if (res)
         m_configWidget->saveConfig();
