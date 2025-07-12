@@ -126,6 +126,7 @@ class SpecRenderer : public CrtRenderer, public IActive
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
+        std::string getDebugInfo() override;
 
         // derived from ActiveDevice
         void operate() override;

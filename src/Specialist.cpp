@@ -275,6 +275,18 @@ string SpecRenderer::getPropertyStringValue(const string& propertyName)
 }
 
 
+string SpecRenderer::getDebugInfo()
+{
+    int line = (m_curLine + 55) % 312;
+    stringstream ss;
+    ss << "CRT:" << "\n";
+    ss << "L: " << line;
+    if (line >= 56)
+        ss << " /" << (m_curLine + 311) % 312;
+    return ss.str();
+}
+
+
 SpecVideoRam::SpecVideoRam(int memSize)  : Ram(memSize)
 {
     m_memSize = memSize;
