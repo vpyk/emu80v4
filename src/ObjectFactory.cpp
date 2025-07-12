@@ -213,6 +213,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Pk8000RomDiskSelector);
     REG_EMU_CLASS(Psg3910);
     REG_EMU_CLASS(Psg3910SoundSource);
+    REG_EMU_CLASS(TurboSound);
     REG_EMU_CLASS(Pk8000CpuWaits);
     REG_EMU_CLASS(PpiAtaAdapter);
     REG_EMU_CLASS(AtaDrive);

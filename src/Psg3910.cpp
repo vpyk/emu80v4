@@ -309,3 +309,38 @@ string Psg3910SoundSource::getPropertyStringValue(const string& propertyName)
     return "";
 }
 
+
+void TurboSound::reset()
+{
+    m_curPsg = 0;
+}
+
+
+void TurboSound::writeByte(int addr, uint8_t value)
+{
+    if (addr == 0 || (value & 0xFE) != 0xFE) {
+        m_psg[m_curPsg]->writeByte(addr, value);
+        return;
+    }
+
+    m_curPsg = value & 1;
+}
+
+
+uint8_t TurboSound::readByte(int addr)
+{
+    return m_psg[m_curPsg]->readByte(addr);
+}
+
+
+bool TurboSound::setProperty(const std::string &propertyName, const EmuValuesList &values)
+{
+    if (propertyName == "psg1") {
+        m_psg[0] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } if (propertyName == "psg2") {
+        m_psg[1] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
+        return true;
+        }
+    return false;
+}

@@ -90,7 +90,6 @@ bool ZxCore::setProperty(const string& propertyName, const EmuValuesList& values
 
 void ZxPorts::reset()
 {
-    m_curAy = 0;
     m_bdiActive = false;
 }
 
@@ -124,11 +123,11 @@ uint8_t ZxPorts::readByte(int addr)
         return (m_kbdMatrixData & 0x1F) + (g_emulation->getWavReader()->getCurValue() ? 0x40 : 0x00);
     } else if (!(addr & 2)) {
         // port FD
-        if (!m_ay[m_curAy])
+        if (!m_ay)
             return 0xFF;
         addr >>= 8;
         if (addr == 0xFF)
-            return m_ay[m_curAy]->readByte(0);
+            return m_ay->readByte(0);
         else
             return 0xFF;
     } else if (m_gs && (addr & 0xf7) == 0xb3) {
@@ -162,17 +161,12 @@ void ZxPorts::writeByte(int addr, uint8_t value)
                 m_port7FFDOutput->setValue(value);
         } else if ((addr & 0xC0) == 0xC0) {
             // AY address reg
-            if (m_ay[1] && (value & 0xFE) == 0xFE)
-                // select AY #
-                m_curAy = value & 1;
-            else {
-                if (m_ay[m_curAy])
-                    m_ay[m_curAy]->writeByte(1, value);
-            }
+            if (m_ay)
+                m_ay->writeByte(1, value);
         } else if ((addr & 0xC0) == 0x80) {
             // AY data register
-            if (m_ay[m_curAy])
-                m_ay[m_curAy]->writeByte(0, value);
+            if (m_ay)
+                m_ay->writeByte(0, value);
         }
         /*if (m_128kMode && (addr & 0x20)) {
             // 48K mode
@@ -200,10 +194,7 @@ bool ZxPorts::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
 
     if (propertyName == "ay") {
-        m_ay[0] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
-        return true;
-    } else if (propertyName == "ay2") {
-        m_ay[1] = static_cast<Psg3910*>(g_emulation->findObject(values[0].asString()));
+        m_ay = static_cast<AddressableDevice*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "fdc") {
         m_fdc = static_cast<Fdc1793*>(g_emulation->findObject(values[0].asString()));

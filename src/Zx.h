@@ -151,8 +151,7 @@ public:
 private:
     int m_kbdMatrixData = 0;
 
-    Psg3910* m_ay[2] = {nullptr, nullptr};
-    int m_curAy = 0;
+    AddressableDevice* m_ay = nullptr;
 
     GsPorts* m_gs = nullptr;
 

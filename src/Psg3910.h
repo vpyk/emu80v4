@@ -104,4 +104,22 @@ class Psg3910SoundSource : public SoundSource
 };
 
 
+class TurboSound : public AddressableDevice
+{
+public:
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    void reset() override;
+
+    void writeByte(int addr, uint8_t value) override;
+    uint8_t readByte(int addr) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new TurboSound();}
+
+private:
+    Psg3910* m_psg[2] = {nullptr, nullptr};
+    int m_curPsg = 0;
+};
+
+
 #endif // PSG3910_H
