@@ -311,8 +311,10 @@ VectorConfigWidget::VectorConfigWidget(QWidget *parent) :
 void VectorConfigWidget::loadConfig()
 {
     m_defValues["CFG_EDD"] = "EDD";
+    m_defValues["CFG_TS"] = "OFF";
 
     optBegin();
+    ui->tsCheckBox->setChecked(optLoad("CFG_TS").toString() == "ON");
     QString val = optLoad("CFG_EDD").toString();
     optEnd();
 
@@ -340,12 +342,15 @@ void VectorConfigWidget::saveConfig()
 
     optBegin();
     optSave("CFG_EDD", val);
+    optSave("CFG_TS", ui->tsCheckBox->isChecked() ? "ON" : "OFF");
     optEnd();
 }
+
 
 void VectorConfigWidget::setDefaults()
 {
     ui->edd1RadioButton->setChecked(m_defValues["CFG_EDD"] == "EDD");
+    ui->tsCheckBox->setChecked(m_defValues["CFG_TS"] == "ON");
 }
 
 
