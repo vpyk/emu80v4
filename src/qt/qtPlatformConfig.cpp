@@ -66,7 +66,8 @@ bool PlatformConfigDialog::configure(QString platform)
     m_configWidget->loadConfig();
 
     if (getGroupName(platform) == "spec") {
-        ConfigWidget* configWidget2 = ConfigWidget::create("apogey");
+        ConfigWidget* configWidget2 = new ApogeyConfigWidget();
+        configWidget2->tune("spec");
         //configWidget2->setSizePolicy(sp);
         static_cast<QBoxLayout*>(layout())->insertWidget(0, configWidget2);
         configWidget2->loadConfig();

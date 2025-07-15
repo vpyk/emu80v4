@@ -39,6 +39,13 @@ ConfigWidget::ConfigWidget(QWidget* parent) : QWidget(parent)
 }
 
 
+void ConfigWidget::tune(const QString &platform)
+{
+    m_platform = platform;
+    tune();
+}
+
+
 ConfigWidget* ConfigWidget::create(QString platformName)
 {
     ConfigWidget* widget;

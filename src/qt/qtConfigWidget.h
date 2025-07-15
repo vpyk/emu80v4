@@ -37,6 +37,8 @@ public:
 
     virtual void tune() {}
 
+    void tune(const QString& platform);
+
     static ConfigWidget* create(QString platformName);
 
 protected:
