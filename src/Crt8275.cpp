@@ -147,6 +147,7 @@ void Crt8275::displayBuffer()
     m_frame.nLines = m_nLines;
     m_frame.nCharsPerRow = m_nCharsPerRow;
     m_frame.isOffsetLineMode = m_isOffsetLine;
+    m_frame.underlinePos = m_undLine;
 
     // ffame format check fields
     m_frame.nHrChars = m_nHrChars;
@@ -190,6 +191,7 @@ void Crt8275::displayBuffer()
             m_frame.symbols[m_curRow][i].symbolAttributes.hglt = false; // ?
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa0 = false; // ?
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa1 = false; // ?
+            m_frame.symbols[m_curRow][i].symbolAttributes.la1 = false;
             for (int j = 0; j < m_nLines; j++) {
                 m_frame.symbols[m_curRow][i].symbolLineAttributes[j].vsp  = true;
                 m_frame.symbols[m_curRow][i].symbolLineAttributes[j].lten = false;
@@ -200,6 +202,7 @@ void Crt8275::displayBuffer()
             m_frame.symbols[m_curRow][i].symbolAttributes.hglt = m_curHighlight;
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa0 = m_curGpa0;
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa1 = m_curGpa1;
+            m_frame.symbols[m_curRow][i].symbolAttributes.la1 = false;
             for (int j = 0; j < m_nLines; j++) {
                 m_frame.symbols[m_curRow][i].symbolLineAttributes[j].vsp  = m_curBlink && (m_frameCount & 0x10);
                 m_frame.symbols[m_curRow][i].symbolLineAttributes[j].lten = false;
@@ -230,6 +233,7 @@ void Crt8275::displayBuffer()
             m_frame.symbols[m_curRow][i].symbolAttributes.hglt = m_curHighlight; // ?
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa0 = m_curGpa0; //?? уточнить!!!
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa1 = m_curGpa1; //?? уточнить!!!
+            m_frame.symbols[m_curRow][i].symbolAttributes.la1 = false;
 
         } else if ((chr & 0xC0) == 0xC0 && (chr & 0x30) != 0x30) {
             // Character Attribute
@@ -256,6 +260,8 @@ void Crt8275::displayBuffer()
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa0 = m_curGpa0;
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa1 = m_curGpa1;
 
+            m_frame.symbols[m_curRow][i].symbolAttributes.la1 = (chr & 0x0c) == 0; // simplifyed, actually should be determined for each scanline
+
         } else {
             // Special Control Characters
             if (chr & 0x02) {
@@ -269,6 +275,7 @@ void Crt8275::displayBuffer()
             m_frame.symbols[m_curRow][i].symbolAttributes.hglt = m_curHighlight;
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa0 = m_curGpa0;
             m_frame.symbols[m_curRow][i].symbolAttributes.gpa1 = m_curGpa1;
+            m_frame.symbols[m_curRow][i].symbolAttributes.la1 = false;
             for (int j = 0; j < m_nLines; j++) {
                 m_frame.symbols[m_curRow][i].symbolLineAttributes[j].vsp  = true;
                 m_frame.symbols[m_curRow][i].symbolLineAttributes[j].lten = false;

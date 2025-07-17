@@ -163,6 +163,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Rk86Core);
     REG_EMU_CLASS(Rk86Renderer);
     REG_EMU_CLASS(RkPixeltronRenderer);
+    REG_EMU_CLASS(RkRamFontRenderer);
     REG_EMU_CLASS(RkFddRegister);
     REG_EMU_CLASS(RkFddController);
     REG_EMU_CLASS(RkFileLoader);

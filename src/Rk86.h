@@ -88,4 +88,21 @@ class RkPixeltronRenderer : public Crt8275Renderer
         void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt) override;
 };
 
+class RkRamFontRenderer : public Crt8275Renderer
+{
+    public:
+        RkRamFontRenderer();
+        ~RkRamFontRenderer();
+
+        void primaryRenderFrame() override;
+
+        static EmuObject* create(const EmuValuesList&) {return new RkRamFontRenderer();}
+
+    protected:
+        void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt) override;
+
+    private:
+        uint8_t* m_ramFont = nullptr;
+};
+
 #endif // RK86_H

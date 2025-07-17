@@ -43,6 +43,7 @@ struct SymbolAttributes {
     bool hglt;   // highlight
     bool gpa0;   // general purpose 1
     bool gpa1;   // general purpose 2
+    bool la1;    // simplified LA1, actually should be per line basis
 };
 
 
@@ -66,6 +67,7 @@ struct Frame {
     int nRows;          // line number from top
     int nCharsPerRow;
     int nLines;
+    int underlinePos;
     bool isOffsetLineMode;
     Symbol symbols[64][128]; // array of symbols
 

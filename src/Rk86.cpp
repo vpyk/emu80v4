@@ -16,11 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstring>
+
 #include "Rk86.h"
 #include "Emulation.h"
 #include "Globals.h"
 #include "EmuWindow.h"
 #include "SoundMixer.h"
+#include "Crt8275.h"
 
 using namespace std;
 
@@ -235,6 +238,67 @@ void RkPixeltronRenderer::customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol
 
     for (int i = 0; i < 6; i++) {
         *linePtr++ = (bt & 0x20) ? fgColor : bgColor;
+        bt <<= 1;
+    }
+}
+
+
+RkRamFontRenderer::RkRamFontRenderer()
+{
+    m_fntCharWidth = 6;
+    m_customDraw = true;
+    m_ltenOffset = false;
+    m_gpaOffset  = false;
+}
+
+
+RkRamFontRenderer::~RkRamFontRenderer()
+{
+    delete[] m_ramFont;
+}
+
+
+void RkRamFontRenderer::primaryRenderFrame()
+{
+    Crt8275Renderer::primaryRenderFrame();
+
+    const Frame* frame = m_crt->getFrame();
+
+    int nRows = frame->nRows;
+    int nChars = frame->nCharsPerRow;
+    int line = frame->underlinePos;
+
+    if (frame->isOffsetLineMode)
+        line = line != 0 ? line - 1 : frame->nLines - 1;
+
+    for (int row = 0; row < nRows; row++)
+        for (int pos = 1; pos < nChars - 1; pos++)
+            if (frame->symbols[row][pos].symbolAttributes.la1) {
+                int data = frame->symbols[row][pos - 1].chr;
+                int chr = frame->symbols[row][pos + 1].chr;
+                int bank = frame->symbols[row][pos].symbolAttributes.gpa0 ? 1024 : 0;
+                m_ramFont[bank + chr * 8 + line] = data;
+            }
+}
+
+
+void RkRamFontRenderer::customDrawSymbolLine(uint32_t *linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt)
+{
+    if (!m_ramFont) {
+        m_ramFont = new uint8_t[2048];
+        memcpy(m_ramFont, m_font, 1024);
+        memset(m_ramFont + 1024, 0x55, 1024);
+    }
+
+    int offset = (gpa0 ? 0x400 : 0) + symbol * 8 + (line & 7);
+    uint8_t bt = ~m_ramFont[offset];
+    if (lten)
+        bt = 0x3f;
+    else if (vsp)
+        bt = 0x00;
+
+    for (int i = 0; i < 6; i++) {
+        *linePtr++ = (bt & 0x20) ? 0xC0C0C0 : 0;
         bt <<= 1;
     }
 }
