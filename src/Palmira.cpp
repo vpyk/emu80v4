@@ -142,7 +142,7 @@ void PalmiraConfigRegister::writeByte(int, uint8_t value)
 {
     m_renderer->setExtFontMode(value & 0x40);
     m_fontMemMapper->setCurPage(value & 0x40 ? 1 : 0);
-    m_renderer->setFontSetNum((value & 0x06) >> 1);
+    m_renderer->setFontSetNum(((value & 0x02)) >> 1 | ((value & 0x08) >> 3));
 
     m_lowerMemMapper->setCurPage(value & 1);
     m_upperMemMapper->setCurPage(value & 0x80 ? 0 : 1);
