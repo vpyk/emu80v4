@@ -60,6 +60,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="bdiCheckBox">
+     <property name="text">
+      <string>TR-DOS in 48K &amp;&amp; 128K confugurations</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -74,6 +81,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tsCheckBox</tabstop>
+  <tabstop>gsCheckBox</tabstop>
+  <tabstop>ay48kCheckBox</tabstop>
+  <tabstop>bdiCheckBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -59,22 +59,22 @@
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="253"/>
+        <location filename="qtConfigWidget.cpp" line="260"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="253"/>
+        <location filename="qtConfigWidget.cpp" line="260"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="259"/>
+        <location filename="qtConfigWidget.cpp" line="266"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="265"/>
+        <location filename="qtConfigWidget.cpp" line="272"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -105,7 +105,7 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="qtConfigWidget.cpp" line="90"/>
+        <location filename="qtConfigWidget.cpp" line="97"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -1967,6 +1967,11 @@
         <location filename="qtZxConfig.ui" line="55"/>
         <source>AY &amp;&amp; GS in 48K configuration</source>
         <translation>AY и GS в конфигурации 48K</translation>
+    </message>
+    <message>
+        <location filename="qtZxConfig.ui" line="65"/>
+        <source>TR-DOS in 48K &amp;&amp; 128K confugurations</source>
+        <translation>TR-DOS в конфигурациях 48K и 128K</translation>
     </message>
 </context>
 </TS>

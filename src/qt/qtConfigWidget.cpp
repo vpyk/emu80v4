@@ -376,12 +376,14 @@ void ZxConfigWidget::loadConfig()
     m_defValues["CFG_AY_48K"] = "OFF";
     m_defValues["CFG_AY_TS"] = "ON";
     m_defValues["CFG_GS"] = "OFF";
+    m_defValues["CFG_BDI_48_128"] = "OFF";
 
     optBegin();
 
     ui->ay48kCheckBox->setChecked(optLoad("CFG_AY_48K").toString() == "ON");
     ui->tsCheckBox->setChecked(optLoad("CFG_AY_TS").toString() == "ON");
     ui->gsCheckBox->setChecked(optLoad("CFG_GS").toString() == "ON");
+    ui->bdiCheckBox->setChecked(optLoad("CFG_BDI_48_128").toString() == "ON");
 
     optEnd();
 }
@@ -393,6 +395,7 @@ void ZxConfigWidget::saveConfig()
     optSave("CFG_AY_48K", ui->ay48kCheckBox->isChecked() ? "ON" : "OFF");
     optSave("CFG_AY_TS", ui->tsCheckBox->isChecked() ? "ON" : "OFF");
     optSave("CFG_GS", ui->gsCheckBox->isChecked() ? "ON" : "OFF");
+    optSave("CFG_BDI_48_128", ui->bdiCheckBox->isChecked() ? "ON" : "OFF");
 
     optEnd();
 }
@@ -402,6 +405,7 @@ void ZxConfigWidget::setDefaults()
     ui->ay48kCheckBox->setChecked(m_defValues["CFG_AY_48K"] == "ON");
     ui->tsCheckBox->setChecked(m_defValues["CFG_AY_TS"] == "ON");
     ui->gsCheckBox->setChecked(m_defValues["CFG_GS"] == "ON");
+    ui->bdiCheckBox->setChecked(m_defValues["CFG_BDI_48_128"] == "OFF");
 }
 
 
