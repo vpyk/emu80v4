@@ -238,6 +238,8 @@ class ZxKbdLayout : public KbdLayout
         EmuKey translateKey(PalKeyCode keyCode) override;
         EmuKey translateUnicodeKey(unsigned unicodeKey, PalKeyCode key, bool& shift, bool& lang, bool& ctrl) override;
         bool translateKeyEx(PalKeyCode keyCode, EmuKey& key1, EmuKey& key2) override;
+
+        bool processSpecialKeys(PalKeyCode keyCode, bool pressed) override;
 };
 
 

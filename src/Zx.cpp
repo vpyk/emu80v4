@@ -719,7 +719,7 @@ EmuKey ZxKbdLayout::translateUnicodeKey(unsigned unicodeKey, PalKeyCode keyCode,
     case PK_RIGHT:
         shift = true;
         return EK_8;
-    case PK_F12:
+    case PK_TAB:
         ctrl = true;
         return EK_SPACE;
     case PK_BSP:
@@ -871,6 +871,51 @@ bool ZxKbdLayout::translateKeyEx(PalKeyCode keyCode, EmuKey &key1, EmuKey &key2)
         break;
     }
 
+    return false;
+}
+
+
+bool ZxKbdLayout::processSpecialKeys(PalKeyCode keyCode, bool pressed)
+{
+    if (!pressed)
+        return false;
+
+    if (keyCode == PK_F11) {
+        m_platform->reset();
+        static_cast<Cpu8080Compatible*>(m_platform->getCpu())->setPC(0);
+        return true;
+    } else if (keyCode == PK_F12) {
+        m_platform->reset();
+        //static_cast<Cpu8080Compatible*>(m_platform->getCpu())->getIoAddrSpace()->writeByte(0xFFFD, );
+        Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+        g_emulation->exec((int64_t)cpu->getKDiv() * 6000000);
+
+        Keyboard* kbd = m_platform->getKeyboard();
+
+        for (int i = 0; i < 3; i++) {
+            kbd->processKey(EK_SHIFT, true);
+            kbd->processKey(EK_6, true);
+            g_emulation->exec((int64_t)cpu->getKDiv() * 100000, true);
+            kbd->processKey(EK_SHIFT, false);
+            kbd->processKey(EK_6, false);
+            g_emulation->exec((int64_t)cpu->getKDiv() * 350000, false);
+        }
+
+        // Press CR
+        kbd->processKey(EK_CR, true);
+        g_emulation->exec((int64_t)cpu->getKDiv() * 100000, true);
+        kbd->processKey(EK_CR, false);
+
+        g_emulation->exec((int64_t)cpu->getKDiv() * 6000000);
+
+        AddressableDevice* as = cpu->getAddrSpace();
+        as->writeByte(0xfff6, 0);
+        as->writeByte(0xfff7, 0);
+        cpu->setSP(0xfff6);
+
+        cpu->setPC(0x3d00);
+        return true;
+    }
     return false;
 }
 
