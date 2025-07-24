@@ -128,6 +128,7 @@ bool palQtInit(int& argc, char** argv)
 
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings settings;
+    SET_INI_CODEC(settings);
 
     settings.beginGroup("system");
 
@@ -403,6 +404,7 @@ void palDelay(uint64_t time)
 std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window)
 {
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup("dirs");
 
     QString keyPrefix;
@@ -600,6 +602,7 @@ void palGetPlatformDefines(std::string platformName, std::map<std::string, std::
 {
     string platformGroupName = platformName.substr(0, platformName.find(".",0));
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup(QString::fromUtf8(platformGroupName.c_str()) + "-config");
     QStringList keys = settings.allKeys();
     for (const auto& key: keys) {
@@ -613,6 +616,7 @@ void palGetPlatformDefines(std::string platformName, std::map<std::string, std::
 std::string palGetDefaultPlatform()
 {
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup("system");
     return settings.value("platform", "").toString().toUtf8().constData();
 }

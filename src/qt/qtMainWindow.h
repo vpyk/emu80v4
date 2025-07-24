@@ -466,4 +466,11 @@ private:
     keyList.append(QKeySequence(Qt::ALT | key))
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #define SET_INI_CODEC(x) x.setIniCodec("UTF-8")
+#else
+    #define SET_INI_CODEC(x)
+#endif
+
+
 #endif // QTMAINWINDOW_H

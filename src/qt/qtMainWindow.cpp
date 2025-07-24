@@ -208,6 +208,7 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
             bool resizable = m_clientWidth == 0 && m_clientHeight == 0;
             if (resizable) {
                 QSettings settings;
+                SET_INI_CODEC(settings);
                 settings.beginGroup("window");
                 if (settings.contains("width") && settings.contains("height")) {
                     m_clientWidth = settings.value("width").toInt();
@@ -249,6 +250,7 @@ void MainWindow::setClientSize(int width, int height)
 
     if (m_windowType == EWT_EMULATION) {
         QSettings settings;
+        SET_INI_CODEC(settings);
         settings.beginGroup("system");
         bool preserveSize = settings.value("preserveSize") == "yes";
 
@@ -322,6 +324,7 @@ void MainWindow::showWindow()
         if (m_windowType == EWT_EMULATION) {
             // place main window, not debug one
             QSettings settings;
+            SET_INI_CODEC(settings);
             settings.beginGroup("window");
             if (settings.contains("left") && settings.contains("top")) {
                 int left = settings.value("left").toInt();
@@ -405,6 +408,7 @@ void MainWindow::setFullScreen(bool fullscreen)
 void MainWindow::fillPlatformListMenu()
 {
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup("system");
     bool selectedPlatformsOnly = settings.value("selectedPlatformsOnly").toString() == "yes";
     QStringList selectedPlatforms = settings.value("enabledPlatforms").toStringList();
@@ -2869,10 +2873,13 @@ void MainWindow::onPlatformSelect()
     QAction* action = (QAction*)sender();
     std::string platform(action->data().toString().toUtf8().constData());
 
-    // Set as default
-    QSettings settings;
-    settings.beginGroup("system");
-    settings.setValue("platform", action->data().toString().toUtf8().constData());
+    {
+        // Set as default
+        QSettings settings;
+        SET_INI_CODEC(settings);
+        settings.beginGroup("system");
+        settings.setValue("platform", action->data().toString().toUtf8().constData());
+    } // ensure QSettings object is destroyed now before calling emuSelectPlatform and creating another QSettings
 
     emuSelectPlatform(platform);
 }
@@ -3596,6 +3603,7 @@ void MainWindow::savePosition()
         return;
 
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup("window");
     if (geometry().topLeft() != QPoint(0, 0)) { // don't save incorrect position
         settings.setValue("left", geometry().x());
@@ -3654,6 +3662,7 @@ void MainWindow::updateLastPlatforms(QString platform)
     m_lastPlatformsActions[0]->setVisible(true);
 
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup("Last_platforms");
 
     for (int i = 0; i < LAST_PLATFORMS_QTY; i++)
@@ -3684,6 +3693,7 @@ void LastFileList::loadLastFiles()
     QString keyPrefix = getKeyPrefix();
 
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup("Last_files");
 
     m_list.clear();
@@ -3725,6 +3735,7 @@ void LastFileList::saveLastFiles()
     QString keyPrefix = getKeyPrefix();
 
     QSettings settings;
+    SET_INI_CODEC(settings);
     settings.beginGroup("Last_files");
 
     int i = 1;

@@ -79,6 +79,7 @@ void SettingsDialog::fillEnabledPlatformList()
     }
 
     QSettings settings;
+    SET_INI_CODEC(settings);
 
     settings.beginGroup("system");
     QStringList platforms = settings.value("enabledPlatforms").toStringList();
@@ -102,6 +103,7 @@ void SettingsDialog::saveEnabledPlatformList()
     }
 
     QSettings settings;
+    SET_INI_CODEC(settings);
 
     settings.beginGroup("system");
     settings.setValue("enabledPlatforms", platforms);
@@ -259,6 +261,7 @@ void SettingsDialog::writeInitialSavedConfig()
     m_initialOptions = m_options;
 
     QSettings settings;
+    SET_INI_CODEC(settings);
 
     settings.beginGroup(m_platformGroup);
     foreach (QString option, m_options.keys()) {
@@ -276,6 +279,7 @@ void SettingsDialog::writeInitialSavedConfig()
 void SettingsDialog::loadSavedConfig()
 {
     QSettings settings;
+    SET_INI_CODEC(settings);
 
     settings.beginGroup("system");
     m_options["locale"] = settings.value("locale").toString();
@@ -1127,6 +1131,7 @@ void SettingsDialog::saveRunningConfig()
 void SettingsDialog::saveStoredConfig()
 {
     QSettings settings;
+    SET_INI_CODEC(settings);
 
     settings.beginGroup(m_platformGroup);
     //foreach (QString option, m_options.keys()) {
@@ -1162,6 +1167,7 @@ void SettingsDialog::saveStoredConfig()
 void SettingsDialog::resetPlatformOptions()
 {
     QSettings settings;
+    SET_INI_CODEC(settings);
 
     settings.beginGroup(m_platformGroup);
     settings.remove("");
@@ -1193,6 +1199,8 @@ void SettingsDialog::resetPlatformOptions()
 void SettingsDialog::resetAllOptions()
 {
     QSettings settings;
+    SET_INI_CODEC(settings);
+
     settings.clear();
     settings.sync();
 

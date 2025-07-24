@@ -21,6 +21,8 @@
 #include "qtChoosePlatformDialog.h"
 #include "ui_qtChoosePlatformDialog.h"
 
+#include "qtMainWindow.h" // for INI_CODEC
+
 ChoosePlatformDialog::ChoosePlatformDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ChoosePlatformDialog)
@@ -41,6 +43,8 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
     Q_UNUSED(setDef)
 
     QSettings settings;
+    SET_INI_CODEC(settings);
+
     settings.beginGroup("system");
     bool selectedPlatformsOnly = settings.value("selectedPlatformsOnly").toString() == "yes";
     QStringList selectedPlatforms = settings.value("enabledPlatforms").toStringList();
@@ -83,6 +87,7 @@ bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool
 
         if (ui->defaultCheckBox->isChecked()) {
             QSettings settings;
+            SET_INI_CODEC(settings);
             settings.beginGroup("system");
             settings.setValue("platform", QString::fromUtf8(pi[pos].objName.c_str()));
         }
