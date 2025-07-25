@@ -1,292 +1,294 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_project_file>
-    <FileVersion major="1" minor="6" />
-    <Project>
-        <Option title="Emu80" />
-        <Option pch_mode="2" />
-        <Option compiler="gcc" />
-        <Build>
-            <Target title="Debug">
-                <Option output="../bin/Debug/Emu80" prefix_auto="1" extension_auto="1" />
-                <Option object_output="../obj/WxSdl/Debug" />
-                <Option type="0" />
-                <Option compiler="gcc" />
-                <Compiler>
-                    <Add option="-std=c++11" />
-                    <Add option="-g" />
-                    <Add option="-DPAL_SDL" />
-                    <Add option="-DPAL_WX" />
-                    <Add option="-D__WXMSW__" />
-                    <Add option="-DWXUSINGDLL" />
-                    <Add option="-DwxUSE_UNICODE" />
-                </Compiler>
-                <Linker>
-                    <Add library="libwxmsw31u_core.a" />
-                    <Add library="libwxbase31u.a" />
-                </Linker>
-            </Target>
-            <Target title="Release">
-                <Option output="../bin/Release/Emu80" prefix_auto="1" extension_auto="1" />
-                <Option object_output="../obj/WxSdl/Release/" />
-                <Option type="0" />
-                <Option compiler="gcc" />
-                <Compiler>
-                    <Add option="-O2" />
-                    <Add option="-std=c++11" />
-                    <Add option="-DPAL_SDL" />
-                    <Add option="-DPAL_WX" />
-                    <Add option="-D__WXMSW__" />
-                    <Add option="-DWXUSINGDLL" />
-                    <Add option="-DwxUSE_UNICODE" />
-                </Compiler>
-                <Linker>
-                    <Add option="-s" />
-                    <Add library="libwxmsw31u_core.a" />
-                    <Add library="libwxbase31u.a" />
-                </Linker>
-            </Target>
-            <Target title="Lite-Debug">
-                <Option output="../bin/Debug/Emu80lite" prefix_auto="1" extension_auto="1" />
-                <Option object_output="../obj/Lite/Debug" />
-                <Option type="0" />
-                <Option compiler="gcc" />
-                <Compiler>
-                    <Add option="-std=c++11" />
-                    <Add option="-DPAL_SDL" />
-                    <Add option="-DPAL_LITE" />
-                    <Add option="-g" />
-                </Compiler>
-            </Target>
-            <Target title="Lite-Release">
-                <Option output="../bin/Release/Emu80lite" prefix_auto="1" extension_auto="1" />
-                <Option object_output="../obj/Lite/Release" />
-                <Option type="0" />
-                <Option compiler="gcc" />
-                <Compiler>
-                    <Add option="-O2" />
-                    <Add option="-std=c++11" />
-                    <Add option="-DPAL_SDL" />
-                    <Add option="-DPAL_LITE" />
-                </Compiler>
-                <Linker>
-                    <Add option="-s" />
-                </Linker>
-            </Target>
-        </Build>
-        <Compiler>
-            <Add option="-Wall" />
-            <Add option="-D__GNUWIN32__" />
-            <Add directory="$(#sdl2.include)" />
-            <Add directory="$(#wx)/lib/mswu" />
-            <Add directory="$(#wx)/include" />
-        </Compiler>
-        <Linker>
-            <Add library="mingw32" />
-            <Add library="SDL2main" />
-            <Add library="SDL2.dll" />
-            <Add library="user32" />
-            <Add library="gdi32" />
-            <Add library="winmm" />
-            <Add library="dxguid" />
-            <Add library="opengl32" />
-            <Add directory="$(#sdl2.lib)" />
-            <Add directory="$(#wx)/lib" />
-        </Linker>
-        <Unit filename="AddrSpace.cpp" />
-        <Unit filename="AddrSpace.h" />
-        <Unit filename="Apogey.cpp" />
-        <Unit filename="Apogey.h" />
-        <Unit filename="AtaDrive.cpp" />
-        <Unit filename="AtaDrive.h" />
-        <Unit filename="Bashkiria.cpp" />
-        <Unit filename="Bashkiria.h" />
-        <Unit filename="CloseFileHook.cpp" />
-        <Unit filename="CloseFileHook.h" />
-        <Unit filename="CmdLine.cpp" />
-        <Unit filename="CmdLine.h" />
-        <Unit filename="ConfigReader.cpp" />
-        <Unit filename="ConfigReader.h" />
-        <Unit filename="Covox.cpp" />
-        <Unit filename="Covox.h" />
-        <Unit filename="Cpu.cpp" />
-        <Unit filename="Cpu.h" />
-        <Unit filename="Cpu8080.cpp" />
-        <Unit filename="Cpu8080.h" />
-        <Unit filename="Cpu8080dasm.cpp" />
-        <Unit filename="Cpu8080dasm.h" />
-        <Unit filename="CpuHook.cpp" />
-        <Unit filename="CpuHook.h" />
-        <Unit filename="CpuWaits.h" />
-        <Unit filename="CpuZ80.cpp" />
-        <Unit filename="CpuZ80.h" />
-        <Unit filename="CpuZ80dasm.cpp" />
-        <Unit filename="CpuZ80dasm.h" />
-        <Unit filename="Crt8275.cpp" />
-        <Unit filename="Crt8275.h" />
-        <Unit filename="Crt8275Renderer.cpp" />
-        <Unit filename="Crt8275Renderer.h" />
-        <Unit filename="CrtRenderer.cpp" />
-        <Unit filename="CrtRenderer.h" />
-        <Unit filename="Debugger.cpp" />
-        <Unit filename="Debugger.h" />
-        <Unit filename="DiskImage.cpp" />
-        <Unit filename="DiskImage.h" />
-        <Unit filename="Dma8257.cpp" />
-        <Unit filename="Dma8257.h" />
-        <Unit filename="EmuCalls.cpp" />
-        <Unit filename="EmuCalls.h" />
-        <Unit filename="EmuConfig.cpp" />
-        <Unit filename="EmuConfig.h" />
-        <Unit filename="EmuObjects.cpp" />
-        <Unit filename="EmuObjects.h" />
-        <Unit filename="EmuTypes.h" />
-        <Unit filename="EmuWindow.cpp" />
-        <Unit filename="EmuWindow.h" />
-        <Unit filename="Emulation.cpp" />
-        <Unit filename="Emulation.h" />
-        <Unit filename="Eureka.cpp" />
-        <Unit filename="Eureka.h" />
-        <Unit filename="Fdc1793.cpp" />
-        <Unit filename="Fdc1793.h" />
-        <Unit filename="FileLoader.cpp" />
-        <Unit filename="FileLoader.h" />
-        <Unit filename="GenericModules.cpp" />
-        <Unit filename="GenericModules.h" />
-        <Unit filename="Globals.h" />
-        <Unit filename="KbdLayout.cpp" />
-        <Unit filename="KbdLayout.h" />
-        <Unit filename="KbdTapper.cpp" />
-        <Unit filename="KbdTapper.h" />
-        <Unit filename="Keyboard.h" />
-        <Unit filename="Korvet.cpp" />
-        <Unit filename="Korvet.h" />
-        <Unit filename="Kr04.cpp" />
-        <Unit filename="Kr04.h" />
-        <Unit filename="Lvov.cpp" />
-        <Unit filename="Lvov.h" />
-        <Unit filename="Main.cpp" />
-        <Unit filename="Memory.cpp" />
-        <Unit filename="Memory.h" />
-        <Unit filename="Mikro80.cpp" />
-        <Unit filename="Mikro80.h" />
-        <Unit filename="Mikrosha.cpp" />
-        <Unit filename="Mikrosha.h" />
-        <Unit filename="MsxTapeHooks.cpp" />
-        <Unit filename="MsxTapeHooks.h" />
-        <Unit filename="ObjectFactory.cpp" />
-        <Unit filename="ObjectFactory.h" />
-        <Unit filename="Orion.cpp" />
-        <Unit filename="Orion.h" />
-        <Unit filename="Pal.cpp" />
-        <Unit filename="Pal.h" />
-        <Unit filename="PalFile.h" />
-        <Unit filename="PalKeys.h" />
-        <Unit filename="PalWindow.h" />
-        <Unit filename="Palmira.cpp" />
-        <Unit filename="Palmira.h" />
-        <Unit filename="Parameters.cpp" />
-        <Unit filename="Parameters.h" />
-        <Unit filename="Partner.cpp" />
-        <Unit filename="Partner.h" />
-        <Unit filename="Pic8259.cpp" />
-        <Unit filename="Pic8259.h" />
-        <Unit filename="Pit8253.cpp" />
-        <Unit filename="Pit8253.h" />
-        <Unit filename="Pit8253Sound.cpp" />
-        <Unit filename="Pit8253Sound.h" />
-        <Unit filename="Pk8000.cpp" />
-        <Unit filename="Pk8000.h" />
-        <Unit filename="Platform.cpp" />
-        <Unit filename="Platform.h" />
-        <Unit filename="PlatformCore.cpp" />
-        <Unit filename="PlatformCore.h" />
-        <Unit filename="Ppi8255.cpp" />
-        <Unit filename="Ppi8255.h" />
-        <Unit filename="Ppi8255Circuit.h" />
-        <Unit filename="PpiAtaAdapter.cpp" />
-        <Unit filename="PpiAtaAdapter.h" />
-        <Unit filename="PrnWriter.cpp" />
-        <Unit filename="PrnWriter.h" />
-        <Unit filename="Psg3910.cpp" />
-        <Unit filename="Psg3910.h" />
-        <Unit filename="RamDisk.cpp" />
-        <Unit filename="RamDisk.h" />
-        <Unit filename="RfsTapeHooks.cpp" />
-        <Unit filename="RfsTapeHooks.h" />
-        <Unit filename="Rk86.cpp" />
-        <Unit filename="Rk86.h" />
-        <Unit filename="RkFdd.cpp" />
-        <Unit filename="RkFdd.h" />
-        <Unit filename="RkKeyboard.cpp" />
-        <Unit filename="RkKeyboard.h" />
-        <Unit filename="RkPpi8255Circuit.cpp" />
-        <Unit filename="RkPpi8255Circuit.h" />
-        <Unit filename="RkRomDisk.cpp" />
-        <Unit filename="RkRomDisk.h" />
-        <Unit filename="RkSdController.cpp" />
-        <Unit filename="RkSdController.h" />
-        <Unit filename="RkTapeHooks.cpp" />
-        <Unit filename="RkTapeHooks.h" />
-        <Unit filename="SdAdapters.cpp" />
-        <Unit filename="SdAdapters.h" />
-        <Unit filename="SdCard.cpp" />
-        <Unit filename="SdCard.h" />
-        <Unit filename="Shortcuts.cpp" />
-        <Unit filename="Shortcuts.h" />
-        <Unit filename="SoundMixer.cpp" />
-        <Unit filename="SoundMixer.h" />
-        <Unit filename="Specialist.cpp" />
-        <Unit filename="Specialist.h" />
-        <Unit filename="TapeRedirector.cpp" />
-        <Unit filename="TapeRedirector.h" />
-        <Unit filename="Ut88.cpp" />
-        <Unit filename="Ut88.h" />
-        <Unit filename="Vector.cpp" />
-        <Unit filename="Vector.h" />
-        <Unit filename="Version.h" />
-        <Unit filename="WavReader.cpp" />
-        <Unit filename="WavReader.h" />
-        <Unit filename="WavWriter.cpp" />
-        <Unit filename="WavWriter.h" />
-        <Unit filename="Zx.cpp" />
-        <Unit filename="Zx.h" />
-        <Unit filename="lite/litePal.cpp">
-            <Option target="Lite-Debug" />
-            <Option target="Lite-Release" />
-        </Unit>
-        <Unit filename="lite/litePal.h">
-            <Option target="Lite-Debug" />
-            <Option target="Lite-Release" />
-        </Unit>
-        <Unit filename="sdl/sdlGlExt.h" />
-        <Unit filename="sdl/sdlPal.cpp" />
-        <Unit filename="sdl/sdlPal.h" />
-        <Unit filename="sdl/sdlPalFile.cpp" />
-        <Unit filename="sdl/sdlPalFile.h" />
-        <Unit filename="sdl/sdlPalWindow.cpp" />
-        <Unit filename="sdl/sdlPalWindow.h" />
-        <Unit filename="wx/wxChPlatformDlg.cpp">
-            <Option target="Debug" />
-            <Option target="Release" />
-        </Unit>
-        <Unit filename="wx/wxChPlatformDlg.h" />
-        <Unit filename="wx/wxConfigWnd.cpp">
-            <Option target="Debug" />
-            <Option target="Release" />
-        </Unit>
-        <Unit filename="wx/wxConfigWnd.h" />
-        <Unit filename="wx/wxLogWnd.cpp">
-            <Option target="Debug" />
-            <Option target="Release" />
-        </Unit>
-        <Unit filename="wx/wxLogWnd.h" />
-        <Unit filename="wx/wxPal.cpp">
-            <Option target="Debug" />
-            <Option target="Release" />
-        </Unit>
-        <Unit filename="wx/wxPal.h" />
-        <Extensions>
-            <lib_finder disable_auto="1" />
-        </Extensions>
-    </Project>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Emu80" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../bin/Debug/Emu80" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/WxSdl/Debug" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add option="-DPAL_SDL" />
+					<Add option="-DPAL_WX" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DwxUSE_UNICODE" />
+				</Compiler>
+				<Linker>
+					<Add library="libwxmsw31u_core.a" />
+					<Add library="libwxbase31u.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../bin/Release/Emu80" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/WxSdl/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-std=c++11" />
+					<Add option="-DPAL_SDL" />
+					<Add option="-DPAL_WX" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DwxUSE_UNICODE" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="libwxmsw31u_core.a" />
+					<Add library="libwxbase31u.a" />
+				</Linker>
+			</Target>
+			<Target title="Lite-Debug">
+				<Option output="../bin/Debug/Emu80lite" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Lite/Debug" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-DPAL_SDL" />
+					<Add option="-DPAL_LITE" />
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Lite-Release">
+				<Option output="../bin/Release/Emu80lite" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Lite/Release" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-std=c++11" />
+					<Add option="-DPAL_SDL" />
+					<Add option="-DPAL_LITE" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-D__GNUWIN32__" />
+			<Add directory="$(#sdl2.include)" />
+			<Add directory="$(#wx)/lib/mswu" />
+			<Add directory="$(#wx)/include" />
+		</Compiler>
+		<Linker>
+			<Add library="mingw32" />
+			<Add library="SDL2main" />
+			<Add library="SDL2.dll" />
+			<Add library="user32" />
+			<Add library="gdi32" />
+			<Add library="winmm" />
+			<Add library="dxguid" />
+			<Add library="opengl32" />
+			<Add directory="$(#sdl2.lib)" />
+			<Add directory="$(#wx)/lib" />
+		</Linker>
+		<Unit filename="AddrSpace.cpp" />
+		<Unit filename="AddrSpace.h" />
+		<Unit filename="Apogey.cpp" />
+		<Unit filename="Apogey.h" />
+		<Unit filename="AtaDrive.cpp" />
+		<Unit filename="AtaDrive.h" />
+		<Unit filename="Bashkiria.cpp" />
+		<Unit filename="Bashkiria.h" />
+		<Unit filename="CloseFileHook.cpp" />
+		<Unit filename="CloseFileHook.h" />
+		<Unit filename="CmdLine.cpp" />
+		<Unit filename="CmdLine.h" />
+		<Unit filename="ConfigReader.cpp" />
+		<Unit filename="ConfigReader.h" />
+		<Unit filename="Covox.cpp" />
+		<Unit filename="Covox.h" />
+		<Unit filename="Cpu.cpp" />
+		<Unit filename="Cpu.h" />
+		<Unit filename="Cpu8080.cpp" />
+		<Unit filename="Cpu8080.h" />
+		<Unit filename="Cpu8080dasm.cpp" />
+		<Unit filename="Cpu8080dasm.h" />
+		<Unit filename="CpuHook.cpp" />
+		<Unit filename="CpuHook.h" />
+		<Unit filename="CpuWaits.h" />
+		<Unit filename="CpuZ80.cpp" />
+		<Unit filename="CpuZ80.h" />
+		<Unit filename="CpuZ80dasm.cpp" />
+		<Unit filename="CpuZ80dasm.h" />
+		<Unit filename="Crt8275.cpp" />
+		<Unit filename="Crt8275.h" />
+		<Unit filename="Crt8275Renderer.cpp" />
+		<Unit filename="Crt8275Renderer.h" />
+		<Unit filename="CrtRenderer.cpp" />
+		<Unit filename="CrtRenderer.h" />
+		<Unit filename="Debugger.cpp" />
+		<Unit filename="Debugger.h" />
+		<Unit filename="DiskImage.cpp" />
+		<Unit filename="DiskImage.h" />
+		<Unit filename="Dma8257.cpp" />
+		<Unit filename="Dma8257.h" />
+		<Unit filename="EmuCalls.cpp" />
+		<Unit filename="EmuCalls.h" />
+		<Unit filename="EmuConfig.cpp" />
+		<Unit filename="EmuConfig.h" />
+		<Unit filename="EmuObjects.cpp" />
+		<Unit filename="EmuObjects.h" />
+		<Unit filename="EmuTypes.h" />
+		<Unit filename="EmuWindow.cpp" />
+		<Unit filename="EmuWindow.h" />
+		<Unit filename="Emulation.cpp" />
+		<Unit filename="Emulation.h" />
+		<Unit filename="Eureka.cpp" />
+		<Unit filename="Eureka.h" />
+		<Unit filename="Fdc1793.cpp" />
+		<Unit filename="Fdc1793.h" />
+		<Unit filename="FileLoader.cpp" />
+		<Unit filename="FileLoader.h" />
+		<Unit filename="GeneralSound.cpp" />
+		<Unit filename="GeneralSound.h" />
+		<Unit filename="GenericModules.cpp" />
+		<Unit filename="GenericModules.h" />
+		<Unit filename="Globals.h" />
+		<Unit filename="KbdLayout.cpp" />
+		<Unit filename="KbdLayout.h" />
+		<Unit filename="KbdTapper.cpp" />
+		<Unit filename="KbdTapper.h" />
+		<Unit filename="Keyboard.h" />
+		<Unit filename="Korvet.cpp" />
+		<Unit filename="Korvet.h" />
+		<Unit filename="Kr04.cpp" />
+		<Unit filename="Kr04.h" />
+		<Unit filename="Lvov.cpp" />
+		<Unit filename="Lvov.h" />
+		<Unit filename="Main.cpp" />
+		<Unit filename="Memory.cpp" />
+		<Unit filename="Memory.h" />
+		<Unit filename="Mikro80.cpp" />
+		<Unit filename="Mikro80.h" />
+		<Unit filename="Mikrosha.cpp" />
+		<Unit filename="Mikrosha.h" />
+		<Unit filename="MsxTapeHooks.cpp" />
+		<Unit filename="MsxTapeHooks.h" />
+		<Unit filename="ObjectFactory.cpp" />
+		<Unit filename="ObjectFactory.h" />
+		<Unit filename="Orion.cpp" />
+		<Unit filename="Orion.h" />
+		<Unit filename="Pal.cpp" />
+		<Unit filename="Pal.h" />
+		<Unit filename="PalFile.h" />
+		<Unit filename="PalKeys.h" />
+		<Unit filename="PalWindow.h" />
+		<Unit filename="Palmira.cpp" />
+		<Unit filename="Palmira.h" />
+		<Unit filename="Parameters.cpp" />
+		<Unit filename="Parameters.h" />
+		<Unit filename="Partner.cpp" />
+		<Unit filename="Partner.h" />
+		<Unit filename="Pic8259.cpp" />
+		<Unit filename="Pic8259.h" />
+		<Unit filename="Pit8253.cpp" />
+		<Unit filename="Pit8253.h" />
+		<Unit filename="Pit8253Sound.cpp" />
+		<Unit filename="Pit8253Sound.h" />
+		<Unit filename="Pk8000.cpp" />
+		<Unit filename="Pk8000.h" />
+		<Unit filename="Platform.cpp" />
+		<Unit filename="Platform.h" />
+		<Unit filename="PlatformCore.cpp" />
+		<Unit filename="PlatformCore.h" />
+		<Unit filename="Ppi8255.cpp" />
+		<Unit filename="Ppi8255.h" />
+		<Unit filename="Ppi8255Circuit.h" />
+		<Unit filename="PpiAtaAdapter.cpp" />
+		<Unit filename="PpiAtaAdapter.h" />
+		<Unit filename="PrnWriter.cpp" />
+		<Unit filename="PrnWriter.h" />
+		<Unit filename="Psg3910.cpp" />
+		<Unit filename="Psg3910.h" />
+		<Unit filename="RamDisk.cpp" />
+		<Unit filename="RamDisk.h" />
+		<Unit filename="RfsTapeHooks.cpp" />
+		<Unit filename="RfsTapeHooks.h" />
+		<Unit filename="Rk86.cpp" />
+		<Unit filename="Rk86.h" />
+		<Unit filename="RkFdd.cpp" />
+		<Unit filename="RkFdd.h" />
+		<Unit filename="RkKeyboard.cpp" />
+		<Unit filename="RkKeyboard.h" />
+		<Unit filename="RkPpi8255Circuit.cpp" />
+		<Unit filename="RkPpi8255Circuit.h" />
+		<Unit filename="RkRomDisk.cpp" />
+		<Unit filename="RkRomDisk.h" />
+		<Unit filename="RkSdController.cpp" />
+		<Unit filename="RkSdController.h" />
+		<Unit filename="RkTapeHooks.cpp" />
+		<Unit filename="RkTapeHooks.h" />
+		<Unit filename="SdAdapters.cpp" />
+		<Unit filename="SdAdapters.h" />
+		<Unit filename="SdCard.cpp" />
+		<Unit filename="SdCard.h" />
+		<Unit filename="Shortcuts.cpp" />
+		<Unit filename="Shortcuts.h" />
+		<Unit filename="SoundMixer.cpp" />
+		<Unit filename="SoundMixer.h" />
+		<Unit filename="Specialist.cpp" />
+		<Unit filename="Specialist.h" />
+		<Unit filename="TapeRedirector.cpp" />
+		<Unit filename="TapeRedirector.h" />
+		<Unit filename="Ut88.cpp" />
+		<Unit filename="Ut88.h" />
+		<Unit filename="Vector.cpp" />
+		<Unit filename="Vector.h" />
+		<Unit filename="Version.h" />
+		<Unit filename="WavReader.cpp" />
+		<Unit filename="WavReader.h" />
+		<Unit filename="WavWriter.cpp" />
+		<Unit filename="WavWriter.h" />
+		<Unit filename="Zx.cpp" />
+		<Unit filename="Zx.h" />
+		<Unit filename="lite/litePal.cpp">
+			<Option target="Lite-Debug" />
+			<Option target="Lite-Release" />
+		</Unit>
+		<Unit filename="lite/litePal.h">
+			<Option target="Lite-Debug" />
+			<Option target="Lite-Release" />
+		</Unit>
+		<Unit filename="sdl/sdlGlExt.h" />
+		<Unit filename="sdl/sdlPal.cpp" />
+		<Unit filename="sdl/sdlPal.h" />
+		<Unit filename="sdl/sdlPalFile.cpp" />
+		<Unit filename="sdl/sdlPalFile.h" />
+		<Unit filename="sdl/sdlPalWindow.cpp" />
+		<Unit filename="sdl/sdlPalWindow.h" />
+		<Unit filename="wx/wxChPlatformDlg.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="wx/wxChPlatformDlg.h" />
+		<Unit filename="wx/wxConfigWnd.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="wx/wxConfigWnd.h" />
+		<Unit filename="wx/wxLogWnd.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="wx/wxLogWnd.h" />
+		<Unit filename="wx/wxPal.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="wx/wxPal.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
 </CodeBlocks_project_file>

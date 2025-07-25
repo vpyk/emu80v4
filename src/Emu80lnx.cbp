@@ -135,6 +135,8 @@
         <Unit filename="Fdc1793.h" />
         <Unit filename="FileLoader.cpp" />
         <Unit filename="FileLoader.h" />
+        <Unit filename="GeneralSound.cpp" />
+        <Unit filename="GeneralSound.h" />
         <Unit filename="GenericModules.cpp" />
         <Unit filename="GenericModules.h" />
         <Unit filename="Globals.h" />
