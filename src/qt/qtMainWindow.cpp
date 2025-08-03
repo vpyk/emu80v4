@@ -622,7 +622,7 @@ void MainWindow::createActions()
     connect(m_loadWavAction, SIGNAL(triggered()), this, SLOT(onLoadWav()));
 
     fileMenu->addSeparator();
-    m_toolBar->addSeparator();
+    m_toolBarFileSeparator = m_toolBar->addSeparator();
 
 
     // Select disk A
@@ -1708,7 +1708,7 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setVisible(false);
         m_colorColor2Action->setEnabled(false);
     } else if (platformGroup == "bashkiria" || platformGroup == "orion" || platformGroup == "lvov" ||
-               platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "korvet") {
+               platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "korvet" || platformGroup == "krokha") {
         hasColor = true;
 
         m_colorMonoOrigAction->setVisible(false);
@@ -1784,8 +1784,10 @@ void MainWindow::tuneMenu()
 
     m_printerCaptureAction->setVisible(platformGroup == "korvet" || platformGroup == "vector" || platformGroup == "pk8000" || platformGroup == "lvov");
 
-    m_loadMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria" && platformGroup != "zx");
-    m_loadRunMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria");
+    m_loadMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria" && platformGroup != "krokha" && platformGroup != "zx");
+    m_loadRunMenuAction->setVisible(platformGroup != "korvet" && platformGroup != "bashkiria" && platformGroup != "krokha");
+    m_loadWavAction->setVisible(platformGroup != "krokha");
+    m_toolBarFileSeparator ->setVisible(platformGroup != "krokha");
 
     m_pasteAction->setVisible(!emuGetPropertyValue(m_palWindow->getPlatformObjectName() + ".kbdTapper", "pasting").empty());
 

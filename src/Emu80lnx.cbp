@@ -149,6 +149,8 @@
         <Unit filename="Korvet.h" />
         <Unit filename="Kr04.cpp" />
         <Unit filename="Kr04.h" />
+        <Unit filename="Krokha.cpp" />
+        <Unit filename="Krokha.h" />
         <Unit filename="Lvov.cpp" />
         <Unit filename="Lvov.h" />
         <Unit filename="Main.cpp" />

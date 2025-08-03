@@ -378,6 +378,7 @@ private:
     QAction* m_edd2AutoSaveAction;
     QAction* m_edd2SaveAction;
     QAction* m_edd2SaveAsAction;
+    QAction* m_toolBarFileSeparator;
     QAction* m_menuDiskSeparator;
     QAction* m_menuHddSeparator;
     QAction* m_toolbarDiskSeparator;

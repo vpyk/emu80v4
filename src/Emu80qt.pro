@@ -44,6 +44,7 @@ SOURCES += \
     KbdTapper.cpp \
     Korvet.cpp \
     Kr04.cpp \
+    Krokha.cpp \
     Main.cpp \
     AddrSpace.cpp \
     Apogey.cpp \
@@ -169,6 +170,7 @@ HEADERS  += \
     Keyboard.h \
     Korvet.h \
     Kr04.h \
+    Krokha.h \
     Lvov.h \
     Memory.h \
     Mikro80.h \

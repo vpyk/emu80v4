@@ -206,6 +206,8 @@ class KbdLayout : public EmuObject
 
         bool getNumpadJoystickMode() {return m_numpadJoystick;}
 
+        static EmuObject* create(const EmuValuesList&) {return new KbdLayout();}
+
     protected:
         KbdLayoutMode m_mode = KLM_QWERTY;
         bool m_numpadJoystick = false;

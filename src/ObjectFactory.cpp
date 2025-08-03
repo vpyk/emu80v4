@@ -33,6 +33,7 @@
 #include "Pit8253Sound.h"
 #include "Orion.h"
 #include "Specialist.h"
+#include "Krokha.h"
 #include "Eureka.h"
 #include "Mikro80.h"
 #include "Ut88.h"
@@ -106,6 +107,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(RkPit8253SoundSource);
     REG_EMU_CLASS(MikroshaPit8253SoundSource);
     REG_EMU_CLASS(Pit8253Helper);
+    REG_EMU_CLASS(KbdLayout);
     REG_EMU_CLASS(OrionMemPageSelector);
     REG_EMU_CLASS(OrionRenderer);
     REG_EMU_CLASS(OrionScreenSelector);
@@ -131,6 +133,9 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(EurekaCore);
     REG_EMU_CLASS(EurekaRenderer);
     REG_EMU_CLASS(EurekaPpi8255Circuit);
+    REG_EMU_CLASS(KrokhaCore);
+    REG_EMU_CLASS(KrokhaRenderer);
+    REG_EMU_CLASS(KrokhaJoystick);
     REG_EMU_CLASS(Mikro80Renderer);
     REG_EMU_CLASS(Mikro80Core);
     REG_EMU_CLASS(Mikro80TapeRegister);
