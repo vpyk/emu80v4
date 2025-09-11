@@ -32,10 +32,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #QMAKE_CXXFLAGS_DEBUG += -pg
 #QMAKE_LFLAGS_DEBUG += -pg
 
+INCLUDEPATH += 3rdparty
 
 DEFINES += PAL_QT
 
 SOURCES += \
+    3rdparty/z80/Z80.cpp \
     CmdLine.cpp \
     Covox.cpp \
     DbgCalls.cpp \
@@ -133,6 +135,8 @@ SOURCES += \
     qt/qtHelpDialog.cpp
 
 HEADERS  += \
+    3rdparty/z80/Z80.h \
+    3rdparty/z80/zdefs.h \
     AddrSpace.h \
     Apogey.h \
     AtaDrive.h \

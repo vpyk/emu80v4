@@ -295,7 +295,7 @@ void ZxRenderer::renderFrame()
 
 void ZxRenderer::operate()
 {
-    advanceTo(m_curClock + 8 * m_ticksPerTState);
+    advanceTo(m_curClock/* + 8 * m_ticksPerTState*/);
 
     if (m_intActive) {
         m_intActive = false;
@@ -327,21 +327,23 @@ void ZxRenderer::advanceTo(uint64_t clocks)
     if (toFrameTState <= m_curFrameTState)
         return;
 
-    int scanLine = m_curFrameTState / m_lineTStates;
+    int fromScanLine = m_curFrameTState / m_lineTStates;
+    int toScanLine = toFrameTState / m_lineTStates;
     int toTState = (toFrameTState + m_lineTStates - 1) % m_lineTStates;
     int fromTState = m_curFrameTState % m_lineTStates;
 
-    if (fromTState <= toTState)
-        drawLine(scanLine, fromTState, toTState);
+    if (fromScanLine == toScanLine)
+        drawLine(fromScanLine, fromTState, toTState);
     else {
-        drawLine(scanLine, fromTState, m_lineTStates - 1);
-        if (scanLine != m_scanLines - 1)
-            drawLine(scanLine + 1, 0, toTState);
+        drawLine(fromScanLine++, fromTState, m_lineTStates - 1);
+        while (fromScanLine < m_scanLines && fromScanLine < toScanLine)
+            drawLine(fromScanLine++, 0, m_lineTStates - 1);
+        if (fromScanLine < m_scanLines)
+            drawLine(fromScanLine, 0, toTState);
     }
 
     m_curFrameTState = toFrameTState % (m_lineTStates * m_scanLines);
 }
-
 
 void ZxRenderer::drawLine(int scanLine, int fromTState, int toTState)
 {

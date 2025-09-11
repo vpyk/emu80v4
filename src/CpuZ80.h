@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,17 +22,27 @@
 #include "Cpu.h"
 
 
-/* two sets of 16-bit registers */
-struct ddregs {
-    uint16_t bc;
-    uint16_t de;
-    uint16_t hl;
-};
+struct Z80;
+
+uint8_t fetchOpcodeCb(void* ctx, uint16_t address);
+uint8_t readCb(void* ctx, uint16_t address);
+void writeCb(void* ctx, uint16_t address, uint8_t value);
+uint8_t inCb(void* ctx, uint16_t address);
+void outCb(void* ctx, uint16_t address, uint8_t value);
+uint8_t intaCb(void* ctx, uint16_t address);
 
 class CpuZ80 : public Cpu8080Compatible
 {
+    friend uint8_t fetchOpcodeCb(void* ctx, uint16_t address);
+    friend uint8_t readCb(void* ctx, uint16_t address);
+    friend void writeCb(void* ctx, uint16_t address, uint8_t value);
+    friend uint8_t inCb(void* ctx, uint16_t address);
+    friend void outCb(void* ctx, uint16_t address, uint8_t value);
+    friend uint8_t intaCb(void* ctx, uint16_t address);
+
     public:
         CpuZ80();
+        ~CpuZ80();
 
         CpuType getType() override {return Cpu::CPU_Z80;}
 
@@ -52,14 +62,6 @@ class CpuZ80 : public Cpu8080Compatible
         uint16_t getSP() override;
         uint16_t getPC() override;
 
-        /*int getA()  override {return 0;}
-        int getB()   override {return 0;}
-        int getC()  override {return 0;}
-        int getD()  override {return 0;}
-        int getE()  override {return 0;}
-        int getH()  override {return 0;}
-        int getL()  override {return 0;}*/
-
         void setAF(uint16_t value) override;
         void setBC(uint16_t value) override;
         void setDE(uint16_t value) override;
@@ -67,7 +69,6 @@ class CpuZ80 : public Cpu8080Compatible
         void setSP(uint16_t value) override;
         void setPC(uint16_t value) override;
         void setIFF(bool iff) override;
-        //void exec(int nCmds) override;
 
         bool getInte() override; // у Z80 нет inte, сохранено для эмуляции Z80-Card
 
@@ -94,41 +95,30 @@ class CpuZ80 : public Cpu8080Compatible
         void setI(uint8_t value);
         void setR(uint8_t value);
 
-        bool checkForStackOperation() override {return m_stackOperation;}
-        int getCurIoInstructionDuration() override {return m_curIoInstructionDuration;}
-        bool getM1Status() /*override*/ {return m_m1Status;}
+        bool checkForStackOperation() override;
+        int getCurIoInstructionDuration() override;
+        bool getM1Status();
 
         static EmuObject* create(const EmuValuesList&) {return new CpuZ80();}
 
     private:
-        /* Z80 registers */
-        uint16_t af[2];         /* accumulator and flags (2 banks) */
-        int af_sel;             /* bank select for af */
+        Z80* m_z80 = nullptr;
 
-        struct ddregs regs[2];  /* bc,de,hl */
-        int regs_sel;           /* bank select for ddregs */
-
-        uint16_t ir;            /* other Z80 registers */
-        uint16_t ix;
-        uint16_t iy;
-        uint16_t sp;
-        uint16_t pc;
-        uint16_t IFF;
-        uint16_t IM;
-
-        int m_iffPendingCnt = 0;
-        bool m_stackOperation = false;
         bool m_m1Status = false;
+        bool m_16bitPorts = false;
+        bool m_stackOperation = false;
+        int m_rstNum = 7;
+        bool m_inte = false;
+        bool m_performRet = false;
 
-        unsigned cb_prefix(unsigned adr, bool dd = false);
-        unsigned dfd_prefix(uint16_t& IXY);
         unsigned simz80();
 
-        inline void incR() {ir = (ir & 0xff80) | ((ir + 1) & 0x7f);}
-
-        bool m_16bitPorts = false;
-
-        int m_curIoInstructionDuration = 0;
+        uint8_t fetchOpcode(uint16_t address);
+        uint8_t read(uint16_t address);
+        void write(uint16_t address, uint8_t value);
+        uint8_t in(uint16_t address);
+        void out(uint16_t address, uint8_t value);
+        uint8_t fetchIntOpcode(uint16_t address);
 };
 
 #endif // CPUZ80_H
