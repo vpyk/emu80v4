@@ -117,6 +117,8 @@ void KrokhaRenderer::renderLine(int line)
 
 void KrokhaRenderer::renderFrame()
 {
+    swapBuffers();
+
     if (m_showBorder) {
         m_sizeX = 417;
         m_sizeY = 288;
@@ -135,8 +137,6 @@ void KrokhaRenderer::renderFrame()
 
         memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     }
-
-    swapBuffers();
 }
 
 

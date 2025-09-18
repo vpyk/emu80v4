@@ -103,6 +103,8 @@ bool SpecCore::setProperty(const string& propertyName, const EmuValuesList& valu
 
 SpecRenderer::SpecRenderer()
 {
+    m_defaultDebugRendering = false;
+
     m_frameBuf = new uint32_t[384 * 256];
     memset(m_frameBuf, 0, 384 * 256 * sizeof(uint32_t));
 
@@ -169,6 +171,8 @@ void SpecRenderer::renderLine(int line)
 
 void SpecRenderer::renderFrame()
 {
+    swapBuffers();
+
     if (m_showBorder) {
         m_sizeX = 417;
         m_sizeY = 288;
@@ -187,8 +191,6 @@ void SpecRenderer::renderFrame()
 
         memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     }
-
-    swapBuffers();
 }
 
 
@@ -213,6 +215,18 @@ void SpecRenderer::operate()
 void SpecRenderer::toggleCropping()
 {
     m_showBorder = !m_showBorder;
+}
+
+
+void SpecRenderer::prepareDebugScreen()
+{
+    enableSwapBuffersOnce();
+
+    for (int i = 0; i < 256; i++)
+        renderLine(i);
+
+    renderFrame();
+    g_emulation->screenUpdateReq();
 }
 
 

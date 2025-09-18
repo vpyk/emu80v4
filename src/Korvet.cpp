@@ -288,8 +288,8 @@ void KorvetRenderer::prepareFrame()
 
 void KorvetRenderer::renderFrame()
 {
-    memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     swapBuffers();
+    memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     prepareFrame();
 }
 

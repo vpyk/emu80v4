@@ -125,8 +125,9 @@ Bashkiria2mRenderer::~Bashkiria2mRenderer()
 
 void Bashkiria2mRenderer::renderFrame()
 {
-    memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     swapBuffers();
+
+    memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
 
     if (m_showBorder) {
         m_sizeX = 417; m_sizeY = 288;

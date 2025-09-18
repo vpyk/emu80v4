@@ -480,6 +480,9 @@ void VectorRenderer::renderLine(int nLine, int firstPx, int lastPx)
 
 void VectorRenderer::renderFrame()
 {
+    swapBuffers();
+    prepareFrame();
+
     if (m_showBorder)
         memcpy(m_pixelData, m_frameBuf, m_sizeX * m_sizeY * sizeof(uint32_t));
     else {
@@ -489,9 +492,6 @@ void VectorRenderer::renderFrame()
             ptr += 626;
         }
     }
-
-    swapBuffers();
-    prepareFrame();
 }
 
 

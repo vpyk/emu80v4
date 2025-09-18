@@ -123,6 +123,7 @@ class SpecRenderer : public CrtRenderer, public IActive
 
         void toggleColorMode() override;
         void toggleCropping() override;
+        void prepareDebugScreen() override;
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
