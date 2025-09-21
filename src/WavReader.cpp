@@ -55,6 +55,14 @@ bool WavReader::chooseAndLoadFile()
     return loadFile(fileName);
 }
 
+
+void WavReader::unlinkTapeRedirector(TapeRedirector *tapeRedirector)
+{
+    if (tapeRedirector == m_tapeRedirector)
+        m_tapeRedirector = nullptr;
+}
+
+
 void WavReader::reportError(const std::string& errorStr)
 {
     emuLog << errorStr << " " << m_fileName << "\n";
@@ -327,8 +335,10 @@ bool WavReader::getCurValue()
         m_isOpen = false;
         m_file.close();
         g_emulation->setTemporarySpeedUpFactor(0);
-        if (m_tapeRedirector)
+        if (m_tapeRedirector) {
             m_tapeRedirector->closeFile();
+            m_tapeRedirector = nullptr;
+        }
         return false;
     }
 }

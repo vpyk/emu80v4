@@ -38,6 +38,8 @@ TapeRedirector::~TapeRedirector()
 {
     if (m_isOpen)
         closeFile();
+
+    g_emulation->getWavReader()->unlinkTapeRedirector(this);
 }
 
 
