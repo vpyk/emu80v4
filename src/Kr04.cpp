@@ -128,7 +128,12 @@ Kr04Renderer::Kr04Renderer()
     m_visibleOffsetX = -4;
 
     m_customDraw = true;
+
     m_ltenOffset = false;
+    m_rvvOffset  = false;
+    m_hgltOffset = false; // ???
+    m_gpaOffset  = false; // ???
+
 }
 
 
