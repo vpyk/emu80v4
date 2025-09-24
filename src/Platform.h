@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ class Keyboard;
 class DiskImage;
 class DebugWindow;
 class KbdTapper;
+class IDebugger;
 
 
 class Platform : public ParentObject
@@ -71,7 +72,7 @@ class Platform : public ParentObject
         CrtRenderer* getRenderer() {return m_renderer;}
         Keyboard* getKeyboard() {return m_keyboard;}
 
-        DebugWindow* getDebugger() {return m_dbgWindow;}
+        IDebugger* getDebugger() {return m_debugger;}
 
         void showDebugger();
         void updateDebugger();
@@ -108,7 +109,7 @@ class Platform : public ParentObject
 
         int m_defConfigTabId = 0;
 
-        DebugWindow* m_dbgWindow = nullptr;
+        IDebugger* m_debugger = nullptr;
 
         std::string m_helpFile = "";
         CodePage m_codePage = CP_RK;

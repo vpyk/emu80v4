@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -195,8 +195,8 @@ Platform::~Platform()
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
         delete *it;
 
-    if (m_dbgWindow)
-        delete m_dbgWindow;
+    if (m_debugger)
+        delete m_debugger;
 }
 
 
@@ -402,8 +402,8 @@ void Platform::draw()
     if (m_core)
         m_core->draw();
 
-    if (m_dbgWindow)
-        m_dbgWindow->draw();
+    if (m_debugger)
+        m_debugger->draw();
 }
 
 
@@ -411,12 +411,12 @@ void Platform::showDebugger()
 {
 #ifndef PAL_WASM
     if (m_cpu->getType() == Cpu::CPU_8080 || m_cpu->getType() == Cpu::CPU_Z80) {
-        if (!m_dbgWindow) {
-            m_dbgWindow = new DebugWindow(this);
-            m_dbgWindow->initDbgWindow();
-            m_dbgWindow->setCaption("Debug: " + m_window->getCaption());
+        if (!m_debugger) {
+            m_debugger = new DebugWindow(this);
+            m_debugger->initDbgWindow();
+            m_debugger->setCaption("Debug: " + m_window->getCaption());
         }
-        m_dbgWindow->startDebug();
+        m_debugger->startDebug();
     }
 #endif
 }
@@ -424,8 +424,8 @@ void Platform::showDebugger()
 
 void Platform::updateDebugger()
 {
-    if (m_dbgWindow)
-        m_dbgWindow->update();
+    if (m_debugger)
+        m_debugger->update();
 }
 
 

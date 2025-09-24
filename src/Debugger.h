@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -105,24 +105,40 @@ struct BreakpointInfo {
     CodeBreakpoint* codeBp = nullptr;
 };
 
-class DebugWindow : private EmuWindow
+
+class IDebugger
+{
+public:
+    IDebugger(Platform* platform) {} // todo: implement
+    virtual ~IDebugger() {}
+
+    virtual void initDbgWindow() = 0;
+    virtual void setCaption(std::string caption) = 0;
+    virtual void sendCmd(DebugCommand cmd) {}
+
+    virtual void startDebug() = 0;
+    virtual void update() = 0;
+    virtual void draw() {}
+};
+
+
+class DebugWindow : public IDebugger, private EmuWindow
 {
 public:
     DebugWindow(Platform* platform);
     ~DebugWindow();
 
-    void mouseClick(int x, int y, PalMouseKey key) override;
+    void initDbgWindow() override {EmuWindow::init();}
+    void setCaption(std::string caption) override {EmuWindow::setCaption(caption);}
+    void sendCmd(DebugCommand cmd) override;
 
+    void startDebug() override;
+    void update() override;
+    void draw() override;
+
+    void mouseClick(int x, int y, PalMouseKey key) override;
     void processKey(PalKeyCode keyCode, bool isPressed) override;
     void closeRequest() override;
-
-    void initDbgWindow() {EmuWindow::init();}
-    void setCaption(std::string caption) {EmuWindow::setCaption(caption);}
-    void sendCmd(DebugCommand cmd);
-
-    void startDebug();
-    void update();
-    void draw();
 
 private:
     struct Cpu8080State {

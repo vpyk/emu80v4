@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2023-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ Platform* emuGetPlatform(PalWindow* wnd)
 }
 
 
-DebugWindow* emuGetDebugger(PalWindow* wnd)
+IDebugger* emuGetDebugger(PalWindow* wnd)
 {
     if (!wnd)
         return nullptr;
 
-    DebugWindow* dbg = dynamic_cast<DebugWindow*>(wnd);
+    IDebugger* dbg = dynamic_cast<DebugWindow*>(wnd);
     if (!dbg) {
         Platform* platform = emuGetPlatform(wnd);
         if (platform)
