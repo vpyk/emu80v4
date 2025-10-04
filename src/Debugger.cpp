@@ -2268,3 +2268,240 @@ bool CodeBreakpoint::hookProc()
     g_emulation->debugRequest(m_cpu);
     return true;
 }
+
+
+
+#ifdef WASM_DBG
+
+//##### External Debugger class ####
+
+ExternalDebugger::ExternalDebugger(Platform* platform) : IDebugger(platform)
+{
+    m_platform = platform;
+
+    m_cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    m_as = m_cpu->getAddrSpace();
+
+    m_z80cpu = dynamic_cast<CpuZ80*>(m_cpu);
+    m_z80Mode = m_z80cpu != nullptr;
+
+    m_resetKeys = g_emulation->getDebuggerOptions().resetKeys;
+
+    m_isRunning = true;
+}
+
+
+int ExternalDebugger::getInstructionLength(uint16_t addr)
+{
+    uint8_t buf[4];
+    buf[0] = memByte(addr);
+    buf[1] = memByte(addr + 1); // Z80
+    buf[2] = memByte(addr + 2); // Z80
+    buf[3] = memByte(addr + 3); // Z80
+
+    if (!m_z80Mode) {
+        return i8080GetInstructionLength(buf);
+    }
+
+    unsigned length;
+    STEP_FLAG flag;
+    cpu_disassemble_z80(addr, buf, length, flag);
+    return length;
+}
+
+
+bool ExternalDebugger::getInstructionOverFlag(uint16_t addr)
+{
+    if (!m_z80Mode) {
+        uint8_t op = memByte(addr);
+        return (op & 0xcf) == 0xcd /* CALL */ || (op & 0xc7) == 0xc7 /* RST */ || (op & 0xc7) == 0xc4 /* Cx */;
+    }
+
+    uint8_t buf[4];
+    buf[0] = memByte(addr);
+    buf[1] = memByte(addr + 1); // Z80
+    buf[2] = memByte(addr + 2); // Z80
+    buf[3] = memByte(addr + 3); // Z80
+
+    unsigned length;
+    STEP_FLAG flag;
+    cpu_disassemble_z80(addr, buf, length, flag);
+    return (flag == SF_OVER);
+}
+
+
+void ExternalDebugger::dbgPause()
+{
+    if (!m_isRunning)
+        return;
+
+    m_isRunning = false;
+
+    if (m_tempBp) {
+        delete m_tempBp;
+        m_tempBp = nullptr;
+    }
+
+    palDebugRequest();
+}
+
+
+void ExternalDebugger::dbgRun()
+{
+    m_isRunning = true;
+
+    checkForCurBreakpoint();
+    g_emulation->debugRun();
+}
+
+
+void ExternalDebugger::dbgStepIn()
+{
+    m_cpu->debugStepRequest();
+    m_isRunning = true;
+    checkForCurBreakpoint();
+    g_emulation->debugRun();
+}
+
+
+void ExternalDebugger::dbgStepOver()
+{
+    unsigned pc = m_cpu->getPC();
+    unsigned len = getInstructionLength(pc);
+    bool over = getInstructionOverFlag(pc);
+
+    if (over) {
+        if (m_tempBp)
+            return;
+        m_tempBp = new CodeBreakpoint(pc + len);
+        m_cpu->addHook(m_tempBp);
+
+        m_isRunning = true;
+        checkForCurBreakpoint();
+        if (m_resetKeys)
+            m_platform->resetKeys();
+        g_emulation->debugRun();
+    } else
+        dbgStepIn();
+}
+
+
+void ExternalDebugger::checkForCurBreakpoint()
+{
+    uint16_t pc = m_cpu->getPC();
+    for (auto it = m_bpList.begin(); it != m_bpList.end(); it++)
+        if ((*it).type == BT_EXEC && (*it).addr == pc)
+            (*it).codeBp->setSkipCount(1);
+}
+
+
+void ExternalDebugger::addBreakpoint(uint16_t addr)
+{
+    // ищем точку останова
+    bool found = false;
+    BreakpointInfo bpInfo;
+    list<BreakpointInfo>::iterator it;
+    for (it = m_bpList.begin(); it != m_bpList.end(); it++)
+        if ((*it).addr == addr) {
+            found = true;
+            bpInfo = *it;
+            break;
+        }
+
+    if (!found) {
+        CodeBreakpoint* cbp = new CodeBreakpoint(addr);
+        m_cpu->addHook(cbp);
+        bpInfo.addr = addr;
+        bpInfo.type = BT_EXEC;
+        bpInfo.codeBp = cbp;
+        m_bpList.push_back(bpInfo);
+    }
+}
+
+
+void ExternalDebugger::deleteBreakpoint(uint16_t addr)
+{
+    // ищем точку останова
+    bool found = false;
+    BreakpointInfo bpInfo;
+    list<BreakpointInfo>::iterator it;
+    for (it = m_bpList.begin(); it != m_bpList.end(); it++)
+        if ((*it).addr == addr) {
+            found = true;
+            bpInfo = *it;
+            break;
+        }
+
+    if (found) {
+        // нашли, удаляем
+        delete bpInfo.codeBp;
+        m_bpList.erase(it);
+    }
+}
+
+
+void ExternalDebugger::dbgSetBreakpoints(const std::list<uint16_t> &breakpoints)
+{
+    for (auto& addr: breakpoints)
+        addBreakpoint(addr);
+}
+
+
+void ExternalDebugger::dbgDelBreakpoints(const std::list<uint16_t> &breakpoints)
+{
+    for (auto& addr: breakpoints)
+        deleteBreakpoint(addr);
+}
+
+
+void ExternalDebugger::dbgSetRegister(Register reg, uint16_t value)
+{
+    switch (reg) {
+    case Register::af:
+        m_cpu->setAF(value);
+        break;
+    case Register::bc:
+        m_cpu->setBC(value);
+        break;
+    case Register::de:
+        m_cpu->setDE(value);
+        break;
+    case Register::hl:
+        m_cpu->setHL(value);
+        break;
+    case Register::sp:
+        m_cpu->setSP(value);
+        break;
+    case Register::pc:
+        m_cpu->setPC(value);
+        break;
+    case Register::iff:
+        m_cpu->setIFF(value & 1);
+        break;
+    }
+}
+
+
+void ExternalDebugger::dbgWriteByte(uint16_t addr, uint8_t value)
+{
+    m_as->writeByte(addr, value);
+}
+
+
+void ExternalDebugger::dbgGetState(DbgCpuState& state)
+{
+    state.af = m_cpu->getAF();
+    state.bc = m_cpu->getBC();
+    state.de = m_cpu->getDE();
+    state.hl = m_cpu->getHL();
+    state.sp = m_cpu->getSP();
+    state.pc = m_cpu->getPC();
+    state.iff = m_cpu->getInte();
+    for (int i = 0; i <= 0xffff; i++)
+        state.mem[i] = memByte(i);
+
+    for (auto& bp: m_bpList)
+        state.breakpoints.push_back(bp.addr);
+}
+
+#endif // WASM_DBG

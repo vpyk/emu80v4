@@ -572,6 +572,10 @@ void palUpdateConfig()
 }
 
 
+void palDebugRequest() {
+}
+
+
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef, PalWindow* wnd) {
     QWidget* parent = nullptr;
     if (wnd)

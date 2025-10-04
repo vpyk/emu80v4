@@ -409,17 +409,30 @@ void Platform::draw()
 
 void Platform::showDebugger()
 {
-#ifndef PAL_WASM
     if (m_cpu->getType() == Cpu::CPU_8080 || m_cpu->getType() == Cpu::CPU_Z80) {
-        if (!m_debugger) {
-            m_debugger = new DebugWindow(this);
-            m_debugger->initDbgWindow();
-            m_debugger->setCaption("Debug: " + m_window->getCaption());
-        }
+        if (!m_debugger)
+            createDebugger();
         m_debugger->startDebug();
     }
+}
+
+
+void Platform::createDebugger()
+{
+    if (m_debugger)
+        return;
+
+#ifndef PAL_WASM
+    m_debugger = new DebugWindow(this);
+    m_debugger->initDbgWindow();
+    m_debugger->setCaption("Debug: " + m_window->getCaption());
+#else
+  #ifdef WASM_DBG
+    m_debugger = new ExternalDebugger(this);
+  #endif // WASM_DBG
 #endif
 }
+
 
 
 void Platform::updateDebugger()

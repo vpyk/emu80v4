@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2023-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ class PalWindow;
 class DebugWindow;
 
 Platform* emuGetPlatform(PalWindow* wnd);
-DebugWindow* emuGetDebugger(PalWindow* wnd);
+IDebugger* emuGetDebugger(PalWindow* wnd);
+void emuCreateDebugger(PalWindow* wnd);
 
 #endif // EMUCALLS_H

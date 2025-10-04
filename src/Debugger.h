@@ -413,4 +413,74 @@ private:
 };
 
 
+#ifdef WASM_DBG
+
+struct DbgCpuState {
+    uint16_t af;
+    uint16_t bc;
+    uint16_t de;
+    uint16_t hl;
+    uint16_t sp;
+    uint16_t pc;
+    bool iff;
+    uint8_t mem[0x10000];
+    std::list<uint16_t> breakpoints;
+};
+
+
+class ExternalDebugger : public IDebugger
+{
+public:
+    ExternalDebugger(Platform* platform);
+    virtual ~ExternalDebugger() {}
+
+    virtual void initDbgWindow() override {}
+    virtual void setCaption(std::string) override {}
+    virtual void update() override {}
+    virtual void draw() override {}
+
+    virtual void sendCmd(DebugCommand cmd) override {}
+    virtual void startDebug() override {dbgPause();}
+
+    enum class Register {
+        af, bc, de, hl, sp, pc, iff
+    };
+
+    void dbgPause();
+    void dbgRun();
+    void dbgStepIn();
+    void dbgStepOver();
+    void dbgStepOut() {}
+    void dbgSetBreakpoints(const std::list<uint16_t>& breakpoints);
+    void dbgDelBreakpoints(const std::list<uint16_t>& breakpoints);
+    void dbgSetRegister(ExternalDebugger::Register reg, uint16_t value);
+    void dbgWriteByte(uint16_t addr, uint8_t value);
+    void dbgGetState(DbgCpuState& state);
+
+    //static IDebugger* create(Platform* platform, bool oldSchool = true);
+
+private:
+    std::list<BreakpointInfo> m_bpList;
+    CodeBreakpoint* m_tempBp = nullptr;
+    AddressableDevice* m_as = nullptr;
+    Cpu8080Compatible* m_cpu = nullptr;
+    CpuZ80* m_z80cpu = nullptr;
+    Platform* m_platform = nullptr;
+
+    bool m_z80Mode = false;
+    bool m_isRunning = true;
+
+    bool m_resetKeys;
+
+    inline uint8_t memByte(uint16_t addr) {return m_as->readByte(addr);}
+    int getInstructionLength(uint16_t addr);
+    bool getInstructionOverFlag(uint16_t addr);
+
+    void checkForCurBreakpoint();
+    void addBreakpoint(uint16_t addr);
+    void deleteBreakpoint(uint16_t addr);
+};
+
+#endif // WASM_DBG
+
 #endif // DEBUGWINDOW_H

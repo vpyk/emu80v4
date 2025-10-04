@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2024-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -82,6 +82,12 @@ void wasmEmuRunPlatform(const char* platform)
 void wasmSetWindowId(void* window)
 {
     ::window = window;
+}
+
+
+void* wasmGetWindowId()
+{
+    return window;
 }
 
 

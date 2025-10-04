@@ -694,6 +694,12 @@ void palRequestForQuit()
     ev.type = SDL_QUIT;
     SDL_PushEvent(&ev);
 }
+
+
+void palDebugRequest()
+{
+
+}
 #endif //PAL_WASM
 
 

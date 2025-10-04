@@ -73,6 +73,7 @@ bool palChooseConfiguration(std::string platformName, PalWindow* wnd);
 void palSetRunFileName(std::string runFileName);
 void palShowConfigWindow(int curTabId = 0);
 void palUpdateConfig();
+void palDebugRequest();
 std::string palGetDefaultPlatform();
 void palGetPalDefines(std::list<std::string>& difineList);
 void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap);

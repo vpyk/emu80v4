@@ -57,6 +57,7 @@ std::string palMakeCaseInsensitivePath(std::string basePath, const std::string c
 
 #ifndef PAL_WASM
 void palRequestForQuit();
+void palDebugRequest();
 #endif //PAL_WASM
 
 void palPlaySample(int16_t sample);

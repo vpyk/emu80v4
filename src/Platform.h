@@ -74,6 +74,7 @@ class Platform : public ParentObject
 
         IDebugger* getDebugger() {return m_debugger;}
 
+        void createDebugger();
         void showDebugger();
         void updateDebugger();
         void reqScreenUpdateForDebug();
