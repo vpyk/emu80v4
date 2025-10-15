@@ -169,7 +169,7 @@ loader.filter = "Файлы Специалиста-MX (*.cpu)|*.cpu;*.CPU|Все
 
 FdImage diskA = 80, 2, 5, 1024
 diskA.label = A
-diskA.filter = "Образы дисков Спецмалиста (*.odi)|*.odi;*.ODI|Все файлы (*.*)|*"
+diskA.filter = "Образы дисков Специалиста (*.odi)|*.odi;*.ODI|Все файлы (*.*)|*"
 #diskA.readOnly = yes
 
 FdImage diskB = 80, 2, 5, 1024
