@@ -396,9 +396,7 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
         len = (ptr[0x0b] << 8) | ptr[0x0a];
     }
 
-    //len = (((len - 1) | 0xf ) + 17);
-
-    if (fileSize < len) {
+    if (fileSize < len + 16) {
         delete[] buf;
         return false;
     }
@@ -423,9 +421,15 @@ bool OrionFileLoader::loadFile(const std::string& fileName, bool run)
         for (int i = 0; i < nBytes; i++)
             m_as->writeByte(begAddr++, *ptr++);
     } else {
-        for (uint16_t addr = 0; addr < len; addr++)
-            m_ramDisk->writeByte(addr, *ptr++);
-        m_ramDisk->writeByte(len, 0xff);
+        uint16_t addr = 0;
+        while (addr < len + 16)
+            m_ramDisk->writeByte(addr++, *ptr++);
+        while (addr & 0xf)
+            m_ramDisk->writeByte(addr++, 0);
+        m_ramDisk->writeByte(addr, 0xff);
+        len = (len + 15) & ~0xf;
+        m_ramDisk->writeByte(0xa, len & 0xFF);
+        m_ramDisk->writeByte(0xb, len >> 8);
     }
 
     delete[] buf;
