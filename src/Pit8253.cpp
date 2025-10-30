@@ -76,6 +76,8 @@ void Pit8253Counter::outChangeNotify()
     if (m_core) {
         m_core->timer(m_number, m_out);
     }
+
+    m_pit->m_outputs[m_number]->setValue(m_out);
 }
 
 
@@ -431,6 +433,14 @@ Pit8253::~Pit8253()
 {
     for (int i = 0; i < 3; i++)
         delete m_counters[i];
+}
+
+
+void Pit8253::initConnections()
+{
+    m_outputs[0] = registerOutput("out0");
+    m_outputs[1] = registerOutput("out1");
+    m_outputs[2] = registerOutput("out2");
 }
 
 

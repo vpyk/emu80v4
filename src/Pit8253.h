@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -113,6 +113,8 @@ class Pit8253 : public AddressableDevice
         Pit8253();
         virtual ~Pit8253();
 
+        void initConnections() override;
+
         void setFrequency(int64_t freq) override;
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         // std::string getDebugInfo() override;
@@ -131,12 +133,16 @@ class Pit8253 : public AddressableDevice
 
         static EmuObject* create(const EmuValuesList&) {return new Pit8253();}
 
+        friend class Pit8253Counter;
+
     private:
         Pit8253Counter* m_counters[3];
         uint16_t m_latches[3];
         bool m_latched[3];
         PitReadLoadMode m_rlModes[3];
         bool m_waitingHi[3];
+
+        EmuOutput* m_outputs[3] = {nullptr, nullptr, nullptr};
 };
 
 
