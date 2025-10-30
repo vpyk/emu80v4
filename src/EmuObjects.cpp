@@ -44,6 +44,15 @@ void EmuInput::setValue(uint32_t value)
 {
     if (m_setFunc)
         (*m_setFunc)(value);
+    else if (m_setFuncMasked)
+        (*m_setFuncMasked)(value, 0xFFFFFFFF);
+}
+
+
+void EmuInput::setMaskedValue(uint32_t value, uint32_t mask)
+{
+    if (m_setFuncMasked)
+        (*m_setFuncMasked)(value, mask);
 }
 
 
@@ -58,10 +67,14 @@ void EmuOutput::addConnection(EmuConnection connection)
 void EmuOutput::setValue(uint32_t value)
 {
     for (auto& conn: m_connections) {
-        if (conn.params.indexed)
-            conn.input->setValue(conn.params.index, ((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift);
-        else
+        switch (conn.params.type) {
+        case EmuConnectionParams::OutputType::Ordinary:
             conn.input->setValue(((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift);
+        case EmuConnectionParams::OutputType::Indexed:
+            conn.input->setValue(conn.params.index, ((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift);
+        case EmuConnectionParams::OutputType::Masked:
+            conn.input->setMaskedValue(((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift << conn.params.outputShift, conn.params.outputMask);
+        }
     }
 }
 
@@ -153,6 +166,14 @@ EmuInput* EmuObject::registerInput(const std::string inputName, SetFunc* setFunc
 EmuInput* EmuObject::registerIndexedInput(const std::string inputName, SetFuncIndexed* setFuncIndexed)
 {
     EmuInput* input = new EmuInput(setFuncIndexed);
+    m_inputMap.insert(make_pair(inputName, input));
+    return input;//m_curInputId;
+}
+
+
+EmuInput* EmuObject::registerMaskedInput(const std::string inputName, SetFuncMasked* setFuncMasked)
+{
+    EmuInput* input = new EmuInput(setFuncMasked);
     m_inputMap.insert(make_pair(inputName, input));
     return input;//m_curInputId;
 }

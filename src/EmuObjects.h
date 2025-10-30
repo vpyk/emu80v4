@@ -32,6 +32,7 @@
 
 typedef std::function<void(uint32_t)> SetFunc;
 typedef std::function<void(int, uint32_t)> SetFuncIndexed;
+typedef std::function<void(uint32_t, uint32_t)> SetFuncMasked;
 
 class EmuObject;
 
@@ -40,23 +41,34 @@ class EmuInput {
 public:
     EmuInput(SetFunc* setFunc) : m_setFunc(setFunc) {}
     EmuInput(SetFuncIndexed* setFuncIndexed) : m_setFuncIndexed(setFuncIndexed) {}
+    EmuInput(SetFuncMasked* setFuncMasked) : m_setFuncMasked(setFuncMasked) {}
     ~EmuInput();
 
     void setValue(uint32_t value);
     void setValue(int index, uint32_t value);
+    void setMaskedValue(uint32_t value, uint32_t mask);
 
 private:
     SetFunc* m_setFunc = nullptr;
     SetFuncIndexed* m_setFuncIndexed = nullptr;
+    SetFuncMasked* m_setFuncMasked = nullptr;
 };
 
 
 struct EmuConnectionParams {
-    bool indexed = false;
+    enum class OutputType {
+        Ordinary,
+        Masked,
+        Indexed
+    };
+
+    OutputType type = OutputType::Ordinary;
     int index = 0;
     uint32_t andMask = 0xFFFFFFFF;
     uint32_t xorMask = 0;
     int shift = 0;
+    uint32_t outputMask = 0xFFFFFFFF;
+    int outputShift = 0;
 };
 
 
@@ -120,6 +132,7 @@ class EmuObject
 
         EmuInput* registerInput(const std::string inputName, SetFunc* setFunc);
         EmuInput* registerIndexedInput(const std::string inputName, SetFuncIndexed* setFuncIndexed);
+        EmuInput* registerMaskedInput(const std::string inputName, SetFuncMasked* setFuncMasked);
 
         int m_kDiv = 1;
         Platform* m_platform = nullptr;
@@ -135,6 +148,7 @@ class EmuObject
 
 #define REG_INPUT(name, func) registerInput(name, new SetFunc(std::bind(&func, this, std::placeholders::_1)));
 #define REG_INDEXED_INPUT(name, func) registerIndexedInput(name, new SetFuncIndexed(std::bind(&func, this, std::placeholders::_1, std::placeholders::_2)));
+#define REG_MASKED_INPUT(name, func) registerMaskedInput(name, new SetFuncMasked(std::bind(&func, this, std::placeholders::_1, std::placeholders::_2)));
 
 
 class AddressableDevice : public EmuObject

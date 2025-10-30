@@ -319,6 +319,8 @@ void ConfigReader::parseConnect(string s, string token)
 
     string sIndex;
     string dstInputName = getToken(p2, DELIM_BRACKETS);
+    string sDstRangeFirst;
+    string sDstRangeLast;
     token = getToken(p2, DELIM_BRACKETS);
     if (token == "(") {
         sIndex = getToken(p2, DELIM_BRACKETS);
@@ -327,6 +329,19 @@ void ConfigReader::parseConnect(string s, string token)
             logPrefix();
             emuLog << "systax error" << "\n";
             return;
+        }
+    } else if (token == "[") {
+        sDstRangeFirst = getToken(p2, DELIM_BRACKETS);
+        token = getToken(p2, DELIM_BRACKETS);
+        if (token != "]") {
+            if (!token.empty())
+                sDstRangeLast = getToken(p2, DELIM_BRACKETS);
+            string rbr = getToken(p2, DELIM_BRACKETS);
+            if (rbr != "]") {
+                logPrefix();
+                emuLog << "systax error" << "\n";
+                return;
+            }
         }
     }
 
@@ -349,6 +364,8 @@ void ConfigReader::parseConnect(string s, string token)
 
     int srcRangeFirst = -1;
     int srcRangeLast = -1;
+    int dstRangeFirst = -1;
+    int dstRangeLast = -1;
     int index = -1;
 
     if (!sIndex.empty())
@@ -381,10 +398,39 @@ void ConfigReader::parseConnect(string s, string token)
             return;
         }
 
+    if (!sDstRangeFirst.empty())
+        try {
+            istringstream iss(sDstRangeFirst);
+            iss >> dstRangeFirst;
+        } catch (...) {
+            logPrefix();
+            emuLog << sDstRangeFirst << " is not valid value!" << "\n";
+            return;
+        }
+
+    if (!sDstRangeLast.empty())
+        try {
+            istringstream iss(sDstRangeLast);
+            iss >> dstRangeLast;
+        } catch (...) {
+            logPrefix();
+            emuLog << sDstRangeLast << " is not valid value!" << "\n";
+            return;
+        }
+
     if (srcRangeFirst >= 0 && srcRangeLast < 0)
         srcRangeLast = srcRangeFirst;
 
     if (srcRangeLast < srcRangeFirst) {
+        logPrefix();
+        emuLog << "invalid range!" << "\n";
+        return;
+    }
+
+    if (dstRangeFirst >= 0 && dstRangeLast < 0)
+        dstRangeLast = dstRangeFirst;
+
+    if (dstRangeLast < dstRangeFirst) {
         logPrefix();
         emuLog << "invalid range!" << "\n";
         return;
@@ -402,9 +448,16 @@ void ConfigReader::parseConnect(string s, string token)
         params.xorMask = inv ? 0xFFFFFFFF : 0;
 
 
-    params.indexed = !sIndex.empty();
-    if (params.indexed)
+    if (index >= 0) {
+        params.type = EmuConnectionParams::OutputType::Indexed;
         params.index = index;
+    } else if (dstRangeFirst >= 0) {
+        params.type = EmuConnectionParams::OutputType::Masked;
+        int bits = dstRangeLast - dstRangeFirst + 1;
+        params.outputShift = dstRangeFirst;
+        params.outputMask = ((1 << bits) - 1) << dstRangeFirst;
+    } else
+        params.type = EmuConnectionParams::OutputType::Ordinary;
 
     //cout << srcObjectName << " " << srcOutputName << " " << sSrcRangeFirst << " " << sSrcRangeLast << " "  << dstObjectName << " "<< dstInputName << " " << sIndex << " " << inv << endl;
     //cout << params.indexed << " " << params.index << " " << params.andMask << " " << params.xorMask << " " << params.shift << endl;
