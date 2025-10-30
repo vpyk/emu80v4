@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2020-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,12 @@ using namespace std;
 Covox::Covox(int bits)
 {
     m_bits = bits;
+}
+
+
+void Covox::initConnections()
+{
+    REG_INPUT("value", Covox::setValue);
 }
 
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2020
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ class Covox : public SoundSource
 {
     public:
         Covox(int bits);
+
+        void initConnections() override;
 
         // derived from SoundSOurce
         int calcValue() override;
