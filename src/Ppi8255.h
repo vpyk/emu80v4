@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,6 +41,8 @@ class Ppi8255 : public AddressableDevice
     public:
         Ppi8255();
 
+        void initConnections() override;
+
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         void reset() override; // Chip reset
 
@@ -69,6 +71,18 @@ class Ppi8255 : public AddressableDevice
         PpiChMode m_chCLoMode;
 
         bool m_noReset = false; // true if RESET input is not used
+
+        EmuOutput* m_portAOutput = nullptr;
+        EmuOutput* m_portBOutput = nullptr;
+        EmuOutput* m_portCOutput = nullptr;
+
+        void setPortA(uint32_t value, uint32_t mask);
+        void setPortB(uint32_t value, uint32_t mask);
+        void setPortC(uint32_t value, uint32_t mask);
+
+        uint8_t m_portAInputValue = 0;
+        uint8_t m_portBInputValue = 0;
+        uint8_t m_portCInputValue = 0;
 };
 
 #endif // PPI8255_H

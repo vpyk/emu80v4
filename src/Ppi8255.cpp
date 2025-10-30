@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,20 @@ Ppi8255::Ppi8255()
 }
 
 
+void Ppi8255::initConnections()
+{
+    AddressableDevice::initConnections();
+
+    m_portAOutput = registerOutput("portA");
+    m_portBOutput = registerOutput("portB");
+    m_portCOutput = registerOutput("portC");
+
+    REG_MASKED_INPUT("portA", Ppi8255::setPortA);
+    REG_MASKED_INPUT("portB", Ppi8255::setPortB);
+    REG_MASKED_INPUT("portC", Ppi8255::setPortC);
+}
+
+
 void Ppi8255::reset()
 {
     if (m_noReset)
@@ -45,6 +59,12 @@ void Ppi8255::reset()
     m_chBMode = PCM_IN;
     m_chCHiMode = PCM_IN;
     m_chCLoMode = PCM_IN;
+    if (m_portAOutput)
+        m_portAOutput->setValue(0xff);
+    if (m_portBOutput)
+    m_portBOutput->setValue(0xff);
+    if (m_portCOutput)
+    m_portCOutput->setValue(0xff);
     if (m_ppiCircuit) {
         m_ppiCircuit->setPortAMode(true);
         m_ppiCircuit->setPortBMode(true);
@@ -62,15 +82,17 @@ void Ppi8255::writeByte(int addr, uint8_t value)
     case 0:
         if (m_chAMode == PCM_OUT) {
             m_portA = value;
+            m_portAOutput->setValue(value);
             if (m_ppiCircuit)
-                m_ppiCircuit->setPortA(value);
+                m_ppiCircuit->setPortA(m_portA);
         }
         break;
     case 1:
         if (m_chBMode == PCM_OUT) {
             m_portB = value;
+            m_portBOutput->setValue(value);
             if (m_ppiCircuit)
-                m_ppiCircuit->setPortB(value);
+                m_ppiCircuit->setPortB(m_portB);
         }
         break;
     case 2:
@@ -78,8 +100,11 @@ void Ppi8255::writeByte(int addr, uint8_t value)
             m_portC = (m_portC & 0x0F) | (value & 0xF0);
         if (m_chCLoMode == PCM_OUT)
             m_portC = (m_portC & 0xF0) | (value & 0x0F);
-        if (m_ppiCircuit && (m_chCLoMode == PCM_OUT || m_chCHiMode == PCM_OUT))
-            m_ppiCircuit->setPortC(m_portC);
+        if (m_chCLoMode == PCM_OUT || m_chCHiMode == PCM_OUT) {
+            m_portCOutput->setValue(m_portC);
+            if (m_ppiCircuit)
+                m_ppiCircuit->setPortC(m_portC);
+        }
         break;
     default: //ctrl reg
         if (!(value & 0x80)) {
@@ -88,6 +113,7 @@ void Ppi8255::writeByte(int addr, uint8_t value)
                 uint8_t mask = ~(1 << bit);
                 m_portC &= mask;
                 m_portC |= ((value & 1) << bit);
+                m_portCOutput->setValue(m_portC);
                 if (m_ppiCircuit)
                     m_ppiCircuit->setPortC(m_portC);
             }
@@ -105,18 +131,35 @@ void Ppi8255::writeByte(int addr, uint8_t value)
 
             if (m_ppiCircuit) {
                 m_ppiCircuit->setPortAMode(m_chAMode == PCM_IN);
-                if (m_chAMode == PCM_OUT)
-                    m_ppiCircuit->setPortA(0);
-
                 m_ppiCircuit->setPortBMode(m_chBMode == PCM_IN);
-                if (m_chBMode == PCM_OUT)
-                    m_ppiCircuit->setPortB(0);
-
                 m_ppiCircuit->setPortCLoMode(m_chCLoMode == PCM_IN);
                 m_ppiCircuit->setPortCHiMode(m_chCHiMode == PCM_IN);
-                if (m_chCHiMode == PCM_OUT || m_chCLoMode == PCM_OUT)
-                    m_ppiCircuit->setPortC(0); // если на вывод толко половина порта, может быть не совсем корректно
             }
+
+            if (m_chAMode == PCM_OUT) {
+                m_portAOutput->setValue(0);
+                if (m_ppiCircuit)
+                    m_ppiCircuit->setPortA(0);
+            }
+
+            if (m_chBMode == PCM_OUT) {
+                m_portBOutput->setValue(0);
+                if (m_ppiCircuit)
+                    m_ppiCircuit->setPortB(0);
+            }
+
+            if (m_chCHiMode == PCM_OUT || m_chCLoMode == PCM_OUT) {
+                m_portCOutput->setValue(0);
+                if (m_ppiCircuit)
+                    m_ppiCircuit->setPortC(0); // если на вывод только половина порта, может быть не совсем корректно
+            }
+
+            if (m_chAMode == PCM_IN)
+                m_portAOutput->setValue(0xff);
+            if (m_chBMode == PCM_IN)
+                m_portBOutput->setValue(0xff);
+            if (m_chCLoMode == PCM_IN && m_chCHiMode == PCM_IN)
+                m_portCOutput->setValue(0xff); // если на вывод только половина порта, может быть не совсем корректно
         }  else {
             // двунаправленный режим, пока просто сброс значений регистров
             m_portA = 0x0;
@@ -135,19 +178,19 @@ uint8_t Ppi8255::readByte(int addr)
     case 0: {
         uint8_t portA = m_portA;
         if (m_chAMode == PCM_IN)
-            portA = m_ppiCircuit ? m_ppiCircuit->getPortA() : 0;
+            portA = m_ppiCircuit ? m_ppiCircuit->getPortA() : m_portAInputValue;
         return portA;
     }
     case 1: {
         uint8_t portB = m_portB;
         if (m_chBMode == PCM_IN)
-            portB = m_ppiCircuit ? m_ppiCircuit->getPortB() : 0;
+            portB = m_ppiCircuit ? m_ppiCircuit->getPortB() : m_portBInputValue;
         return portB;
     }
     case 2: {
         uint8_t portC = m_portC;
         if (m_chCLoMode == PCM_IN || m_chCHiMode == PCM_IN) {
-            uint8_t val = m_ppiCircuit ? m_ppiCircuit->getPortC() : 0;
+            uint8_t val = m_ppiCircuit ? m_ppiCircuit->getPortC() : m_portCInputValue;
             if (m_chCLoMode == PCM_IN)
                 portC = (portC & 0xf0) | (val & 0x0f);
             if (m_chCHiMode == PCM_IN)
@@ -168,6 +211,23 @@ void Ppi8255::attachPpi8255Circuit(Ppi8255Circuit* circuit)
     m_ppiCircuit = circuit;
 }
 
+
+void Ppi8255::setPortA(uint32_t value, uint32_t mask)
+{
+    m_portAInputValue = (m_portAInputValue & ~mask) | value;
+}
+
+
+void Ppi8255::setPortB(uint32_t value, uint32_t mask)
+{
+    m_portBInputValue = (m_portBInputValue & ~mask) | value;
+}
+
+
+void Ppi8255::setPortC(uint32_t value, uint32_t mask)
+{
+    m_portCInputValue = (m_portCInputValue & ~mask) | value;
+}
 
 
 bool Ppi8255::setProperty(const string& propertyName, const EmuValuesList& values)
