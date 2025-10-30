@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ class Cpu8080Compatible;
 class Pic8259 : public AddressableDevice
 {
     public:
+        void initConnections() override;
+
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getDebugInfo() override;
 

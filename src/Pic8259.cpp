@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2021-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -147,6 +147,12 @@ void Pic8259::inte(bool active)
     if (active && (m_irr & ~m_imr)) {
         serviceInt();
     }
+}
+
+
+void Pic8259::initConnections()
+{
+    REG_INDEXED_INPUT("irq", Pic8259::irq);
 }
 
 
