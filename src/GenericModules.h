@@ -148,6 +148,7 @@ private:
     uint8_t m_curOutputValue = 0;
 
     EmuOutput* m_output = nullptr;
+    EmuOutput* m_queryOutput = nullptr;
 
     void setInput(uint8_t value);
     void setInputBit(int nBit, int value);

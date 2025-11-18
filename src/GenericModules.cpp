@@ -276,6 +276,7 @@ void Register::initConnections()
     AddressableDevice::initConnections();
 
     m_output = registerOutput("output");
+    m_queryOutput = registerOutput("query");
     REG_INPUT("input", Register::setInput);
     REG_INDEXED_INPUT("inputBit", Register::setInputBit);
 }
@@ -300,6 +301,7 @@ void Register::writeByte(int /*addr*/, uint8_t value)
 
 uint8_t Register::readByte(int /*addr*/)
 {
+    m_queryOutput->setValue(0);
     return m_curInputValue;
 }
 

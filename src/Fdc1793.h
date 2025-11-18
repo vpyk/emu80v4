@@ -63,7 +63,7 @@ public:
         void setDrive(int drive);
         void setHead(int head);
 
-        bool getIrq() {return m_irq;}
+        bool getIrq();
         bool getDrq();
 
 
@@ -116,6 +116,7 @@ public:
         void setReset(bool rst);
 
         void updateOutputs();
+        void updateState(int);
 };
 
 

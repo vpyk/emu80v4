@@ -59,6 +59,7 @@ void Fdc1793::initConnections()
     REG_INPUT("drive", Fdc1793::setDrive);
     REG_INPUT("head", Fdc1793::setHead);
     REG_INPUT("reset", Fdc1793::setReset);
+    REG_INPUT("updateState", Fdc1793::updateState);
     m_drqOutput = registerOutput("drq");
     m_intOutput = registerOutput("int");
 }
@@ -174,6 +175,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                         m_accessMode = FAM_WAITING;
                         m_status = 0x10;
                     }
+                    m_cmdTime = g_emulation->getCurClock();
                     break;
                 case 0xA:
                 case 0xB:
@@ -194,6 +196,7 @@ void Fdc1793::writeByte(int addr, uint8_t value)
                         m_accessMode = FAM_WAITING;
                         m_status = 0x80;
                     }
+                    m_cmdTime = g_emulation->getCurClock();
                     break;
                 case 0xC:
                     // read address
@@ -379,6 +382,11 @@ uint8_t Fdc1793::readByte(int addr)
                     break;
                 case 8:
                 case 9:
+                    if (m_lastCommand == 9 && (g_emulation->getCurClock() - m_cmdTime)  * 1000000 / g_emulation->getFrequency() > 300000) {
+                        m_accessMode = FAM_READING;
+                        generateInt();
+                        break;
+                    }
                     if (m_dma && m_accessMode == FAM_READING) {
                         m_status = 0;
                         m_accessMode = FAM_WAITING;
@@ -391,6 +399,11 @@ uint8_t Fdc1793::readByte(int addr)
                     break;
                 case 0xA:
                 case 0xB:
+                    if (m_lastCommand == 0xB && (g_emulation->getCurClock() - m_cmdTime)  * 1000000 / g_emulation->getFrequency() > 300000) {
+                        m_accessMode = FAM_READING;
+                        generateInt();
+                        break;
+                    }
                     if (m_dma && m_accessMode == FAM_WRITING) {
                         m_status = 0;
                         m_accessMode = FAM_WAITING;
@@ -500,11 +513,33 @@ void Fdc1793::updateOutputs()
 }
 
 
+void Fdc1793::updateState(int)
+{
+    /*if ((m_lastCommand == 0x9 || m_lastCommand == 0xB) && m_accessMode == FAM_READING && (g_emulation->getCurClock() - m_cmdTime)  * 1000000 / g_emulation->getFrequency() > 300000) {
+        m_accessMode = FAM_READING;
+        generateInt();
+    }*/
+
+    getIrq(); // update state, ignore return value
+    updateOutputs();
+}
+
+
 bool Fdc1793::getDrq()
 {
     return m_accessMode != FAM_WAITING;
 }
 
+
+bool Fdc1793::getIrq()
+{
+    if ((m_lastCommand == 0x9 || m_lastCommand == 0xB) && m_accessMode == FAM_READING && (g_emulation->getCurClock() - m_cmdTime)  * 1000000 / g_emulation->getFrequency() > 300000) {
+        m_accessMode = FAM_READING;
+        generateInt();
+    }
+
+    return m_irq;
+}
 
 
 bool Fdc1793::setProperty(const string& propertyName, const EmuValuesList& values)
