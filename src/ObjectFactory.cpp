@@ -69,6 +69,7 @@
 #include "Korvet.h"
 #include "Palmira.h"
 #include "Bashkiria.h"
+#include "Okean.h"
 #include "Zx.h"
 #include "KbdTapper.h"
 #include "GeneralSound.h"
@@ -290,6 +291,13 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Bashkiria2mKbdMem);
     REG_EMU_CLASS(Bashkiria2mPit8253SoundSource);
     REG_EMU_CLASS(Bashkiria2mSpi8251);
+    REG_EMU_CLASS(OkeanCore);
+    REG_EMU_CLASS(OkeanRenderer);
+    REG_EMU_CLASS(OkeanKeyboard);
+    REG_EMU_CLASS(OkeanMatrixKeyboard);
+    REG_EMU_CLASS(OkeanKbdLayout);
+    REG_EMU_CLASS(OkeanFileLoader);
+    REG_EMU_CLASS(OkeanFddRegisters);
     REG_EMU_CLASS(ZxCore);
     REG_EMU_CLASS(ZxRenderer);
     REG_EMU_CLASS(ZxPorts);

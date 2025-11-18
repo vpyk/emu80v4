@@ -150,6 +150,8 @@ class EmuObject
 #define REG_INDEXED_INPUT(name, func) registerIndexedInput(name, new SetFuncIndexed(std::bind(&func, this, std::placeholders::_1, std::placeholders::_2)));
 #define REG_MASKED_INPUT(name, func) registerMaskedInput(name, new SetFuncMasked(std::bind(&func, this, std::placeholders::_1, std::placeholders::_2)));
 
+#define REG_OUTPUT(name, output) output = registerOutput(name);
+
 
 class AddressableDevice : public EmuObject
 {

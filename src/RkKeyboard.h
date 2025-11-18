@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ class Ms7007Keyboard : public Keyboard
 
         static EmuObject* create(const EmuValuesList&) {return new Ms7007Keyboard();}
 
-    private:
+    protected:
 
     const EmuKey m_keyMatrix[8][11] = {
             {EK_NP_COMMA,    EK_ESC,       EK_SEMICOLON, EK_F1,    EK_F2,         EK_F3,   EK_4,      EK_F4,    EK_F5,     EK_7,        EK_8        },

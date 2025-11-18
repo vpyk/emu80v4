@@ -79,6 +79,7 @@ SOURCES += \
     Mikrosha.cpp \
     MsxTapeHooks.cpp \
     ObjectFactory.cpp \
+    Okean.cpp \
     Orion.cpp \
     Pal.cpp \
     Palmira.cpp \
@@ -177,6 +178,7 @@ HEADERS  += \
     Mikrosha.h \
     MsxTapeHooks.h \
     ObjectFactory.h \
+    Okean.h \
     Orion.h \
     Pal.h \
     Palmira.h \
@@ -242,6 +244,7 @@ CODECFORSRC = UTF-8
 
 FORMS += \
     qt/qtKorvetConfig.ui \
+    qt/qtOkeanConfig.ui \
     qt/qtPlatformConfig.ui \
     qt/qtSettingsDialog.ui \
     qt/qtChoosePlatformDialog.ui \

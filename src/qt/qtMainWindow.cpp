@@ -1770,6 +1770,27 @@ void MainWindow::tuneMenu()
         m_colorColor2Action->setEnabled(true);
         m_colorColor2Action->setText(tr("8-color"));
         m_colorColor2Action->setData("8color");
+    } else if (platformGroup == "okean") {
+        hasColor = true;
+
+        m_colorMonoOrigAction->setVisible(false);
+        m_colorMonoOrigAction->setEnabled(false);
+
+        m_colorMonoAction->setVisible(false);
+        m_colorMonoAction->setEnabled(false);
+
+        m_colorColor1Action->setVisible(true);
+        m_colorColor1Action->setEnabled(true);
+        m_colorColor1Action->setText(tr("Color"));
+        m_colorColor1Action->setData("color1");
+
+        m_colorColor2Action->setVisible(true);
+        m_colorColor2Action->setEnabled(true);
+        m_colorColor2Action->setText(tr("Color (Journal)"));
+        m_colorColor2Action->setData("color2");
+
+        m_colorGrayscaleAction->setVisible(true);
+        m_colorGrayscaleAction->setEnabled(true);
     }
 
     m_colorLabel->setVisible(hasColor);

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2017
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ class Keyboard : public EmuObject
         void reset() override {if (m_keysResetAllowed) resetKeys();}
 
         virtual void resetKeys() = 0;
-        virtual void processKey(EmuKey key, bool isPressed) = 0;
+        virtual void processKey(EmuKey /*key*/, bool /*isPressed*/) {};
+        virtual bool processKeyCode(int /*keyCode*/) {return false;} // returns true if processing is done on this stage
 
         void enableKeysReset() {m_keysResetAllowed = true;}
         void disableKeysReset() {m_keysResetAllowed = false;}

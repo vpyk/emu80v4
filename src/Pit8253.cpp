@@ -58,6 +58,8 @@ void Pit8253Counter::planIrq()
         ticksToUpdate = !m_out ? 1 : m_counter - 1  + m_countDelay;
     else if (m_mode == 0 && !m_out)
         ticksToUpdate = m_counter + m_countDelay;
+    else if (m_mode == 4 && m_isCounting)
+        ticksToUpdate = m_counter != 0 ? m_counter : 1;
 
     if (ticksToUpdate)
         m_helper->updateAndScheduleNext((g_emulation->getCurClock() / m_kDiv + ticksToUpdate) * m_kDiv);
@@ -191,8 +193,17 @@ void Pit8253Counter::operateForTicks(int ticks)
                     --m_counter;
             }
             break;
-        case 1:
         case 4:
+            m_tempSumOut += ticks;
+            if (m_isCounting && ticks >= m_counter) {
+                m_tempSumOut--;
+                m_sumOutTicks++;
+                m_isCounting = false;
+                m_counter = (m_counter - ticks) & 0xffff;
+            }
+            m_out = !m_isCounting || m_counter != 0;
+            break;
+        case 1:
         case 5:
         default:
             if (m_out)
@@ -298,11 +309,11 @@ void Pit8253Counter::setMode(int mode)
             break;
         case 2:
         case 3:
+        case 4:
             m_isCounting = false;
             m_out = true;
             break;
         case 1:
-        case 4:
         case 5:
             // not implemented yet
             m_isCounting = false;
@@ -325,9 +336,9 @@ void Pit8253Counter::setHalfOfCounter()
             m_isCounting = false;
         case 2:
         case 3:
+        case 4:
             break;
         case 1:
-        case 4:
         case 5:
             // not implemented yet
             break;
@@ -360,8 +371,12 @@ void Pit8253Counter::setCounter(uint16_t counter)
             m_isCounting = true;
             m_countDelay = 2;
             break;
-        case 1:
         case 4:
+            m_counter = m_counterInitValue;
+            m_isCounting = true;
+            m_out = true;
+        case 1:
+            m_out = true;
         case 5:
         default:
             // not implemented yet
@@ -541,10 +556,10 @@ uint8_t Pit8253::readByte(int addr)
             m_counters[addr]->updateState();
         uint16_t cntVal = m_latched[addr] ? m_latches[addr] : m_counters[addr]->m_counter;
         uint8_t res = m_waitingHi[addr] ? (cntVal & 0xff00) >> 8 : cntVal & 0xff;
-        if (/* m_latched[addr] && */ m_waitingHi[addr])
+        if (m_waitingHi[addr])
             m_latched[addr] = false;
 
-        if (m_rlModes[addr] == PRLM_WORD)
+        if (m_rlModes[addr] == PRLM_WORD || m_latched[addr])
             m_waitingHi[addr] = !m_waitingHi[addr];
 
         return res;

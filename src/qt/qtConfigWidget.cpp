@@ -26,6 +26,7 @@
 #include "ui_qtVectorConfig.h"
 #include "ui_qtZxConfig.h"
 #include "ui_qtSpecConfig.h"
+#include "ui_qtOkeanConfig.h"
 
 #include "../Pal.h"
 
@@ -57,6 +58,8 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new ZxConfigWidget();
     else if (platformName == "spec")
         widget = new SpecConfigWidget();
+    else if (platformName == "okean")
+        widget = new OkeanConfigWidget();
     else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha" || platformName == "mikro80" || platformName == "ut88")
     widget = new ApogeyConfigWidget();
 
@@ -459,4 +462,78 @@ void SpecConfigWidget::saveConfig()
 void SpecConfigWidget::setDefaults()
 {
     //
+}
+
+
+// ######## Okean config widget ########
+
+OkeanConfigWidget::OkeanConfigWidget(QWidget *parent) :
+    ConfigWidget(parent),
+    ui(new Ui::OkeanConfigWidget)
+{
+    ui->setupUi(this);
+}
+
+
+void OkeanConfigWidget::loadConfig()
+{
+    m_defValues["CFG_BIOS_VER"] = "8p";
+
+    optBegin();
+
+    QString val = optLoad("CFG_BIOS_VER").toString();
+    if (val == "5") {
+        ui->rel5RadioButton->setChecked(true);
+        ui->rel5RadioButton->setFocus();
+    } else if (val == "6") {
+        ui->rel6RadioButton->setChecked(true);
+        ui->rel6RadioButton->setFocus();
+    } else if (val == "7") {
+        ui->rel7RadioButton->setChecked(true);
+        ui->rel7RadioButton->setFocus();
+    } else if (val == "7m") {
+        ui->rel7mRadioButton->setChecked(true);
+        ui->rel7mRadioButton->setFocus();
+    } else if (val == "8") {
+        ui->rel8RadioButton->setChecked(true);
+        ui->rel8RadioButton->setFocus();
+    } else if (val == "8p") {
+        ui->rel8pRadioButton->setChecked(true);
+        ui->rel8pRadioButton->setFocus();
+    }
+
+    optEnd();
+}
+
+void OkeanConfigWidget::saveConfig()
+{
+    optBegin();
+
+    QString val;
+    if (ui->rel5RadioButton->isChecked())
+        val = "5";
+    else if (ui->rel6RadioButton->isChecked())
+        val = "6";
+    else if (ui->rel7RadioButton->isChecked())
+        val = "7";
+    else if (ui->rel7mRadioButton->isChecked())
+        val = "7m";
+    else if (ui->rel8RadioButton->isChecked())
+        val = "8";
+    else if (ui->rel8pRadioButton->isChecked())
+        val = "8p";
+
+    optSave("CFG_BIOS_VER", val);
+
+    optEnd();
+}
+
+void OkeanConfigWidget::setDefaults()
+{
+    ui->rel5RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "5");
+    ui->rel6RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "6");
+    ui->rel7RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "7");
+    ui->rel7mRadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "7m");
+    ui->rel8RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "8");
+    ui->rel8pRadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "8p");
 }
