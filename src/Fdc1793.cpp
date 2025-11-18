@@ -326,7 +326,7 @@ bool Fdc1793::writeTrackByte(uint8_t val)
         }
     }
 
-    if (++m_writeTrackCnt >= 6125/*5208*/)
+    if (++m_writeTrackCnt >= 6250)
         return false;
 
     return true;
