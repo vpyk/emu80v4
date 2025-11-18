@@ -457,7 +457,7 @@ uint8_t Fdc1793::readByte(int addr)
                 } else if (m_images[m_disk]) {
                     m_data = m_images[m_disk]->readNextByte();
                     if (!m_images[m_disk]->getReadyStatus()) {
-                        if (m_lastCommand == 9) {
+                        if (m_lastCommand == 9 && (m_sector != m_images[m_disk]->getSectors())) {
                             m_images[m_disk]->startSectorAccess(m_sector++);
                             m_status = 0x01;
                         }
