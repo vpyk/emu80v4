@@ -297,6 +297,9 @@ void RkRamFontRenderer::customDrawSymbolLine(uint32_t *linePtr, uint8_t symbol, 
     else if (vsp)
         bt = 0x00;
 
+    if (rvv)
+        bt ^= 0x3f;
+
     for (int i = 0; i < 6; i++) {
         *linePtr++ = (bt & 0x20) ? 0xC0C0C0 : 0;
         bt <<= 1;
