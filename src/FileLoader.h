@@ -48,8 +48,12 @@ class FileLoader : public EmuObject
         bool m_multiblockAvailable = false;
         bool m_allowMultiblock = false;
 
+        bool loadHex(const uint8_t* hexFile, size_t fileLen, uint16_t& minAddr);
+
     private:
         std::string m_lastFile;
+
+        void hexStr(const std::string& str, std::vector<uint8_t>& data);
 };
 
 

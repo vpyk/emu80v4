@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include "Pal.h"
 #include "Globals.h"
 #include "Emulation.h"
@@ -124,6 +126,72 @@ string FileLoader::getPropertyStringValue(const string& propertyName)
         return m_lastFile;
 
     return "";
+}
+
+
+bool FileLoader::loadHex(const uint8_t* hexFile, size_t fileLen, uint16_t& minAddr)
+{
+    stringstream stream(std::string(hexFile, hexFile + fileLen));
+
+    minAddr = 0xffff;
+    string line;
+    while (getline(stream, line)) {
+        vector<uint8_t> data;
+        hexStr(line, data);
+        if( data.size() < 5)
+            return false;
+
+        int bytes = data[0];
+        uint16_t addr = (data[1] << 8 | data[2]);
+        int type = data[3];
+
+        if (type == 1)
+            return true;
+        if (type == 0) {
+            if (addr < minAddr)
+                minAddr = addr;
+
+            for (int i = 0; i < bytes; i++) {
+                if (i >= data.size())
+                    continue;
+
+                m_as->writeByte(addr + i, data[i + 4]);
+            }
+        }
+    }
+
+    return true;
+}
+
+
+void FileLoader::hexStr(const std::string &str, std::vector<uint8_t> &data)
+{
+    data.clear();
+
+    size_t pos = 0;
+
+    if (pos >= str.size())
+        return;
+
+    if (str[pos++] != ':')
+        return;
+
+    for(;;) {
+        if (pos > str.size() - 2)
+            return;
+
+        int bt = 0;
+        try {
+            stringstream ss;
+            ss << str[pos];
+            ss << str[pos + 1];
+            ss >> hex >> bt;
+            data.push_back(bt);
+        } catch(...) {}
+
+        pos += 2;
+    }
+
 }
 
 

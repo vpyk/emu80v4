@@ -16,8 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#include <sstream>
 #include <cstring>
+#include <algorithm>
 
 //#include "Pal.h"
 
@@ -560,10 +560,33 @@ void OkeanMatrixKeyboard::ack(bool val)
 
 bool OkeanFileLoader::loadFile(const std::string &fileName, bool run)
 {
+    auto periodPos = fileName.find_last_of(".");
+    string ext = periodPos != string::npos ? fileName.substr(periodPos) : fileName;
+    transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
     int fileSize;
     uint8_t* buf = palReadFile(fileName, fileSize, false);
     if (!buf)
         return false;
+
+    if (ext == ".hex") {
+        Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
+
+        if (run) {
+            m_platform->reset();
+            cpu->disableHooks();
+            g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
+        }
+
+        uint16_t minAddr;
+        bool loaded = loadHex(buf, fileSize, minAddr);
+
+        if (loaded && run) {
+            cpu->enableHooks();
+            cpu->setPC(minAddr);
+        }
+    }
+
 
     if (fileSize >= 65536 - 256) {
         delete[] buf;
@@ -574,7 +597,6 @@ bool OkeanFileLoader::loadFile(const std::string &fileName, bool run)
 
     if (run) {
         m_platform->reset();
-        Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         cpu->disableHooks();
         g_emulation->exec((int64_t)cpu->getKDiv() * m_skipTicks, true);
     }
