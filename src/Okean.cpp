@@ -449,6 +449,17 @@ void OkeanKeyboard::processKey(EmuKey key, bool isPressed)
         case EK_RESET: // F12
             m_code = 0x03   ;
             break;
+
+        case EK_ESC:
+            m_code = 0x1B;
+            break;
+        case EK_CR:
+            m_code = 0x0D;
+            break;
+        case EK_BSP:
+            m_code = 0x08;
+            break;
+
         default:
             m_strobe = false;
         }

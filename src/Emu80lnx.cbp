@@ -164,6 +164,8 @@
         <Unit filename="MsxTapeHooks.h" />
         <Unit filename="ObjectFactory.cpp" />
         <Unit filename="ObjectFactory.h" />
+        <Unit filename="Okean.cpp" />
+        <Unit filename="Okean.h" />
         <Unit filename="Orion.cpp" />
         <Unit filename="Orion.h" />
         <Unit filename="Pal.cpp" />
