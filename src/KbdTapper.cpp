@@ -88,11 +88,11 @@ void KbdTapper::stop()
 
 void KbdTapper::sendNextKey()
 {
-    unsigned key = m_string[m_pos];
+    m_key = m_string[m_pos];
 
-    PalKeyCode palKey = key != 0x0A ? PK_NONE : PK_ENTER;
+    PalKeyCode palKey = m_key != 0x0A ? PK_NONE : PK_ENTER;
 
-    m_platform->processKey(palKey, !m_keyPressed, key);
+    m_platform->processKey(palKey, !m_keyPressed, m_key);
     m_keyPressed = !m_keyPressed;
 
     if (!m_keyPressed) {
@@ -114,15 +114,13 @@ void KbdTapper::operate()
 
 void KbdTapper::scheduleKey()
 {
-    unsigned key = m_string[m_pos];
-
     int delay;
     if (m_keyPressed)
         delay = m_pressTime;
     else
         delay = m_releaseTime;
 
-    if (key == 0x0A)
+    if (m_key == 0x0A && !m_keyPressed)
         delay += m_crDelay;
 
     m_curClock += m_kDiv * delay;

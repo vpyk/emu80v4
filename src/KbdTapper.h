@@ -45,6 +45,7 @@ class KbdTapper : public ActiveDevice
 
         std::wstring m_string;
         unsigned m_pos = 0;
+        unsigned m_key = 0;
 
         bool m_typing = false;
         bool m_keyPressed = false;
