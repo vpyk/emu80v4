@@ -220,6 +220,11 @@ ifdef EXT_ROMDISK
   romDiskPageSelector.romDisk = &romDisk
 endif
 
+KbdTapper kbdTapper
+kbdTapper.pressTime = 45
+kbdTapper.releaseTime = 45
+kbdTapper.crDelay = 600
+
 
 
 ######## File I/O ########
