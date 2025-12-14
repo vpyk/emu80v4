@@ -2458,7 +2458,7 @@ unsigned CpuZ80::simz80()
             SETFLAG(Z, hreg(BC) == 0);
             break;
         case 0xAB:          /* OUTD */
-            Sethreg(BC, lreg(BC) - 1);
+            Sethreg(BC, hreg(BC) - 1);
             //m_curIoInstructionDuration = 16;
             if (!m_16bitPorts)
                 io_output(lreg(BC), GetBYTE(HL));
