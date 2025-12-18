@@ -317,4 +317,35 @@ private:
 };*/
 
 
+
+// "Byte" ZX Spectrum clone
+
+class Pit8253;
+
+class BytePorts : public ZxPorts
+{
+public:
+    void writeByte(int addr, uint8_t value) override;
+    uint8_t readByte(int addr) override;
+
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new BytePorts();}
+
+private:
+    Pit8253* m_pit = nullptr;
+};
+
+
+class ByteTapeInHook : public ZxTapeInHook
+{
+public:
+    ByteTapeInHook(uint16_t addr) : ZxTapeInHook(addr) {}
+
+    bool hookProc() override;
+
+    static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new ByteTapeInHook(parameters[0].asInt()) : nullptr;}
+};
+
+
 #endif // ZX_H

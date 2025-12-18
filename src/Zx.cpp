@@ -1234,3 +1234,141 @@ void ZxCpuWaits::setInt(int)
 {
     m_lastIntTime = g_emulation->getCurClock();
 }*/
+
+
+
+// "Byte" ZX Spectrum clone
+
+#include "Pit8253.h"
+
+void BytePorts::writeByte(int addr, uint8_t value)
+{
+    if (m_pit && ((addr & 0x15) == 0x04))
+        m_pit->writeByte((addr >> 5) & 3, value);
+    else
+        ZxPorts::writeByte(addr, value);
+}
+
+
+uint8_t BytePorts::readByte(int addr)
+{
+    if (m_pit && ((addr & 0x15) == 0x04))
+        return m_pit->readByte(addr >> 4);
+    else
+        return ZxPorts::readByte(addr);
+}
+
+
+bool BytePorts::setProperty(const std::string &propertyName, const EmuValuesList &values)
+{
+    if (ZxPorts::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "pit") {
+        m_pit = static_cast<Pit8253*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+    return false;
+}
+
+
+bool ByteTapeInHook::hookProc()
+{
+    if (!m_isEnabled)
+        return false;
+
+    if (g_emulation->getWavReader()->isPlaying())
+        return false;
+
+    if (!m_file->isOpen())
+        m_file->openFile();
+
+    if (m_file->isCancelled())
+        return false;
+
+    CpuZ80* cpu = static_cast<CpuZ80*>(m_cpu);
+
+    uint16_t addr = cpu->getIX();
+
+    if (m_file->isOpen() && !m_file->isEof() && (m_file->isTap() || m_file->isTzx()))
+    {
+        int blockSize = m_file->advanceToNextBlock();
+
+        // ЦЕРИКОПИК algorythm
+        uint8_t first = m_file->readByte();
+        uint8_t seed = cpu->getAddrSpace()->readByte(0xfea3);
+
+        for (int i = 0; i < blockSize - 1; i++) {
+            uint8_t bt = m_file->readByte();
+            cpu->getAddrSpace()->writeByte(addr++, ((bt ^ 0x87) + seed) ^ first);
+        }
+
+        cpu->setIX(addr + blockSize);
+    }
+
+    static_cast<Cpu8080Compatible*>(m_cpu)->ret();
+
+    if (m_file->isEof())
+        m_file->closeFile();
+
+    return true;
+}
+
+
+/*bool ByteTapeInHook::hookProc()
+{
+    if (!m_isEnabled)
+        return false;
+
+    if (g_emulation->getWavReader()->isPlaying())
+        return false;
+
+    if (!m_file->isOpen())
+        m_file->openFile();
+
+    if (m_file->isCancelled())
+        return false;
+
+    CpuZ80* cpu = static_cast<CpuZ80*>(m_cpu);
+
+    uint16_t addr = cpu->getIX();
+
+    if (m_file->isOpen() && !m_file->isEof() && (m_file->isTap() || m_file->isTzx()))
+    {
+        int blockSize = m_file->advanceToNextBlock();
+
+
+        uint8_t first = m_file->readByte();
+        uint8_t seed = cpu->getAddrSpace()->readByte(0xfea3);
+
+        for (int i = 0; i < blockSize - 1; i++) {
+            uint8_t bt = m_file->readByte();
+            cpu->getAddrSpace()->writeByte(addr++, ((bt ^ 0x87) + seed) ^ first);
+        }
+
+
+        // cericopic algorythm
+        uint8_t h = 0;
+        uint8_t l;
+        uint8_t vfea3 = cpu->getAddrSpace()->readByte(0xfea3); //0x6e;
+        uint8_t vfea4 = vfea3;
+        for (int i = 0; i < blockSize; i++) {
+            l = m_file->readByte();
+            h ^= l;
+            if (i == 0)
+                vfea4 = l;
+            else {
+                l = ((l ^ 0x87) + vfea3) ^ vfea4;
+                cpu->getAddrSpace()->writeByte(addr++, l);
+            }
+        }
+        cpu->setIX((addr + blockSize));
+    }
+
+    static_cast<Cpu8080Compatible*>(m_cpu)->ret();
+
+    if (m_file->isEof())
+        m_file->closeFile();
+
+    return true;
+}*/

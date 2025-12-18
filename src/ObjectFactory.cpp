@@ -318,6 +318,8 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(GsSoundSource);
     REG_EMU_CLASS(GsSoundMem);
     REG_EMU_CLASS(Rtc14818);
+    REG_EMU_CLASS(BytePorts);
+    REG_EMU_CLASS(ByteTapeInHook);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
