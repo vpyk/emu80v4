@@ -120,7 +120,7 @@ uint8_t ZxPorts::readByte(int addr)
         int kbdMatrixMask = (addr >> 8) & 0xFF;
         m_kbdMaskOutput->setValue(kbdMatrixMask);
         // recieve kbdData from Keyboard here
-        return (m_kbdMatrixData & 0x1F) + (g_emulation->getWavReader()->getCurValue() ? 0x40 : 0x00);
+        return (m_kbdMatrixData & 0x1F) + (g_emulation->getWavReader()->getCurValue() ? 0x40 : 0x00) + 0xa0;
     } else if (!(addr & 2)) {
         // port FD
         if (!m_ay)
