@@ -464,7 +464,10 @@ void SpecConfigWidget::saveConfig()
 
 void SpecConfigWidget::setDefaults()
 {
-    //
+    ui->noneRadioButton->setChecked(m_defValues["CFG_AY"] == "NONE");
+    ui->ayRadioButton->setChecked(m_defValues["CFG_AY"] == "AY");
+    ui->tsRadioButton->setChecked(m_defValues["CFG_TS"] == "TS");
+    ui->intsCheckBox->setChecked(m_defValues["CFG_INTS"] == "ON");
 }
 
 
