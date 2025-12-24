@@ -136,7 +136,22 @@
 <context>
     <name>KorvetConfigWidget</name>
     <message>
+        <location filename="qtKorvetConfig.ui" line="26"/>
+        <source>ROM set</source>
+        <translation>Версия ПЗУ</translation>
+    </message>
+    <message>
         <location filename="qtKorvetConfig.ui" line="32"/>
+        <source>OPTS 1.1</source>
+        <translation>ОПТС 1.1</translation>
+    </message>
+    <message>
+        <location filename="qtKorvetConfig.ui" line="39"/>
+        <source>OPTS 2.0</source>
+        <translation>ОПТС 2.0</translation>
+    </message>
+    <message>
+        <location filename="qtKorvetConfig.ui" line="55"/>
         <source>3d PPI</source>
         <translation>ППА №3</translation>
     </message>

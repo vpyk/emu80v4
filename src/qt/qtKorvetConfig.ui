@@ -21,6 +21,29 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
+    <widget class="QGroupBox" name="RomGroupBox">
+     <property name="title">
+      <string>ROM set</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="opts1RadioButton">
+        <property name="text">
+         <string>OPTS 1.1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="opts2RadioButton">
+        <property name="text">
+         <string>OPTS 2.0</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="ppi3GroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -60,6 +83,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>opts1RadioButton</tabstop>
+  <tabstop>opts2RadioButton</tabstop>
+  <tabstop>psgCheckBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -292,22 +292,35 @@ KorvetConfigWidget::KorvetConfigWidget(QWidget *parent) :
 void KorvetConfigWidget::loadConfig()
 {
     m_defValues["CFG_PPI3"] = "AY";
+    m_defValues["CFG_OPTS"] = "2";
 
     optBegin();
     ui->psgCheckBox->setChecked(optLoad("CFG_PPI3").toString() == "AY");
+    QString val = optLoad("CFG_OPTS").toString();
     optEnd();
+
+    if (val == "1") {
+        ui->opts1RadioButton->setChecked(val == "1");
+        ui->opts1RadioButton->setFocus();
+    } else if (val == "2") {
+        ui->opts2RadioButton->setChecked(true);
+        ui->opts2RadioButton->setFocus();
+    }
 }
 
 void KorvetConfigWidget::saveConfig()
 {
     optBegin();
     optSave("CFG_PPI3", ui->psgCheckBox->isChecked() ? "AY" : "NONE");
+    optSave("CFG_OPTS", ui->opts1RadioButton->isChecked() ? "1" : "2");
     optEnd();
 }
 
 void KorvetConfigWidget::setDefaults()
 {
     ui->psgCheckBox->setChecked(m_defValues["CFG_PPI3"] == "AY");
+    ui->opts1RadioButton->setChecked(m_defValues["CFG_OPTS"] == "1");
+    ui->opts2RadioButton->setChecked(m_defValues["CFG_OPTS"] == "2");
 }
 
 
