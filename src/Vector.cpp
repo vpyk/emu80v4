@@ -622,6 +622,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
         static_cast<VectorAddrSpace*>(m_platform->getCpu()->getAddrSpace())->enableRom();
         static_cast<Cpu8080Compatible*>(m_platform->getCpu())->setPC(0);
+        static_cast<VectorAddrSpace*>(m_platform->getCpu()->getAddrSpace())->enableRom();
         g_emulation->exec((int64_t)cpu->getKDiv() * 25000000, true);
 
         if (run) {
