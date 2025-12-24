@@ -245,6 +245,7 @@ CODECFORSRC = UTF-8
 FORMS += \
     qt/qtKorvetConfig.ui \
     qt/qtOkeanConfig.ui \
+    qt/qtPartnerConfig.ui \
     qt/qtPlatformConfig.ui \
     qt/qtSettingsDialog.ui \
     qt/qtChoosePlatformDialog.ui \

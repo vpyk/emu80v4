@@ -65,6 +65,7 @@ namespace Ui {
     class ZxConfigWidget;
     class SpecConfigWidget;
     class OkeanConfigWidget;
+    class PartnerConfigWidget;
 }
 
 class ApogeyConfigWidget : public ConfigWidget
@@ -170,6 +171,22 @@ public:
 
 private:
     Ui::OkeanConfigWidget *ui;
+};
+
+
+class PartnerConfigWidget : public ConfigWidget
+{
+    Q_OBJECT
+
+public:
+    explicit PartnerConfigWidget(QWidget *parent = nullptr);
+
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private:
+    Ui::PartnerConfigWidget *ui;
 };
 
 

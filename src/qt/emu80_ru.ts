@@ -59,22 +59,22 @@
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="263"/>
+        <location filename="qtConfigWidget.cpp" line="266"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="263"/>
+        <location filename="qtConfigWidget.cpp" line="266"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="269"/>
+        <location filename="qtConfigWidget.cpp" line="272"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="275"/>
+        <location filename="qtConfigWidget.cpp" line="278"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -105,7 +105,7 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="qtConfigWidget.cpp" line="100"/>
+        <location filename="qtConfigWidget.cpp" line="103"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -1229,6 +1229,34 @@
         <location filename="qtOkeanConfig.ui" line="76"/>
         <source>REL.8&apos; (192K RAM Disk)</source>
         <translation>REL.8&apos; (RAM-диск 192K)</translation>
+    </message>
+</context>
+<context>
+    <name>PartnerConfigWidget</name>
+    <message>
+        <location filename="qtPartnerConfig.ui" line="35"/>
+        <source>ROM set</source>
+        <translation>Версия ПЗУ</translation>
+    </message>
+    <message>
+        <location filename="qtPartnerConfig.ui" line="44"/>
+        <source>V.03 (recommended)</source>
+        <translation>В.03 (рекомендуется)</translation>
+    </message>
+    <message>
+        <location filename="qtPartnerConfig.ui" line="51"/>
+        <source>V.02</source>
+        <translation>В.02</translation>
+    </message>
+    <message>
+        <location filename="qtPartnerConfig.ui" line="58"/>
+        <source>V.1</source>
+        <translation>В.1</translation>
+    </message>
+    <message>
+        <location filename="qtPartnerConfig.ui" line="65"/>
+        <source>V 1.03 32K</source>
+        <translation>В. 1.03 32K</translation>
     </message>
 </context>
 <context>

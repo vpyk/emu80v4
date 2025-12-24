@@ -66,18 +66,35 @@ bool PlatformConfigDialog::configure(QString platform)
     m_configWidget->loadConfig();
 
     if (getGroupName(platform) == "spec") {
-        ConfigWidget* configWidget2 = new ApogeyConfigWidget();
-        configWidget2->tune("spec");
+        m_configWidget2 = new ApogeyConfigWidget();
+        m_configWidget2->tune("spec");
+        //m_configWidget2->setSizePolicy(sp);
+        static_cast<QBoxLayout*>(layout())->insertWidget(0, m_configWidget2);
+        m_configWidget2->loadConfig();
+    }
+
+    if (getGroupName(platform) == "partner") {
+        m_configWidget2 = new PartnerConfigWidget();
+        m_configWidget2->tune("partner");
         //configWidget2->setSizePolicy(sp);
-        static_cast<QBoxLayout*>(layout())->insertWidget(0, configWidget2);
-        configWidget2->loadConfig();
+        static_cast<QBoxLayout*>(layout())->insertWidget(0, m_configWidget2);
+        m_configWidget2->loadConfig();
     }
 
     bool res = exec() == QDialog::Accepted;
-    if (res)
+    if (res) {
         m_configWidget->saveConfig();
+        if (m_configWidget2)
+            m_configWidget2->saveConfig();
+    }
     delete m_configWidget;
     m_configWidget = nullptr;
+
+    if (m_configWidget2) {
+        delete m_configWidget2;
+        m_configWidget2 = nullptr;
+    }
+
     return res;
 }
 
@@ -86,4 +103,6 @@ void PlatformConfigDialog::onDefaults()
 {
     if (m_configWidget)
         m_configWidget->setDefaults();
+    if (m_configWidget2)
+        m_configWidget2->setDefaults();
 }

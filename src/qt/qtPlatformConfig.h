@@ -42,6 +42,7 @@ private:
     Ui::PlatformConfigDialog *ui;
 
     ConfigWidget* m_configWidget = nullptr;
+    ConfigWidget* m_configWidget2 = nullptr;
 
     static QString getGroupName(QString name);
 
