@@ -676,7 +676,8 @@ static bool palProcessEvents()
                 break;
             case SDL_DROPFILE:
                 if (SDL_GetWindowFromID(event.drop.windowID))
-                    emuDropFile(PalWindow::windowById(event.drop.windowID), event.drop.file);
+                    if (emuDropFile(PalWindow::windowById(event.drop.windowID), event.drop.file))
+                        SDL_RaiseWindow(SDL_GetWindowFromID(event.drop.windowID));
                 break;
 #endif
         }

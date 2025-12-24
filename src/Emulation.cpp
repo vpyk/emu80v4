@@ -636,11 +636,12 @@ void Emulation::restoreFocus()
 }
 
 
-void Emulation::dropFile(EmuWindow* wnd, const string& fileName)
+bool Emulation::dropFile(EmuWindow* wnd, const string& fileName)
 {
     Platform* platform = platformByWindow(wnd);
     if (platform)
-        platform->loadFile(fileName);
+        return platform->loadFile(fileName);
+    return false;
 }
 
 

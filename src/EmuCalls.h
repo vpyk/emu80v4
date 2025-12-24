@@ -30,7 +30,7 @@ void emuKeyboard(PalWindow* wnd, PalKeyCode key, bool isPressed, unsigned unicod
 void emuResetKeys(PalWindow* wnd);
 void emuSysReq(PalWindow* wnd, SysReq sr);
 void emuFocusWnd(PalWindow* wnd);
-void emuDropFile(PalWindow* wnd, const char* fileName);
+bool emuDropFile(PalWindow* wnd, const char* fileName);
 void emuEmulationCycle();
 bool emuSetPropertyValue(const std::string& objName, const std::string& propName, const std::string& value);
 std::string emuGetPropertyValue(const std::string& objName, const std::string& propName);

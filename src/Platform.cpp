@@ -389,9 +389,10 @@ void Platform::mouseDrag(int x, int y)
 bool Platform::loadFile(string fileName, bool run)
 {
     if (m_loader) {
-        m_loader->loadFile(fileName, run);
-        updateDebugger();
-        return true;
+        if (m_loader->loadFile(fileName, run)) {
+            updateDebugger();
+            return true;
+        }
     }
     return false;
 }

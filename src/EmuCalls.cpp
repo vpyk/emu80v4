@@ -55,9 +55,9 @@ void emuFocusWnd(PalWindow* wnd)
 
 
 // Drop files event
-void emuDropFile(PalWindow* wnd, const char* fileName)
+bool emuDropFile(PalWindow* wnd, const char* fileName)
 {
-    g_emulation->dropFile(static_cast<EmuWindow*>(wnd), std::string(fileName));
+    return g_emulation->dropFile(static_cast<EmuWindow*>(wnd), std::string(fileName));
 }
 
 

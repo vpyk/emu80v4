@@ -79,7 +79,7 @@ class Emulation : public ParentObject
         void draw();
         void sysReq(EmuWindow* wnd, SysReq sr);
         void setWndFocus(EmuWindow* wnd);
-        void dropFile(EmuWindow* wnd, const std::string& fileName);
+        bool dropFile(EmuWindow* wnd, const std::string& fileName);
         void restoreFocus();
         void newPlatform(const std::string& platformName);
 

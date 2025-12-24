@@ -2277,7 +2277,8 @@ void MainWindow::dropEvent(QDropEvent *event)
 {
     if (event->mimeData()->hasUrls()) {
         QString qFileName = event->mimeData()->urls().begin()->toLocalFile();
-        emuDropFile(m_palWindow, qFileName.toUtf8().constData());
+        if (emuDropFile(m_palWindow, qFileName.toUtf8().constData()))
+            activateWindow();
     }
 }
 
