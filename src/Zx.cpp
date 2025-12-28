@@ -26,7 +26,6 @@
 #include "EmuWindow.h"
 #include "Platform.h"
 #include "CpuZ80.h"
-#include "Psg3910.h"
 #include "Fdc1793.h"
 #include "TapeRedirector.h"
 #include "CpuHook.h"
@@ -617,6 +616,13 @@ bool ZxBdiAddrSpace::setProperty(const string& propertyName, const EmuValuesList
 }
 
 
+void ZxBdiAddrSpace::activateBdi()
+{
+    m_bdiActive = false;
+    m_bdiActiveOutput->setValue(0);
+}
+
+
 void ZxKeyboard::processKey(EmuKey key, bool isPressed)
 {
     if (key == EK_NONE)
@@ -1016,6 +1022,15 @@ bool ZxFileLoader::loadFile(const std::string& fileName, bool /*run*/)
     if (!buf)
         return false;
 
+    auto periodPos = fileName.find_last_of(".");
+    string ext = periodPos != string::npos ? fileName.substr(periodPos) : fileName;
+    transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (ext == ".sna") {
+        bool res = loadSna(buf, fileSize);
+        delete buf;
+        return res;
+    }
+
     TapeFileParser parser(buf, fileSize);
 
     auto fileFormat = parser.getFormat();
@@ -1061,6 +1076,86 @@ bool ZxFileLoader::loadFile(const std::string& fileName, bool /*run*/)
     kbd->processKey(EK_CR, true);
     g_emulation->exec((int64_t)cpu->getKDiv() * 100000, true);
     kbd->processKey(EK_CR, false);
+
+    return true;
+}
+
+
+static uint16_t wordAt(uint8_t* data)
+{
+    uint8_t lo = *data++;
+    return lo + (*data << 8);
+}
+
+bool ZxFileLoader::loadSna(uint8_t* data, int len)
+{
+    bool sna128Mode = false;
+    if (len == 131103 || len == 147487)
+        sna128Mode = true;
+    else if (len != 49179)
+        return false;
+
+    m_platform->reset();
+
+    CpuZ80* cpu = dynamic_cast<CpuZ80*>(m_platform->getCpu());
+    ZxPorts* ports = static_cast<ZxPorts*>(cpu->getIoAddrSpace());
+    AddressableDevice* as = cpu->getAddrSpace();
+
+    bool cur128kMode = ports->is128kMode();
+
+    cpu->setI(data[0]);
+    cpu->setHL2(wordAt(data + 1));
+    cpu->setDE2(wordAt(data + 3));
+    cpu->setBC2(wordAt(data + 5));
+    cpu->setAF2(wordAt(data + 7));
+    cpu->setHL(wordAt(data + 9));
+    cpu->setDE(wordAt(data + 11));
+    cpu->setBC(wordAt(data + 13));
+    cpu->setIY(wordAt(data + 15));
+    cpu->setIX(wordAt(data + 17));
+    cpu->setIFF(data[19] & 4);
+    cpu->setR(data[20]);
+    cpu->setAF(wordAt(data + 21));
+    cpu->setSP(wordAt(data + 23));
+    cpu->setIM(data[25]);
+
+    int borderColor = data[26] & 7;
+    static_cast<ZxRenderer*>(m_platform->getRenderer())->setBorderColor(borderColor);
+
+    if (cur128kMode)
+        ports->writeByte(0x7ffd, sna128Mode ? data[49181] : 0);
+
+    for (int i = 0; i < 0xC000; i++)
+        as->writeByte(0x4000 + i, data[27 + i]);
+
+    if (sna128Mode) {
+        cpu->setPC(wordAt(data + 49179));
+        uint8_t portFd = data[49181];
+        bool trdos = data[49182];
+
+        bool banks[8] = { false, false, true, false, false, true, false, false };
+        banks[portFd & 7] = true;
+
+        if (cur128kMode) {
+            int ofs = 49183;
+            for (int i = 0; i <= 7; i++) {
+                if (!banks[i]) {
+                    ports->writeByte(0x7ffd, i);
+                    for (int i = 0; i < 0x4000; i++)
+                        as->writeByte(0xC000 + i, data[ofs + i]);
+                    ofs += 0x4000;
+                }
+            }
+            ports->writeByte(0x7ffd, portFd);
+            if (trdos)
+                static_cast<ZxBdiAddrSpace*>(as)->activateBdi();
+        }
+    } else {
+        uint16_t sp = cpu->getSP();
+        uint16_t pc = as->readByte(sp) + (as->readByte(sp + 1) << 8);
+        cpu->setSP(sp + 2);
+        cpu->setPC(pc);
+    }
 
     return true;
 }

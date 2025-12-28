@@ -2895,8 +2895,28 @@ uint8_t CpuZ80::getI() {
 }
 
 
+uint8_t CpuZ80::getR() {
+    return ir & 0xFF;
+}
+
+
 uint8_t CpuZ80::getIFF() {
     return IFF;
+}
+
+
+void CpuZ80::setIM(uint8_t value) {
+    IM = value;
+}
+
+
+void CpuZ80::setI(uint8_t value) {
+    ir = (ir & 0xff) | (value << 8);
+}
+
+
+void CpuZ80::setR(uint8_t value) {
+    ir = (ir & 0xffff) | value;
 }
 
 

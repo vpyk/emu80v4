@@ -146,6 +146,8 @@ public:
 
     bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
+    bool is128kMode() { return m_128kMode; }
+
     static EmuObject* create(const EmuValuesList&) {return new ZxPorts();}
 
 private:
@@ -183,6 +185,8 @@ public:
     uint8_t readByte(int addr) override;
 
     bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    void activateBdi();
 
     static EmuObject* create(const EmuValuesList&) {return new ZxBdiAddrSpace();}
 
@@ -271,6 +275,7 @@ class ZxFileLoader : public FileLoader
         ZxFileLoader() {m_multiblockAvailable = true;}
 
         bool loadFile(const std::string& fileName, bool run = false) override;
+        bool loadSna(uint8_t* data, int len);
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 

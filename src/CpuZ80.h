@@ -87,7 +87,12 @@ class CpuZ80 : public Cpu8080Compatible
 
         uint8_t  getIM();
         uint8_t  getI();
+        uint8_t  getR();
         uint8_t  getIFF();
+
+        void setIM(uint8_t value);
+        void setI(uint8_t value);
+        void setR(uint8_t value);
 
         bool checkForStackOperation() override {return m_stackOperation;}
         int getCurIoInstructionDuration() override {return m_curIoInstructionDuration;}
