@@ -1,14 +1,27 @@
-# Emu80 4.x emulator source code
-
-For license info, see the file "COPYING.txt"
+# Emu80 Emulator v.4
 
 ## Назначение
 Эмулятор поддерживает ПК Радио-86РК, Апогей, Партнёр, Микроша, Электроника КР-04, Специалист, Eureka, Специалист-MX, Орион, Микроша, ПК-8000, Вектор, Львов, Корвет, ZX Spectrum и некоторые их модификации
 
 ## Ссылки
+#### Сайты эмулятора:
 * Сайт проекта: [http://emu80.org](http://emu80.org)
+* Web-версия эмулятора: [http://online.emu80.org](http://online.emu80.org)
+* Исходный код: [https://github.com/vpyk/emu80v4](https://github.com/vpyk/emu80v4)
+* Официальный Telegram-канал: [https://t.me/emu80_official](https://t.me/emu80_official)
+
+#### Обсуждение:
 * Обсуждение на форуме zx-pk.ru: [http://zx-pk.ru/threads/27488-emu80-v-4.html](http://zx-pk.ru/threads/27488-emu80-v-4.html)
 * Обсуждение на форуме nedopc.org: [http://www.nedopc.org/forum/viewtopic.php?f=43&t=17234](http://www.nedopc.org/forum/viewtopic.php?f=43&t=17234)
+* Чат подедржки в Telegram: [https://t.me/emu80_chat](https://t.me/emu80_chat)
+
+#### Проекты, использующие Emu80:
+* Pretty Intel 8080 Assembler Вячеслава Славинского, содержит встроенный Emu80: [https://svofski.github.io/pretty-8080-assembler/](https://svofski.github.io/pretty-8080-assembler/)
+* Форк Emu80 от Mike_V73 для платформы "Мурмулятор" на RP2350: [https://murmulator.ru/emu80](https://murmulator.ru/emu80)
+
+## Лицензия
+Эмулятор раcпространяется под лицензией GPL-3.0.
+For license info, see the file "COPYING.txt".
 
 ## Версии
 Эмулятор может быть собран в одной из версий:
