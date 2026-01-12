@@ -80,7 +80,9 @@ static bool fusionStyle = false;
 QApplication* getApplication() {return application;};
 
 
-bool palQtInit(int& argc, char** argv)
+static bool tryTranslation(const QString& langCode);
+
+    bool palQtInit(int& argc, char** argv)
 {
 #ifdef Q_OS_WIN32
     // Graphics driver options
@@ -191,13 +193,31 @@ bool palQtInit(int& argc, char** argv)
     ::basePath = application->applicationDirPath().toUtf8().constData();
     ::basePath += '/';
 
+    QString systemLangCode = QLocale::system().name().split('_').first();
+
+    QString langCode = locale.split('_').first();
     if (locale == "system")
-        locale = QLocale::system().name();
-    translator = new QTranslator();
-    if (translator->load("emu80_" + locale, ":/translations"))
-        application->installTranslator(translator);
+        langCode = systemLangCode;
+
+    if (!tryTranslation(langCode))
+        tryTranslation(systemLangCode);
 
     return true;
+}
+
+
+static bool tryTranslation(const QString& langCode)
+{
+    if (langCode == "en")
+        return true;
+
+    translator = new QTranslator();
+    QString translationsDir = langCode == "en" || langCode == "ru" ? ":/translations" : qApp->applicationDirPath() + "/translations";
+    if (translator->load("emu80_" + langCode, translationsDir)) {
+        application->installTranslator(translator);
+        return true;
+    }
+    return false;
 }
 
 

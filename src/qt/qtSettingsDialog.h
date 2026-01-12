@@ -83,6 +83,8 @@ private:
     QMap<QString, QString> m_options;
     QMap<QString, QString> m_initialOptions;
 
+    void loadLanguages();
+
     std::string m_platform;
     QString m_platformGroup;
 

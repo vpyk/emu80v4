@@ -18,6 +18,8 @@
 
 #include <QSettings>
 #include <QMessageBox>
+#include <QDir>
+#include <QTranslator>
 
 #include "qtSettingsDialog.h"
 #include "ui_qtSettingsDialog.h"
@@ -49,7 +51,12 @@ void SettingsDialog::initConfig()
     ui->shaderComboBox->addItem("- None -");
     ui->shaderComboBox->addItems(m_mainWindow->getShaderList());
 
+    ui->langComboBox->setItemData(0, "system");
+    ui->langComboBox->setItemData(1, "en");
+    ui->langComboBox->setItemData(2, "ru");
+
     //fillEnabledPlatformList();
+    loadLanguages();
 
     clearConfig();
     readRunningConfig();
@@ -317,12 +324,11 @@ void SettingsDialog::fillControlValues()
 
     // Language
     val = m_options["locale"];
-    if (val == "en")
-        ui->langComboBox->setCurrentIndex(1);
-    else if (val == "ru")
-        ui->langComboBox->setCurrentIndex(2);
-    else // if (val == "system")
-        ui->langComboBox->setCurrentIndex(0);
+    int langIndex = ui->langComboBox->findData(val);
+    if (langIndex > 0)
+        ui->langComboBox->setCurrentIndex(langIndex);
+    else
+        m_options["locale"] = "system";
 
     // Show help
     ui->showHelpCheckBox->setChecked(m_options["showHelp"] == "yes");
@@ -800,20 +806,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     QString val;
     bool rebootFlag = false;
 
-    switch (ui->langComboBox->currentIndex()) {
-        case 0:
-            val = "system";
-            break;
-        case 1:
-            val = "en";
-            break;
-        case 2:
-            val = "ru";
-            break;
-        default:
-            val = "";
-            break;
-    }
+    val = ui->langComboBox->currentData().toString();
     if (val != m_options["locale"]) {
         m_options["locale"] = val;
         rebootFlag = true;
@@ -1290,4 +1283,34 @@ void SettingsDialog::on_shaderComboBox_currentIndexChanged(int index)
 void SettingsDialog::on_selectedPlatformsCheckBox_toggled(bool checked)
 {
     ui->platformsListWidget->setEnabled(checked);
+}
+
+
+void SettingsDialog::loadLanguages()
+{
+    QString translationsDir = qApp->applicationDirPath() + "/translations";
+
+    QDir dir(translationsDir);
+    if (!dir.exists())
+        return;
+
+    dir.setNameFilters(QStringList("emu80_*.qm"));
+
+    foreach (const QFileInfo &fileInfo, dir.entryInfoList()) {
+        QString fileName = fileInfo.baseName();
+
+        QStringList parts = fileName.split('_');
+        if (parts.size() != 2)
+            continue;
+
+        QString langCode = parts.last();
+
+        QLocale locale(langCode);
+        QString langName = locale.nativeLanguageName();
+
+        if (!langName.isEmpty()) {
+            langName[0] = langName[0].toUpper();
+            ui->langComboBox->addItem(langName, langCode);
+        }
+    }
 }
