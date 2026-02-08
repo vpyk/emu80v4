@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link href="../help.css" rel="stylesheet" type="text/css">
+    <title></title>
+  </head>
+  <body>
+    <h2>Океан-240.2. Краткая справка</h2>
+    <h3>Общая информация</h3>
+    <p>После выбора данной конфигурации запускается встроенная в ПЗУ ОС CP/M. В
+      эмуляторе предусмотрена возможность выбора одной из 6 конфигураций,
+      соответствующим разным версиям ПЗУ и разным методам подключения
+      клавиатуры:</p>
+    <ul>
+      <li>REL.5. Не поддерживается FDD, RAM-диск 64K. Возможен выход в Монитор.</li>
+      <li>REL.6. Поддерживает работу с FDD, RAM-диск 64К. Возможен выход в
+        Монитор.</li>
+      <li>REL.7. Поддерживает работу с FDD, RAM-диск 64К. Выход в Монитор
+        отсутствует.</li>
+      <li>REL.7/2D. Поддерживает работу с FDD, RAM-диск 64К. Присутствует
+        альтернативный Turbo Monitor. Используется клавиатура МС7007.</li>
+      <li>REL.8. Поддерживает работу с FDD, RAM-диск 64К. Выход в Монитор
+        отсутствует.</li>
+      <li>REL.8'. Поддерживает работу с FDD, RAM-диск 192К. Выход в Монитор
+        отсутствует. Изменена палитра по умолчанию.</li>
+    </ul>
+    <p>В эмуляторе реализованы две цветовых схемы, переключаемых из меню/тулбара
+      или с помощью клавиш Alt-С:</p>
+    <ul>
+      <li>оригинальная палитра, реализованная в известных экземплярах,</li>
+      <li>журнальная палитра, соответствующая схеме в журнале МПСИС</li>
+    </ul>
+    <h3>Загрузка файлов с помощью встроенного загрузчика</h3>
+    <p>Файлы .com и .ok можно загружать с помощью пункта меню «Файл -&gt;
+      Загрузить и выполнить», комбинации клавиш Alt-F3 (Meta-F3), либо
+      соответствующей кнопки на панели инструментов. Можно также перетащить
+      нужный файл в окно эмулятора.</p>
+    <p>Пункт меню «Файл -&gt; Загрузить загружает файл в память по адресу 100,
+      для сохранения его в файл служит команда «SAVE кол-во_секторов_по_128 байт
+      имя_файла».</p>
+    <h3>Работа с образами дисков </h3>
+    <p>Работа с дисководом возможна из конфигураций, отличных от REL.5. Файлы
+      образов дискет (.okd) подключаются с помощью горячих клавиш Alt-A (Meta-B)
+      для диска «B» и Alt-C (Meta-C) — для диска «C». Можно также использовать
+      соответствующие пункты меню или кнопки на панели инструментов. Некоторые
+      программы на имеющихся дискетах могут быть рассчитаны на старые версии
+      ПЗУ, и для их норимальной работы нужно будет выбрать конфигурацию REL.6
+      или REL.7. Также, возможно, нужно будет изменить цветовую схему для
+      наилучшего отображения. Буква «A» всегда зарезервирована за электронным
+      диском, содержиммое электронного диска также можно выгрузить в файл и
+      загрузить из негос помощью соответствующей кнопки или пункта меню.</p>
+    <h3>Соответствие клавиш и раскладки клавиатуры </h3>
+    <p>Для всех конфигураций, кроме REL7/2D используется эмуляция терминала, и
+      раскладка клавиатуры совпадает с обычной раскладкой ПК. Возможнсть ввода
+      русских букв отсутствует.</p>
+    <p>В конфигурации REL7/2D используется матричная клавиатура MC7007, ее
+      раскладка в режиме QWERTY приведена ниже:</p>
+    <table class="kbd">
+      <tbody>
+        <tr>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td colspan="6">ESC</td>
+          <td colspan="6" class="blank">&nbsp;<br>
+            &nbsp;</td>
+          <td colspan="6">F1</td>
+          <td colspan="6">F2</td>
+          <td colspan="6">F3</td>
+          <td colspan="6">F4</td>
+          <td colspan="3" class="blank"><br>
+          </td>
+          <td colspan="6">F5</td>
+          <td colspan="6"><span style="font-size:x-small">ПОМ</span></td>
+          <td colspan="6"><span style="font-size:x-small">УСТ</span></td>
+          <td colspan="6"><span style="font-size:x-small">ГРАФ</span></td>
+          <td colspan="3" class="blank"><br>
+          </td>
+          <td colspan="6" class="unused">F9</td>
+          <td colspan="6" class="unused">F10</td>
+          <td colspan="6" class="unused">F11</td>
+          <td colspan="6"><span style="font-size:x-small">СТОП</span></td>
+          <td colspan="2" class="blank"><br>
+          </td>
+          <td colspan="6" class="unused">PS</td>
+          <td colspan="6" class="unused">S/L</td>
+          <td colspan="6" class="special">Ps</td>
+          <td colspan="8" class="blank"><br>
+          </td>
+          <td colspan="18" class="title"> <b>Океан-240.2/МС7007</b><br>
+            (QWERTY) </td>
+        </tr>
+        <tr>
+          <td class="blank">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td colspan="6">
+            <div align="right">+&nbsp;</div>
+            <div align="left">&nbsp;;</div>
+          </td>
+          <td colspan="6">
+            <div align="right">!&nbsp;</div>
+            <div align="left">&nbsp;1</div>
+          </td>
+          <td colspan="6">
+            <div align="right">@&nbsp;</div>
+            <div align="left">&nbsp;2</div>
+          </td>
+          <td colspan="6">
+            <div align="right">#&nbsp;</div>
+            <div align="left">&nbsp;3</div>
+          </td>
+          <td colspan="6">
+            <div align="right">¤&nbsp;</div>
+            <div align="left">&nbsp;4</div>
+          </td>
+          <td colspan="6">
+            <div align="right">%&nbsp;</div>
+            <div align="left">&nbsp;5</div>
+          </td>
+          <td colspan="6">
+            <div align="right">&amp;&nbsp;</div>
+            <div align="left">&nbsp;6</div>
+          </td>
+          <td colspan="6">
+            <div align="right">'&nbsp;</div>
+            <div align="left">&nbsp;7</div>
+          </td>
+          <td colspan="6">
+            <div align="right">(&nbsp;</div>
+            <div align="left">&nbsp;8</div>
+          </td>
+          <td colspan="6">
+            <div align="right">)&nbsp;</div>
+            <div align="left">&nbsp;9</div>
+          </td>
+          <td colspan="6">0</td>
+          <td colspan="6">
+            <div align="right">=&nbsp;</div>
+            <div align="left">&nbsp;-</div>
+          </td>
+          <td colspan="6">
+            <div align="right">*&nbsp;</div>
+            <div align="left">&nbsp;:</div>
+          </td>
+          <td colspan="12">ЗБ</td>
+          <td colspan="2" class="blank">&nbsp;</td>
+          <td colspan="6"><span style="font-size:x-small">АЛФ</span></td>
+          <td colspan="6" class="unused"><span style="font-size:x-small">Home</span></td>
+          <td colspan="6" class="unused">PgUp</td>
+          <td colspan="2" class="blank"><br>
+          </td>
+          <td colspan="6" class="special">N/L</td>
+          <td colspan="6" class="unused">/</td>
+          <td colspan="6" class="unused">*</td>
+          <td colspan="6" class="unused">-</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td colspan="9">ТАБ</td>
+          <td colspan="6">Q</td>
+          <td colspan="6">W</td>
+          <td colspan="6">E</td>
+          <td colspan="6">R</td>
+          <td colspan="6">T</td>
+          <td colspan="6">Y</td>
+          <td colspan="6">U</td>
+          <td colspan="6">I</td>
+          <td colspan="6">O</td>
+          <td colspan="6">P</td>
+          <td colspan="6">
+            <div align="right">{&nbsp;</div>
+            <div align="left">&nbsp;[</div>
+          </td>
+          <td colspan="6">
+            <div align="right">}&nbsp;</div>
+            <div align="left">&nbsp;]</div>
+          </td>
+          <td colspan="9">
+            <div align="right">|&nbsp;&nbsp;</div>
+            <div align="left">&nbsp;\</div>
+          </td>
+          <td colspan="2" class="blank">&nbsp;<br>
+            &nbsp;</td>
+          <td colspan="6" class="unused">Del</td>
+          <td colspan="6" class="special">Spd</td>
+          <td colspan="6" class="unused">PgDn</td>
+          <td colspan="2" class="blank"><br>
+          </td>
+          <td colspan="6">
+            <div align="right">&nbsp;</div>
+            <div align="left">&nbsp;7</div>
+          </td>
+          <td colspan="6">
+            <div align="right">↑&nbsp;</div>
+            <div align="left">&nbsp;8</div>
+          </td>
+          <td colspan="6">
+            <div align="right">&nbsp;</div>
+            <div align="left">&nbsp;9</div>
+          </td>
+          <td colspan="6" rowspan="2" class="unused">+</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td colspan="10" class="unused">C/L</td>
+          <td colspan="6">A</td>
+          <td colspan="6">S</td>
+          <td colspan="6">D</td>
+          <td colspan="6">F</td>
+          <td colspan="6">G</td>
+          <td colspan="6">H</td>
+          <td colspan="6">J</td>
+          <td colspan="6">K</td>
+          <td colspan="6">L</td>
+          <td colspan="6">
+            <div align="right">~&nbsp;</div>
+            <div align="left">&nbsp;^</div>
+          </td>
+          <td colspan="6">
+            <div align="right">`&nbsp;</div>
+            <div align="left">&nbsp;@</div>
+          </td>
+          <td colspan="14">ВК</td>
+          <td colspan="22" class="blank">&nbsp;<br>
+            &nbsp;</td>
+          <td colspan="6">
+            <div align="right">←&nbsp;</div>
+            <div align="left">&nbsp;4</div>
+          </td>
+          <td colspan="6">
+            <div align="right">&nbsp;</div>
+            <div align="left">&nbsp;5</div>
+          </td>
+          <td colspan="6">
+            <div align="right">→&nbsp;</div>
+            <div align="left">&nbsp;6</div>
+          </td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td colspan="14"><span style="font-size:large">⇕</span></td>
+          <td colspan="6">Z</td>
+          <td colspan="6">X</td>
+          <td colspan="6">C</td>
+          <td colspan="6">V</td>
+          <td colspan="6">B</td>
+          <td colspan="6">N</td>
+          <td colspan="6">M</td>
+          <td colspan="6">
+            <div align="right">&lt;&nbsp;</div>
+            <div align="left">&nbsp;,</div>
+          </td>
+          <td colspan="6">
+            <div align="right">&gt;&nbsp;</div>
+            <div align="left">&nbsp;.</div>
+          </td>
+          <td colspan="6">
+            <div align="right">?&nbsp;</div>
+            <div align="left">&nbsp;/</div>
+          </td>
+          <td colspan="16"><span style="font-size:large">⇕</span></td>
+          <td colspan="8" class="blank">&nbsp;<br>
+            &nbsp;</td>
+          <td colspan="6">↑</td>
+          <td colspan="8" class="blank">&nbsp;<br>
+            &nbsp;</td>
+          <td colspan="6">
+            <div align="right">&nbsp;</div>
+            <div align="left">&nbsp;1</div>
+          </td>
+          <td colspan="6">
+            <div align="right">↓&nbsp;</div>
+            <div align="left">&nbsp;2</div>
+          </td>
+          <td colspan="6">
+            <div align="right">&nbsp;</div>
+            <div align="left">&nbsp;3</div>
+          </td>
+          <td colspan="6" rowspan="2">ВК</td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+          <td colspan="9">УПР</td>
+          <td colspan="7" class="special">Meta</td>
+          <td colspan="7" class="special">Alt</td>
+          <td colspan="37">Пробел</td>
+          <td colspan="7" class="special">Alt</td>
+          <td colspan="7" class="special">Meta</td>
+          <td colspan="7"><span style="font-size:x-small">ФИКС</span></td>
+          <td colspan="9">УПР<br>
+            (алф)</td>
+          <td colspan="2" class="blank">&nbsp;<br>
+            &nbsp;</td>
+          <td colspan="6">←</td>
+          <td colspan="6">↓</td>
+          <td colspan="6">→</td>
+          <td colspan="2" class="blank">&nbsp;<br>
+            &nbsp;</td>
+          <td colspan="12">
+            <div align="right"><span style="font-size:x-small">АЛФ</span>&nbsp;</div>
+            <div align="left">&nbsp;0</div>
+          </td>
+          <td colspan="6">
+            <div align="right">&nbsp;</div>
+            <div align="left">&nbsp;.</div>
+          </td>
+          <td class="blank" colspan="2">&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="blank">&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <p>«Умная» раскладка примерно совпадает с раскладкой ПК, оаднако возможны
+      расхождения в некоторых клавшах, ее применять не рекомендуется.</p>
+    <p>Клавиши дополнительной клавиатуры отображаются на соответствующие клавиши
+      дополнительной клавиатуры PC при выключенном режиме NumLock (для
+      SDL-версии статус NumLock не имеет значения).</p>
+  </body>
+</html>

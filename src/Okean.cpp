@@ -363,6 +363,8 @@ EmuKey OkeanKbdLayout::translateKey(PalKeyCode keyCode)
         return EK_GRAPH;
     case PK_F12:
         return EK_RESET;
+    case PK_MENU:
+        return EK_FIX;
     default:
         break;
     }
