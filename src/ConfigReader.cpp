@@ -49,9 +49,9 @@ ConfigReader::ConfigReader(string configFileName, const string& platformName)
     list<string> palDefines;
     palGetPalDefines(palDefines);
     for (auto it = palDefines.begin(); it != palDefines.end(); it++)
-        m_varMap[*it] = "";
+        m_varMap[*it].clear();
 
-    if (platformName != "") {
+    if (!platformName.empty()) {
         map<string, string> platformDefines;
         palGetPlatformDefines(platformName, platformDefines);
         for (auto it = platformDefines.begin(); it != platformDefines.end(); it++)
@@ -171,7 +171,7 @@ static string getToken(string &s, const string& delimeters)
     if (pos == string::npos) {
         // остаток строки
         res = s;
-        s = "";
+        s.clear();
         return res;
     }
 
@@ -202,7 +202,7 @@ static string getToken(string &s, const string& delimeters)
 void ConfigReader::fillValuesList(string s, EmuValuesList* values)
 {
     string token;
-    while (s != "") {
+    while (!s.empty()) {
         // подставляем переменные
         while (s[0] == '@') {
             token = getToken(s, DELIM_COMMA);
@@ -212,7 +212,7 @@ void ConfigReader::fillValuesList(string s, EmuValuesList* values)
             if (it != m_varMap.end())
                 s = it->second + s;
             else {
-                s = "";
+                s.clear();
                 logPrefix();
                 emuLog << "variable @" << var << " not found" << "\n";
             }
@@ -224,7 +224,7 @@ void ConfigReader::fillValuesList(string s, EmuValuesList* values)
             token = getToken(s, DELIM_QUOT);
             getToken(s, DELIM_QUOT);
         }
-        if (token != "") {
+        if (!token.empty()) {
             if (token.substr(0, 1) == "&") {
                 if (token == "&platform")
                     token = m_prefix.substr(0, m_prefix.size() - 1); // убираем "."
@@ -491,8 +491,8 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
 
         token = getToken(s, DELIM_DOTSPACE);
 
-        // пропускаем пустые строки или строки с комменатриями
-        if (token == "")
+        // пропускаем пустые строки или строки с комментариями
+        if (token.empty())
             continue;
 
         string first, second;
@@ -604,7 +604,7 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
                 return false;
             }
             string var = defines[0].asString();
-            m_varMap[var] = "";
+            m_varMap[var].clear();
             continue;
         }
 
@@ -658,13 +658,13 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
                 continue;
             }
 
-            typeName = "";
+            typeName.clear();
             objName = first;
             propName = second;
 
             fillValuesList(s, values);
         } else {
-            if (token == "" || token == "=") {
+            if (token.empty() || token == "=") {
                 logPrefix();
                 emuLog << "object name expected" << "\n";
                 stop();
@@ -676,10 +676,10 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
             // создание объекта
             typeName = first;
             objName = second;
-            propName = "";
+            propName.clear();
 
             token = getToken(s, DELIM_DOTSPACE);
-            if (token != "=" && token != "") {
+            if (token != "=" && !token.empty()) {
                 logPrefix();
                 emuLog << "EOL or \"=\" expected" << "\n";
                 stop();
@@ -718,7 +718,7 @@ bool ConfigReader::processConfigFile(ParentObject* parent)
     while (res) {
         processed = true;
         //cout << t << " " << o << " " << p << endl;
-        if (t != "" && o != "" && p == "") {
+        if (!t.empty() && !o.empty() && p.empty()) {
             if (g_emulation->findObject(m_prefix + o)) {
                 logPrefix();
                 emuLog << "Object " << o << " already exists!" << "\n";
@@ -731,9 +731,9 @@ bool ConfigReader::processConfigFile(ParentObject* parent)
                 //break;
             }
         }
-        else if (t == "" && o != "" && p != "") {
+        else if (t.empty() && !o.empty() && !p.empty()) {
             EmuObject* obj = nullptr;
-            if (m_prefix != "" && o == "platform") // подставляем вместо "platform" конкретное имя текущей платформы
+            if (!m_prefix.empty() && o == "platform") // подставляем вместо "platform" конкретное имя текущей платформы
                 o = m_prefix.substr(0, m_prefix.size() - 1); // убираем "."
             else
                 o = m_prefix + o;
@@ -745,7 +745,7 @@ bool ConfigReader::processConfigFile(ParentObject* parent)
                 emuLog << "Object " << o << " not found" << "\n";
             } else if (!obj->setProperty(p, v)) {
                 logPrefix();
-                emuLog << "Set property " << o << "." << p <<  " failed\n";
+                emuLog << "Set property " << o << "." << p << " failed\n";
             }
         }
         v.clearList();
