@@ -49,19 +49,20 @@ class EmuValue {
 class EmuValuesList {
     public:
         EmuValuesList() {}
-        EmuValuesList(std::string value1);
-        EmuValuesList(std::string value1, std::string value2);
-        EmuValuesList(std::string value1, std::string value2, std::string value3);
+        ~EmuValuesList();
+        EmuValuesList(const std::string& value1);
+        EmuValuesList(const std::string& value1, const std::string& value2);
+        EmuValuesList(const std::string& value1, const std::string& value2, const std::string& value3);
         //EmuValuesList(EmuValue& value1);
         //EmuValuesList(EmuValue& value1, EmuValue& value2);
         //EmuValuesList(EmuValue& value1, EmuValue& value2, EmuValue& value3);
-        const EmuValue& operator[](int index) const;
-        void addValue(std::string value);
-        int size() const;
+        const EmuValue& operator[](size_t index) const;
+        void addValue(const std::string& value);
+        size_t size() const;
         void clearList();
     private:
         std::vector<EmuValue*> m_values;
-        EmuValue emptyValue;
+        static const EmuValue emptyValue;
 };
 
 

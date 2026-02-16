@@ -98,14 +98,23 @@ const string& EmuValue::asString() const
 }
 
 
-EmuValuesList::EmuValuesList(string value1)
+const EmuValue EmuValuesList::emptyValue;
+
+
+EmuValuesList::~EmuValuesList()
+{
+    clearList();
+}
+
+
+EmuValuesList::EmuValuesList(const string& value1)
 {
     EmuValue* ev1 = new EmuValue(value1);
     m_values.push_back(ev1);
 }
 
 
-EmuValuesList::EmuValuesList(string value1, string value2)
+EmuValuesList::EmuValuesList(const string& value1, const string& value2)
 {
     EmuValue* ev1 = new EmuValue(value1);
     EmuValue* ev2 = new EmuValue(value2);
@@ -114,7 +123,7 @@ EmuValuesList::EmuValuesList(string value1, string value2)
 }
 
 
-EmuValuesList::EmuValuesList(string value1, string value2, string value3)
+EmuValuesList::EmuValuesList(const string& value1, const string& value2, const string& value3)
 {
     EmuValue* ev1 = new EmuValue(value1);
     EmuValue* ev2 = new EmuValue(value2);
@@ -147,7 +156,7 @@ EmuValuesList::EmuValuesList(EmuValue& value1, EmuValue& value2, EmuValue& value
 }
 */
 
-void EmuValuesList::addValue(string value)
+void EmuValuesList::addValue(const string& value)
 {
     EmuValue* ev = new EmuValue(value);
     m_values.push_back(ev);
@@ -162,12 +171,12 @@ void EmuValuesList::clearList()
 }
 
 
-int EmuValuesList::size() const
+size_t EmuValuesList::size() const
 {
     return m_values.size();
 }
 
-const EmuValue& EmuValuesList::operator[](int n) const
+const EmuValue& EmuValuesList::operator[](size_t n) const
 {
     if (n < size())
         return *(m_values[n]);
