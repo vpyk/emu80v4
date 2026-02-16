@@ -26,12 +26,12 @@
 #include "EmuObjects.h"
 
 
-static EmuValuesList emptyValues("", "", "");
+static EmuValuesList emptyValues({}, {}, {});
 
 class ConfigReader : public EmuObject
 {
     public:
-        ConfigReader(std::string configFileName, std::string platformName = "");
+        ConfigReader(std::string configFileName, const std::string& platformName = {});
         virtual ~ConfigReader();
 
         //bool setProperty(const string& propertyName, const EmuValuesList& values) override;
@@ -47,7 +47,7 @@ class ConfigReader : public EmuObject
 
         std::string m_prefix;
         std::string m_configFileName;
-        std::istringstream* m_inputStream;
+        std::istringstream* m_inputStream = nullptr;
         int m_curLine;
         std::map<std::string, std::string> m_varMap;
         std::stack<ConfigReaderState> m_stateStack;
@@ -58,7 +58,7 @@ class ConfigReader : public EmuObject
         void openFile();
         bool getNextLine(std::string& typeName, std::string& objName, std::string& propname, EmuValuesList* values);
         void fillValuesList(std::string s, EmuValuesList* values);
-        EmuObject* createObject(std::string typeName, std::string objName, const EmuValuesList& parameters = ::emptyValues);
+        EmuObject* createObject(const std::string& typeName, const std::string& objName, const EmuValuesList& parameters = ::emptyValues);
         void logPrefix();
         void stop();
         void parseConnect(std::string s, std::string token);

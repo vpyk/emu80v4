@@ -38,14 +38,13 @@
 
 using namespace std;
 
-ConfigReader::ConfigReader(string configFileName, string platformName)
+ConfigReader::ConfigReader(string configFileName, const string& platformName)
+    : m_configFileName(std::move(configFileName))
 {
-    if (platformName == "")
+    if (platformName.empty())
         m_prefix = platformName;
     else
         m_prefix = platformName + ".";
-
-    m_configFileName = configFileName;
 
     list<string> palDefines;
     palGetPalDefines(palDefines);
@@ -81,8 +80,7 @@ void ConfigReader::openFile()
         fileSize -= 3;
     }
     string s((const char*)dataPtr, fileSize);
-    if(buf)
-        delete[] buf;
+    delete[] buf;
     m_curLine = 0;
     m_inputStream = new istringstream(s);
 }
@@ -90,8 +88,7 @@ void ConfigReader::openFile()
 
 ConfigReader::~ConfigReader()
 {
-     if (m_inputStream)
-        delete m_inputStream;
+    delete m_inputStream;
 }
 
 
@@ -146,7 +143,7 @@ static const char* DELIM_SPACE = " \t";
 static const char* DELIM_DOT = ".";
 static const char* DELIM_BRACKETS = "[]()-";
 
-static string getToken(string &s, string delimeters)
+static string getToken(string &s, const string& delimeters)
 {
     trim(s);
 
@@ -696,7 +693,7 @@ bool ConfigReader::getNextLine(string& typeName, string& objName, string& propNa
 }
 
 
-EmuObject* ConfigReader::createObject(string typeName, string objName, const EmuValuesList& parameters)
+EmuObject* ConfigReader::createObject(const string& typeName, const string& objName, const EmuValuesList& parameters)
 {
     EmuObject* obj = nullptr;
     obj = ObjectFactory::get()->createObject(typeName, parameters);
