@@ -3,7 +3,7 @@
 /src/build
 /src/*.layout
 /src/*.depend
-/src/*.pro.user*
+/src/**/*.pro.user*
 *.o
 /Emu80
 /Emu80lite
