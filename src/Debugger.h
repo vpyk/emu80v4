@@ -109,12 +109,12 @@ struct BreakpointInfo {
 class IDebugger
 {
 public:
-    IDebugger(Platform* platform) {} // todo: implement
+    IDebugger(Platform* /*platform*/) {} // todo: implement
     virtual ~IDebugger() {}
 
     virtual void initDbgWindow() = 0;
     virtual void setCaption(std::string caption) = 0;
-    virtual void sendCmd(DebugCommand cmd) {}
+    virtual void sendCmd(DebugCommand /*cmd*/) {}
 
     virtual void startDebug() = 0;
     virtual void update() = 0;
