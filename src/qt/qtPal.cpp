@@ -77,12 +77,12 @@ static QTranslator* translator;
 
 static bool fusionStyle = false;
 
-QApplication* getApplication() {return application;};
+QApplication* getApplication() {return application;}
 
 
 static bool tryTranslation(const QString& langCode);
 
-    bool palQtInit(int& argc, char** argv)
+bool palQtInit(int& argc, char** argv)
 {
 #ifdef Q_OS_WIN32
     // Graphics driver options
@@ -235,12 +235,26 @@ static EmuAudioIoDevice* audioDevice = nullptr;
 void palQtQuit()
 {
     if (audio)
+    {
         audio->stop();
+        delete audio;
+        audio = nullptr;
+    }
     if (audioDevice)
+    {
         delete audioDevice;
+        audioDevice = nullptr;
+    }
 
-    delete translator;
+    if(translator)
+    {
+        application->removeTranslator(translator);
+        delete translator;
+        translator = nullptr;
+    }
+
     delete application;
+    application = nullptr;
 }
 
 
@@ -329,14 +343,15 @@ int palGetSampleRate()
 }
 
 
-string palMakeFullFileName(string fileName)
+string palMakeFullFileName(const string &fileName)
 {
+    if (fileName.empty())
+        return {};
     if (fileName[0] == '\0' || fileName[0] == '/' || fileName[0] == '\\' || (fileName.size() > 1 && fileName[1] == ':'))
         return fileName;
     string fullFileName(::basePath);
     fullFileName += fileName;
     return fullFileName;
-  return "";
 }
 
 
@@ -421,7 +436,7 @@ void palDelay(uint64_t time)
 }
 
 
-std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window)
+std::string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window)
 {
     QSettings settings;
     SET_INI_CODEC(settings);
@@ -446,7 +461,7 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
     do {
         itemDesc = qFilter.section('|', item, item);
         itemFilter = qFilter.section('|', item + 1, item + 1);
-        if (itemDesc != "" && itemFilter != "") {
+        if (!itemDesc.isEmpty() && !itemFilter.isEmpty()) {
             if (item != 0)
                 newFilter += ";;";
             newFilter += itemDesc.section('(', 0, 0).trimmed();
@@ -455,18 +470,18 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
             QString ext;
             do {
                 ext = itemFilter.section(QRegularExpression("[;,]"), extItem, extItem);
-                if (ext != "") {
+                if (!ext.isEmpty()) {
                     if (extItem != 0)
                         newFilter += " ";
                     newFilter += ext;
                 }
                 ++extItem;
-            } while (ext != "");
+            } while (!ext.isEmpty());
             newFilter += ")";
         }
         item += 2;
-    } while (itemDesc != "");
-    QString fileName = "";
+    } while (!itemDesc.isEmpty());
+    QString fileName;
     QWidget* parent = nullptr;
     if (window)
         parent = window->getQtWindow();
@@ -476,12 +491,12 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
         fileDialog.setAcceptMode(QFileDialog::QFileDialog::AcceptSave);
         fileDialog.setNameFilter(newFilter);
         fileDialog.setDirectory(dir);
-        if (lastFilter != "" && newFilter.contains(lastFilter))
+        if (!lastFilter.isEmpty() && newFilter.contains(lastFilter))
             fileDialog.selectNameFilter(lastFilter);
         g_renderHelper->pause();
         if (fileDialog.exec() == QDialog::Accepted) {
             fileName = fileDialog.selectedFiles().constFirst(); // Qt >= 5.6
-            if (dirKey != "") {
+            if (!dirKey.isEmpty()) {
                 dir = fileDialog.directory().absolutePath();
                 lastFilter = fileDialog.selectedNameFilter();
                 settings.setValue(dirKey, dir);
@@ -497,12 +512,12 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
         fileDialog.setFileMode(QFileDialog::ExistingFiles);
         fileDialog.setNameFilter(newFilter);
         fileDialog.setDirectory(dir);
-        if (lastFilter != "" && newFilter.contains(lastFilter))
+        if (!lastFilter.isEmpty() && newFilter.contains(lastFilter))
             fileDialog.selectNameFilter(lastFilter);
         g_renderHelper->pause();
         if (fileDialog.exec() == QDialog::Accepted) {
             fileName = fileDialog.selectedFiles().constFirst(); // Qt >= 5.6
-            if (dirKey != "") {
+            if (!dirKey.isEmpty()) {
                 dir = fileDialog.directory().absolutePath();
                 lastFilter = fileDialog.selectedNameFilter();
                 settings.setValue(dirKey, dir);
@@ -517,7 +532,7 @@ std::string palOpenFileDialog(std::string title, std::string filter, bool write,
 }
 
 
-std::string palMakeCaseInsensitivePath(const std::string& basePath, const std::string caseInsensitivePath)
+std::string palMakeCaseInsensitivePath(const std::string& basePath, const std::string& caseInsensitivePath)
 {
     QString qBasePath = QString::fromUtf8(basePath.c_str());
     QString qPath = QString::fromUtf8(caseInsensitivePath.c_str());
@@ -600,7 +615,7 @@ bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bo
     QWidget* parent = nullptr;
     if (wnd)
         parent = wnd->getQtWindow();
-    ChoosePlatformDialog* dialog = new ChoosePlatformDialog(parent);
+    auto dialog = QScopedPointer(new ChoosePlatformDialog(parent));
     g_renderHelper->pause();
     bool res = dialog->execute(pi, pos, newWnd, "", setDef);
     g_renderHelper->resume();
@@ -608,23 +623,22 @@ bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bo
 }
 
 
-bool palChooseConfiguration(std::string platformName, PalWindow* wnd)
+bool palChooseConfiguration(const string &platformName, PalWindow* wnd)
 {
     QWidget* parent = nullptr;
     if (wnd)
         parent = wnd->getQtWindow();
-    PlatformConfigDialog* dialog = new PlatformConfigDialog(parent);
+    auto dialog = QScopedPointer(new PlatformConfigDialog(parent));
     g_renderHelper->pause();
     bool res = dialog->configure(QString::fromUtf8(platformName.c_str()));
-    delete dialog;
     g_renderHelper->resume();
     return res;
 }
 
 
-void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
+void palGetPlatformDefines(string_view platformName, std::map<std::string, std::string>& definesMap)
 {
-    string platformGroupName = platformName.substr(0, platformName.find(".",0));
+    string platformGroupName(platformName.substr(0, platformName.find(".",0)));
     QSettings settings;
     SET_INI_CODEC(settings);
     settings.beginGroup(QString::fromUtf8(platformGroupName.c_str()) + "-config");
@@ -668,9 +682,9 @@ string palGetTextFromClipboard()
 }
 
 
-static string logStr = "";
+static string logStr;
 
-void palLog(std::string str) {
+void palLog(string_view str) {
     logStr += str;
     string::size_type pos = logStr.find("\n");
     while (pos != string::npos) {
@@ -678,22 +692,14 @@ void palLog(std::string str) {
         if (pos < logStr.size())
             logStr = logStr.substr(pos + 1);
         else
-            logStr = "";
+            logStr.clear();
         pos = logStr.find("\n");
     }
 }
 
 
-EmuLog& EmuLog::operator<<(string s)
+EmuLog& EmuLog::operator<<(string_view s)
 {
-    palLog(s);
-    return *this;
-}
-
-
-EmuLog& EmuLog::operator<<(const char* sz)
-{
-    string s = sz;
     palLog(s);
     return *this;
 }
@@ -709,9 +715,9 @@ EmuLog& EmuLog::operator<<(int n)
 }
 
 
-void palMsgBox(std::string msg, bool critical)
+void palMsgBox(string_view msg, bool critical)
 {
-    QMessageBox msgBox(critical ? QMessageBox::Critical : QMessageBox::Information, "Emu80", QString::fromUtf8(msg.c_str()));
+    QMessageBox msgBox(critical ? QMessageBox::Critical : QMessageBox::Information, "Emu80", QString::fromUtf8(msg));
     msgBox.exec();
 }
 
@@ -720,22 +726,22 @@ EmuLog emuLog;
 
 
 // Unimplemented functions
-void palSetRunFileName(std::string) {
+void palSetRunFileName(const std::string&) {
 }
 
 void palShowConfigWindow(int) {
 }
 
-void palAddTabToConfigWindow(int, std::string) {
+void palAddTabToConfigWindow(int, const std::string&) {
 }
 
 void palRemoveTabFromConfigWindow(int) {
 }
 
-void palAddRadioSelectorToTab(int, int, std::string, std::string, std::string, SelectItem*, int) {
+void palAddRadioSelectorToTab(int, int, const std::string&, const std::string&, const std::string&, SelectItem*, int) {
 }
 
-void palSetTabOptFileName(int, string) {
+void palSetTabOptFileName(int, const string&) {
 }
 
 void palWxProcessMessages() {

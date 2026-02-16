@@ -26,7 +26,6 @@
 #include <map>
 
 #include "../EmuTypes.h"
-#include "../PalKeys.h"
 
 class PalWindow;
 
@@ -51,10 +50,10 @@ int palGetSampleRate();
 //bool palSetFrameRate(int frameRate);
 bool palSetVsync(bool vsync);
 
-std::string palMakeFullFileName(std::string fileName);
+std::string palMakeFullFileName(const std::string& fileName);
 int palReadFromFile(const std::string& fileName, int first, int size, uint8_t* buffer, bool useBasePath = true);
-uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePath = true);
-std::string palMakeCaseInsensitivePath(const std::string& basePath, const std::string caseInsensitivePath);
+uint8_t* palReadFile(const std::string& fileName, int& fileSize, bool useBasePath = true);
+std::string palMakeCaseInsensitivePath(const std::string& basePath, const std::string& caseInsensitivePath);
 
 //bool palProcessEvents();
 
@@ -63,40 +62,39 @@ void palRequestForQuit();
 void palPlaySample(int16_t sample); // mono, not used for now
 void palPlaySample(int16_t left, int16_t right); // stereo
 
-std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
+std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr);
 
 void palCopyTextToClipboard(const char* text);
 std::string palGetTextFromClipboard();
 
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false, PalWindow* wnd = nullptr);
-bool palChooseConfiguration(std::string platformName, PalWindow* wnd);
-void palSetRunFileName(std::string runFileName);
+bool palChooseConfiguration(const std::string& platformName, PalWindow* wnd);
+void palSetRunFileName(const std::string& runFileName);
 void palShowConfigWindow(int curTabId = 0);
 void palUpdateConfig();
 void palDebugRequest();
 std::string palGetDefaultPlatform();
 void palGetPalDefines(std::list<std::string>& difineList);
-void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap);
+void palGetPlatformDefines(std::string_view platformName, std::map<std::string, std::string>& definesMap);
 
-void palAddTabToConfigWindow(int tabId, std::string tabName);
+void palAddTabToConfigWindow(int tabId, const std::string& tabName);
 void palRemoveTabFromConfigWindow(int tabId);
-void palAddRadioSelectorToTab(int tabId, int column, std::string caption, std::string object, std::string property, SelectItem* items, int nItems);
-void palSetTabOptFileName(int tabId, std::string optFileName);
+void palAddRadioSelectorToTab(int tabId, int column, const std::string& caption, const std::string& object, const std::string& property, SelectItem* items, int nItems);
+void palSetTabOptFileName(int tabId, const std::string& optFileName);
 
 void palRegisterSetPropValueCallbackFunc(bool (*func)(const std::string&, const std::string&, const std::string&));
 void palRegisterGetPropertyStringValueFunc(std::string (*func)(const std::string&, const std::string&));
 
 void palWxProcessMessages();
 
-void palLog(std::string s);
+void palLog(std::string_view s);
 
-void palMsgBox(std::string msg, bool critical = false);
+void palMsgBox(std::string_view msg, bool critical = false);
 
 class EmuLog
 {
     public:
-        EmuLog& operator<<(std::string s);
-        EmuLog& operator<<(const char* sz);
+        EmuLog& operator<<(std::string_view s);
         EmuLog& operator<<(int n);
 };
 
