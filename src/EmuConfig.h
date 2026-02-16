@@ -19,7 +19,6 @@
 #ifndef EMUCONFIG_H
 #define EMUCONFIG_H
 
-#include <list>
 #include <map>
 
 #include "EmuTypes.h"
