@@ -3,7 +3,8 @@
 /src/build
 /src/*.layout
 /src/*.depend
-/src/**/*.pro.user*
+/src/*.pro.user*
+/src/.qtcreator*
 *.o
 /Emu80
 /Emu80lite
