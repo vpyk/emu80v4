@@ -636,7 +636,7 @@ bool palChooseConfiguration(const string &platformName, PalWindow* wnd)
 }
 
 
-void palGetPlatformDefines(string_view platformName, std::map<std::string, std::string>& definesMap)
+void palGetPlatformDefines(const string& platformName, std::map<std::string, std::string>& definesMap)
 {
     string platformGroupName(platformName.substr(0, platformName.find(".",0)));
     QSettings settings;
@@ -684,7 +684,7 @@ string palGetTextFromClipboard()
 
 static string logStr;
 
-void palLog(string_view str) {
+void palLog(const string& str) {
     logStr += str;
     string::size_type pos = logStr.find("\n");
     while (pos != string::npos) {
@@ -698,7 +698,7 @@ void palLog(string_view str) {
 }
 
 
-EmuLog& EmuLog::operator<<(string_view s)
+EmuLog& EmuLog::operator<<(const string& s)
 {
     palLog(s);
     return *this;
@@ -715,9 +715,9 @@ EmuLog& EmuLog::operator<<(int n)
 }
 
 
-void palMsgBox(string_view msg, bool critical)
+void palMsgBox(const string& msg, bool critical)
 {
-    QMessageBox msgBox(critical ? QMessageBox::Critical : QMessageBox::Information, "Emu80", QString::fromUtf8(msg));
+    QMessageBox msgBox(critical ? QMessageBox::Critical : QMessageBox::Information, "Emu80", QString::fromUtf8(msg.c_str()));
     msgBox.exec();
 }
 

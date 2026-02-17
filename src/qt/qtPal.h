@@ -75,7 +75,7 @@ void palUpdateConfig();
 void palDebugRequest();
 std::string palGetDefaultPlatform();
 void palGetPalDefines(std::list<std::string>& difineList);
-void palGetPlatformDefines(std::string_view platformName, std::map<std::string, std::string>& definesMap);
+void palGetPlatformDefines(const std::string& platformName, std::map<std::string, std::string>& definesMap);
 
 void palAddTabToConfigWindow(int tabId, const std::string& tabName);
 void palRemoveTabFromConfigWindow(int tabId);
@@ -87,14 +87,14 @@ void palRegisterGetPropertyStringValueFunc(std::string (*func)(const std::string
 
 void palWxProcessMessages();
 
-void palLog(std::string_view s);
+void palLog(const std::string& s);
 
-void palMsgBox(std::string_view msg, bool critical = false);
+void palMsgBox(const std::string& msg, bool critical = false);
 
 class EmuLog
 {
     public:
-        EmuLog& operator<<(std::string_view s);
+        EmuLog& operator<<(const std::string& s);
         EmuLog& operator<<(int n);
 };
 
