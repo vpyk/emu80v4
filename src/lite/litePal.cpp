@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ using namespace std;
 
 #ifdef _WIN32
 
-string palOpenFileDialog(string title, string filter, bool write, PalWindow* window)
+string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window)
 {
     OPENFILENAMEW ofn;
     memset(&ofn, 0, sizeof(ofn));
@@ -138,7 +138,7 @@ void palUpdateConfig() {
 #else
 
 #ifndef PAL_WASM
-std::string palOpenFileDialog(std::string, std::string, bool, PalWindow*) {
+std::string palOpenFileDialog(const std::string&, const std::string&, bool, PalWindow*) {
     return "";
 }
 
@@ -201,7 +201,7 @@ bool palChoosePlatform(std::vector<PlatformInfo>&, int&, bool&, bool, PalWindow*
 }
 
 
-bool palChooseConfiguration(std::string platformName, PalWindow* wnd) {
+bool palChooseConfiguration(const std::string& platformName, PalWindow* wnd) {
     return false;
 }
 
@@ -212,25 +212,25 @@ void palGetPalDefines(std::list<std::string>& defineList)
 }
 
 
-void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
+void palGetPlatformDefines(const std::string& platformName, std::map<std::string, std::string>& definesMap)
 {
 
 }
 
 
-void palSetRunFileName(std::string) {
+void palSetRunFileName(const std::string&) {
 }
 
 void palShowConfigWindow(int) {
 }
 
-void palAddTabToConfigWindow(int, std::string) {
+void palAddTabToConfigWindow(int, const std::string&) {
 }
 
 void palRemoveTabFromConfigWindow(int) {
 }
 
-void palAddRadioSelectorToTab(int, int, std::string, std::string, std::string, SelectItem*, int) {
+void palAddRadioSelectorToTab(int, int, const std::string&, const std::string&, const std::string&, SelectItem*, int) {
 }
 
 void palSetTabOptFileName(int, string) {
@@ -239,20 +239,12 @@ void palSetTabOptFileName(int, string) {
 void palWxProcessMessages() {
 }
 
-void palLog(std::string s) {
+void palLog(const std::string& s) {
     cout << s << endl;
 }
 
-EmuLog& EmuLog::operator<<(string s)
+EmuLog& EmuLog::operator<<(const string& s)
 {
-    palLog(s);
-    return *this;
-}
-
-
-EmuLog& EmuLog::operator<<(const char* sz)
-{
-    string s = sz;
     palLog(s);
     return *this;
 }
@@ -268,7 +260,7 @@ EmuLog& EmuLog::operator<<(int n)
 }
 
 
-void palMsgBox(string msg, bool)
+void palMsgBox(const string& msg, bool)
 {
     cout << msg << endl;
 }

@@ -282,7 +282,7 @@ void RkRamFontRenderer::primaryRenderFrame()
 }
 
 
-void RkRamFontRenderer::customDrawSymbolLine(uint32_t *linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt)
+void RkRamFontRenderer::customDrawSymbolLine(uint32_t *linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool /*gpa1*/, bool /*hglt*/)
 {
     if (!m_ramFont) {
         m_ramFont = new uint8_t[2048];

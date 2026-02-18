@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ wxIMPLEMENT_APP_NO_MAIN(wxApp);
 bool palWxInit(int argc, char** argv)
 {
     if (wxEntryStart(argc, argv)) {
-       	configWnd = new ConfigWnd(0);
+        configWnd = new ConfigWnd(0);
         logWnd = new LogWnd(0);
         return true;
     }
@@ -56,7 +56,7 @@ void palWxQuit()
 }
 
 
-string palOpenFileDialog(string title, string filter, bool write, PalWindow*)
+string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow*)
 {
     //palPause();
     wxString wxFilter = wxString::FromUTF8(filter.c_str());
@@ -146,13 +146,13 @@ bool palChoosePlatform(vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool se
 }
 
 
-bool palChooseConfiguration(std::string platformName, PalWindow* wnd)
+bool palChooseConfiguration(const std::string& platformName, PalWindow* wnd)
 {
     return false;
 }
 
 
-void palSetRunFileName(std::string runFileName) {
+void palSetRunFileName(const std::string& runFileName) {
     ::runFileName = wxString::FromUTF8(runFileName.c_str());
 }
 
@@ -164,7 +164,7 @@ void palShowConfigWindow(int curTabId)
 }
 
 
-void palAddTabToConfigWindow(int tabId, string tabName)
+void palAddTabToConfigWindow(int tabId, const string& tabName)
 {
     configWnd->addTab(tabId, wxString::FromUTF8(tabName.c_str()));
 }
@@ -176,7 +176,7 @@ void palRemoveTabFromConfigWindow(int tabId)
 }
 
 
-void palAddRadioSelectorToTab(int tabId, int column, string caption, string object, string property, SelectItem* items, int nItems)
+void palAddRadioSelectorToTab(int tabId, int column, const string& caption, const string& object, const string& property, SelectItem* items, int nItems)
 {
     wxString* wsItems = new wxString[nItems];
     wxString* wsValues = new wxString[nItems];
@@ -212,7 +212,7 @@ void palGetPalDefines(std::list<std::string>& defineList)
 }
 
 
-void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap)
+void palGetPlatformDefines(const std::string& platformName, std::map<std::string, std::string>& definesMap)
 {
 
 }
@@ -225,23 +225,15 @@ void palWxProcessMessages()
 }
 
 
-void palLog(string s)
+void palLog(const string& s)
 {
     logWnd->addText(wxString::FromUTF8(s.c_str()));
     logWnd->Show();
 }
 
 
-EmuLog& EmuLog::operator<<(string s)
+EmuLog& EmuLog::operator<<(const string& s)
 {
-    palLog(s);
-    return *this;
-}
-
-
-EmuLog& EmuLog::operator<<(const char* sz)
-{
-    string s = sz;
     palLog(s);
     return *this;
 }
@@ -257,7 +249,7 @@ EmuLog& EmuLog::operator<<(int n)
 }
 
 
-void palMsgBox(string msg, bool critical)
+void palMsgBox(const string& msg, bool critical)
 {
     wxMessageBox(wxString::FromUTF8(msg.c_str()),
                  wxT("Emu80"),

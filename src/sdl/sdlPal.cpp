@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ bool palSetVsync(bool)
 }
 
 
-string palMakeFullFileName(string fileName)
+string palMakeFullFileName(const string& fileName)
 {
     if (fileName[0] == '\0' || fileName[0] == '/' || fileName[0] == '\\' || (fileName.size() > 1 && fileName[1] == ':'))
         return fileName;
@@ -348,7 +348,7 @@ uint8_t* palReadFile(const string& fileName, int &fileSize, bool useBasePath)
 #endif
 
 
-string palMakeCaseInsensitivePath(string basePath, const std::string caseInsensitivePath)
+string palMakeCaseInsensitivePath(string basePath, const std::string& caseInsensitivePath)
 {
     // just concatente paths for now
     if (!basePath.empty() && basePath.back() != '/')
@@ -790,7 +790,7 @@ EM_ASYNC_JS(int, jsSelectAndLoadFile, (), {
         return 0;
 });
 
-string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window)
+string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window)
 {
     if (write)
         return "";

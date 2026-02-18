@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,33 +31,32 @@
 class PalWindow;
 
 #ifndef PAL_WASM
-std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
+std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr);
 void palUpdateConfig();
 #endif //!PAL_WASM
 
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false, PalWindow* wnd = nullptr);
-bool palChooseConfiguration(std::string platformName, PalWindow* wnd);
-void palSetRunFileName(std::string runFileName);
+bool palChooseConfiguration(const std::string& platformName, PalWindow* wnd);
+void palSetRunFileName(const std::string& runFileName);
 void palShowConfigWindow(int curTabId = 0);
 void palGetPalDefines(std::list<std::string>& difineList);
-void palGetPlatformDefines(std::string platformName, std::map<std::string, std::string>& definesMap);
+void palGetPlatformDefines(const std::string& platformName, std::map<std::string, std::string>& definesMap);
 
-void palAddTabToConfigWindow(int tabId, std::string tabName);
+void palAddTabToConfigWindow(int tabId, const std::string& tabName);
 void palRemoveTabFromConfigWindow(int tabId);
-void palAddRadioSelectorToTab(int tabId, int column, std::string caption, std::string object, std::string property, SelectItem* items, int nItems);
+void palAddRadioSelectorToTab(int tabId, int column, const std::string& caption, const std::string& object, const std::string& property, SelectItem* items, int nItems);
 void palSetTabOptFileName(int tabId, std::string optFileName);
 
 void palWxProcessMessages();
 
-void palLog(std::string s);
+void palLog(const std::string& s);
 
-void palMsgBox(std::string msg, bool critical = false);
+void palMsgBox(const std::string& msg, bool critical = false);
 
 class EmuLog
 {
     public:
-        EmuLog& operator<<(std::string s);
-        EmuLog& operator<<(const char* sz);
+        EmuLog& operator<<(const std::string& s);
         EmuLog& operator<<(int n);
 };
 
