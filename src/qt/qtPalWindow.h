@@ -60,7 +60,7 @@ class PalWindow
         void focusChanged(bool isFocused);
 
         virtual void mouseClick(int x, int y, PalMouseKey key); //{}
-        virtual void mouseDrag(int x, int y) = 0;
+        virtual void mouseDrag(bool pressed, int x, int y) = 0;
 
         virtual std::string getPlatformObjectName() = 0;
         virtual EmuWindowType getWindowType() {return m_windowType;}

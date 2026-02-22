@@ -392,9 +392,9 @@ void PaintWidget::recreateProgramIfNeeded()
 }*/
 
 
-void PaintWidget::mouseDrag(int x, int y)
+void PaintWidget::mouseDrag(bool pressed, int x, int y)
 {
-    static_cast<MainWindow*>(parent())->mouseDrag(x, y);
+    static_cast<MainWindow*>(parent())->mouseDrag(pressed, x, y);
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -408,7 +408,7 @@ void PaintWidget::mouseDrag(int x, int y)
 void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 {
     if (event->buttons() & Qt::LeftButton)
-        mouseDrag(event->POS_X(), event->POS_Y());
+        mouseDrag(true, event->POS_X(), event->POS_Y());
 
     if (!m_hideCursor || m_cursorTimerPaused)
         return;
@@ -426,7 +426,15 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() & Qt::LeftButton)
         static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_CLICK);
 
-    mouseDrag(event->POS_X(), event->POS_Y());
+    if (event->button() & Qt::LeftButton)
+        mouseDrag(true, event->POS_X(), event->POS_Y());
+}
+
+
+void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() & Qt::LeftButton)
+        mouseDrag(false, event->POS_X(), event->POS_Y());
 }
 
 

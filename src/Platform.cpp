@@ -379,10 +379,10 @@ void Platform::resetKeys()
 }
 
 
-void Platform::mouseDrag(int x, int y)
+void Platform::mouseDrag(bool pressed, int x, int y)
 {
     if (m_renderer)
-        m_renderer->mouseDrag(x, y);
+        m_renderer->mouseDrag(pressed, x, y);
 }
 
 
@@ -529,4 +529,10 @@ void Platform::updateScreenOnce()
 //    if (m_renderer2)
 //        m_renderer2->updateScreenOnce();
     updateDebugger();
+}
+
+
+uint64_t Platform::getCpuClock()
+{
+    return m_cpu->getClock();
 }

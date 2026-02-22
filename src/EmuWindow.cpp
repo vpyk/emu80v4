@@ -600,10 +600,10 @@ void EmuWindow::sysReq(SysReq sr)
 }
 
 
-void EmuWindow::mouseDrag(int x, int y)
+void EmuWindow::mouseDrag(bool pressed, int x, int y)
 {
     if (translateCoords(x, y))
-        m_platform->mouseDrag(x, y);
+        m_platform->mouseDrag(pressed, x, y);
 }
 
 

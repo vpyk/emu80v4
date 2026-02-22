@@ -38,7 +38,7 @@ class Crt8275Renderer : public TextCrtRenderer
         const char* getTextScreen() override;
         void prepareDebugScreen() override;
 
-        void mouseDrag(int x, int y) override;
+        void mouseDrag(bool pressed, int x, int y) override;
 
         void attachCrt(Crt8275* crt);
 

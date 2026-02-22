@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ class Platform : public ParentObject
         void processKey(PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);
         void resetKeys();
         bool loadFile(std::string fileName, bool run = true);
-        void mouseDrag(int x, int y);
+        void mouseDrag(bool pressed, int x, int y);
         void updateScreenOnce();
 
         const std::string& getBaseDir() {return m_baseDir;}
@@ -71,6 +71,8 @@ class Platform : public ParentObject
         KbdLayout* getKbdLayout() {return m_kbdLayout;}
         CrtRenderer* getRenderer() {return m_renderer;}
         Keyboard* getKeyboard() {return m_keyboard;}
+
+        uint64_t getCpuClock();
 
         IDebugger* getDebugger() {return m_debugger;}
 
