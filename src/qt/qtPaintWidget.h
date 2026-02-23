@@ -27,7 +27,6 @@
 #include <QOpenGLTexture>
 
 #include "qtMainWindow.h"
-#include "qtPalWindow.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     #define QEnterEvent QEvent
@@ -42,8 +41,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         explicit PaintWidget(QWidget *parent = 0);
         ~PaintWidget();
 
-        void drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend = false, bool useAlpha = false);
-        void colorFill(QColor color);
+        void drawImage(const uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend = false, bool useAlpha = false);
+        void colorFill(const QColor& color);
         void screenshot(const QString& ssFileName);
         void setHideCursor(bool hide);
         void pauseCursorTimer(bool paused);
@@ -52,8 +51,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void setDesaturate(bool desaturate) {m_desaturate = desaturate;}
         //void setVsync(bool vsync);
 
-        int getImageWidth() {return m_dstRect.width();}
-        int getImageHeight() {return m_dstRect.height();}
+        int getImageWidth() const {return m_dstRect.width();}
+        int getImageHeight() const {return m_dstRect.height();}
 
     protected:
         void mouseMoveEvent(QMouseEvent *event) override;
@@ -71,7 +70,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void onHideCursorTimer();
 
     private:
-        void paintImageGL(QImage* img/*, double aspectRatio*/);
+        void paintImageGL(const QImage* img/*, double aspectRatio*/);
 
         void mouseDrag(int x, int y);
 
@@ -90,8 +89,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
 
         QImage* m_image = nullptr;
         QImage* m_image2 = nullptr;
-        uchar* m_imageData;
-        uchar* m_imageData2;
+        uchar* m_imageData = nullptr;
+        uchar* m_imageData2 = nullptr;
         double m_img1aspectRatio;
         //double m_img2aspectRatio;
 
