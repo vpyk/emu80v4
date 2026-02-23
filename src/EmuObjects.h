@@ -84,7 +84,7 @@ struct EmuConnection {
 
 class EmuOutput {
 public:
-    void addConnection(EmuConnection connection);
+    void addConnection(const EmuConnection& connection);
     void setValue(uint32_t value);
 
 private:
@@ -107,8 +107,8 @@ class EmuObject
 
         virtual void initConnections() {}
 
-        void setName(std::string name);
-        std::string getName();
+        void setName(const std::string& name);
+        std::string getName() const;
 
         int getKDiv() {return m_kDiv;}
 
@@ -119,7 +119,7 @@ class EmuObject
         virtual void reset() {}
 
         virtual void setPlatform(Platform* platform) {m_platform = platform;}
-        Platform* getPlatform() {return m_platform;}
+        Platform* getPlatform() const {return m_platform;}
 
         virtual bool setProperty(const std::string& propertyName, const EmuValuesList& values);
         virtual std::string getPropertyStringValue(const std::string& propertyName);
@@ -130,9 +130,9 @@ class EmuObject
     protected:
         EmuOutput* registerOutput(const std::string outputName);
 
-        EmuInput* registerInput(const std::string inputName, SetFunc* setFunc);
-        EmuInput* registerIndexedInput(const std::string inputName, SetFuncIndexed* setFuncIndexed);
-        EmuInput* registerMaskedInput(const std::string inputName, SetFuncMasked* setFuncMasked);
+        EmuInput* registerInput(const std::string& inputName, SetFunc* setFunc);
+        EmuInput* registerIndexedInput(const std::string& inputName, SetFuncIndexed* setFuncIndexed);
+        EmuInput* registerMaskedInput(const std::string& inputName, SetFuncMasked* setFuncMasked);
 
         int m_kDiv = 1;
         Platform* m_platform = nullptr;
