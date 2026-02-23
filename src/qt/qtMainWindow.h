@@ -80,7 +80,7 @@ public:
     void checkIfWindowIsVisible();
 
     void mouseClick(int x, int y, PalMouseKey key);
-    void mouseDrag(int x, int y);
+    void mouseDrag(bool pressed, int x, int y);
 
     void setClientSize(int width, int height);
     void adjustClientSize();

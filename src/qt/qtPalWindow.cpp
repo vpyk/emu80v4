@@ -183,7 +183,7 @@ void PalWindow::screenshotRequest(const string& ssFileName)
 void PalWindow::mouseClick(int, int, PalMouseKey) {}
 
 
-void PalWindow::mouseDrag(int, int) {}
+void PalWindow::mouseDrag(bool, int, int) {}
 
 
 map<uint32_t, PalWindow*> PalWindow::m_windowsMap;

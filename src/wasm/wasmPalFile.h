@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2024-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,18 +24,21 @@
 class PalFile
 {
     public:
-        bool open(std::string fileName, std::string mode = "r");
+        PalFile() = default;
+        ~PalFile();
+
+        bool open(const std::string& fileName, const std::string& mode = "r");
         void close();
-        bool isOpen();
-        bool eof();
+        bool isOpen() const;
+        bool eof() const;
         uint8_t read8();
         uint16_t read16();
         uint32_t read32();
         void write8(uint8_t value);
         void write16(uint16_t value);
         void write32(uint32_t value);
-        int64_t getSize();
-        int64_t getPos();
+        int64_t getSize() const;
+        int64_t getPos() const;
         void seek(int position);
         void skip(int len);
 

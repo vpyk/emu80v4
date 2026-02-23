@@ -1842,12 +1842,12 @@ void MainWindow::mouseClick(int x, int y, PalMouseKey key)
 }
 
 
-void MainWindow::mouseDrag(int x, int y)
+void MainWindow::mouseDrag(bool pressed, int x, int y)
 {
     if (m_windowType != EWT_EMULATION)
         return;
 
-    m_palWindow->mouseDrag(x, y);
+    m_palWindow->mouseDrag(pressed, x, y);
 }
 
 

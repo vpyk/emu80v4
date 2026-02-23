@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include <list>
 
 #include "../EmuTypes.h"
-#include "../PalKeys.h"
 
 class PalWindow;
 
@@ -50,10 +49,10 @@ int palGetSampleRate();
 bool palSetFrameRate(int frameRate);
 bool palSetVsync(bool vsync);
 
-std::string palMakeFullFileName(std::string fileName);
+std::string palMakeFullFileName(const std::string& fileName);
 int palReadFromFile(const std::string& fileName, int first, int size, uint8_t* buffer, bool useBasePath = true);
-uint8_t* palReadFile(const std::string& fileName, int &fileSize, bool useBasePath = true);
-std::string palMakeCaseInsensitivePath(std::string basePath, const std::string caseInsensitivePath);
+uint8_t* palReadFile(const std::string& fileName, int& fileSize, bool useBasePath = true);
+std::string palMakeCaseInsensitivePath(std::string basePath, const std::string& caseInsensitivePath);
 
 #ifndef PAL_WASM
 void palRequestForQuit();
@@ -69,7 +68,7 @@ void palCopyTextToClipboard(const char* text);
 std::string palGetTextFromClipboard();
 
 #ifdef PAL_WASM
-std::string palOpenFileDialog(std::string title, std::string filter, bool write, PalWindow* window = nullptr);
+std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr);
 #endif //PAL_WASM
 
 

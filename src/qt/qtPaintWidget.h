@@ -57,6 +57,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
     protected:
         void mouseMoveEvent(QMouseEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
+        void mouseReleaseEvent(QMouseEvent *event) override;
         void mouseDoubleClickEvent(QMouseEvent *event) override;
         void wheelEvent(QWheelEvent *event) override;
         void enterEvent(QEnterEvent *event) override;
@@ -72,7 +73,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
     private:
         void paintImageGL(const QImage* img/*, double aspectRatio*/);
 
-        void mouseDrag(int x, int y);
+        void mouseDrag(bool pressed, int x, int y);
 
         bool m_useCustomShader = false;
         QString m_shaderFileName;

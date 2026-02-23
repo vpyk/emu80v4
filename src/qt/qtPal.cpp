@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -615,7 +615,7 @@ bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bo
     QWidget* parent = nullptr;
     if (wnd)
         parent = wnd->getQtWindow();
-    auto dialog = QScopedPointer(new ChoosePlatformDialog(parent));
+    QScopedPointer<ChoosePlatformDialog> dialog (new ChoosePlatformDialog(parent));
     g_renderHelper->pause();
     bool res = dialog->execute(pi, pos, newWnd, "", setDef);
     g_renderHelper->resume();
@@ -628,7 +628,7 @@ bool palChooseConfiguration(const string &platformName, PalWindow* wnd)
     QWidget* parent = nullptr;
     if (wnd)
         parent = wnd->getQtWindow();
-    auto dialog = QScopedPointer(new PlatformConfigDialog(parent));
+    QScopedPointer<PlatformConfigDialog> dialog(new PlatformConfigDialog(parent));
     g_renderHelper->pause();
     bool res = dialog->configure(QString::fromUtf8(platformName.c_str()));
     g_renderHelper->resume();

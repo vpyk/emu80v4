@@ -181,17 +181,26 @@ void Crt8275Renderer::trimImage(int charWidth, int charHeight)
 }
 
 
-void Crt8275Renderer::mouseDrag(int x, int y)
+void Crt8275Renderer::mouseDrag(bool pressed, int x, int y)
 {
     if (m_cropping) {
         x += m_cropX;
         y += m_cropY;
     }
 
-    x /= m_fntCharWidth;
-    y /= m_crt->getFrame()->nLines;
+    if (m_isAltRender) {
+        int nLines;
+        int nRows = m_crt->getNRows();
+        if (nRows <= 32)
+            nLines = 16;
+        else if (nRows <= 42)
+            nLines = 12;
+        else
+            nLines = 8;
+        y = y * m_crt->getNLines() / nLines;
+    }
 
-    m_crt->setLpenPosition(x, y);
+    m_crt->setLpenPosition(pressed, x / m_fntCharWidth, y);
 }
 
 

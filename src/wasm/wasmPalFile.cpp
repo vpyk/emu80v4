@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2024-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,12 +22,20 @@
 
 using namespace std;
 
-bool PalFile::open(string fileName, string mode)
+PalFile::~PalFile()
 {
+    close();
+}
+
+
+bool PalFile::open(const string& fileName, const string& mode)
+{
+    if (isOpen())
+        close();
+
     m_fileBuffer = palReadFile(fileName, m_fileSize);
     return m_fileBuffer != nullptr;
 }
-
 
 
 void PalFile::close()
@@ -40,7 +48,7 @@ void PalFile::close()
 }
 
 
-bool PalFile::isOpen()
+bool PalFile::isOpen() const
 {
     return m_fileBuffer != nullptr;
 }
@@ -102,7 +110,7 @@ void PalFile::write32(uint32_t value)
 }
 
 
-int64_t PalFile::getSize()
+int64_t PalFile::getSize() const
 {
     return m_fileSize;
 }
@@ -126,13 +134,13 @@ void PalFile::skip(int len)
 }
 
 
-int64_t PalFile::getPos()
+int64_t PalFile::getPos() const
 {
     return m_filePos;
 }
 
 
-bool PalFile::eof()
+bool PalFile::eof() const
 {
     return m_filePos < m_fileSize;
 }

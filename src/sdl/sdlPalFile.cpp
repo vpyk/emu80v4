@@ -20,12 +20,21 @@
 
 using namespace std;
 
-bool PalFile::open(string fileName, string mode)
+
+PalFile::~PalFile()
 {
+    close();
+}
+
+
+bool PalFile::open(const string& fileName, const string& mode)
+{
+    if (isOpen())
+        close();
+
     m_file = SDL_RWFromFile(fileName.c_str(), mode.c_str());
     return m_file;
 }
-
 
 
 void PalFile::close()
@@ -37,7 +46,7 @@ void PalFile::close()
 }
 
 
-bool PalFile::isOpen()
+bool PalFile::isOpen() const
 {
     return m_file != nullptr;
 }
@@ -79,7 +88,7 @@ void PalFile::write32(uint32_t value)
 }
 
 
-int64_t PalFile::getSize()
+int64_t PalFile::getSize() const
 {
     return SDL_RWsize(m_file);
 }
@@ -97,13 +106,13 @@ void PalFile::skip(int len)
 }
 
 
-int64_t PalFile::getPos()
+int64_t PalFile::getPos() const
 {
     return SDL_RWtell(m_file);
 }
 
 
-bool PalFile::eof()
+bool PalFile::eof() const
 {
     return SDL_RWsize(m_file) == SDL_RWtell(m_file);
 }

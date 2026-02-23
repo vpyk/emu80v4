@@ -18,6 +18,7 @@
 
 #include <cstring>
 #include <sstream>
+#include <algorithm>
 
 #include "Globals.h"
 #include "Memory.h"
