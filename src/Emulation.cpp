@@ -334,7 +334,8 @@ void Emulation::exec(uint64_t ticks, bool forced)
         }
 
         m_curClock = time;
-        curDev->operate();
+        if (curDev)
+            curDev->operate();
     }
 
     m_clockOffset = m_curClock - toTime;
