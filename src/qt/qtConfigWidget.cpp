@@ -48,7 +48,7 @@ void ConfigWidget::tune(const QString &platform)
 }
 
 
-ConfigWidget* ConfigWidget::create(QString platformName)
+ConfigWidget* ConfigWidget::create(const QString& platformName)
 {
     ConfigWidget* widget;
     if (platformName == "korvet")
@@ -96,7 +96,7 @@ void ConfigWidget::optEnd()
 }
 
 
-QString ConfigWidget::selectFile(QString fileName, bool dirMode, QString title, QString filter)
+QString ConfigWidget::selectFile(const QString& fileName, bool dirMode, const QString& title, const QString& filter)
 {
     QStringList filters;
     filters.append(filter);
@@ -119,18 +119,18 @@ QString ConfigWidget::selectFile(QString fileName, bool dirMode, QString title, 
     fileDialog.setNameFilters(filters);
     fileDialog.setDirectory(oldDir);
     if (fileDialog.exec() == QDialog::Accepted) {
-        fileName = fileDialog.selectedFiles().constFirst(); // Qt >= 5.6
-        QString relFileName = m_baseDir.relativeFilePath(fileName);
-        return relFileName.startsWith("..") ? fileName : relFileName;
+        QString dlgFileName = fileDialog.selectedFiles().constFirst(); // Qt >= 5.6
+        QString relFileName = m_baseDir.relativeFilePath(dlgFileName);
+        return relFileName.startsWith("..") ? dlgFileName : relFileName;
     }
-    return "";
+    return QString();
 }
 
 
-void ConfigWidget::selectFile(QLabel* label, bool dirMode, QString title, QString filter)
+void ConfigWidget::selectFile(QLabel* label, bool dirMode, const QString& title, const QString& filter)
 {
     QString file = selectFile(label->text(), dirMode, title, filter);
-    if (file != "")
+    if (!file.isEmpty())
         label->setText(file);
 }
 

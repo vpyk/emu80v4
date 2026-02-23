@@ -39,7 +39,7 @@ public:
 
     void tune(const QString& platform);
 
-    static ConfigWidget* create(QString platformName);
+    static ConfigWidget* create(const QString& platformName);
 
 protected:
     QSettings m_settings;
@@ -53,8 +53,8 @@ protected:
     QVariant optLoad(QString option);
     void optEnd();
 
-    QString selectFile(QString fileName, bool dirMode, QString title = "Select file", QString filter = "*.*");
-    void selectFile(QLabel* label, bool dirMode, QString title = "Select file", QString filter = "*.*");
+    QString selectFile(const QString& fileName, bool dirMode, const QString& title, const QString& filter = "*.*");
+    void selectFile(QLabel* label, bool dirMode, const QString& title, const QString& filter = "*.*");
 };
 
 
