@@ -292,7 +292,7 @@ void Emulation::removeObject(EmuObject* obj)
 }
 
 
-EmuObject* Emulation::findObject(string name)
+EmuObject* Emulation::findObject(const string& name) const
 {
     for (auto it = m_objectList.begin(); it != m_objectList.end(); it++)
         if ((*it)->getName() == name)
@@ -305,7 +305,7 @@ void Emulation::addChild(EmuObject* child)
 {
     if (Platform* pl = dynamic_cast<Platform*>(child))
         m_platformList.push_back(pl);
-};
+}
 
 
 void Emulation::exec(uint64_t ticks, bool forced)
@@ -689,7 +689,7 @@ void Emulation::setSpeedByGrade(int speedGrade)
 }
 
 
-Platform* Emulation::platformByWindow(EmuWindow* window)
+Platform* Emulation::platformByWindow(const EmuWindow* window) const
 {
     if (!window)
         return nullptr;
