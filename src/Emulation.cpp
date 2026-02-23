@@ -109,6 +109,7 @@ Emulation::~Emulation()
     delete m_config;
     delete m_wavReader; // перед m_mixer!
     delete m_mixer;
+    delete m_prnWriter;
 
     // Удяляем оставшиеся объекты
     list<EmuObject*> tempList = m_objectList; // второй список, так как в деструкторе удаление из основного списка
