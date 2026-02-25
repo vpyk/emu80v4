@@ -1019,7 +1019,7 @@ void MainWindow::createActions()
     QToolButton* fullThrottleButton = new QToolButton(this);
     fullThrottleButton->setFocusPolicy(Qt::NoFocus);
     fullThrottleButton->setIcon(QIcon(":/icons/full_throttle.png"));
-    fullThrottleButton->setToolTip(tr("Full Throttle (Alt-End)"));
+    fullThrottleButton->setToolTip(tr("Temporary full throttle (Alt-End)"));
     m_toolBar->addWidget(fullThrottleButton);
     connect(fullThrottleButton, SIGNAL(pressed()), this, SLOT(onFullThrottleOn()));
     connect(fullThrottleButton, SIGNAL(released()), this, SLOT(onForwardOff()));
@@ -1075,6 +1075,17 @@ void MainWindow::createActions()
     addAction(m_speedNormalAction);
     platformMenu->addAction(m_speedNormalAction);
     connect(m_speedNormalAction, SIGNAL(triggered()), this, SLOT(onSpeedNormal()));
+
+    // Max Speed
+    m_maxSpeedAction = new QAction(QIcon(":/icons/full_throttle.png"), tr("Maximum speed (toggle)"), this);
+    m_maxSpeedAction->setCheckable(true);
+    m_maxSpeedAction->setToolTip(tr("Maximum speed (Alt-Del)"));
+    QList<QKeySequence> maxSpeedKeyList;
+    ADD_HOTKEY(maxSpeedKeyList, Qt::Key_Delete);
+    m_maxSpeedAction->setShortcuts(maxSpeedKeyList);
+    addAction(m_maxSpeedAction);
+    platformMenu->addAction(m_maxSpeedAction);
+    connect(m_maxSpeedAction, SIGNAL(triggered()), this, SLOT(onMaxSpeed()));
 
     platformMenu->addSeparator();
 
@@ -2226,6 +2237,7 @@ PalKeyCode MainWindow::translateKey(QKeyEvent* evt)
 void MainWindow::keyPressEvent(QKeyEvent* evt)
 {
     if (evt->key() == Qt::Key_End && !(evt->modifiers() & Qt::KeypadModifier)) {
+        m_maxSpeedAction->setChecked(false);
         emuSysReq(m_palWindow, evt->modifiers() & Qt::AltModifier ? SR_FULLTHROTTLE : SR_SPEEDUP);
         return;
     }
@@ -2302,32 +2314,49 @@ void MainWindow::onPause()
 }
 
 
+void MainWindow::onMaxSpeed()
+{
+    bool maxspeed = ((QAction*)sender())->isChecked();
+    emuSysReq(m_palWindow, maxspeed ? SR_FULLTHROTTLE : SR_SPEEDNORMAL);
+}
+
+
 void MainWindow::onSpeedUp()
 {
+    m_maxSpeedAction->setChecked(false);
+    emuSysReq(m_palWindow, SR_SPEEDNORMAL);
     emuSysReq(m_palWindow, SR_SPEEDSTEPUP);
 }
 
 
 void MainWindow::onSpeedDown()
 {
+    m_maxSpeedAction->setChecked(false);
+    emuSysReq(m_palWindow, SR_SPEEDNORMAL);
     emuSysReq(m_palWindow, SR_SPEEDSTEPDOWN);
 }
 
 
 void MainWindow::onSpeedUpFine()
 {
+    m_maxSpeedAction->setChecked(false);
+    emuSysReq(m_palWindow, SR_SPEEDNORMAL);
     emuSysReq(m_palWindow, SR_SPEEDSTEPUPFINE);
 }
 
 
 void MainWindow::onSpeedDownFine()
 {
+    m_maxSpeedAction->setChecked(false);
+    emuSysReq(m_palWindow, SR_SPEEDNORMAL);
     emuSysReq(m_palWindow, SR_SPEEDSTEPDOWNFINE);
 }
 
 
 void MainWindow::onSpeedNormal()
 {
+    m_maxSpeedAction->setChecked(false);
+    emuSysReq(m_palWindow, SR_SPEEDNORMAL);
     emuSysReq(m_palWindow, SR_SPEEDSTEPNORMAL);
 }
 
@@ -2340,6 +2369,7 @@ void MainWindow::onMute()
 
 void MainWindow::onForwardOn()
 {
+    m_maxSpeedAction->setChecked(false);
     emuSysReq(m_palWindow, SR_SPEEDUP);
 }
 

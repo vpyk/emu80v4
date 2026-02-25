@@ -485,6 +485,10 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
             m_fullThrottle = true;
             setTemporarySpeedUpFactor(1);
             break;
+        case SR_TOGGLEFULLTHROTTLE:
+            m_fullThrottle = !m_fullThrottle;
+            setTemporarySpeedUpFactor(m_fullThrottle ? 0 : 1);
+            break;
         case SR_SPEEDNORMAL:
             m_fullThrottle = false;
             setTemporarySpeedUpFactor(0);
