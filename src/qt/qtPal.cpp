@@ -82,6 +82,8 @@ QApplication* getApplication() {return application;}
 
 static bool tryTranslation(const QString& langCode);
 
+static bool checkIniFile(const QString& fileName);
+
 bool palQtInit(int& argc, char** argv)
 {
 #ifdef Q_OS_WIN32
@@ -129,8 +131,12 @@ bool palQtInit(int& argc, char** argv)
     QCoreApplication::setApplicationName("emu80");
 
     QSettings::setDefaultFormat(QSettings::IniFormat);
+
     QSettings settings;
     SET_INI_CODEC(settings);
+
+    if (checkIniFile(settings.fileName()))
+        settings.sync();
 
     settings.beginGroup("system");
 
@@ -745,4 +751,46 @@ void palSetTabOptFileName(int, const string&) {
 }
 
 void palWxProcessMessages() {
+}
+
+
+#include <QSaveFile>
+static bool checkIniFile(const QString& iniFileName)
+{
+    QFile inputFile(iniFileName);
+
+    if (!inputFile.open(QIODevice::ReadOnly))
+        return false;
+
+    bool hasErrors = false;
+    while (!inputFile.atEnd()) {
+        QByteArray line = inputFile.readLine();
+        if (line.contains("\xc3\x83") || line.contains("\xc3\x82") || line.contains("\xc3\x90")) {
+            hasErrors = true;
+            break;
+        }
+    }
+
+    if (!hasErrors) {
+        inputFile.close();
+        return false;
+    }
+
+    // repair
+    QSaveFile saveFile(iniFileName);
+    if (!saveFile.open(QIODevice::WriteOnly))
+        return false;
+
+    inputFile.seek(0);
+    while (!inputFile.atEnd()) {
+        QByteArray line = inputFile.readLine();
+
+        // remove erroneous lines
+        if (!line.contains("\xc3\x83") && !line.contains("\xc3\x82") && !line.contains("\xc3\x90"))
+            saveFile.write(line);
+    }
+
+    inputFile.close();
+
+    return saveFile.commit();
 }

@@ -30,6 +30,7 @@ class ConfigWidget : public QWidget
 
 public:
     explicit ConfigWidget(QWidget* parent = nullptr);
+    ~ConfigWidget();
 
     virtual void loadConfig() = 0;
     virtual void saveConfig() = 0;
@@ -42,7 +43,7 @@ public:
     static ConfigWidget* create(QString platformName);
 
 protected:
-    QSettings m_settings;
+    QSettings* m_settings = nullptr;
     QString m_platform;
     QDir m_baseDir;
 

@@ -31,13 +31,19 @@
 
 #include "../Pal.h"
 
+#include "qtMainWindow.h" // SET_INI_CODEC
+
 ConfigWidget::ConfigWidget(QWidget* parent) : QWidget(parent)
 {
-    //m_settings = new QSettings();
-
+    m_settings = new QSettings();
+    SET_INI_CODEC(*m_settings);
     m_baseDir.setPath(QString::fromUtf8(palGetBasePath().c_str()));
+}
 
 
+ConfigWidget::~ConfigWidget()
+{
+    delete m_settings;
 }
 
 
@@ -74,25 +80,25 @@ ConfigWidget* ConfigWidget::create(QString platformName)
 
 void ConfigWidget::optBegin()
 {
-    m_settings.beginGroup(m_platform + "-config");
+    m_settings->beginGroup(m_platform + "-config");
 }
 
 
 void ConfigWidget::optSave(QString option, QString value)
 {
-    m_settings.setValue(option, value);
+    m_settings->setValue(option, value);
 }
 
 
 QVariant ConfigWidget::optLoad(QString option)
 {
-    return m_settings.value(option, m_defValues[option]);
+    return m_settings->value(option, m_defValues[option]);
 }
 
 
 void ConfigWidget::optEnd()
 {
-    m_settings.endGroup();
+    m_settings->endGroup();
 }
 
 
