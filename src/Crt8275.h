@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -145,6 +145,8 @@ class Crt8275 : public AddressableDevice, public IActive
         double getFrameRate();
 
         void setLpenPosition(bool active, int x, int y);
+
+        int getCurRow() {return m_curRow;} // for font switching
 
         static EmuObject* create(const EmuValuesList&) {return new Crt8275();}
 

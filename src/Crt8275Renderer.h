@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class Crt8275Renderer : public TextCrtRenderer
 
         void attachCrt(Crt8275* crt);
 
-        void setFontSetNum(int fontNum) {m_fontNumber = fontNum;}
+        void setFontSetNum(int fontNum);
 
     protected:
         void toggleCropping() override;
@@ -81,6 +81,10 @@ class Crt8275Renderer : public TextCrtRenderer
 
         void primaryRenderFrame() override;
         void altRenderFrame() override;
+
+        int m_fontNums[64];
+        int m_curFontNum = 0;
+        int m_prevRow = 0;
 
     private:
         double m_freqMHz;
