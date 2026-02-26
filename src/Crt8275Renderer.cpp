@@ -50,7 +50,7 @@ void Crt8275Renderer::setFontSetNum(int fontNum)
 {
     //m_fontNumber = fontNum;
     int curRow = (m_crt->getCurRow() + 63) % 64;
-    for (int i = m_prevRow; i != curRow; i = (i + 1) % 64)
+    for (int i = (m_prevRow + 1) % 64; i != curRow; i = (i + 1) % 64)
         m_fontNums[i] = m_curFontNum;
     m_curFontNum = fontNum;
     m_prevRow = curRow;
