@@ -502,7 +502,7 @@ OkeanConfigWidget::OkeanConfigWidget(QWidget *parent) :
 
 void OkeanConfigWidget::loadConfig()
 {
-    m_defValues["CFG_BIOS_VER"] = "8p";
+    m_defValues["CFG_BIOS_VER"] = "6";
 
     optBegin();
 
