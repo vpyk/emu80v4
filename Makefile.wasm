@@ -17,7 +17,7 @@ PRE_JS := $(SRC_DIR)/wasm/prejs.js
 SRC_WEB_FILES := index.html emu80.js emuframe.html dummyframe.html const.js emu80.css readme.txt
 
 EMFLAGS := -c -g2 -O3 -std=c++11 -DPAL_SDL -DPAL_LITE -DPAL_WASM -sUSE_SDL=2
-LDFLAGS := -sUSE_SDL=2 -sASSERTIONS=0 -sFETCH=1 -sASYNCIFY=1 -sEXPORTED_RUNTIME_METHODS=ccall --pre-js $(PRE_JS)
+LDFLAGS := -sUSE_SDL=2 -sASSERTIONS=0 -sFETCH=1 -sASYNCIFY=1  -sASYNCIFY_STACK_SIZE=16384 -sEXPORTED_RUNTIME_METHODS=ccall --pre-js $(PRE_JS)
 
 OBJECTS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.cpp=.o))
 DEPENDS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.cpp=.d))
