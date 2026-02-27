@@ -44,8 +44,8 @@ public:
 
     void setPlatformName(const QString& name);
     void addToLastFiles(const QString& fileName);
-    int getSize() {return m_list.size();}
-    QString getLastFile();
+    int getSize() const {return m_list.size();}
+    QString getLastFile() const;
     void tuneActions(QAction** actions);
 
 private:
@@ -69,12 +69,12 @@ public:
     ~MainWindow();
 
     //inline RenderHelper* getHelper() {return m_helper;}
-    inline PaintWidget* getPaintWidget() {return m_paintWidget;}
+    inline PaintWidget* getPaintWidget() const {return m_paintWidget;}
 
     void incFrameCount();
 
     void setPalWindow(PalWindow* palWindow);
-    PalWindow* getPalWindow() {return m_windowType != EWT_UNDEFINED ? m_palWindow : nullptr;}
+    PalWindow* getPalWindow() const {return m_windowType != EWT_UNDEFINED ? m_palWindow : nullptr;}
     void showWindow();
     void hideWindow();
     void checkIfWindowIsVisible();
@@ -89,11 +89,11 @@ public:
     void updateConfig();
     void updateActions();
 
-    std::string getPlatformObjectName() {return m_platformName;}
-    std::string getPlatformGroupName() {return m_platformGroupName;}
+    std::string getPlatformObjectName() const {return m_platformName;}
+    std::string getPlatformGroupName() const {return m_platformGroupName;}
 
     void setSmoothingAndShader(SmoothingType smoothing, const std::string& shaderName);
-    const QStringList& getShaderList() {return m_shaderList;}
+    const QStringList& getShaderList() const {return m_shaderList;}
 
 protected:
     void closeEvent(QCloseEvent *event) override;

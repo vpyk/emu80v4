@@ -30,14 +30,14 @@ class HelpDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit HelpDialog(QWidget *parent = nullptr);
+    explicit HelpDialog(QWidget* parent = nullptr);
     ~HelpDialog();
 
-    static HelpDialog* execute(QString helpFile, bool showHint);
+    static HelpDialog* execute(const QString& helpFile, bool showHint);
     static void activate();
 
 protected:
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent* event) override;
 
 protected slots:
     void reject() override;

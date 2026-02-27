@@ -58,7 +58,7 @@ void EmuInput::setMaskedValue(uint32_t value, uint32_t mask)
 
 // ##### EmuOutput methods #####
 
-void EmuOutput::addConnection(EmuConnection connection)
+void EmuOutput::addConnection(const EmuConnection& connection)
 {
     m_connections.push_back(connection);
 }
@@ -101,13 +101,13 @@ EmuObject::~EmuObject()
 }
 
 
-void EmuObject::setName(string name)
+void EmuObject::setName(const string& name)
 {
     m_name = name;
 }
 
 
-string EmuObject::getName()
+string EmuObject::getName() const
 {
     return m_name;
 }
@@ -137,7 +137,7 @@ string EmuObject::getPropertyStringValue(const string& propertyName)
     if (propertyName == "name")
         return getName();
 
-    return "";
+    return string();
 }
 
 
@@ -155,7 +155,7 @@ EmuOutput* EmuObject::registerOutput(const std::string outputName)
 }
 
 
-EmuInput* EmuObject::registerInput(const std::string inputName, SetFunc* setFunc)
+EmuInput* EmuObject::registerInput(const string& inputName, SetFunc* setFunc)
 {
     EmuInput* input = new EmuInput(setFunc);
     m_inputMap.insert(make_pair(inputName, input));
@@ -163,7 +163,7 @@ EmuInput* EmuObject::registerInput(const std::string inputName, SetFunc* setFunc
 }
 
 
-EmuInput* EmuObject::registerIndexedInput(const std::string inputName, SetFuncIndexed* setFuncIndexed)
+EmuInput* EmuObject::registerIndexedInput(const string& inputName, SetFuncIndexed* setFuncIndexed)
 {
     EmuInput* input = new EmuInput(setFuncIndexed);
     m_inputMap.insert(make_pair(inputName, input));
@@ -171,7 +171,7 @@ EmuInput* EmuObject::registerIndexedInput(const std::string inputName, SetFuncIn
 }
 
 
-EmuInput* EmuObject::registerMaskedInput(const std::string inputName, SetFuncMasked* setFuncMasked)
+EmuInput* EmuObject::registerMaskedInput(const string& inputName, SetFuncMasked* setFuncMasked)
 {
     EmuInput* input = new EmuInput(setFuncMasked);
     m_inputMap.insert(make_pair(inputName, input));
