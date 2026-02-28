@@ -82,7 +82,7 @@ class Crt8275Renderer : public TextCrtRenderer
         void primaryRenderFrame() override;
         void altRenderFrame() override;
 
-        int m_fontNums[64];
+        int m_fontNums[64 + 4];
         int m_curFontNum = 0;
         int m_prevRow = 0;
 

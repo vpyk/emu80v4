@@ -49,9 +49,12 @@ void Crt8275Renderer::attachCrt(Crt8275* crt)
 void Crt8275Renderer::setFontSetNum(int fontNum)
 {
     //m_fontNumber = fontNum;
-    int curRow = (m_crt->getCurRow() + 63) % 64;
-    for (int i = (m_prevRow + 1) % 64; i != curRow; i = (i + 1) % 64)
+    int curRow = m_crt->getCurRow();
+    if (m_prevRow > curRow)
+        m_prevRow = 0;
+    for (int i = m_prevRow; i < curRow; i++)
         m_fontNums[i] = m_curFontNum;
+    m_fontNums[curRow] = fontNum;
     m_curFontNum = fontNum;
     m_prevRow = curRow;
 }
@@ -222,7 +225,12 @@ void Crt8275Renderer::mouseDrag(bool pressed, int x, int y)
 
 void Crt8275Renderer::primaryRenderFrame()
 {
-    setFontSetNum(m_curFontNum); // for font switching
+    int curRow = m_crt->getCurRow();
+    if (m_prevRow >= curRow)
+        m_prevRow = 0;
+    for (int i = m_prevRow; i <= curRow; i++)
+        m_fontNums[i] = m_curFontNum;
+    m_prevRow = curRow;
 
     calcAspectRatio(m_fntCharWidth);
 
@@ -326,7 +334,12 @@ void Crt8275Renderer::primaryRenderFrame()
 
 void Crt8275Renderer::altRenderFrame()
 {
-    setFontSetNum(m_curFontNum); // for font switching
+    int curRow = m_crt->getCurRow();
+    if (m_prevRow >= curRow)
+        m_prevRow = 0;
+    for (int i = m_prevRow; i <= curRow; i++)
+        m_fontNums[i] = m_curFontNum;
+    m_prevRow = curRow;
 
     calcAspectRatio(8);
 
