@@ -772,13 +772,11 @@ void Crt8275Raster::operate()
                 m_crt->syncronize(m_curClock);
                 m_crt->nextRow();
             }
-            //if (m_crt->m_isIntsEnabled && (m_curScanRow == m_crt->m_nRows - 1))
-            //    m_crt->m_statusReg |= 0x20;
+            if (m_crt->m_isIntsEnabled && (m_curScanRow == m_crt->m_nRows - 1))
+                m_crt->m_statusReg |= 0x20;
             if (m_curScanRow == m_crt->m_nRows) {
                 // next row is VRTC
                 m_crt->m_frameStartTime = m_curClock;
-                if (m_crt->m_isIntsEnabled)
-                    m_crt->m_statusReg |= 0x20; // actually should be at the beginning of the last display row
                 m_crt->m_lpenRead = false;
                 m_isVrtcActive = true;
                 m_crt->m_wasVsync = true;
