@@ -497,8 +497,10 @@ uint8_t Crt8275::readByte(int nAddr)
             // Reading Status Register
             value = m_statusReg;
 
-            if (m_lpenActive && (m_lpenRasterTime + m_frameStartTime) <= m_platform->getCpuClock())
+            if (m_lpenActive && !m_lpenRead && (m_lpenRasterTime + m_frameStartTime) <= m_platform->getCpuClock()) {
                 value |= 0x10;
+                m_lpenRead = true;
+            }
 
             m_statusReg &= 0xc4;
             break;
@@ -758,7 +760,6 @@ void Crt8275Raster::operate()
         m_curClock += m_crt->m_nHrChars * m_kDiv;
         //m_crt->syncronize(m_curClock);
         m_isHrtcActive = false;
-        //_crt->_wasVsync = true;
         m_core->hrtc(false, m_curScanLine);
         ++m_curScanLine;
         m_curScanLine %= m_crt->m_nLines;
@@ -778,6 +779,7 @@ void Crt8275Raster::operate()
                 m_crt->m_frameStartTime = m_curClock;
                 if (m_crt->m_isIntsEnabled)
                     m_crt->m_statusReg |= 0x20; // actually should be at the beginning of the last display row
+                m_crt->m_lpenRead = false;
                 m_isVrtcActive = true;
                 m_crt->m_wasVsync = true;
                 m_core->vrtc(true);
@@ -788,7 +790,6 @@ void Crt8275Raster::operate()
                 m_crt->syncronize(m_curClock);
                 m_crt->nextFrame();
                 m_crt->resume();
-                //! m_renderer->drawFrame();
                 m_curScanRow = 0;
                 m_curScanLine = 0;
             }
