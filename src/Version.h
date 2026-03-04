@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 #define VER_MAJOR 4
 #define VER_MINOR 0
-#define VER_BUILD 551
+#define VER_BUILD 552
 
 #define VER_STR XSTR(VER_MAJOR) "." XSTR(VER_MINOR) "." XSTR(VER_BUILD)
 #define VER_COMMA_SEP VER_MAJOR,VER_MINOR,VER_BUILD

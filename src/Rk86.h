@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -88,13 +88,18 @@ class RkPixeltronRenderer : public Crt8275Renderer
         void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt) override;
 };
 
+
 class RkRamFontRenderer : public Crt8275Renderer
 {
     public:
         RkRamFontRenderer();
         ~RkRamFontRenderer();
 
+        void reset() override;
+
         void primaryRenderFrame() override;
+
+        void initConnections() override;
 
         static EmuObject* create(const EmuValuesList&) {return new RkRamFontRenderer();}
 
@@ -102,7 +107,18 @@ class RkRamFontRenderer : public Crt8275Renderer
         void customDrawSymbolLine(uint32_t* linePtr, uint8_t symbol, int line, bool lten, bool vsp, bool rvv, bool gpa0, bool gpa1, bool hglt) override;
 
     private:
+        const uint32_t c_palette[16] = {
+            0x000000, 0x800000, 0x008000, 0x808000,
+            0x000080, 0x800080, 0x008080, 0x808080,
+            0x000000, 0xFF0000, 0x00FF00, 0xFFFF00,
+            0x0000FF, 0xFF00FF, 0x00FFFF, 0xFFFFFF,
+        };
+
         uint8_t* m_ramFont = nullptr;
+        uint32_t m_fgColors[8];
+        uint32_t m_bgColors[8];
+
+        void setColorRec(uint8_t color);
 };
 
 #endif // RK86_H
