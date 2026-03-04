@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -81,6 +81,8 @@ class AtaDrive : public EmuObject
         uint8_t* m_dataPtr;
         uint8_t m_sectorBuf[512];
         bool m_prefilledData = false;
+        uint8_t m_featuresReg = 0;
+        bool m_8bitMode = false;
 
         void putWord(int wordOffset, uint16_t word);
         void putStr(int wordOffset, const char* str);
@@ -88,6 +90,7 @@ class AtaDrive : public EmuObject
         void identify();
         void readSectors();
         void writeSectors();
+        void setFeatures();
 
         void setReadOnly(bool ro);
 
@@ -97,5 +100,20 @@ class AtaDrive : public EmuObject
         void setVectorGeometry();
 };
 
+
+class Cf8bitAdapter : public AddressableDevice
+{
+public:
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    // derived from AddressableDevice
+    void writeByte(int addr, uint8_t value) override;
+    uint8_t readByte(int addr) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new Cf8bitAdapter();}
+
+private:
+    AtaDrive* m_ataDrive = nullptr;
+};
 
 #endif // ATADRIVE_H

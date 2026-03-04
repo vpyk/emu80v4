@@ -224,6 +224,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Pk8000CpuWaits);
     REG_EMU_CLASS(PpiAtaAdapter);
     REG_EMU_CLASS(AtaDrive);
+    REG_EMU_CLASS(Cf8bitAdapter);
     REG_EMU_CLASS(VectorAddrSpace);
     REG_EMU_CLASS(VectorCore);
     REG_EMU_CLASS(VectorRenderer);
