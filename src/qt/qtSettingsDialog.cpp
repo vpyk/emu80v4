@@ -141,7 +141,7 @@ void SettingsDialog::execute()
 }
 
 
-QString SettingsDialog::getRunningConfigValue(QString option)
+QString SettingsDialog::getRunningConfigValue(const QString& option) const
 {
     int dotPos = option.lastIndexOf(".");
     std::string obj = option.mid(0, dotPos).toUtf8().constData();
@@ -157,7 +157,7 @@ QString SettingsDialog::getRunningConfigValue(QString option)
 }
 
 
-void SettingsDialog::setRunningConfigValue(QString option, QString value)
+void SettingsDialog::setRunningConfigValue(const QString& option, const QString& value)
 {
     int dotPos = option.lastIndexOf(".");
     std::string obj = option.mid(0, dotPos).toUtf8().constData();
@@ -178,10 +178,10 @@ void SettingsDialog::setRunningConfigValue(QString option, QString value)
 }
 
 
-void SettingsDialog::loadRunningConfigValue(QString option, bool force)
+void SettingsDialog::loadRunningConfigValue(const QString& option, bool force)
 {
     QString value = getRunningConfigValue(option);
-    if (value != "" || force)
+    if (!value.isEmpty() || force)
         m_options[option] = value;
 }
 
@@ -858,7 +858,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["emulation.debugSwapF5F9"] = ui->swapF5F9checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugResetKeys"] = ui->resetKeysCheckBox->isChecked() ? "yes" : "no";
 
-    val = "";
+    val.clear();
     if (ui->rkCodePageRadioButton->isChecked())
         val = "rk";
     else if (ui->koi8CodePageRadioButton->isChecked())
@@ -868,7 +868,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     val = QString::number(ui->volumeSlider->value());
     m_options["emulation.volume"] = val;
 
-    val = "";
+    val.clear();
     if (ui->autoSizeRadioButton->isChecked())
         val = "autosize";
     else if (ui->userSizeRadioButton->isChecked())
@@ -880,7 +880,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["window.defaultWindowWidth"] = ui->widthLineEdit->text();
     m_options["window.defaultWindowHeight"] = ui->heightLineEdit->text();
 
-    val = "";
+    val.clear();
     if (ui->fixedScaleRadioButton->isChecked())
         switch (ui->fixedScaleComboBox->currentIndex()) {
         case 0:
@@ -922,7 +922,7 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = ui->shaderComboBox->currentText();
     m_options["window.shader"] = val;
 
-    val = "";
+    val.clear();
     if (ui->smoothingNearestRadioButton->isChecked())
         val = "nearest";
     else if (ui->smoothingBilinearRadioButton->isChecked())
@@ -931,15 +931,15 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "sharp";
     else if (ui->smoothingCustomRadioButton->isChecked())
         val = "custom";
-    if (val != "")
+    if (!val.isEmpty())
         m_options["window.smoothing"] = val;
 
-    val = "";
+    val.clear();
     if (ui->adaptArRadioButton->isChecked())
         val = "no";
     else if (ui->sqrArRadioButton->isChecked())
         val = "yes";
-    if (val != "")
+    if (!val.isEmpty())
         m_options["window.squarePixels"] = val;
 
     m_options["window.aspectCorrection"] = ui->aspectCheckBox->isChecked() ? "yes" : "no";
@@ -958,7 +958,7 @@ void SettingsDialog::on_applyPushButton_clicked()
 
     m_options["cpu.debugOnIllegalCmd"] = ui->debugIllegalCheckBox->isChecked() ? "yes" : "no";
 
-    val = "";
+    val.clear();
     if (ui->colorGroupBox->isVisible()) {
         if (ui->bwRadioButton->isChecked()) {
             if (m_platformGroup == "rk86")
@@ -991,10 +991,10 @@ void SettingsDialog::on_applyPushButton_clicked()
                 val = "color3";
         }
     }
-    if (val != "")
+    if (!val.isEmpty())
         m_options["crtRenderer.colorMode"] = val;
 
-    val = "";
+    val.clear();
     if (ui->mixingGroupBox->isEnabled()) {
         if (ui->mixingOffRadioButton->isChecked())
             val = "none";
@@ -1007,13 +1007,13 @@ void SettingsDialog::on_applyPushButton_clicked()
         else if (ui->mixingScanlineRadioButton->isChecked())
             val = "scanline";
     }
-    if (val != "")
+    if (!val.isEmpty())
         m_options["window.fieldsMixing"] = val;
 
     if (ui->altFontCheckBox->isVisible())
         m_options["crtRenderer.altRenderer"] = ui->altFontCheckBox->isChecked() ? "yes" : "no";
 
-    val = "";
+    val.clear();
     switch (ui->wavChannelComboBox->currentIndex()) {
     case 0:
         val = "left";
@@ -1027,7 +1027,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     default:
         break;
     }
-    if (val != "")
+    if (!val.isEmpty())
         m_options["wavReader.channel"] = val;
 
     if (!ui->speedUpCheckBox->isChecked())
@@ -1066,7 +1066,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     if (ui->gsStereoCheckBox->isVisible())
         m_options["gsSoundSource.mixing"] = ui->gsStereoCheckBox->isChecked() ? "stereo" : "mono";
 
-    val = "";
+    val.clear();
     if (ui->qwertyRadioButton->isChecked())
         val = "qwerty";
     else if (ui->jcukenRadioButton->isChecked())
@@ -1075,7 +1075,7 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "smart";
     m_options["kbdLayout.layout"] = val;
 
-    val = "";
+    val.clear();
     if (ui->kbdOriginalRadioButton->isChecked())
         val = "original";
     else if (ui->kbdRamfosRadioButton->isChecked())
@@ -1109,9 +1109,9 @@ void SettingsDialog::saveRunningConfig()
 {
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (value != "" && option != "locale" && option != "showHelp" && option != "maxFps" &&
-                           option != "limitFps" && option != "sampleRate" && option != "vsync" &&
-                           option != "preserveSize" && option != "selectedPlatformsOnly" && option != "fusionStyle") {
+        if (!value.isEmpty() && option != "locale" && option != "showHelp" && option != "maxFps" &&
+                                option != "limitFps" && option != "sampleRate" && option != "vsync" &&
+                                option != "preserveSize" && option != "selectedPlatformsOnly" && option != "fusionStyle") {
             setRunningConfigValue(option, value);
         } else if (option == "maxFps") {
             setRunningConfigValue("emulation.maxFps", m_options.value("limitFps") == "true" ? value : 0);
@@ -1140,9 +1140,9 @@ void SettingsDialog::saveStoredConfig()
     settings.beginGroup("system");
     foreach (QString option, m_options.keys()) {
         QString value = m_options.value(option);
-        if (option.left(10) != "emulation." && value != "" && (option == "locale" || option == "showHelp" || option == "maxFps" ||
-                                                               option == "limitFps" || option == "sampleRate" || option == "vsync" ||
-                                                               option == "preserveSize" || option == "selectedPlatformsOnly" || option == "fusionStyle"))
+        if (option.left(10) != "emulation." && !value.isEmpty() && (option == "locale" || option == "showHelp" || option == "maxFps" ||
+                                                                    option == "limitFps" || option == "sampleRate" || option == "vsync" ||
+                                                                    option == "preserveSize" || option == "selectedPlatformsOnly" || option == "fusionStyle"))
             settings.setValue(option, value);
     }
     settings.endGroup();
@@ -1219,7 +1219,7 @@ void SettingsDialog::on_limitFpsCheckBox_toggled(bool checked)
 }
 
 
-QString SettingsDialog::getOptionValue(QString option)
+QString SettingsDialog::getOptionValue(const QString& option) const
 {
     return m_options[option];
 }

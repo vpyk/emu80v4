@@ -34,13 +34,13 @@ PlatformConfigDialog::~PlatformConfigDialog()
     delete ui;
 }
 
-QString PlatformConfigDialog::getGroupName(QString name)
+QString PlatformConfigDialog::getGroupName(const QString& name)
 {
     return name.section('.', 0, 0);
 }
 
 
-bool PlatformConfigDialog::hasConfig(QString platform)
+bool PlatformConfigDialog::hasConfig(const QString& platform)
 {
     QString groupName = getGroupName(platform);
     return groupName == "apogey" || groupName == "rk86" || groupName == "korvet" ||
@@ -50,10 +50,10 @@ bool PlatformConfigDialog::hasConfig(QString platform)
 }
 
 
-bool PlatformConfigDialog::configure(QString platform)
+bool PlatformConfigDialog::configure(const QString& platform)
 {
     connect(ui->defaultsButton, SIGNAL(clicked()), this, SLOT(onDefaults()));
-    QSizePolicy sp;
+    //QSizePolicy sp;
     //sp.setVerticalPolicy(QSizePolicy::Expanding);
     //sp.setVerticalStretch(0);
     //sp.setHorizontalPolicy(QSizePolicy::Expanding);
