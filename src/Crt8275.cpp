@@ -704,7 +704,7 @@ void Crt8275::setLpenPosition(bool active, int x, int y)
     if (m_isRasterStarted) {
         m_lpenX = x + m_lpenCorrection;
         m_lpenY = y / m_nLines;;
-        m_lpenRasterTime = ((y + m_nVrRows * m_nLines - 1) * (m_nHrChars + m_nCharsPerRow) + m_nHrChars + x) * m_kDiv; //todo: remove "-1" after fixing IR
+        m_lpenRasterTime = ((y + (m_nVrRows + 1) * m_nLines) * (m_nHrChars + m_nCharsPerRow) + m_nHrChars + x) * m_kDiv; //todo: remove "+ 1" after fixing IR
         m_lpenActive = active;
     }
 }
