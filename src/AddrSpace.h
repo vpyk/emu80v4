@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ class AddrSpaceMapper : public AddressableDevice
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         void reset() override {m_curPage = 0;}
 
-        void attachPage(int page, AddressableDevice* as);
+        void attachPage(int page, AddressableDevice* as, int offset);
         void setCurPage(int page);
 
         void initConnections() override;
@@ -95,6 +95,7 @@ class AddrSpaceMapper : public AddressableDevice
 
 protected:
         AddressableDevice** m_pages;
+        int* m_offsets;
         int m_nPages;
         int m_curPage = 0;
 };
