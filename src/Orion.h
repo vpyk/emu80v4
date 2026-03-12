@@ -181,7 +181,11 @@ class OrionCore : public PlatformCore
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
+        void initConnections() override;
+
+        void reset() override;
         void draw() override;
+        void vrtc(bool isActive) override;
         void inte(bool isActive) override;
 
         void attachCrtRenderer(OrionRenderer* crtRenderer);
@@ -190,8 +194,12 @@ class OrionCore : public PlatformCore
 
     private:
         OrionRenderer* m_crtRenderer = nullptr;
-
         GeneralSoundSource* m_beepSoundSource;
+
+        bool m_useInts = false;
+        bool m_intGate = false;
+
+        void setIntGate(bool intGate);
 };
 
 

@@ -40,15 +40,35 @@ void OrionCore::draw()
 }
 
 
+void OrionCore::vrtc(bool isActive)
+{
+    // actually this is not VTRC, but this proc is called onece per frame on interrupt
+
+    if (!m_useInts || !m_intGate || !isActive)
+        return;
+
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    if (cpu->getInte())
+        cpu->intRst(7);
+}
+
+
 void OrionCore::inte(bool isActive)
 {
-    m_beepSoundSource->setValue(isActive ? 1 : 0);
+    if (!m_useInts)
+        m_beepSoundSource->setValue(isActive ? 1 : 0);
 }
 
 
 void OrionCore::attachCrtRenderer(OrionRenderer* crtRenderer)
 {
     m_crtRenderer = crtRenderer;
+}
+
+
+void OrionCore::setIntGate(bool intGate)
+{
+    m_intGate = intGate;
 }
 
 
@@ -63,8 +83,27 @@ bool OrionCore::setProperty(const string& propertyName, const EmuValuesList& val
     } else if (propertyName == "beepSoundSource") {
         m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
+    } else if (propertyName == "useInts") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_useInts = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
+}
+
+
+void OrionCore::initConnections()
+{
+    PlatformCore::initConnections();
+
+    REG_INPUT("intGate", OrionCore::setIntGate);
+}
+
+
+void OrionCore::reset()
+{
+    m_intGate = false;
 }
 
 
@@ -175,6 +214,7 @@ void OrionRenderer::operate()
     renderFrame();
     m_curClock += g_emulation->getFrequency() * 640 * 312 / 10000000; // 10 MHz pixelclock, 312 scanlines, 640 pixels wide
     g_emulation->screenUpdateReq(); // transfer to Core
+    m_platform->getCore()->vrtc(true);
 }
 
 
