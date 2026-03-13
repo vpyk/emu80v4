@@ -54,9 +54,9 @@ void HelpDialog::reject()
 }
 
 
-HelpDialog* HelpDialog::execute(QString helpFile, bool showHint)
+HelpDialog* HelpDialog::execute(const QString& helpFile, bool showHint)
 {
-    if (helpFile == "")
+    if (helpFile.isEmpty())
         return nullptr;
 
     if (!m_instance) {
@@ -65,7 +65,7 @@ HelpDialog* HelpDialog::execute(QString helpFile, bool showHint)
 
     //m_instance->setAttribute(Qt::WA_DeleteOnClose);
 
-    if (helpFile != "")
+    if (!helpFile.isEmpty())
         m_instance->ui->textBrowser->setSource(QUrl::fromLocalFile(helpFile));
     else
         m_instance->ui->textBrowser->setHtml("<h2>Sorry, currently there is no help for this platrorm</h2>");
