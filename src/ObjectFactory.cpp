@@ -60,6 +60,7 @@
 #include "Psg3910.h"
 #include "PpiAtaAdapter.h"
 #include "AtaDrive.h"
+#include "Rtc14818.h"
 #include "Vector.h"
 #include "Covox.h"
 #include "SdCard.h"
@@ -314,6 +315,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(GsInternalPorts);
     REG_EMU_CLASS(GsSoundSource);
     REG_EMU_CLASS(GsSoundMem);
+    REG_EMU_CLASS(Rtc14818);
 
     reg("ConfigTab", &EmuConfigTab::create);
     reg("ConfigRadioSelector", &EmuConfigRadioSelector::create);
