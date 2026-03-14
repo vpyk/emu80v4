@@ -630,7 +630,7 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
             static_cast<VectorAddrSpace*>(m_platform->getCpu()->getAddrSpace())->disableRom();
         }
         return true;
-    } else if (run && ext == ".wav") {
+    } else if (ext == ".wav") {
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
         static_cast<VectorAddrSpace*>(m_platform->getCpu()->getAddrSpace())->enableRom();
         static_cast<Cpu8080Compatible*>(m_platform->getCpu())->setPC(0);
