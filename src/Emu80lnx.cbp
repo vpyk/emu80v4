@@ -218,6 +218,8 @@
         <Unit filename="RkSdController.h" />
         <Unit filename="RkTapeHooks.cpp" />
         <Unit filename="RkTapeHooks.h" />
+        <Unit filename="Rtc14818.cpp" />
+        <Unit filename="Rtc14818.h" />
         <Unit filename="SdAdapters.cpp" />
         <Unit filename="SdAdapters.h" />
         <Unit filename="SdCard.cpp" />

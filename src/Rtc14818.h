@@ -21,7 +21,7 @@
 #ifndef RTC14818_H
 #define RTC14818_H
 
-#include <EmuObjects.h>
+#include "EmuObjects.h"
 
 class Rtc14818 : public AddressableDevice
 {
