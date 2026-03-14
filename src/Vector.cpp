@@ -630,6 +630,18 @@ bool VectorFileLoader::loadFile(const std::string& fileName, bool run)
             static_cast<VectorAddrSpace*>(m_platform->getCpu()->getAddrSpace())->disableRom();
         }
         return true;
+    } else if (run && ext == ".wav") {
+        Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+        static_cast<VectorAddrSpace*>(m_platform->getCpu()->getAddrSpace())->enableRom();
+        static_cast<Cpu8080Compatible*>(m_platform->getCpu())->setPC(0);
+        Keyboard* kbd = m_platform->getKeyboard();
+        kbd->processKey(EK_F1, true);
+        g_emulation->exec((int64_t)cpu->getKDiv() * 2200000, true);
+        kbd->resetKeys();
+
+        g_emulation->getWavReader()->loadFile(fileName);
+
+        return true;
     }
 
     int fileSize;
