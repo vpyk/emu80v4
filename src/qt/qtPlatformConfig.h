@@ -35,8 +35,8 @@ public:
     explicit PlatformConfigDialog(QWidget *parent = nullptr);
     ~PlatformConfigDialog();
 
-    static bool hasConfig(QString platform);
-    bool configure(QString platform);
+    static bool hasConfig(const QString& platform);
+    bool configure(const QString& platform);
 
 private:
     Ui::PlatformConfigDialog *ui;
@@ -44,7 +44,7 @@ private:
     ConfigWidget* m_configWidget = nullptr;
     ConfigWidget* m_configWidget2 = nullptr;
 
-    static QString getGroupName(QString name);
+    static QString getGroupName(const QString& name);
 
 private slots:
     void onDefaults();

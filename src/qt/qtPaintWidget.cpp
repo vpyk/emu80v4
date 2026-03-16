@@ -24,6 +24,7 @@
 #include <QFile>
 
 #include "qtPaintWidget.h"
+#include "qtPalWindow.h"
 
 PaintWidget::PaintWidget(QWidget *parent) :
     QOpenGLWidget(parent)
@@ -43,10 +44,9 @@ PaintWidget::PaintWidget(QWidget *parent) :
 
 PaintWidget::~PaintWidget()
 {
-    if (m_image)
-        delete m_image;
-    if (m_image2)
-        delete m_image2;
+    // It's safe to delete nullptr
+    delete m_image;
+    delete m_image2;
 
     delete m_standardVShader;
     delete m_standardFShader;
@@ -66,37 +66,45 @@ void PaintWidget::screenshot(const QString& ssFileName)
     QImage fullImg = grabFramebuffer();
     QImage img = fullImg.copy(m_dstRect);
 
-    if (ssFileName != "")
+    if (!ssFileName.isEmpty())
         img.save(ssFileName);
     else
         QGuiApplication::clipboard()->setImage(img);
 }
 
 
-void PaintWidget::colorFill(QColor color)
+void PaintWidget::colorFill(const QColor& color)
 {
     m_fillColor = color;
     if (m_image) {
         delete m_image;
-        delete[] m_imageData;
         m_image = nullptr;
     }
     //update();
 }
 
 
-void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
+void PaintWidget::drawImage(const uint32_t* pixels, int imageWidth, int imageHeight, double aspectRatio, bool blend, bool useAlpha)
 {
     if (m_image2) {
         delete m_image2;
         m_image2 = nullptr;
-        delete[] m_imageData2;
     }
+
+    // Delete array and nullify pointer
+    // ptr should actually be a pointer to pointer
+    auto deleter = [](void *ptr) {
+        uchar **ptrPtr = (uchar **)ptr;
+        delete[] (*ptrPtr);
+        *ptrPtr = nullptr;
+    };
 
     if (useAlpha || blend) {
         m_imageData2 = new uchar[imageWidth * imageHeight * 4];
         memcpy(m_imageData2, pixels, imageWidth * imageHeight * 4);
-        m_image2 = new QImage(m_imageData2, imageWidth, imageHeight, useAlpha ? QImage::Format_ARGB32 : QImage::Format_RGB32);
+        // Provide cleanup function
+        m_image2 = new QImage(m_imageData2, imageWidth, imageHeight, useAlpha ? QImage::Format_ARGB32 : QImage::Format_RGB32,
+                              deleter, &m_imageData2);
         //m_img2aspectRatio = aspectRatio;
         if (!useAlpha)
             *m_image2 = m_image2->convertToFormat(QImage::Format_ARGB32); // add alpha channel
@@ -104,13 +112,13 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
         return;
     }
 
-    if (m_image) {
-        delete m_image;
-        delete m_imageData;
-    }
+    delete m_image;
+
     m_imageData = new uchar[imageWidth * imageHeight * 4];
     memcpy(m_imageData, pixels, imageWidth * imageHeight * 4);
-    m_image = new QImage(m_imageData, imageWidth, imageHeight, QImage::Format_RGB32);
+    // Provide cleanup function
+    m_image = new QImage(m_imageData, imageWidth, imageHeight, QImage::Format_RGB32,
+                         deleter, &m_imageData);
     m_img1aspectRatio = aspectRatio;
 
     //update();
@@ -241,7 +249,7 @@ bool PaintWidget::createProgram(QOpenGLShader* vShader, QOpenGLShader* fShader)
 }
 
 
-void PaintWidget::paintImageGL(QImage* img/*, double aspectRatio*/)
+void PaintWidget::paintImageGL(const QImage* img/*, double aspectRatio*/)
 {
     int dstWidth, dstHeight, dstX, dstY;
     PalWindow* palWindow = static_cast<MainWindow*>(parent())->getPalWindow();
@@ -351,8 +359,8 @@ void PaintWidget::recreateProgramIfNeeded()
 
     bool success = shaderFile.open(QFile::ReadOnly | QFile::Text);
 
-    QString shaderSrc = "";
-    QString versionStr = "";
+    QString shaderSrc;
+    QString versionStr;
 
     if (success) {
         while (!shaderFile.atEnd()) {

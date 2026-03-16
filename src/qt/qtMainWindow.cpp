@@ -111,8 +111,8 @@ void MainWindow::setPalWindow(PalWindow* palWindow)
         }
 
         m_windowType = EWT_UNDEFINED;
-        m_platformName = "";
-        m_platformGroupName = "";
+        m_platformName.clear();
+        m_platformGroupName.clear();
         return;
     }
 
@@ -1898,56 +1898,56 @@ void MainWindow::onFpsTimer()
 
     std::string platform = m_palWindow->getPlatformObjectName() + ".";
 
-    std::string crtMode = "";
+    std::string crtMode;
     if (m_palWindow)
         crtMode= emuGetPropertyValue(platform + "crtRenderer", "crtMode");
     m_crtModeLabel->setText(QString::fromUtf8(crtMode.c_str()));
-    m_crtModeLabel->setVisible(crtMode != "");
+    m_crtModeLabel->setVisible(!crtMode.empty());
 
-    std::string dmaTime = "";
+    std::string dmaTime;
     if (m_palWindow)
         dmaTime = emuGetPropertyValue(platform + "dma", "percentage");
     m_dmaTimeLabel->setText(/*tr("DMA: ") + */QString::fromUtf8(dmaTime.c_str()) + " %");
-    m_dmaTimeLabel->setVisible(dmaTime != "");
+    m_dmaTimeLabel->setVisible(!dmaTime.empty());
 
     m_imageSizeLabel->setText(QString::number(m_paintWidget->getImageWidth()) + QString::fromUtf8(u8"\u00D7") + QString::number(m_paintWidget->getImageHeight()));
 
     std::string fileName;
     QString labelText;
     fileName = emuGetPropertyValue(platform + "tapeInFile", "currentFile");
-    if (fileName != "")
+    if (!fileName.empty())
         labelText = tr("Reading RK file:");
     else {
         fileName = emuGetPropertyValue(platform + "tapeOutFile", "currentFile");
-        if (fileName != "")
+        if (!fileName.empty())
             labelText = tr("Writing RK file:");
         else {
             fileName = emuGetPropertyValue(platform + "msxTapeInFile", "currentFile");
-            if (fileName != "")
+            if (!fileName.empty())
                 labelText = tr("Reading MSX file:");
             else {
                 fileName = emuGetPropertyValue(platform + "msxTapeOutFile", "currentFile");
-                if (fileName != "")
+                if (!fileName.empty())
                     labelText = tr("Writing MSX file:");
                 else {
                     fileName = emuGetPropertyValue(platform + "rfsTapeOutFile", "currentFile");
-                    if (fileName != "")
+                    if (!fileName.empty())
                         labelText = tr("Writing RFS file:");
                     else {
                         fileName = emuGetPropertyValue(platform + "rfsTapeInFile", "currentFile");
-                        if (fileName != "")
+                        if (!fileName.empty())
                             labelText = tr("Reading RFS file:");
                     }
                 }
             }
         }
     }
-    if (fileName != "") {
+    if (!fileName.empty()) {
         QString qFileName = QString::fromUtf8(fileName.c_str());
         qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
         m_tapeLabel->setText(labelText + " " + qFileName);
     }
-    m_tapeLabel->setVisible(fileName != "");
+    m_tapeLabel->setVisible(!fileName.empty());
 
     fileName = emuGetPropertyValue("prnWriter", "fileName");
     if (!fileName.empty()) {
@@ -1960,32 +1960,32 @@ void MainWindow::onFpsTimer()
 
     std::string position;
     fileName = emuGetPropertyValue("wavWriter", "currentFile");
-    if (fileName != "")
+    if (!fileName.empty())
         labelText = tr("Writing wave file:");
     else {
         fileName = emuGetPropertyValue("wavReader", "currentFile");
-        if (fileName != "") {
+        if (!fileName.empty()) {
             labelText = tr("Playing wave file:");
             position = emuGetPropertyValue("wavReader", "position");
         }
     }
-    if (fileName != "") {
+    if (!fileName.empty()) {
         QString qFileName = QString::fromUtf8(fileName.c_str());
         qFileName = qFileName.mid(qFileName.lastIndexOf('/') + 1);
         QString qPosition;
-        if (position != "") {
+        if (!position.empty()) {
             qPosition = " [" + QString::fromUtf8(position.c_str()) + "]";
         }
         m_wavLabel->setText(labelText + " " + qFileName + qPosition);
     }
-    m_wavLabel->setVisible(fileName != "");
+    m_wavLabel->setVisible(!fileName.empty());
 
     std::string val = emuGetPropertyValue(platform + "kbdTapper", "pasting");
     if (val == "yes") {
         m_pasteLabel->setText(tr("Pasting"));
         m_pasteLabel->setVisible(true);
     } else {
-        m_pasteLabel->setText("");
+        m_pasteLabel->clear();
         m_pasteLabel->setVisible(false);
     }
 }
@@ -2241,7 +2241,7 @@ void MainWindow::keyPressEvent(QKeyEvent* evt)
         emuSysReq(m_palWindow, evt->modifiers() & Qt::AltModifier ? SR_FULLTHROTTLE : SR_SPEEDUP);
         return;
     }
-    unsigned unicodeKey = evt->text().isEmpty() ? 0 : evt->text()[0].unicode(); // "at()" does not operate with empty strings
+    unsigned unicodeKey = evt->text().isEmpty() ? 0 : evt->text().at(0).unicode(); // "at()" does not operate with empty strings
     emuKeyboard(m_palWindow, translateKey(evt), true, unicodeKey);
 }
 
@@ -2252,7 +2252,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* evt)
         emuSysReq(m_palWindow, SR_SPEEDNORMAL);
         return;
     }
-    unsigned unicodeKey = evt->text().isEmpty() ? 0 : evt->text()[0].unicode(); // "at()" does not operate with empty strings
+    unsigned unicodeKey = evt->text().isEmpty() ? 0 : evt->text().at(0).unicode(); // "at()" does not operate with empty strings
     emuKeyboard(m_palWindow, translateKey(evt), false, unicodeKey);
 }
 
@@ -3248,10 +3248,10 @@ void MainWindow::updateMountToolTip(QAction* action, const QString& fileName)
 
 void MainWindow::updateActions()
 {
-    std::string platform = "";
+    std::string platform;
     if (m_palWindow)
         platform = m_palWindow->getPlatformObjectName();
-    if (platform == "")
+    if (platform.empty())
         return;
 
     platform += ".";
@@ -3526,7 +3526,7 @@ void MainWindow::updateActions()
     m_menuEddSeparator->setVisible(eddPresent);
 
     val = emuGetPropertyValue(platform + "crtRenderer", "altRenderer");
-    if (val == "")
+    if (val.empty())
         m_fontAction->setVisible(false);
     else {
         m_fontAction->setVisible(true);
@@ -3534,7 +3534,7 @@ void MainWindow::updateActions()
     }
 
     val = emuGetPropertyValue(platform + "crtRenderer", "visibleArea");
-    if (val == "")
+    if (val.empty())
         m_cropAction->setVisible(false);
     else {
         m_cropAction->setVisible(true);
@@ -3542,7 +3542,7 @@ void MainWindow::updateActions()
     }
 
     val = emuGetPropertyValue(platform + "window", "aspectCorrection");
-    if (val == "")
+    if (val.empty())
         m_aspectAction->setVisible(false);
     else {
         m_aspectAction->setVisible(true);
@@ -3550,7 +3550,7 @@ void MainWindow::updateActions()
     }
 
     val = emuGetPropertyValue(platform + "window", "wideScreen");
-    if (val == "")
+    if (val.empty())
         m_wideScreenAction->setVisible(false);
     else {
         m_wideScreenAction->setVisible(true);
@@ -3598,7 +3598,7 @@ void MainWindow::updateActions()
     m_desaturateAction->setChecked(val == "yes");
 
     val = emuGetPropertyValue(platform + "tapeGrp", "enabled");
-    if (val == "")
+    if (val.empty())
         m_tapeHookAction->setVisible(false);
     else {
         m_tapeHookAction->setVisible(true);
@@ -3606,7 +3606,7 @@ void MainWindow::updateActions()
     }
 
     val = emuGetPropertyValue(platform + "tapeSoundSource", "muted");
-    if (val == "")
+    if (val.empty())
         m_muteTapeAction->setVisible(false);
     else {
         m_muteTapeAction->setVisible(true);
@@ -3614,7 +3614,7 @@ void MainWindow::updateActions()
     }
 
     val = emuGetPropertyValue(m_palWindow->getPlatformObjectName(), "fastReset");
-    if (val == "")
+    if (val.empty())
         m_fastResetAction->setVisible(false);
     else {
         m_fastResetAction->setVisible(true);
@@ -3634,7 +3634,7 @@ void MainWindow::updateActions()
     }
 
     val = emuGetPropertyValue(platform + "crtRenderer", "colorMode");
-    if (val != "" && m_colorModeMenu) {
+    if (!val.empty() && m_colorModeMenu) {
         QList<QAction*> list = m_colorModeMenu->actions();
         for (auto it = list.begin(); it != list.end(); it++) {
             if ((*it)->data().toString().toUtf8().constData() == val) {
@@ -3802,12 +3802,12 @@ void LastFileList::saveLastFiles()
 }
 
 
-QString LastFileList::getLastFile()
+QString LastFileList::getLastFile() const
 {
     if (!m_list.isEmpty()) {
         return *m_list.begin();
     } else {
-        return "";
+        return QString();
     }
 }
 

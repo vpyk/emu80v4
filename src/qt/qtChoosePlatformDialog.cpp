@@ -37,7 +37,7 @@ ChoosePlatformDialog::~ChoosePlatformDialog()
 }
 
 
-bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, QString runFileName, bool setDef)
+bool ChoosePlatformDialog::execute(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, const QString& runFileName, bool setDef)
 {
     Q_UNUSED(runFileName)
     Q_UNUSED(setDef)

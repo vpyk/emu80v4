@@ -27,7 +27,6 @@ class EmuAudioIoDevice : public QIODevice
 
     public:
         EmuAudioIoDevice();
-        //~EmuAudioIoDevice();
 
         void addSample(int16_t sample); // mono
         void addSample(int16_t leftSample, int16_t rightSample); //stereo
@@ -41,8 +40,7 @@ class EmuAudioIoDevice : public QIODevice
         qint64 bytesAvailable() const override;
 
     private:
-        qint64 m_pos;
-        QByteArray* m_buffer;
+        qint64 m_pos = 0;
         uint32_t m_lastSample = 0;
 
         int m_minSamples;

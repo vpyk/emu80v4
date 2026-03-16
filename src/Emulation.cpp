@@ -109,6 +109,7 @@ Emulation::~Emulation()
     delete m_config;
     delete m_wavReader; // перед m_mixer!
     delete m_mixer;
+    delete m_prnWriter;
 
     // Удяляем оставшиеся объекты
     list<EmuObject*> tempList = m_objectList; // второй список, так как в деструкторе удаление из основного списка
@@ -292,7 +293,7 @@ void Emulation::removeObject(EmuObject* obj)
 }
 
 
-EmuObject* Emulation::findObject(string name)
+EmuObject* Emulation::findObject(const string& name) const
 {
     for (auto it = m_objectList.begin(); it != m_objectList.end(); it++)
         if ((*it)->getName() == name)
@@ -305,7 +306,7 @@ void Emulation::addChild(EmuObject* child)
 {
     if (Platform* pl = dynamic_cast<Platform*>(child))
         m_platformList.push_back(pl);
-};
+}
 
 
 void Emulation::exec(uint64_t ticks, bool forced)
@@ -334,7 +335,8 @@ void Emulation::exec(uint64_t ticks, bool forced)
         }
 
         m_curClock = time;
-        curDev->operate();
+        if (curDev)
+            curDev->operate();
     }
 
     m_clockOffset = m_curClock - toTime;
@@ -693,7 +695,7 @@ void Emulation::setSpeedByGrade(int speedGrade)
 }
 
 
-Platform* Emulation::platformByWindow(EmuWindow* window)
+Platform* Emulation::platformByWindow(const EmuWindow* window) const
 {
     if (!window)
         return nullptr;
