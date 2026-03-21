@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -258,6 +258,15 @@ RkRamFontRenderer::~RkRamFontRenderer()
 }
 
 
+void RkRamFontRenderer::reset()
+{
+    for (int i = 0; i < 8; i++) {
+        m_fgColors[i] = 0xC0C0C0;
+        m_bgColors[i] = 0x000000;
+    }
+}
+
+
 void RkRamFontRenderer::primaryRenderFrame()
 {
     Crt8275Renderer::primaryRenderFrame();
@@ -301,7 +310,23 @@ void RkRamFontRenderer::customDrawSymbolLine(uint32_t *linePtr, uint8_t symbol, 
         bt ^= 0x3f;
 
     for (int i = 0; i < 6; i++) {
-        *linePtr++ = (bt & 0x20) ? 0xC0C0C0 : 0;
+        *linePtr++ = (bt & 0x20) ? m_fgColors[symbol >> 4] : m_bgColors[symbol >> 4];
         bt <<= 1;
     }
+}
+
+
+void RkRamFontRenderer::setColorRec(uint8_t color)
+{
+    if (color & 0x80)
+        m_fgColors[(color & 0x70) >> 4] = c_palette[color & 0x0f];
+    else
+        m_bgColors[color >> 4] = c_palette[color & 0x0f];
+}
+
+
+void RkRamFontRenderer::initConnections()
+{
+    Crt8275Renderer::initConnections();
+    REG_INPUT("colorRec", RkRamFontRenderer::setColorRec);
 }

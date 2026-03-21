@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2018-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -68,6 +68,8 @@ void AtaDrive::reset()
     m_sectorCount = 0;
     m_lastCommand = 0;
     m_prefilledData = false;
+    m_featuresReg = 0;
+    m_8bitMode = false;
 }
 
 
@@ -102,13 +104,20 @@ void AtaDrive::writeControl(int cs, int addr, bool ior, bool iow, bool rst)
 
     if (!m_ior && ior && addr == 0 && cs == 1) {
         if (m_dataCounter) {
-            if (!m_prefilledData && !(m_dataCounter & 0xFF)) {
+            if (!m_prefilledData && !(m_dataCounter & 0x1FF)) {
                 m_image->read(m_sectorBuf, 512);
                 m_dataPtr = m_sectorBuf;
             }
-            m_dataReg = m_rdData = m_dataPtr[0] + (m_dataPtr[1] << 8);
-            m_dataPtr += 2;
-            m_dataCounter--;
+
+            if (!m_8bitMode) {
+                m_dataReg = m_rdData = m_dataPtr[0] + (m_dataPtr[1] << 8);
+                m_dataPtr += 2;
+                m_dataCounter -= 2;
+            } else {
+                m_dataReg = m_rdData = m_dataPtr[0];
+                m_dataPtr++;
+                m_dataCounter--;
+            }
         } else
             m_dataReg = m_rdData = m_image->getImagePresent() ? 0xFFFF : 0;
         }
@@ -149,8 +158,12 @@ void AtaDrive::writeReg(int reg, uint16_t value)
         // data port
         if (m_dataCounter) {
             *(m_dataPtr++) = value & 0xFF;
-            *(m_dataPtr++) = value >> 8;
-            if (!(--m_dataCounter & 0xFF) && !m_image->getWriteProtectStatus()) {
+            m_dataCounter--;
+            if (!m_8bitMode) {
+                *(m_dataPtr++) = value >> 8;
+                m_dataCounter--;
+            }
+            if (!(m_dataCounter & 0x1FF) && !m_image->getWriteProtectStatus()) {
                 m_image->write(m_sectorBuf, 512);
                 m_dataPtr = m_sectorBuf;
             }
@@ -158,6 +171,7 @@ void AtaDrive::writeReg(int reg, uint16_t value)
         break;
     case 1:
         // features register
+        m_featuresReg = value & 0xFF;
         break;
     case 2:
         // sector count register
@@ -204,6 +218,9 @@ void AtaDrive::writeReg(int reg, uint16_t value)
         case 0x30:
         case 0x31:
             writeSectors();
+            break;
+        case 0xEF:
+            setFeatures();
             break;
         }
         break;
@@ -261,6 +278,7 @@ void AtaDrive::identify()
     memset(m_sectorBuf, 0, 512);
 
     //putWord(0, 0x0040);
+    //putWord(0, 0x848A); // CF card signature, uncomment if needed
     if (!m_lba) {
         putWord(1, m_cylinders);
         putWord(3, m_heads);
@@ -289,7 +307,7 @@ void AtaDrive::identify()
     m_dataPtr = m_sectorBuf;
     m_dataReg = m_dataPtr[0] + (m_dataPtr[1] << 8);
     //m_dataPtr += 2;
-    m_dataCounter = 256/* - 1*/;
+    m_dataCounter = 512;
     m_prefilledData = true;
 }
 
@@ -302,7 +320,7 @@ void AtaDrive::readSectors()
     seek();
 
     m_prefilledData = false;
-    m_dataCounter = 256 * m_sectorCount;
+    m_dataCounter = 512 * m_sectorCount;
 }
 
 
@@ -312,8 +330,20 @@ void AtaDrive::writeSectors()
         return;
 
     seek();
-    m_dataCounter = 256 * m_sectorCount;
+    m_dataCounter = 512 * m_sectorCount;
     m_dataPtr = m_sectorBuf;
+}
+
+
+void AtaDrive::setFeatures()
+{
+    if (!m_image->getImagePresent())
+        return;
+
+    if (m_featuresReg == 0x01)
+        m_8bitMode = true;
+    else if (m_featuresReg == 0x81)
+        m_8bitMode = false;
 }
 
 
@@ -326,9 +356,12 @@ void AtaDrive::putWord(int wordOffset, uint16_t word)
 
 void AtaDrive::putStr(int wordOffset, const char* str)
 {
-    int i = 0;
-    for (uint8_t* ptr = m_sectorBuf + wordOffset * 2; *str; str++, i++)
-        ptr[i^1] = *str;
+    if (!m_8bitMode) {
+        int i = 0;
+        for (uint8_t* ptr = m_sectorBuf + wordOffset * 2; *str; str++, i++)
+            ptr[i^1] = *str;
+    } else
+        strcpy(reinterpret_cast<char*>(m_sectorBuf) + wordOffset * 2, str);
 }
 
 
@@ -380,4 +413,34 @@ void AtaDrive::notify(EmuObject* sender, int data)
         m_rdData = 0xFFFF;
     } else if (data == DISKIMAGE_NOTIFY_FILECLOSED)
         m_rdData = 0;
+}
+
+
+bool Cf8bitAdapter::setProperty(const std::string &propertyName, const EmuValuesList &values)
+{
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "ataDrive") {
+        m_ataDrive = static_cast<AtaDrive*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+
+    return false;
+}
+
+
+void Cf8bitAdapter::writeByte(int addr, uint8_t value)
+{
+    if (m_ataDrive)
+        m_ataDrive->writeReg(addr, value & 0xFF);
+}
+
+
+uint8_t Cf8bitAdapter::readByte(int addr)
+{
+    if (m_ataDrive)
+        return m_ataDrive->readReg(addr) & 0xFF;
+
+    return 0xFF;
 }

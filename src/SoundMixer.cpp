@@ -190,6 +190,13 @@ void GeneralSoundSource::setValue(int value)
 }
 
 
+void GeneralSoundSource::setFlip(int)
+{
+    updateStats();
+    m_curValue ^= 1;
+}
+
+
 // Обновляет внутренние счетчики, вызывается перед установкой нового значения либо перед получением текущего
 void GeneralSoundSource::updateStats()
 {
@@ -224,4 +231,5 @@ void GeneralSoundSource::initConnections()
     SoundSource::initConnections();
 
     REG_INPUT("input", GeneralSoundSource::setValue);
+    REG_INPUT("flip", GeneralSoundSource::setFlip);
 }

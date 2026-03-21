@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -150,21 +150,27 @@ AddrSpaceMapper::AddrSpaceMapper(int nPages)
 {
     m_nPages = nPages;
     m_pages = new AddressableDevice* [nPages];
-    for (int i = 0; i < nPages; i++)
+    m_offsets = new int[nPages];
+    for (int i = 0; i < nPages; i++) {
         m_pages[i] = nullptr;
+        m_offsets[i] = 0;
+    }
 }
 
 
 AddrSpaceMapper::~AddrSpaceMapper()
 {
     delete[] m_pages;
+    delete[] m_offsets;
 }
 
 
-void AddrSpaceMapper::attachPage(int page, AddressableDevice* as)
+void AddrSpaceMapper::attachPage(int page, AddressableDevice* as, int offset = 0)
 {
-    if (page < m_nPages)
+    if (page < m_nPages) {
         m_pages[page] = as;
+        m_offsets[page] = offset;
+    }
 }
 
 
@@ -186,7 +192,7 @@ void AddrSpaceMapper::initConnections()
 uint8_t AddrSpaceMapper::readByte(int addr)
 {
     if (m_pages[m_curPage])
-        return m_pages[m_curPage]->readByte(addr);
+        return m_pages[m_curPage]->readByte(addr + m_offsets[m_curPage]);
     else
         return 0xFF;
 }
@@ -195,7 +201,7 @@ uint8_t AddrSpaceMapper::readByte(int addr)
 void AddrSpaceMapper::writeByte(int addr, uint8_t value)
 {
     if (m_pages[m_curPage])
-        m_pages[m_curPage]->writeByte(addr, value);
+        m_pages[m_curPage]->writeByte(addr + m_offsets[m_curPage], value);
 }
 
 
@@ -205,7 +211,7 @@ bool AddrSpaceMapper::setProperty(const string& propertyName, const EmuValuesLis
         return true;
 
     if (propertyName == "page" && values[0].isInt()) {
-            attachPage(values[0].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[1].asString())));
+            attachPage(values[0].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[1].asString())), values[2].asInt());
             return true;
     }
 

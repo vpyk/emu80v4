@@ -148,6 +148,16 @@ ifdef EXT_ROMDISK
   romDiskPageSelector.bits = 4
 endif  
 
+ifdef RTC
+  Rtc14818 rtc
+
+  # binary format and 24h hours
+  rtc.pokeCmos = 0x0B, 0x06
+
+  # DSDOS signature
+  rtc.pokeCmos = 0x0E, 0xDE
+endif
+
 AddrSpace fddSpace
 fddSpace.range = &fdc, 0x00, 0x03
 fddSpace.range = &fddQReg, 0x04, 0x04
@@ -155,6 +165,9 @@ fddSpace.range = &fddReg08, 0x08, 0x08
 fddSpace.range = &fdc, 0x10, 0x13
 fddSpace.range = &fddReg, 0x14, 0x14
 fddSpace.range = &fddReg, 0x20, 0x20
+ifdef RTC
+  fddSpace.range = &rtc, 0x60, 0x61
+endif
 
 AddrSpace addrSpace
 addrSpace.range = &ram, 0x0000, 0xEFFF

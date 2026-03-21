@@ -40,15 +40,35 @@ void OrionCore::draw()
 }
 
 
+void OrionCore::vrtc(bool isActive)
+{
+    // actually this is not VTRC, but this proc is called onece per frame on interrupt
+
+    if (!m_useInts || !m_intGate || !isActive)
+        return;
+
+    Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
+    if (cpu->getInte())
+        cpu->intRst(7);
+}
+
+
 void OrionCore::inte(bool isActive)
 {
-    m_beepSoundSource->setValue(isActive ? 1 : 0);
+    if (!m_useInts)
+        m_beepSoundSource->setValue(isActive ? 1 : 0);
 }
 
 
 void OrionCore::attachCrtRenderer(OrionRenderer* crtRenderer)
 {
     m_crtRenderer = crtRenderer;
+}
+
+
+void OrionCore::setIntGate(bool intGate)
+{
+    m_intGate = intGate;
 }
 
 
@@ -63,8 +83,27 @@ bool OrionCore::setProperty(const string& propertyName, const EmuValuesList& val
     } else if (propertyName == "beepSoundSource") {
         m_beepSoundSource = static_cast<GeneralSoundSource*>(g_emulation->findObject(values[0].asString()));
         return true;
+    } else if (propertyName == "useInts") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_useInts = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
+}
+
+
+void OrionCore::initConnections()
+{
+    PlatformCore::initConnections();
+
+    REG_INPUT("intGate", OrionCore::setIntGate);
+}
+
+
+void OrionCore::reset()
+{
+    m_intGate = false;
 }
 
 
@@ -106,6 +145,12 @@ void OrionRenderer::setColorModeByte(uint8_t modeByte)
     m_palette = modeByte & 1;
 }
 
+void OrionRenderer::setMode480(bool mode480)
+{
+    if (m_mode480Enabled)
+        m_mode480 = mode480;
+}
+
 void OrionRenderer::renderFrame()
 {
     swapBuffers();
@@ -117,20 +162,22 @@ void OrionRenderer::renderFrame()
         m_sizeX = 521;
         m_sizeY = 288;
         memset(m_pixelData, 0, m_sizeX * m_sizeY * sizeof(uint32_t));
-        offsetX = 76;
+        offsetX = m_mode480 ? 20 : 76;
         offsetY = 5;
         m_aspectRatio = double(m_sizeY) * 4 / 3 / m_sizeX;
     } else {
-        m_sizeX = 384;
+        m_sizeX = m_mode480 ? 480 : 384;
         m_sizeY = 256;
         offsetX = offsetY = 0;
         m_aspectRatio = 576.0 * 9 / 704 / 10;
     }
 
+    int cols = m_mode480 ? 60 : 48;
+
     int offset = offsetY * m_sizeX + offsetX;
 
     for (int row = 0; row < 256; row++)
-        for (int col = 0; col < 48; col++) {
+        for (int col = 0; col < cols; col++) {
             int addr = m_screenBase + col * 256 + row;
             if (m_colorMode != OCM_4COLOR) {
                 uint8_t bt = m_screenMemory[addr];
@@ -170,11 +217,26 @@ void OrionRenderer::renderFrame()
 }
 
 
+/*void OrionRenderer::initConnections()
+{
+    CrtRenderer::initConnections();
+
+    REG_INPUT("mode480", OrionRenderer::setMode480);
+}*/
+
+
+void OrionRenderer::reset()
+{
+    m_mode480 = false;
+}
+
+
 void OrionRenderer::operate()
 {
     renderFrame();
     m_curClock += g_emulation->getFrequency() * 640 * 312 / 10000000; // 10 MHz pixelclock, 312 scanlines, 640 pixels wide
     g_emulation->screenUpdateReq(); // transfer to Core
+    m_platform->getCore()->vrtc(true);
 }
 
 
@@ -208,6 +270,11 @@ bool OrionRenderer::setProperty(const string& propertyName, const EmuValuesList&
             m_showBorder = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "enable480") {
+        if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            m_mode480Enabled = values[0].asString() == "yes";
+            return true;
+        }
     }
     return false;
 }
@@ -228,13 +295,13 @@ string OrionRenderer::getPropertyStringValue(const string& propertyName)
     else if (propertyName == "crtMode")
         switch (m_colorMode) {
         case OCM_MONO:
-            return u8"2-color 384\u00D7256@50.08Hz";
+            return m_mode480 ? u8"2-color 480\u00D7256@50.08Hz" : u8"2-color 384\u00D7256@50.08Hz";
         case OCM_4COLOR:
-            return u8"4-color 384\u00D7256@50.08Hz";
+            return m_mode480 ? u8"4-color 480\u00D7256@50.08Hz" : u8"4-color 384\u00D7256@50.08Hz";
         case OCM_16COLOR:
-            return u8"16-color 384\u00D7256@50.08Hz";
+            return m_mode480 ? u8"16-color 480\u00D7256@50.08Hz" : u8"16-color 384\u00D7256@50.08Hz";
         default:
-            return "384\u00D7256@50.08Hz";
+            return "";
         }
 
     return "";
@@ -267,8 +334,10 @@ bool OrionMemPageSelector::setProperty(const string& propertyName, const EmuValu
 
 void OrionScreenSelector::writeByte(int, uint8_t value)
 {
-    if (m_renderer)
+    if (m_renderer) {
         m_renderer->setScreenBase((~value & 0x3) << 14);
+        m_renderer->setMode480(value & 0x80);
+    }
 };
 
 

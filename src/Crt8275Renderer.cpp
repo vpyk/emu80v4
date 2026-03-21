@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,12 +32,31 @@ using namespace std;
 Crt8275Renderer::Crt8275Renderer()
 {
     m_useAltFont = true;
+
+    m_curFontNum = 0;
+    m_prevRow = 0;
+    for (int i = 0; i < 64; i++)
+        m_fontNums[i] = 0;
 }
 
 
 void Crt8275Renderer::attachCrt(Crt8275* crt)
 {
     m_crt = crt;
+}
+
+
+void Crt8275Renderer::setFontSetNum(int fontNum)
+{
+    //m_fontNumber = fontNum;
+    int curRow = m_crt->getCurRow();
+    if (m_prevRow > curRow)
+        m_prevRow = 0;
+    for (int i = m_prevRow; i < curRow; i++)
+        m_fontNums[i] = m_curFontNum;
+    m_fontNums[curRow] = fontNum;
+    m_curFontNum = fontNum;
+    m_prevRow = curRow;
 }
 
 
@@ -206,6 +225,13 @@ void Crt8275Renderer::mouseDrag(bool pressed, int x, int y)
 
 void Crt8275Renderer::primaryRenderFrame()
 {
+    int curRow = m_crt->getCurRow();
+    if (m_prevRow >= curRow)
+        m_prevRow = 0;
+    for (int i = m_prevRow; i <= curRow; i++)
+        m_fontNums[i] = m_curFontNum;
+    m_prevRow = curRow;
+
     calcAspectRatio(m_fntCharWidth);
 
     const Frame* frame = m_crt->getFrame();
@@ -229,6 +255,8 @@ void Crt8275Renderer::primaryRenderFrame()
     uint32_t* rowPtr = m_pixelData;
 
     for (int row = 0; row < nRows; row++) {
+        m_fontNumber = m_fontNums[row];
+
         uint32_t* chrPtr = rowPtr;
         bool curLten[16];
         memset(curLten, 0, sizeof(curLten));
@@ -306,6 +334,13 @@ void Crt8275Renderer::primaryRenderFrame()
 
 void Crt8275Renderer::altRenderFrame()
 {
+    int curRow = m_crt->getCurRow();
+    if (m_prevRow >= curRow)
+        m_prevRow = 0;
+    for (int i = m_prevRow; i <= curRow; i++)
+        m_fontNums[i] = m_curFontNum;
+    m_prevRow = curRow;
+
     calcAspectRatio(8);
 
     const Frame* frame = m_crt->getFrame();
@@ -338,6 +373,8 @@ void Crt8275Renderer::altRenderFrame()
     uint32_t* rowPtr = m_pixelData;
 
     for (int row = 0; row < nRows; row++) {
+        m_fontNumber = m_fontNums[row];
+
         uint32_t* chrPtr = rowPtr;
         for (int chr = 0; chr < nChars; chr++) {
             Symbol symbol = frame->symbols[row][chr];

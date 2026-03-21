@@ -104,6 +104,7 @@ SOURCES += \
     RkRomDisk.cpp \
     RkSdController.cpp \
     RkTapeHooks.cpp \
+    Rtc14818.cpp \
     SdAdapters.cpp \
     SdCard.cpp \
     Shortcuts.cpp \
@@ -207,6 +208,7 @@ HEADERS  += \
     RkRomDisk.h \
     RkSdController.h \
     RkTapeHooks.h \
+    Rtc14818.h \
     SdAdapters.h \
     SdCard.h \
     Shortcuts.h \

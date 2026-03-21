@@ -76,6 +76,9 @@ class OrionRenderer : public CrtRenderer, public IActive
         OrionRenderer();
         void renderFrame() override;
 
+        //void initConnections() override;
+        void reset() override;
+
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
         void toggleColorMode()  override {m_isColorMode = !m_isColorMode;}
@@ -88,6 +91,7 @@ class OrionRenderer : public CrtRenderer, public IActive
         void attachColorMemory(Ram* colorMemory);
         void setScreenBase(uint16_t base);
         void setColorModeByte(uint8_t modeByte);
+        void setMode480(bool mode480);
 
         static EmuObject* create(const EmuValuesList&) {return new OrionRenderer();}
 
@@ -99,6 +103,8 @@ class OrionRenderer : public CrtRenderer, public IActive
         int m_palette = 0;
         bool m_isColorMode = true;
         bool m_showBorder = false;
+        bool m_mode480Enabled = false;
+        bool m_mode480 = false;
 };
 
 
@@ -181,7 +187,11 @@ class OrionCore : public PlatformCore
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
 
+        void initConnections() override;
+
+        void reset() override;
         void draw() override;
+        void vrtc(bool isActive) override;
         void inte(bool isActive) override;
 
         void attachCrtRenderer(OrionRenderer* crtRenderer);
@@ -190,8 +200,12 @@ class OrionCore : public PlatformCore
 
     private:
         OrionRenderer* m_crtRenderer = nullptr;
-
         GeneralSoundSource* m_beepSoundSource;
+
+        bool m_useInts = false;
+        bool m_intGate = false;
+
+        void setIntGate(bool intGate);
 };
 
 

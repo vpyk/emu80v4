@@ -10,6 +10,7 @@ const parButton = document.getElementById("parButton");
 const colorSelect = document.getElementById("colorSelect");
 const fileButton = document.getElementById("fileButton");
 const diskAButton = document.getElementById("diskAButton");
+const diskBButton = document.getElementById("diskBButton");
 const resetButton = document.getElementById("resetButton");
 const pauseButton = document.getElementById("pauseButton");
 const scalingSelect = document.getElementById("scalingSelect");
@@ -426,11 +427,17 @@ function adjustButtonStates()
     colorSelect.value = getPlatformPropertyValue("crtRenderer", "colorMode");
 
     // Пока здесь,но достаточно один раз при запуске платформы
-    const label = getPlatformPropertyValue("diskA", "label");
-    if (label)
+    const labelA = getPlatformPropertyValue("diskA", "label");
+    if (labelA)
         diskAButton.removeAttribute("disabled");
     else
         diskAButton.setAttribute("disabled", "disabled");
+
+    const labelB = getPlatformPropertyValue("diskB", "label");
+    if (labelB)
+        diskBButton.removeAttribute("disabled");
+    else
+        diskBButton.setAttribute("disabled", "disabled");
 
     const altFont = getPlatformPropertyValue("crtRenderer", "altRenderer");
     if (altFont)
@@ -524,6 +531,7 @@ const emuControls = [
     colorSelect,
     fileButton,
     diskAButton,
+    diskBButton,
     resetButton,
     pauseButton,
     scalingSelect,

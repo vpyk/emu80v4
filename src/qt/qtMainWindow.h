@@ -112,6 +112,7 @@ private slots:
     void onLoadWav();
     void onReset();
     void onPause();
+    void onMaxSpeed();
     void onForwardOn();
     void onFullThrottleOn();
     void onForwardOff();
@@ -388,6 +389,7 @@ private:
     QAction* m_platformConfigAction;
     QAction* m_resetAction;
     QAction* m_pauseAction;
+    QAction* m_maxSpeedAction;
     QAction* m_forwardAction;
     QAction* m_speedUpAction;
     QAction* m_speedDownAction;
@@ -468,7 +470,7 @@ private:
 #endif
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    #define SET_INI_CODEC(x) x.setIniCodec("UTF-8")
+#define SET_INI_CODEC(x) (x).setIniCodec("UTF-8")
 #else
     #define SET_INI_CODEC(x)
 #endif
