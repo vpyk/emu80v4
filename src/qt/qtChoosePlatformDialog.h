@@ -37,7 +37,7 @@ public:
     explicit ChoosePlatformDialog(QWidget *parent = 0);
     ~ChoosePlatformDialog();
 
-    bool execute(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, QString runFileName, bool setDef);
+    bool execute(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, const QString& runFileName, bool setDef);
 
 private slots:
     void on_platformListWidget_doubleClicked(const QModelIndex &index);

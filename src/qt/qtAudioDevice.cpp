@@ -19,14 +19,11 @@
 #include "qtAudioDevice.h"
 
 
-EmuAudioIoDevice::EmuAudioIoDevice() : QIODevice(nullptr)
+EmuAudioIoDevice::EmuAudioIoDevice()
+    : QIODevice(nullptr),
+      m_minSamples(1024),
+      m_maxSamples(4096)
 {
-    m_buffer = new QByteArray();
-    m_pos = 0;
-
-    m_minSamples = 1024;
-    m_maxSamples = 4096;
-
     memset(m_buf, 0, sizeof(m_buf));
 }
 

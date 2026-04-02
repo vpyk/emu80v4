@@ -46,7 +46,7 @@ public:
     void resetPlatformOptions();
     void resetAllOptions();
 
-    QString getOptionValue(QString option);
+    QString getOptionValue(const QString& option) const;
     //void setOptionValue(QString option, QString value);
 
 public slots:
@@ -91,9 +91,9 @@ private:
     void fillEnabledPlatformList();
     void saveEnabledPlatformList();
 
-    QString getRunningConfigValue(QString option);
-    void setRunningConfigValue(QString option, QString value);
-    void loadRunningConfigValue(QString option, bool force = false);
+    QString getRunningConfigValue(const QString &option) const;
+    void setRunningConfigValue(const QString &option, const QString &value);
+    void loadRunningConfigValue(const QString &option, bool force = false);
 
     bool m_presetComboBoxEventsAllowed = true;
     void adjustPresetComboBoxState();

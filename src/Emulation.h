@@ -65,7 +65,7 @@ class Emulation : public ParentObject
 
         void addObject(EmuObject* obj);
         void removeObject(EmuObject* obj);
-        EmuObject* findObject(std::string obj);
+        EmuObject* findObject(const std::string& obj) const;
 
         void registerActiveDevice(IActive* device);
         void unregisterActiveDevice(IActive* device);
@@ -88,38 +88,38 @@ class Emulation : public ParentObject
         void screenUpdateReq();
 
         //inline Platform* getPlatform() {return m_platform;} //!!!
-        inline uint64_t getCurClock() {return m_curClock;}
-        inline SoundMixer* getSoundMixer() {return m_mixer;}
-        inline EmuConfig* getConfig() {return m_config;}
-        inline WavReader* getWavReader() {return m_wavReader;}
-        inline PrnWriter* getPrnWriter() {return m_prnWriter;}
+        inline uint64_t getCurClock() const {return m_curClock;}
+        inline SoundMixer* getSoundMixer() const {return m_mixer;}
+        inline EmuConfig* getConfig() const {return m_config;}
+        inline WavReader* getWavReader() const {return m_wavReader;}
+        inline PrnWriter* getPrnWriter() const {return m_prnWriter;}
 
         void setFrequency(int64_t freq) override;
-        int64_t getFrequency() {return m_frequency;}
+        int64_t getFrequency() const {return m_frequency;}
         void setSampleRate(int sampleRate);             // установка частоты дискретизации звуковой карты
-        int getSampleRate() {return m_sampleRate;}
+        int getSampleRate() const {return m_sampleRate;}
         void setFrameRate(int frameRate);               // установка частоты кадров, 0 - max
         void setVsync(bool vsync);                      // установка vsync
-        bool getVsync() {return m_vsync;}
+        bool getVsync() const {return m_vsync;}
         void setTemporarySpeedUpFactor(unsigned speed);
         void setTemporarySpeedUpFactorDbl(double speed);
         void updateFrequency();
 
-        double getSpeedUpFactor() {return m_currentSpeedUpFactor;}
-        bool getPausedState() {return m_isPaused;}
-        bool getFullThrottleState() {return m_fullThrottle;}
+        double getSpeedUpFactor() const {return m_currentSpeedUpFactor;}
+        bool getPausedState() const {return m_isPaused;}
+        bool getFullThrottleState() const {return m_fullThrottle;}
 
         void processCmdLine();
 
-        const DebuggerOptions& getDebuggerOptions() {return m_debuggerOptions;}
+        const DebuggerOptions& getDebuggerOptions() const {return m_debuggerOptions;}
 
     private:
         std::vector<IActive*> m_activeDevVector;
         IActive** m_activeDevices = nullptr;
         int nDevices = 0;
-        bool inCycle;
+        bool inCycle = false;
         uint64_t m_clockOffset = 0;
-        uint64_t m_sysClock;
+        uint64_t m_sysClock = 0;
         uint64_t m_prevSysClock = 0;
         uint64_t m_timeAfterLastDraw = 0;
         Cpu* m_debugReqCpu = nullptr;
@@ -131,8 +131,8 @@ class Emulation : public ParentObject
         double m_currentSpeedUpFactor = 1.0;
         int m_speedGrade = 0;
 
-        uint64_t m_frequency;
-        uint64_t m_curFrequency;
+        uint64_t m_frequency = 0;
+        uint64_t m_curFrequency = 0;
         unsigned m_fpsLimit = 0;
         bool m_vsync = true;
         unsigned m_sampleRate = 48000;
@@ -149,7 +149,7 @@ class Emulation : public ParentObject
 
         Platform* m_lastActivePlatform = nullptr;
 
-        Platform* platformByWindow(EmuWindow* window);
+        Platform* platformByWindow(const EmuWindow* window) const;
 
         void checkPlatforms();
 
@@ -157,7 +157,7 @@ class Emulation : public ParentObject
         CmdLine& m_cmdLine;
 
         bool m_platformCreatedFromCmdLine = false;
-        bool runPlatform (const std::string& platformName);
+        bool runPlatform(const std::string& platformName);
 
         DebuggerOptions m_debuggerOptions;
 
