@@ -32,25 +32,6 @@ class AddrSpaceMapper;
 
 class SpecMxPit8253SoundSource;
 
-class SpecMxMemPageSelector : public AddressableDevice
-{
-    public:
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-
-        inline void attachAddrSpaceMapper(AddrSpaceMapper* addrSpaceMapper) {m_addrSpaceMapper = addrSpaceMapper;}
-
-        void reset() override;
-
-        void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int) override {return 0xff;}
-
-        static EmuObject* create(const EmuValuesList&) {return new SpecMxMemPageSelector();}
-
-    private:
-        AddrSpaceMapper* m_addrSpaceMapper = nullptr;
-        bool m_onePageMode = false;
-};
-
 
 class SpecVideoRam : public Ram
 {

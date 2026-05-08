@@ -334,45 +334,6 @@ void SpecVideoRam::reset()
 };
 
 
-void SpecMxMemPageSelector::reset()
-{
-    m_addrSpaceMapper->setCurPage(0);
-}
-
-
-void SpecMxMemPageSelector::writeByte(int addr, uint8_t value)
-{
-    if (addr == 0) // RAM
-        m_addrSpaceMapper->setCurPage(1);
-    else if (addr == 1) // RAM Disk
-        m_addrSpaceMapper->setCurPage(m_onePageMode ? 2 : (value & 0x7) + 2);
-    else // 2,3 - ROM
-        m_addrSpaceMapper->setCurPage(0);
-};
-
-
-bool SpecMxMemPageSelector::setProperty(const string& propertyName, const EmuValuesList& values)
-{
-    if (AddressableDevice::setProperty(propertyName, values))
-        return true;
-
-    if (propertyName == "mapper") {
-        attachAddrSpaceMapper(static_cast<AddrSpaceMapper*>(g_emulation->findObject(values[0].asString())));
-        return true;
-    } else if (propertyName == "mode") {
-        if (values[0].asString() == "1bank")
-            m_onePageMode = true;
-        else if (values[0].asString() == "8banks")
-            m_onePageMode = false;
-        else
-            return false;
-        return true;
-    }
-
-    return false;
-}
-
-
 void SpecMxColorRegister::writeByte(int, uint8_t value)
 {
     if (m_videoRam)
@@ -1093,12 +1054,12 @@ bool SpecMxFileLoader::loadFile(const std::string& fileName, bool run)
         Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_platform->getCpu());
         if (!cpu) return false; // на всякий случай
         if (monBegAddr != 0) {
-            m_pageMapper->setCurPage(1); // switch to RAM page
+            m_pageMapper->setCurPage(0); // switch to RAM page
             //m_as->writeByte(0xFFFC, 0); // switch to RAM page
             cpu->setPC(monBegAddr);
         }
         g_emulation->exec(cpu->getKDiv() * 2000000, true);
-        m_pageMapper->setCurPage(1); // switch to RAM page
+        m_pageMapper->setCurPage(0); // switch to RAM page
         //m_as->writeByte(0xFFFC, 0); // switch to RAM page
 
         uint8_t* ptr = buf;

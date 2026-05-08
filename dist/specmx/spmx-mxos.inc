@@ -61,15 +61,15 @@ platform.codePage = rk
 Ram ram0 = 0x9000
 SpecVideoRam videoRam = 0x3000
 Ram upperRam = 0x3FC0
-Ram ramDisk1 = 0xFFC0
+Ram ramDisk0 = 0xFFC0
 ifndef RAMDISK_1BANK
+  Ram ramDisk1 = 0xFFC0
   Ram ramDisk2 = 0xFFC0
   Ram ramDisk3 = 0xFFC0
   Ram ramDisk4 = 0xFFC0
   Ram ramDisk5 = 0xFFC0
   Ram ramDisk6 = 0xFFC0
   Ram ramDisk7 = 0xFFC0
-  Ram ramDisk8 = 0xFFC0
 endif
 Ram sysRam = 0x0020
 
@@ -84,26 +84,27 @@ AddrSpace romPage
 romPage.range = &rom, 0x0000, 0xBFFF
 romPage.range = &upperRam, 0xC000, 0xFFBF
 
-# 0 - ROM, 1 - RAM, 2..10 - RAM DIsks
-ifdef RAMDISK_1BANK
-  AddrSpaceMapper lowerAddrSpace = 10
-else
-  AddrSpaceMapper lowerAddrSpace = 3
-endif
-
-lowerAddrSpace.page = 0, &romPage
-lowerAddrSpace.page = 1, &ramPage
-lowerAddrSpace.page = 2, &ramDisk1
-
 ifndef RAMDISK_1BANK
-  lowerAddrSpace.page = 3, &ramDisk2
-  lowerAddrSpace.page = 4, &ramDisk3
-  lowerAddrSpace.page = 5, &ramDisk4
-  lowerAddrSpace.page = 6, &ramDisk5
-  lowerAddrSpace.page = 7, &ramDisk6
-  lowerAddrSpace.page = 8, &ramDisk7
-  lowerAddrSpace.page = 9, &ramDisk8
+  AddrSpaceMapper ramDiskAddrSpace = 8
+  ramDiskAddrSpace.page = 0, &ramDisk0
+  ramDiskAddrSpace.page = 1, &ramDisk1
+  ramDiskAddrSpace.page = 2, &ramDisk2
+  ramDiskAddrSpace.page = 3, &ramDisk3
+  ramDiskAddrSpace.page = 4, &ramDisk4
+  ramDiskAddrSpace.page = 5, &ramDisk5
+  ramDiskAddrSpace.page = 6, &ramDisk6
+  ramDiskAddrSpace.page = 7, &ramDisk7
 endif
+
+AddrSpaceMapper lowerAddrSpace = 4
+lowerAddrSpace.page = 0, &ramPage
+ifdef RAMDISK_1BANK
+  lowerAddrSpace.page = 1, &ramDisk0
+else
+  lowerAddrSpace.page = 1, &ramDiskAddrSpace
+endif
+lowerAddrSpace.page = 2, &romPage
+lowerAddrSpace.page = 3, &romPage
 
 
 Ppi8255 ppi1
@@ -118,10 +119,11 @@ pit.frequency = 2000000
 RkPit8253SoundSource sndSource
 sndSource.pit = &pit
 
-SpecMxMemPageSelector pageSelector
-pageSelector.mapper = &lowerAddrSpace
-ifdef RAMDISK_1BANK
-  pageSelector.mode = 1bank
+Register pageSelector
+pageSelector.defaultAddr = 3
+connect pageSelector.addr[0-1] -> lowerAddrSpace.page
+ifndef RAMDISK_1BANK
+  connect pageSelector.output[0-2] -> ramDiskAddrSpace.page
 endif
 
 SpecMxColorRegister colorReg
@@ -161,7 +163,7 @@ GeneralSoundSource tapeSoundSource
 
 RkKbdLayout kbdLayout
 SpecKeyboard keyboard
-keyboard.matrix = @KBD
+keyboard.matrix = original
 
 SpecPpi8255Circuit ppiCircuit
 ppiCircuit.specKeyboard = &keyboard

@@ -119,7 +119,6 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(OrionFddQueryRegister);
     REG_EMU_CLASS(OrionCore);
     REG_EMU_CLASS(OrionFileLoader);
-    REG_EMU_CLASS(SpecMxMemPageSelector);
     REG_EMU_CLASS(SpecVideoRam);
     REG_EMU_CLASS(SpecMxColorRegister);
     REG_EMU_CLASS(SpecRenderer);

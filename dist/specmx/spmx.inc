@@ -57,6 +57,8 @@ platform.codePage = koi8
 Ram ram0 = 0x9000
 SpecVideoRam videoRam = 0x3000
 Ram upperRam = 0x3FC0
+
+Ram ramDisk0 = 0xFFC0
 Ram ramDisk1 = 0xFFC0
 Ram ramDisk2 = 0xFFC0
 Ram ramDisk3 = 0xFFC0
@@ -64,7 +66,6 @@ Ram ramDisk4 = 0xFFC0
 Ram ramDisk5 = 0xFFC0
 Ram ramDisk6 = 0xFFC0
 Ram ramDisk7 = 0xFFC0
-Ram ramDisk8 = 0xFFC0
 Ram sysRam = 0x0020
 
 Rom rom = @rom, 0xC000
@@ -78,18 +79,21 @@ AddrSpace romPage
 romPage.range = &rom, 0x0000, 0xBFFF
 romPage.range = &upperRam, 0xC000, 0xFFBF
 
-# 0 - ROM, 1 - RAM, 2..10 - RAM DIsks
-AddrSpaceMapper lowerAddrSpace = 10
-lowerAddrSpace.page = 0, &romPage
-lowerAddrSpace.page = 1, &ramPage
-lowerAddrSpace.page = 2, &ramDisk1
-lowerAddrSpace.page = 3, &ramDisk2
-lowerAddrSpace.page = 4, &ramDisk3
-lowerAddrSpace.page = 5, &ramDisk4
-lowerAddrSpace.page = 6, &ramDisk5
-lowerAddrSpace.page = 7, &ramDisk6
-lowerAddrSpace.page = 8, &ramDisk7
-lowerAddrSpace.page = 9, &ramDisk8
+AddrSpaceMapper ramDiskAddrSpace = 8
+ramDiskAddrSpace.page = 0, &ramDisk0
+ramDiskAddrSpace.page = 1, &ramDisk1
+ramDiskAddrSpace.page = 2, &ramDisk2
+ramDiskAddrSpace.page = 3, &ramDisk3
+ramDiskAddrSpace.page = 4, &ramDisk4
+ramDiskAddrSpace.page = 5, &ramDisk5
+ramDiskAddrSpace.page = 6, &ramDisk6
+ramDiskAddrSpace.page = 7, &ramDisk7
+
+AddrSpaceMapper lowerAddrSpace = 4
+lowerAddrSpace.page = 0, &ramPage
+lowerAddrSpace.page = 1, &ramDiskAddrSpace
+lowerAddrSpace.page = 2, &romPage
+lowerAddrSpace.page = 3, &romPage
 
 Ppi8255 ppi1
 Ppi8255 ppi2
@@ -101,8 +105,10 @@ fddRegs.fdc = &fdc
 Pit8253 pit
 pit.frequency = 2000000
 
-SpecMxMemPageSelector pageSelector
-pageSelector.mapper = &lowerAddrSpace
+Register pageSelector
+pageSelector.defaultAddr = 3
+connect pageSelector.addr[0-1] -> lowerAddrSpace.page
+connect pageSelector.output[0-2] -> ramDiskAddrSpace.page
 
 SpecMxColorRegister colorReg
 colorReg.videoRam = &videoRam
@@ -163,7 +169,7 @@ ppi1.circuit = &ppiCircuit
 
 SpecMxFileLoader loader
 loader.addrSpace = &addrSpace
-loader.ramDiskAddrSpace = &ramDisk1
+loader.ramDiskAddrSpace = &ramDisk0
 loader.pageMapper = &lowerAddrSpace
 loader.filter = "Файлы Специалиста-MX (*.cpu)|*.cpu;*.CPU|Все файлы (*.*)|*"
 
@@ -181,14 +187,14 @@ fdc.fdImage = 1, &diskB
 
 RamDisk ramDisk = 8, 0x10000
 ramDisk.filter = "Файлы RAM-диска Специалиста-MX (*.ramdisk)|*.ramdisk|Все файлы (*.*)|*"
-ramDisk.page = 0, &ramDisk1
-ramDisk.page = 1, &ramDisk2
-ramDisk.page = 2, &ramDisk3
-ramDisk.page = 3, &ramDisk4
-ramDisk.page = 4, &ramDisk5
-ramDisk.page = 5, &ramDisk6
-ramDisk.page = 6, &ramDisk7
-ramDisk.page = 7, &ramDisk8
+ramDisk.page = 0, &ramDisk0
+ramDisk.page = 1, &ramDisk1
+ramDisk.page = 2, &ramDisk2
+ramDisk.page = 3, &ramDisk3
+ramDisk.page = 4, &ramDisk4
+ramDisk.page = 5, &ramDisk5
+ramDisk.page = 6, &ramDisk6
+ramDisk.page = 7, &ramDisk7
 
 
 TapeRedirector rfsTapeOutFile
