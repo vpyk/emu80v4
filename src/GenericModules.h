@@ -143,11 +143,13 @@ private:
     bool m_latching = false;
     uint8_t m_defaultInputValue = 0;
     uint8_t m_defaultOutputValue = 0;
+    uint8_t m_defaultAddr = 0;
 
     uint8_t m_curInputValue = 0;
     uint8_t m_curOutputValue = 0;
 
     EmuOutput* m_output = nullptr;
+    EmuOutput* m_addrOutput = nullptr;
     EmuOutput* m_queryOutput = nullptr;
 
     void setInput(uint8_t value);

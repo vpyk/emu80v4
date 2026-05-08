@@ -276,6 +276,7 @@ void Register::initConnections()
     AddressableDevice::initConnections();
 
     m_output = registerOutput("output");
+    m_addrOutput = registerOutput("addr");
     m_queryOutput = registerOutput("query");
     REG_INPUT("input", Register::setInput);
     REG_INDEXED_INPUT("inputBit", Register::setInputBit);
@@ -287,14 +288,16 @@ void Register::reset()
     m_curInputValue = m_latching ? m_defaultOutputValue : m_defaultInputValue;
     m_curOutputValue = m_defaultOutputValue;
     m_output->setValue(m_curOutputValue); // ?
+    m_addrOutput->setValue(m_defaultAddr);
 }
 
 
-void Register::writeByte(int /*addr*/, uint8_t value)
+void Register::writeByte(int addr, uint8_t value)
 {
     m_curOutputValue = value;
     if (m_latching)
         m_curInputValue = value;
+    m_addrOutput->setValue(addr);
     m_output->setValue(m_curOutputValue);
 }
 
@@ -336,6 +339,9 @@ bool Register::setProperty(const std::string &propertyName, const EmuValuesList 
         return true;
     } else if (propertyName == "defaultOutput") {
         m_defaultOutputValue = values[0].asInt();
+        return true;
+    } else if (propertyName == "defaultAddr") {
+        m_defaultAddr = values[0].asInt();
         return true;
     }
 
