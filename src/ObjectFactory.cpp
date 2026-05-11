@@ -93,6 +93,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(AddrSpaceInverter);
     REG_EMU_CLASS(AddrSpaceWriteSplitter);
     REG_EMU_CLASS(Register);
+    REG_EMU_CLASS(DebugInfo);
     REG_EMU_CLASS(Ram);
     REG_EMU_CLASS(Rom);
     REG_EMU_CLASS(NullSpace);

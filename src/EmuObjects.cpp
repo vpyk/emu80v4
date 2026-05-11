@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Globals.h"
+#include <sstream>
 
+#include "Globals.h"
 #include "EmuObjects.h"
 #include "Emulation.h"
 
@@ -318,4 +319,49 @@ string EmuObjectGroup::getPropertyStringValue(const string& propertyName)
         return (*(m_objectList.begin()))->getPropertyStringValue(propertyName);
 
     return "";
+}
+
+
+void DebugInfo::initConnections()
+{
+    REG_INPUT("value", DebugInfo::setValue);
+}
+
+
+void DebugInfo::setValue(int value)
+{
+    m_intValue = value;
+}
+
+
+bool DebugInfo::setProperty(const std::string &propertyName, const EmuValuesList &values)
+{
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "label") {
+        m_label = values[0].asString();
+        return true;
+    }
+
+    return false;
+}
+
+
+string DebugInfo::getDebugInfo()
+{
+    stringstream ss;
+    if (!m_label.empty())
+        ss << m_label << ": ";
+    else {
+        string name = getName();
+        size_t lastDotPos = name.rfind('.');
+        if (lastDotPos != std::string::npos)
+            name = name.substr(lastDotPos + 1);
+         ss << name << ": ";
+    }
+    ss << hex << m_intValue;
+    //ss << "\n";
+
+    return ss.str();
 }

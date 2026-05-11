@@ -228,4 +228,21 @@ class EmuObjectGroup : public EmuObject
         std::list<EmuObject*> m_objectList;
 };
 
+
+class DebugInfo : public EmuObject
+{
+public:
+    void initConnections();
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+    std::string getDebugInfo() override;
+
+    static EmuObject* create(const EmuValuesList&) {return new DebugInfo();}
+
+private:
+    std::string m_label;
+    int m_intValue;
+
+    void setValue(int value);
+};
+
 #endif // EMUOBJECTS_H
