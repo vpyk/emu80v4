@@ -114,7 +114,7 @@ class AddrSpaceMapper : public AddressableDevice
         ~AddrSpaceMapper();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        void reset() override {m_curPage = 0;}
+        void reset() override;
 
         void attachPage(int page, AddressableDevice* as, int offset);
         void setCurPage(int page);
@@ -131,6 +131,7 @@ protected:
         int* m_offsets;
         int m_nPages;
         int m_curPage = 0;
+        int m_defaultPage = 0;
 };
 
 

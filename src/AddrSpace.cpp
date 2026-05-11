@@ -181,6 +181,12 @@ void AddrSpaceMapper::setCurPage(int page)
 }
 
 
+void AddrSpaceMapper::reset()
+{
+    m_curPage = m_defaultPage;
+}
+
+
 void AddrSpaceMapper::initConnections()
 {
     AddressableDevice::initConnections();
@@ -213,6 +219,9 @@ bool AddrSpaceMapper::setProperty(const string& propertyName, const EmuValuesLis
     if (propertyName == "page" && values[0].isInt()) {
             attachPage(values[0].asInt(), static_cast<AddressableDevice*>(g_emulation->findObject(values[1].asString())), values[2].asInt());
             return true;
+    } else if (propertyName == "defaultPage" && values[0].isInt() && values[0].isInt() < m_nPages) {
+        m_defaultPage = values[0].asInt();
+        return true;
     }
 
     return false;
