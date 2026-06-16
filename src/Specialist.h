@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,18 +39,24 @@ class SpecVideoRam : public Ram
         SpecVideoRam(int memSize);
         virtual ~SpecVideoRam();
 
+        void initConnections() override;
+
         void writeByte(int addr, uint8_t value) override;
         void reset() override;
         uint8_t* getColorDataPtr() {return m_colorBuf;}
+        uint8_t* getColorDataPtrMx() {return m_colorBufMx;}
 
         void setCurColor(uint8_t color);
+        void setCurColorMx(uint8_t color);
 
         static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new SpecVideoRam(parameters[0].asInt()) : nullptr;}
 
     private:
         int m_memSize;
         uint8_t m_color = 0;
+        uint8_t m_colorMx = 0;
         uint8_t* m_colorBuf = nullptr;
+        uint8_t* m_colorBufMx = nullptr;
 };
 
 
@@ -100,6 +106,9 @@ class SpecRenderer : public CrtRenderer, public IActive
     public:
         SpecRenderer();
         ~SpecRenderer();
+
+        void initConnections() override;
+
         void renderFrame() override;
 
         void toggleColorMode() override;
@@ -113,18 +122,20 @@ class SpecRenderer : public CrtRenderer, public IActive
         // derived from ActiveDevice
         void operate() override;
 
-        inline void attachScreenMemory(SpecVideoRam* videoMemory) {m_screenMemory = videoMemory->getDataPtr(); m_colorMemory = videoMemory->getColorDataPtr();}
+        void attachScreenMemory(SpecVideoRam* videoMemory);
 
         static EmuObject* create(const EmuValuesList&) {return new SpecRenderer();}
 
     private:
         const uint8_t* m_screenMemory = nullptr;
         const uint8_t* m_colorMemory = nullptr;
+        const uint8_t* m_colorMemoryMx = nullptr;
 
         uint32_t* m_frameBuf = nullptr;
 
         SpecColorMode m_colorMode = SCM_8COLOR;
         bool m_showBorder = false;
+        bool m_mx2Mode = false;
 
         int m_curLine = 0;
 
@@ -132,6 +143,12 @@ class SpecRenderer : public CrtRenderer, public IActive
         int m_offsetY = 0;
 
         void renderLine(int nLine);
+
+        bool m_mx2Color8 = false;
+        bool m_mx2MxMode = false;
+        void setMx2MemMode(int mx2MemMode);
+        void set8Color(bool color8);
+
 };
 
 
