@@ -416,8 +416,8 @@
     <message>
         <location filename="qtMainWindow.cpp" line="857"/>
         <location filename="qtMainWindow.cpp" line="912"/>
-        <location filename="qtMainWindow.cpp" line="3572"/>
-        <location filename="qtMainWindow.cpp" line="3617"/>
+        <location filename="qtMainWindow.cpp" line="3569"/>
+        <location filename="qtMainWindow.cpp" line="3614"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
@@ -777,11 +777,11 @@
         <location filename="qtMainWindow.cpp" line="733"/>
         <location filename="qtMainWindow.cpp" line="769"/>
         <location filename="qtMainWindow.cpp" line="812"/>
-        <location filename="qtMainWindow.cpp" line="3451"/>
-        <location filename="qtMainWindow.cpp" line="3473"/>
-        <location filename="qtMainWindow.cpp" line="3495"/>
-        <location filename="qtMainWindow.cpp" line="3517"/>
-        <location filename="qtMainWindow.cpp" line="3540"/>
+        <location filename="qtMainWindow.cpp" line="3448"/>
+        <location filename="qtMainWindow.cpp" line="3470"/>
+        <location filename="qtMainWindow.cpp" line="3492"/>
+        <location filename="qtMainWindow.cpp" line="3514"/>
+        <location filename="qtMainWindow.cpp" line="3537"/>
         <source>Unmount</source>
         <translation>Извлечь диск</translation>
     </message>
@@ -1022,47 +1022,47 @@
         <translation>1x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1498"/>
+        <location filename="qtMainWindow.cpp" line="1509"/>
         <source>Fixed: 2x</source>
         <translation>2x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1512"/>
+        <location filename="qtMainWindow.cpp" line="1534"/>
         <source>Fixed: 3x</source>
         <translation>3x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1526"/>
+        <location filename="qtMainWindow.cpp" line="1548"/>
         <source>Fixed: 4x</source>
         <translation>4x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1540"/>
+        <location filename="qtMainWindow.cpp" line="1562"/>
         <source>Fixed: 5x</source>
         <translation>5x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1556"/>
+        <location filename="qtMainWindow.cpp" line="1498"/>
         <source>Fixed: 1.5x</source>
         <translation>1.5x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1567"/>
+        <location filename="qtMainWindow.cpp" line="1523"/>
         <source>Fixed: 2.5x</source>
         <translation>2.5x</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1579"/>
+        <location filename="qtMainWindow.cpp" line="1715"/>
         <source>Resizable</source>
         <translation>Изменяемый</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1593"/>
+        <location filename="qtMainWindow.cpp" line="1729"/>
         <source>Preserve size</source>
         <translation>Сохранять размер</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="1598"/>
+        <location filename="qtMainWindow.cpp" line="1577"/>
         <source>Fixed size</source>
         <translation>Фиксированный</translation>
     </message>
@@ -1159,38 +1159,38 @@
         <translation>Вставка текста</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3212"/>
+        <location filename="qtMainWindow.cpp" line="3209"/>
         <source>Emu80: warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3226"/>
+        <location filename="qtMainWindow.cpp" line="3223"/>
         <source>Emu80 Warning</source>
         <translation>Emu80: предупреждение</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3213"/>
+        <location filename="qtMainWindow.cpp" line="3210"/>
         <source>Reset current platform and common settings?</source>
         <oldsource>Reset current platform settings?</oldsource>
         <translation>Сбросить настройки для текущей платформы и общие?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3227"/>
+        <location filename="qtMainWindow.cpp" line="3224"/>
         <source>Reset all settings?</source>
         <translation>Сбросить все настройки?</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3424"/>
+        <location filename="qtMainWindow.cpp" line="3421"/>
         <source>Mounted:</source>
         <oldsource>Mounted: </oldsource>
         <translation>Подключен:</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3456"/>
-        <location filename="qtMainWindow.cpp" line="3478"/>
-        <location filename="qtMainWindow.cpp" line="3500"/>
-        <location filename="qtMainWindow.cpp" line="3522"/>
-        <location filename="qtMainWindow.cpp" line="3552"/>
+        <location filename="qtMainWindow.cpp" line="3453"/>
+        <location filename="qtMainWindow.cpp" line="3475"/>
+        <location filename="qtMainWindow.cpp" line="3497"/>
+        <location filename="qtMainWindow.cpp" line="3519"/>
+        <location filename="qtMainWindow.cpp" line="3549"/>
         <source>Unmount </source>
         <translation>Извлечь</translation>
     </message>
@@ -1199,24 +1199,24 @@
         <translation type="vanished">Отвязать </translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3591"/>
-        <location filename="qtMainWindow.cpp" line="3636"/>
+        <location filename="qtMainWindow.cpp" line="3588"/>
+        <location filename="qtMainWindow.cpp" line="3633"/>
         <source>Save </source>
         <translation>Сохранить </translation>
     </message>
     <message>
+        <location filename="qtMainWindow.cpp" line="3780"/>
         <location filename="qtMainWindow.cpp" line="3783"/>
-        <location filename="qtMainWindow.cpp" line="3786"/>
         <source>Shader</source>
         <translation>Шейдер</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3820"/>
+        <location filename="qtMainWindow.cpp" line="3817"/>
         <source>JCUKEN</source>
         <translation>ЙЦУКЕН</translation>
     </message>
     <message>
-        <location filename="qtMainWindow.cpp" line="3823"/>
+        <location filename="qtMainWindow.cpp" line="3820"/>
         <source>&quot;Smart&quot;</source>
         <translation>«Умная»</translation>
     </message>
@@ -1257,17 +1257,22 @@
     </message>
     <message>
         <location filename="qtOkeanConfig.ui" line="41"/>
+        <source>REL.4 (No FDD)</source>
+        <translation>REL.4 (без FDD)</translation>
+    </message>
+    <message>
+        <location filename="qtOkeanConfig.ui" line="48"/>
         <source>REL.5 (No FDD)</source>
         <translation>REL.5 (без FDD)</translation>
     </message>
     <message>
-        <location filename="qtOkeanConfig.ui" line="62"/>
+        <location filename="qtOkeanConfig.ui" line="69"/>
         <source>REL.7/2D (AZMaster, MC-7007 keyboard)</source>
         <oldsource>REL.7/2D (MC-7007 Keyboard)</oldsource>
         <translation>REL.7/2D (AZMaster, клавиатура МС-7007)</translation>
     </message>
     <message>
-        <location filename="qtOkeanConfig.ui" line="76"/>
+        <location filename="qtOkeanConfig.ui" line="83"/>
         <source>REL.8&apos; (192K RAM Disk)</source>
         <translation>REL.8&apos; (RAM-диск 192K)</translation>
     </message>

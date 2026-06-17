@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -507,7 +507,10 @@ void OkeanConfigWidget::loadConfig()
     optBegin();
 
     QString val = optLoad("CFG_BIOS_VER").toString();
-    if (val == "5") {
+    if (val == "4") {
+        ui->rel4RadioButton->setChecked(true);
+        ui->rel4RadioButton->setFocus();
+    } else if (val == "5") {
         ui->rel5RadioButton->setChecked(true);
         ui->rel5RadioButton->setFocus();
     } else if (val == "6") {
@@ -535,7 +538,9 @@ void OkeanConfigWidget::saveConfig()
     optBegin();
 
     QString val;
-    if (ui->rel5RadioButton->isChecked())
+    if (ui->rel4RadioButton->isChecked())
+        val = "4";
+    else if (ui->rel5RadioButton->isChecked())
         val = "5";
     else if (ui->rel6RadioButton->isChecked())
         val = "6";
@@ -555,6 +560,7 @@ void OkeanConfigWidget::saveConfig()
 
 void OkeanConfigWidget::setDefaults()
 {
+    ui->rel4RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "4");
     ui->rel5RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "5");
     ui->rel6RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "6");
     ui->rel7RadioButton->setChecked(m_defValues["CFG_BIOS_VER"] == "7");
