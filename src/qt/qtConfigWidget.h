@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@ namespace Ui {
     class SpecConfigWidget;
     class OkeanConfigWidget;
     class PartnerConfigWidget;
+    class SpMx2ConfigWidget;
 }
 
 class ApogeyConfigWidget : public ConfigWidget
@@ -188,6 +189,22 @@ public:
 
 private:
     Ui::PartnerConfigWidget *ui;
+};
+
+
+class SpMx2ConfigWidget : public ConfigWidget
+{
+    Q_OBJECT
+
+public:
+    explicit SpMx2ConfigWidget(QWidget *parent = nullptr);
+
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private:
+    Ui::SpMx2ConfigWidget *ui;
 };
 
 

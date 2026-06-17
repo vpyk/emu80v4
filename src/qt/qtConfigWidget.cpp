@@ -28,6 +28,7 @@
 #include "ui_qtSpecConfig.h"
 #include "ui_qtOkeanConfig.h"
 #include "ui_qtPartnerConfig.h"
+#include "ui_qtSpMx2Config.h"
 
 #include "../Pal.h"
 
@@ -67,6 +68,8 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new SpecConfigWidget();
     else if (platformName == "okean")
         widget = new OkeanConfigWidget();
+    else if (platformName == "spmx2")
+        widget = new SpMx2ConfigWidget();
     /*else if (platformName == "partner")
         widget = new PartnerConfigWidget();*/
     else // if (platformName == "apogey" || platformName == "rk86" || platformName == "kr04" || platformName == "mikrosha" || platformName == "mikro80" || platformName == "ut88")
@@ -160,7 +163,7 @@ void ApogeyConfigWidget::tune()
     ui->sdEnableCheckBox->setVisible(m_platform == "kr04");
     ui->romDiskEnableCheckBox->setVisible(m_platform == "mikrosha");
     ui->sdosGroupBox->setVisible(m_platform == "rk86" || m_platform == "spec");
-    ui->romDiskGroupBox->setVisible(m_platform != "kr04" && m_platform != "partner" && m_platform != "spec");
+    ui->romDiskGroupBox->setVisible(m_platform != "kr04" && m_platform != "partner" && m_platform != "spec" && m_platform != "spmx2");
     ui->sdGroupBox->setVisible(m_platform != "mikrosha" && m_platform != "mikro80" && m_platform != "ut88");
 
     if (m_platform == "spec") {
@@ -198,6 +201,8 @@ void ApogeyConfigWidget::loadConfig()
         m_defValues["CFG_SD_DIR"] = "spec/sdcard";
         m_defValues["CFG_SD_IMG"] = "spec/sd_spec.img";
         m_defValues["CFG_SD_TYPE"] = "HWMPVV";
+    } else if (m_platform == "spmx2") {
+        m_defValues["CFG_SD_DIR"] = "specmx/sdcard";
     }
 
     optBegin();
@@ -629,4 +634,36 @@ void PartnerConfigWidget::setDefaults()
     ui->v2RadioButton->setChecked(m_defValues["CFG_ROMSET_VER"] == "2");
     ui->v1RadioButton->setChecked(m_defValues["CFG_ROMSET_VER"] == "1");
     ui->v103RadioButton->setChecked(m_defValues["CFG_ROMSET_VER"] == "1.03");
+}
+
+
+// ######## SpMx2 config widget ########
+
+SpMx2ConfigWidget::SpMx2ConfigWidget(QWidget *parent) :
+    ConfigWidget(parent),
+    ui(new Ui::SpMx2ConfigWidget)
+{
+    ui->setupUi(this);
+}
+
+
+void SpMx2ConfigWidget::loadConfig()
+{
+    m_defValues["CFG_DISABLE_5COLOR"] = "OFF";
+
+    optBegin();
+    ui->disable5colorCheckBox->setChecked(optLoad("CFG_DISABLE_5COLOR").toString() == "ON");
+    optEnd();
+}
+
+void SpMx2ConfigWidget::saveConfig()
+{
+    optBegin();
+    optSave("CFG_DISABLE_5COLOR", ui->disable5colorCheckBox->isChecked() ? "ON" : "OFF");
+    optEnd();
+}
+
+void SpMx2ConfigWidget::setDefaults()
+{
+    ui->disable5colorCheckBox->setChecked(m_defValues["CFG_DISABLE_5COLOR"] == "ON");
 }

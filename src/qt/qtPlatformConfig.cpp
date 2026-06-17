@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,7 +46,8 @@ bool PlatformConfigDialog::hasConfig(QString platform)
     return groupName == "apogey" || groupName == "rk86" || groupName == "korvet" ||
            groupName == "kr04" || groupName == "vector" || groupName == "mikrosha" ||
            groupName == "partner" || groupName == "mikro80" || groupName == "ut88" ||
-           groupName == "spec" || groupName == "zx" || groupName == "okean";
+           groupName == "spec" || groupName == "zx" || groupName == "okean" ||
+           groupName == "spmx2";
 }
 
 
@@ -56,8 +57,8 @@ bool PlatformConfigDialog::configure(QString platform)
     QSizePolicy sp;
     //sp.setVerticalPolicy(QSizePolicy::Expanding);
     //sp.setVerticalStretch(0);
-    //sp.setHorizontalPolicy(QSizePolicy::Expanding);
-    //sp.setHorizontalStretch(1);
+    sp.setHorizontalPolicy(QSizePolicy::Expanding);
+    sp.setHorizontalStretch(1);
 
     m_configWidget = ConfigWidget::create(getGroupName(platform));
     //m_configWidget->setSizePolicy(sp);
@@ -69,6 +70,14 @@ bool PlatformConfigDialog::configure(QString platform)
         m_configWidget2 = new ApogeyConfigWidget();
         m_configWidget2->tune("spec");
         //m_configWidget2->setSizePolicy(sp);
+        static_cast<QBoxLayout*>(layout())->insertWidget(0, m_configWidget2);
+        m_configWidget2->loadConfig();
+    }
+
+    if (getGroupName(platform) == "spmx2") {
+        m_configWidget2 = new ApogeyConfigWidget();
+        m_configWidget2->tune("spmx2");
+        m_configWidget2->setSizePolicy(sp);
         static_cast<QBoxLayout*>(layout())->insertWidget(0, m_configWidget2);
         m_configWidget2->loadConfig();
     }

@@ -254,6 +254,7 @@ FORMS += \
     qt/qtAboutDialog.ui \
     qt/qtHelpDialog.ui \
     qt/qtApogeyConfig.ui \
+    qt/qtSpMx2Config.ui \
     qt/qtSpecConfig.ui \
     qt/qtVectorConfig.ui \
     qt/qtZxConfig.ui

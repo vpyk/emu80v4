@@ -144,7 +144,7 @@ class SpecRenderer : public CrtRenderer, public IActive
 
         void renderLine(int nLine);
 
-        bool m_mx2Color8 = false;
+        bool m_mx2Color8 = true;
         bool m_mx2MxMode = false;
         void setMx2MemMode(int mx2MemMode);
         void set8Color(bool color8);

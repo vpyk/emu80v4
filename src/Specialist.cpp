@@ -117,6 +117,8 @@ SpecRenderer::SpecRenderer()
     m_prevPixelData = new uint32_t[maxBufSize];
     memset(m_pixelData, 0, m_bufSize * sizeof(uint32_t));
     memset(m_prevPixelData, 0, m_prevBufSize * sizeof(uint32_t));
+
+    m_mx2Color8 = true;
 }
 
 

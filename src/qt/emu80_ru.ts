@@ -59,22 +59,22 @@
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="272"/>
+        <location filename="qtConfigWidget.cpp" line="275"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="272"/>
+        <location filename="qtConfigWidget.cpp" line="275"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="278"/>
+        <location filename="qtConfigWidget.cpp" line="281"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="284"/>
+        <location filename="qtConfigWidget.cpp" line="287"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -105,7 +105,7 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="qtConfigWidget.cpp" line="109"/>
+        <location filename="qtConfigWidget.cpp" line="112"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -2005,6 +2005,19 @@
         <location filename="qtSettingsDialog.cpp" line="1099"/>
         <source>Some settings will take effect after emulator restart</source>
         <translation>Некоторые настройки вступят в силу после перезапуска эмулятора</translation>
+    </message>
+</context>
+<context>
+    <name>SpMx2ConfigWidget</name>
+    <message>
+        <location filename="qtSpMx2Config.ui" line="26"/>
+        <source>Color</source>
+        <translation>Цвет</translation>
+    </message>
+    <message>
+        <location filename="qtSpMx2Config.ui" line="32"/>
+        <source>Disable 5-color mode (Syabr)</source>
+        <translation>Отключить 5-цветный режим («Сябр»)</translation>
     </message>
 </context>
 <context>
