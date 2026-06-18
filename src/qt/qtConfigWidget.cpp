@@ -28,6 +28,7 @@
 #include "ui_qtSpecConfig.h"
 #include "ui_qtOkeanConfig.h"
 #include "ui_qtPartnerConfig.h"
+#include "ui_qtOrionConfig.h"
 #include "ui_qtSpMx2Config.h"
 
 #include "../Pal.h"
@@ -68,6 +69,8 @@ ConfigWidget* ConfigWidget::create(QString platformName)
         widget = new SpecConfigWidget();
     else if (platformName == "okean")
         widget = new OkeanConfigWidget();
+    else if (platformName == "orion")
+        widget = new OrionConfigWidget();
     else if (platformName == "spmx2")
         widget = new SpMx2ConfigWidget();
     /*else if (platformName == "partner")
@@ -634,6 +637,42 @@ void PartnerConfigWidget::setDefaults()
     ui->v2RadioButton->setChecked(m_defValues["CFG_ROMSET_VER"] == "2");
     ui->v1RadioButton->setChecked(m_defValues["CFG_ROMSET_VER"] == "1");
     ui->v103RadioButton->setChecked(m_defValues["CFG_ROMSET_VER"] == "1.03");
+}
+
+
+// ######## Orion config widget ########
+
+OrionConfigWidget::OrionConfigWidget(QWidget *parent) :
+    ConfigWidget(parent),
+    ui(new Ui::OrionConfigWidget)
+{
+    ui->setupUi(this);
+}
+
+
+void OrionConfigWidget::loadConfig()
+{
+    m_defValues["CFG_Z80CARD2_AY"] = "ON";
+    m_defValues["CFG_Z80CARD2_480PX"] = "ON";
+
+    optBegin();
+    ui->ayCheckBox->setChecked(optLoad("CFG_Z80CARD2_AY").toString() == "ON");
+    ui->enable480CheckBox->setChecked(optLoad("CFG_Z80CARD2_480PX").toString() == "ON");
+    optEnd();
+}
+
+void OrionConfigWidget::saveConfig()
+{
+    optBegin();
+    optSave("CFG_Z80CARD2_AY", ui->ayCheckBox->isChecked() ? "ON" : "OFF");
+    optSave("CFG_Z80CARD2_480PX", ui->enable480CheckBox->isChecked() ? "ON" : "OFF");
+    optEnd();
+}
+
+void OrionConfigWidget::setDefaults()
+{
+    ui->ayCheckBox->setChecked(m_defValues["CFG_Z80CARD2_AY"] == "ON");
+    ui->enable480CheckBox->setChecked(m_defValues["CFG_Z80CARD2_480PX"] == "ON");
 }
 
 

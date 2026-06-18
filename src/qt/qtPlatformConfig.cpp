@@ -47,7 +47,7 @@ bool PlatformConfigDialog::hasConfig(QString platform)
            groupName == "kr04" || groupName == "vector" || groupName == "mikrosha" ||
            groupName == "partner" || groupName == "mikro80" || groupName == "ut88" ||
            groupName == "spec" || groupName == "zx" || groupName == "okean" ||
-           groupName == "spmx2";
+           groupName == "spmx2" || platform == "orion.z2";
 }
 
 

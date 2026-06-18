@@ -67,6 +67,7 @@ namespace Ui {
     class SpecConfigWidget;
     class OkeanConfigWidget;
     class PartnerConfigWidget;
+    class OrionConfigWidget;
     class SpMx2ConfigWidget;
 }
 
@@ -189,6 +190,22 @@ public:
 
 private:
     Ui::PartnerConfigWidget *ui;
+};
+
+
+class OrionConfigWidget : public ConfigWidget
+{
+    Q_OBJECT
+
+public:
+    explicit OrionConfigWidget(QWidget *parent = nullptr);
+
+    void loadConfig() override;
+    void saveConfig() override;
+    void setDefaults() override;
+
+private:
+    Ui::OrionConfigWidget *ui;
 };
 
 

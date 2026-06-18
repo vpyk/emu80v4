@@ -59,22 +59,22 @@
         <translation>SD-адаптер (схемы hwm/pww, n8vem, msx)</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="275"/>
+        <location filename="qtConfigWidget.cpp" line="280"/>
         <source>Select ROM Disk File</source>
         <translation>Выберите файл ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="275"/>
+        <location filename="qtConfigWidget.cpp" line="280"/>
         <source>ROM Disk Files</source>
         <translation>Файлы ROM-диска</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="281"/>
+        <location filename="qtConfigWidget.cpp" line="286"/>
         <source>Select SD Card Folder</source>
         <translation>Выберите папку SD-карты</translation>
     </message>
     <message>
-        <location filename="qtConfigWidget.cpp" line="287"/>
+        <location filename="qtConfigWidget.cpp" line="292"/>
         <source>Select SD Card Image File</source>
         <translation>Выберите файл образа SD-карты</translation>
     </message>
@@ -105,7 +105,7 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="qtConfigWidget.cpp" line="112"/>
+        <location filename="qtConfigWidget.cpp" line="115"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -1275,6 +1275,20 @@
         <location filename="qtOkeanConfig.ui" line="83"/>
         <source>REL.8&apos; (192K RAM Disk)</source>
         <translation>REL.8&apos; (RAM-диск 192K)</translation>
+    </message>
+</context>
+<context>
+    <name>OrionConfigWidget</name>
+    <message>
+        <location filename="qtOrionConfig.ui" line="26"/>
+        <source>Z80-Card II configuration</source>
+        <oldsource>MX2 configuration</oldsource>
+        <translation>Конфигурация Z80-Card II</translation>
+    </message>
+    <message>
+        <location filename="qtOrionConfig.ui" line="39"/>
+        <source>Enable 480 px screen mode</source>
+        <translation>Разрешить режим экрана 480 px</translation>
     </message>
 </context>
 <context>
