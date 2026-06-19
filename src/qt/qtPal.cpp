@@ -404,9 +404,10 @@ uint8_t* palReadFile(const string& fileName, int &fileSize, bool useBasePath)
 
 void palRequestForQuit()
 {
-    if (isRunning)
+    if (isRunning) {
+        g_renderHelper->pause();
         application->quit();
-    else
+    } else
         dontRun = true;
 }
 
