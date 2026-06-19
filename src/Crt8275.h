@@ -201,7 +201,7 @@ class Crt8275 : public AddressableDevice, public IActive
 
         //bool m_isDmaStarted;         // true if DMA not stopped due special code for the rest of the frame
         bool m_isRasterStarted;
-        int m_curRow;                // current row
+        int m_curRow = 0;            // current row
         int m_curBufPos;                // current position in buffer
         bool m_isNextCharToFifo;
         int m_curFifoPos;            // current FIFO position

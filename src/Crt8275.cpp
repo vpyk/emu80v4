@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2023
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -95,6 +95,7 @@ void Crt8275::reset()
     m_burstCount = 1;
     m_cursorPos = 0;
     m_cursorRow = 0;
+    m_curRow = 0;
     m_isIntsEnabled = false;
     m_statusReg = 0;
     m_cmdReg = 0;
