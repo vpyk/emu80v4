@@ -494,24 +494,24 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
             setTemporarySpeedUpFactor(0);
             break;
         case SR_SPEEDSTEPUP:
-            if (m_speedGrade < 44)
+            if (m_speedGrade < 56)
                 setSpeedByGrade(m_speedGrade += 4);
             else
-                setSpeedByGrade(m_speedGrade = 48);
+                setSpeedByGrade(m_speedGrade = 60);
             break;
         case SR_SPEEDSTEPDOWN:
-            if (m_speedGrade > -44)
+            if (m_speedGrade > -56)
                 setSpeedByGrade(m_speedGrade -= 4);
             else
-                setSpeedByGrade(m_speedGrade = -48);
+                setSpeedByGrade(m_speedGrade = -60);
             break;
             break;
         case SR_SPEEDSTEPUPFINE:
-            if (m_speedGrade < 48)
+            if (m_speedGrade < 60)
                 setSpeedByGrade(++m_speedGrade);
             break;
         case SR_SPEEDSTEPDOWNFINE:
-            if (m_speedGrade > -48)
+            if (m_speedGrade > -60)
                 setSpeedByGrade(--m_speedGrade);
             break;
         case SR_SPEEDSTEPNORMAL:
