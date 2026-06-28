@@ -35,6 +35,10 @@
 #include "FileLoader.h"
 #include "EmuCalls.h"
 
+#ifdef MCP_SERVER
+#include "mcp/McpMarshal.h"
+#endif
+
 using namespace std;
 
 
@@ -549,6 +553,10 @@ void Emulation::sysReq(EmuWindow* wnd, SysReq sr)
 
 void Emulation::mainLoopCycle()
 {
+#ifdef MCP_SERVER
+    mcpProcessCommands();
+#endif
+
     if (m_prevSysClock == 0) // first run
         m_prevSysClock = palGetCounter() - palGetCounterFreq() / 500;
 
@@ -653,6 +661,20 @@ void Emulation::updateFrequency()
 {
     m_curFrequency = m_frequency * m_currentSpeedUpFactor;
     m_mixer->setFrequency(m_curFrequency);
+}
+
+
+Platform* Emulation::getCurrentPlatform()
+{
+    return m_platformList.empty() ? nullptr : m_platformList.front();
+}
+
+
+void Emulation::mcpProcessCommands()
+{
+#ifdef MCP_SERVER
+    mcp::ProcessPendingCommands();
+#endif
 }
 
 

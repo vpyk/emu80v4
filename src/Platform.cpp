@@ -423,14 +423,12 @@ void Platform::createDebugger()
     if (m_debugger)
         return;
 
-#ifndef PAL_WASM
+#if !defined PAL_WASM && !defined WASM_DBG && !defined MCP_SERVER
     m_debugger = new DebugWindow(this);
     m_debugger->initDbgWindow();
     m_debugger->setCaption("Debug: " + m_window->getCaption());
 #else
-  #ifdef WASM_DBG
     m_debugger = new ExternalDebugger(this);
-  #endif // WASM_DBG
 #endif
 }
 

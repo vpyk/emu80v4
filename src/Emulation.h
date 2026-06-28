@@ -94,6 +94,10 @@ class Emulation : public ParentObject
         inline WavReader* getWavReader() {return m_wavReader;}
         inline PrnWriter* getPrnWriter() {return m_prnWriter;}
 
+        Platform* getCurrentPlatform();
+
+        void mcpProcessCommands();
+
         void setFrequency(int64_t freq) override;
         int64_t getFrequency() {return m_frequency;}
         void setSampleRate(int sampleRate);             // установка частоты дискретизации звуковой карты

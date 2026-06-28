@@ -29,6 +29,12 @@
 #include "CmdLine.h"
 #include "Emulation.h"
 
+#ifdef MCP_SERVER
+#include "mcp/McpMarshal.h"
+#include "mcp/McpServer.h"
+#endif
+
+
 using namespace std;
 
 Emulation* g_emulation = nullptr;
@@ -114,10 +120,23 @@ int main (int argc, char** argv)
     if (!warnings.empty())
         palMsgBox("Warnings:\n\n" + warnings + "\nFor brief help: " EXE_NAME " --help");
 
+#ifdef MCP_SERVER
+    mcp::RegisterMainThread();
+#endif
+
     new Emulation(cmdLine); // g_emulation присваивается в конструкторе
 
     palStart();
+
+#ifdef MCP_SERVER
+    g_McpServer.Start(19266);
+#endif
+
     palExecute();
+
+#ifdef MCP_SERVER
+    g_McpServer.Stop();
+#endif
 
     delete g_emulation;
 
