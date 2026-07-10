@@ -429,7 +429,7 @@ void SettingsDialog::fillControlValues()
     } else {
         ui->fixedScaleRadioButton->setChecked(false);
         ui->stretchRadioButton->setChecked(val == "fit");
-        ui->stretchPropIntRadioButton->setChecked(val == "bestfit");
+        ui->stretchPropIntRadioButton->setChecked(val == "bestFit");
     }
 
     // Smoothing
