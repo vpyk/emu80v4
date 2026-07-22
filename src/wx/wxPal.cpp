@@ -56,16 +56,17 @@ void palWxQuit()
 }
 
 
-string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow*)
+string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow*, const string& defaultFileName)
 {
     //palPause();
     wxString wxFilter = wxString::FromUTF8(filter.c_str());
     wxString wxTitle = wxString::FromUTF8(title.c_str());
+    wxString wxDefName = wxString::FromUTF8(defaultFileName.c_str());
     wxFileDialog* openFileDialog = NULL;
     if (write) {
-        openFileDialog = new wxFileDialog(NULL, wxTitle, "", "", wxFilter, wxFD_SAVE | wxFD_CHANGE_DIR | wxFD_OVERWRITE_PROMPT);
+        openFileDialog = new wxFileDialog(NULL, wxTitle, "", wxDefName, wxFilter, wxFD_SAVE | wxFD_CHANGE_DIR | wxFD_OVERWRITE_PROMPT);
     } else {
-        openFileDialog = new wxFileDialog(NULL, wxTitle, "", "", wxFilter, wxFD_OPEN | wxFD_CHANGE_DIR | wxFD_FILE_MUST_EXIST);
+        openFileDialog = new wxFileDialog(NULL, wxTitle, "", wxDefName, wxFilter, wxFD_OPEN | wxFD_CHANGE_DIR | wxFD_FILE_MUST_EXIST);
     }
     string res = "";
     if (openFileDialog->ShowModal() != wxID_CANCEL) {

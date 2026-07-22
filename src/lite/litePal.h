@@ -31,7 +31,7 @@
 class PalWindow;
 
 #ifndef PAL_WASM
-std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr);
+std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr, const std::string& defaultFileName = "");
 void palUpdateConfig();
 #endif //!PAL_WASM
 

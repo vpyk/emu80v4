@@ -36,7 +36,7 @@ using namespace std;
 
 #ifdef _WIN32
 
-string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window)
+string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window, const string& defaultFileName)
 {
     OPENFILENAMEW ofn;
     memset(&ofn, 0, sizeof(ofn));
@@ -59,13 +59,16 @@ string palOpenFileDialog(const string& title, const string& filter, bool write, 
     ofn.lpstrTitle = titleStr;
 
     wchar_t str[MAX_PATH + 1] = L"";
+    if (!defaultFileName.empty()) {
+        MultiByteToWideChar(CP_UTF8, 0, defaultFileName.c_str(), -1, str, MAX_PATH);
+    }
     ofn.lpstrFile = str;
 
     ofn.nFilterIndex = 1;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = write ? 0 : OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
     //ofn.lpstrDefExt = "rk";
-    if (write ? GetOpenFileNameW(&ofn) : GetSaveFileNameW(&ofn)) {
+    if (write ? GetSaveFileNameW(&ofn) : GetOpenFileNameW(&ofn)) {
         int len = wcslen(str);
         char* utf8str = new char[len * 4 + 4]; // с запасом
         WideCharToMultiByte(CP_UTF8, 0, str, -1, utf8str, len * 4 + 4, 0, 0);
@@ -138,7 +141,7 @@ void palUpdateConfig() {
 #else
 
 #ifndef PAL_WASM
-std::string palOpenFileDialog(const std::string&, const std::string&, bool, PalWindow*) {
+std::string palOpenFileDialog(const std::string&, const std::string&, bool, PalWindow*, const std::string&) {
     return "";
 }
 

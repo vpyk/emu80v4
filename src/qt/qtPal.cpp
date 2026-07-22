@@ -444,7 +444,7 @@ void palDelay(uint64_t time)
 }
 
 
-std::string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window)
+std::string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window, const string& defaultFileName)
 {
     QSettings settings;
     SET_INI_CODEC(settings);
@@ -499,6 +499,8 @@ std::string palOpenFileDialog(const string& title, const string& filter, bool wr
         fileDialog.setAcceptMode(QFileDialog::QFileDialog::AcceptSave);
         fileDialog.setNameFilter(newFilter);
         fileDialog.setDirectory(dir);
+        if (!defaultFileName.empty())
+            fileDialog.selectFile(QString::fromUtf8(defaultFileName.c_str()));
         if (!lastFilter.isEmpty() && newFilter.contains(lastFilter))
             fileDialog.selectNameFilter(lastFilter);
         g_renderHelper->pause();
@@ -520,6 +522,8 @@ std::string palOpenFileDialog(const string& title, const string& filter, bool wr
         fileDialog.setFileMode(QFileDialog::ExistingFiles);
         fileDialog.setNameFilter(newFilter);
         fileDialog.setDirectory(dir);
+        if (!defaultFileName.empty())
+            fileDialog.selectFile(QString::fromUtf8(defaultFileName.c_str()));
         if (!lastFilter.isEmpty() && newFilter.contains(lastFilter))
             fileDialog.selectNameFilter(lastFilter);
         g_renderHelper->pause();

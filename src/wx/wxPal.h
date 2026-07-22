@@ -31,7 +31,7 @@ class PalWindow;
 bool palWxInit(int argc, char** argv);
 void palWxQuit();
 
-std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr);
+std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr, const std::string& defaultFileName = "");
 
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef = false, PalWindow* wnd = nullptr);
 bool palChooseConfiguration(const std::string& platformName, PalWindow* wnd);

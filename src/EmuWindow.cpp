@@ -20,6 +20,7 @@
 #include <iomanip>
 #include <string.h>
 #include <cmath>
+#include <chrono>
 
 #include "Globals.h"
 #include "EmuWindow.h"
@@ -589,14 +590,35 @@ void EmuWindow::sysReq(SysReq sr)
             if (m_windowType == EWT_EMULATION)
                 g_emulation->getConfig()->updateConfig();
             break;
-        case SR_SCREENSHOT:
+        case SR_SCREENSHOT: {
+            // Generate default filename from timestamp: YYYYMMDDHHMMSSmmm
+            auto now = std::chrono::system_clock::now();
+            auto t = std::chrono::system_clock::to_time_t(now);
+            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                now.time_since_epoch()) % 1000;
+            std::tm* tm = std::localtime(&t);
+            std::ostringstream fname;
+            fname << std::setfill('0')
+                  << std::setw(4) << (tm->tm_year + 1900)
+                  << std::setw(2) << (tm->tm_mon + 1)
+                  << std::setw(2) << tm->tm_mday
+                  << std::setw(2) << tm->tm_hour
+                  << std::setw(2) << tm->tm_min
+                  << std::setw(2) << tm->tm_sec
+                  << std::setw(3) << ms.count()
+#ifdef PAL_QT
+                  << ".png";
+#else
+                  << ".bmp";
+#endif
             screenshotRequest(palOpenFileDialog("Save screenshot",
 #ifdef PAL_QT
                 "PNG files (*.png)|*.png|"
 #endif
                 "BMP files (*.bmp)|*.bmp"
-                , true, this));
+                , true, this, fname.str()));
             break;
+        }
         default:
             break;
     }

@@ -62,7 +62,7 @@ void palRequestForQuit();
 void palPlaySample(int16_t sample); // mono, not used for now
 void palPlaySample(int16_t left, int16_t right); // stereo
 
-std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr);
+std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr, const std::string& defaultFileName = "");
 
 void palCopyTextToClipboard(const char* text);
 std::string palGetTextFromClipboard();

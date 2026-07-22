@@ -68,7 +68,7 @@ void palCopyTextToClipboard(const char* text);
 std::string palGetTextFromClipboard();
 
 #ifdef PAL_WASM
-std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr);
+std::string palOpenFileDialog(const std::string& title, const std::string& filter, bool write, PalWindow* window = nullptr, const std::string& defaultFileName = "");
 #endif //PAL_WASM
 
 

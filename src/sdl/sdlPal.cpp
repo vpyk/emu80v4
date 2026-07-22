@@ -797,7 +797,7 @@ EM_ASYNC_JS(int, jsSelectAndLoadFile, (), {
         return 0;
 });
 
-string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window)
+string palOpenFileDialog(const string& title, const string& filter, bool write, PalWindow* window, const string& /*defaultFileName*/)
 {
     if (write)
         return "";
