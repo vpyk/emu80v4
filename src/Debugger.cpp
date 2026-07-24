@@ -2264,15 +2264,21 @@ CodeBreakpoint::~CodeBreakpoint()
 
 bool CodeBreakpoint::hookProc()
 {
-    //m_isEnabled = false;
-    if (m_skipCount > 0) {
-        --m_skipCount;
+    ++m_hitCount;
+    if (m_remaining > 0) {
+        --m_remaining;
         return false;
     }
+    // Actual stop — reset counters.
+    m_remaining = m_skipCount;
+    m_hitCount = 0;
     g_emulation->debugRequest(m_cpu);
     return true;
 }
 
+
+
+//##### Data Breakpoint class ####
 
 DataBreakpoint::DataBreakpoint(uint16_t addr, BreakpointType type)
     : m_addr(addr), m_type(type)
@@ -2287,22 +2293,26 @@ DataBreakpoint::~DataBreakpoint()
 
 bool DataBreakpoint::check(bool isWrite)
 {
-    if (m_skipCount > 0) {
-        --m_skipCount;
+    ++m_hitCount;
+    if (m_remaining > 0) {
+        --m_remaining;
         return false;
     }
     // BT_ACSESS fires on any access; BT_WRITE only on writes; BT_READ only on reads.
     bool shouldBreak = (m_type == BT_ACSESS)
                     || (m_type == BT_WRITE && isWrite)
                     || (m_type == BT_READ  && !isWrite);
-    if (shouldBreak)
+    if (shouldBreak) {
+        m_remaining = m_skipCount;
+        m_hitCount = 0;
         g_emulation->debugRequest(m_cpu);
+    }
     return shouldBreak;
 }
 
 
 
-#ifdef WASM_DBG
+#if defined(WASM_DBG) || defined(MCP_SERVER)
 
 //##### External Debugger class ####
 
@@ -2429,8 +2439,9 @@ void ExternalDebugger::checkForCurBreakpoint()
 {
     uint16_t pc = m_cpu->getPC();
     for (auto it = m_bpList.begin(); it != m_bpList.end(); it++)
-        if ((*it).type == BT_EXEC && (*it).addr == pc)
-            (*it).codeBp->setSkipCount(1);
+        if ((*it).type == BT_EXEC && (*it).addr == pc && (*it).codeBp)
+            if ((*it).codeBp->getRemaining() == 0)
+                (*it).codeBp->setRemaining(1);
 }
 
 
@@ -2540,10 +2551,14 @@ void ExternalDebugger::dbgGetState(DbgCpuState& state)
         state.mem[i] = memByte(i);
 
     for (auto& bp: m_bpList)
-        state.breakpoints.push_back(bp.addr);
+        state.breakpoints.push_back({bp.addr,
+            bp.codeBp ? bp.codeBp->getHitCount()  : 0,
+            bp.codeBp ? bp.codeBp->getSkipCount() : 0,
+            bp.codeBp ? bp.codeBp->getRemaining() : 0});
 
     for (auto* dbp: m_dataBpList)
-        state.dataBreakpoints.push_back({dbp->getAddr(), static_cast<int>(dbp->getType())});
+        state.dataBreakpoints.push_back({dbp->getAddr(), static_cast<int>(dbp->getType()),
+            dbp->getHitCount(), dbp->getSkipCount(), dbp->getRemaining()});
 }
 
 
@@ -2589,4 +2604,18 @@ void ExternalDebugger::dbgClearDataBreakpoints()
     m_dataBpList.clear();
 }
 
-#endif // WASM_DBG
+void ExternalDebugger::dbgSetExecSkipCount(uint16_t addr, int skipCount)
+{
+    for (auto& bp : m_bpList)
+        if (bp.addr == addr && bp.codeBp)
+            bp.codeBp->setSkipCount(skipCount);
+}
+
+void ExternalDebugger::dbgSetDataSkipCount(uint16_t addr, int skipCount)
+{
+    for (auto* dbp : m_dataBpList)
+        if (dbp->getAddr() == addr)
+            dbp->setSkipCount(skipCount);
+}
+
+#endif // WASM_DBG || MCP_SERVER

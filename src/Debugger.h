@@ -37,10 +37,16 @@ class CodeBreakpoint : public CpuHook
         virtual ~CodeBreakpoint();
         bool hookProc() override;
 
-        void setSkipCount(int skips) {m_skipCount = skips;}
+        void setSkipCount(int n)  { m_skipCount = n; m_remaining = n; }
+        int  getSkipCount() const { return m_skipCount; }
+        int  getRemaining() const { return m_remaining; }
+        void setRemaining(int n)  { m_remaining = n; }
+        int  getHitCount() const  { return m_hitCount; }
 
     private:
-        int m_skipCount = 0;
+        int m_skipCount = 0;    // fixed property
+        int m_remaining = 0;    // decremented each hit, reset from skipCount on stop
+        int m_hitCount = 0;     // hits since last stop
 };
 
 
@@ -115,16 +121,22 @@ public:
     virtual ~DataBreakpoint();
 
     void setCpu(Cpu* cpu) { m_cpu = cpu; }
-    void setSkipCount(int skips) { m_skipCount = skips; }
-    uint16_t getAddr() { return m_addr; }
+    void setSkipCount(int n)  { m_skipCount = n; m_remaining = n; }
+    int  getSkipCount() const { return m_skipCount; }
+    int  getRemaining() const { return m_remaining; }
+    void setRemaining(int n)  { m_remaining = n; }
+    uint16_t getAddr()  { return m_addr; }
     BreakpointType getType() { return m_type; }
+    int  getHitCount() const { return m_hitCount; }
     bool check(bool isWrite);
 
 protected:
     Cpu*   m_cpu = nullptr;
     uint16_t m_addr;
     BreakpointType m_type;
-    int    m_skipCount = 0;
+    int    m_skipCount = 0;   // fixed property
+    int    m_remaining = 0;   // decremented each hit, reset from skipCount on stop
+    int    m_hitCount = 0;    // hits since last stop
 };
 
 
@@ -435,11 +447,21 @@ private:
 };
 
 
-#ifdef WASM_DBG
+#if defined(WASM_DBG) || defined(MCP_SERVER)
+
+struct DbgExecBreakpoint {
+    uint16_t addr;
+    int hitCount;
+    int skipCount;
+    int remaining;
+};
 
 struct DbgDataBreakpoint {
     uint16_t addr;
-    int type; // BreakpointType: BT_WRITE=1, BT_READ=2, BT_ACSESS=3
+    int type;   // BreakpointType: BT_WRITE=1, BT_READ=2, BT_ACSESS=3
+    int hitCount;
+    int skipCount;
+    int remaining;
 };
 
 struct DbgCpuState {
@@ -451,7 +473,7 @@ struct DbgCpuState {
     uint16_t pc;
     bool iff;
     uint8_t mem[0x10000];
-    std::list<uint16_t> breakpoints;
+    std::list<DbgExecBreakpoint> breakpoints;
     std::list<DbgDataBreakpoint> dataBreakpoints;
 };
 
@@ -484,6 +506,8 @@ public:
     void dbgSetDataBreakpoint(uint16_t addr, BreakpointType type);
     void dbgDelDataBreakpoint(uint16_t addr, BreakpointType type);
     void dbgClearDataBreakpoints();
+    void dbgSetExecSkipCount(uint16_t addr, int skipCount);
+    void dbgSetDataSkipCount(uint16_t addr, int skipCount);
     void dbgSetRegister(ExternalDebugger::Register reg, uint16_t value);
     void dbgWriteByte(uint16_t addr, uint8_t value);
     void dbgGetState(DbgCpuState& state);
@@ -513,6 +537,6 @@ private:
     void deleteBreakpoint(uint16_t addr);
 };
 
-#endif // WASM_DBG
+#endif // WASM_DBG || MCP_SERVER
 
 #endif // DEBUGWINDOW_H
