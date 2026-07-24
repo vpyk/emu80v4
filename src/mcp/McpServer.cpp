@@ -707,6 +707,77 @@ namespace
     }
 
     // ================================================================
+    // Tool: emu_run_for
+    // ================================================================
+    constexpr int RUN_FOR_MAX_MS = 60000;
+
+    json Tool_EmuRunFor(const json& args)
+    {
+        if (!args.contains("ms") || !args["ms"].is_number_integer())
+            throw std::runtime_error("ms (integer, milliseconds) is required");
+        int ms = args["ms"].get<int>();
+        if (ms < 1 || ms > RUN_FOR_MAX_MS)
+            throw std::runtime_error("ms must be between 1 and " + std::to_string(RUN_FOR_MAX_MS));
+
+        json        result;
+        std::string err;
+
+        // Phase 1: set up timer and start run.
+        const bool ok1 = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            if (!cpu) { err = "CPU is not available"; return; }
+
+            IDebugger* dbg = p->getDebugger();
+            if (!dbg) {
+                p->createDebugger();
+                dbg = p->getDebugger();
+            }
+            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+
+            extDbg->dbgRunFor(static_cast<unsigned>(ms));
+            result["ms"] = ms;
+        });
+
+        if (!ok1) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+
+        // Phase 2: poll until CPU stops.
+        int waited = 0;
+        while (!g_emulation->isDebuggerActive() && waited < ms + 5000) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            waited += 2;
+        }
+        bool stoppedByTimeout = !g_emulation->isDebuggerActive();
+
+        // Phase 3: clean up timer and read result.
+        const bool ok3 = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            Cpu8080Compatible* cpu = p ? dynamic_cast<Cpu8080Compatible*>(p->getCpu()) : nullptr;
+            if (!cpu) { err = "CPU unavailable after run"; return; }
+
+            IDebugger* dbg = p->getDebugger();
+            ExternalDebugger* extDbg = dbg ? dynamic_cast<ExternalDebugger*>(dbg) : nullptr;
+            bool timerDidFire = extDbg && extDbg->isTimerFired();
+            if (extDbg)
+                extDbg->dbgCleanupTimer();
+
+            result["stopped"]        = !stoppedByTimeout;
+            result["stoppedByTimer"] = timerDidFire;
+            result["breaked"]        = g_emulation->isDebuggerActive();
+            result["pc"]             = Hex(cpu->getPC());
+        });
+
+        if (!ok3) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
     // Tool: debug_break
     // ================================================================
     json Tool_DebugBreak(const json& /*args*/)
@@ -1340,6 +1411,21 @@ namespace
             "and the current PC.",
             json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_EmuRun
+        });
+
+        tools.push_back({
+            "emu_run_for",
+            "Run the CPU for the specified number of milliseconds and then stop. "
+            "'ms' (1–60000) is required. Stops early if a breakpoint fires. "
+            "The timer resets if a breakpoint stops the CPU before the timeout. ",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "ms", { { "type", "integer" }, { "minimum", 1 }, { "maximum", RUN_FOR_MAX_MS }, { "description", "duration in milliseconds" } } },
+                }},
+                { "required", json::array({ "ms" }) },
+            },
+            &Tool_EmuRunFor
         });
 
         tools.push_back({

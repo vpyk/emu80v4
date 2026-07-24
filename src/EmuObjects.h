@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -244,5 +244,21 @@ private:
 
     void setValue(int value);
 };
+
+
+class ElapsedTimer : public ActiveDevice
+{
+public:
+    ElapsedTimer();
+
+    void operate() override;
+
+    void start(unsigned ms);
+    void stop();
+
+protected:
+    virtual void onElapse() = 0;
+};
+
 
 #endif // EMUOBJECTS_H

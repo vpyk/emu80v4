@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2018
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,21 +41,6 @@ class CloseFileHook : public CpuHook
         std::vector<TapeRedirector*> m_frVector;
         TapeRedirector** m_frs;
         int m_nFr = 0;
-};
-
-
-class ElapsedTimer : public ActiveDevice
-{
-    public:
-        ElapsedTimer();
-
-        void operate() override;
-
-        void start(unsigned ms);
-        void stop();
-
-    protected:
-        virtual void onElapse() = 0;
 };
 
 

@@ -478,6 +478,16 @@ struct DbgCpuState {
 };
 
 
+class DebugElapsedTimer : public ElapsedTimer
+{
+public:
+    DebugElapsedTimer(Cpu* cpu) : m_cpu(cpu) {}
+    void onElapse() override;
+private:
+    Cpu* m_cpu;
+};
+
+
 class ExternalDebugger : public IDebugger
 {
 public:
@@ -498,6 +508,7 @@ public:
 
     void dbgPause();
     void dbgRun();
+    void dbgRunFor(unsigned ms);
     void dbgStepIn();
     void dbgStepOver();
     void dbgStepOut() {}
@@ -511,12 +522,16 @@ public:
     void dbgSetRegister(ExternalDebugger::Register reg, uint16_t value);
     void dbgWriteByte(uint16_t addr, uint8_t value);
     void dbgGetState(DbgCpuState& state);
+    void dbgCleanupTimer();
+    bool isTimerRunning() { return m_runForTimer != nullptr; }
+    bool isTimerFired()   { return m_runForTimer && m_runForTimer->isPaused(); }
 
     //static IDebugger* create(Platform* platform, bool oldSchool = true);
 
 private:
     std::list<BreakpointInfo> m_bpList;
     std::list<DataBreakpoint*> m_dataBpList;
+    DebugElapsedTimer* m_runForTimer = nullptr;
     CodeBreakpoint* m_tempBp = nullptr;
     AddressableDevice* m_as = nullptr;
     Cpu8080Compatible* m_cpu = nullptr;

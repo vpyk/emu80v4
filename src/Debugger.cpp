@@ -2404,6 +2404,26 @@ void ExternalDebugger::dbgRun()
 }
 
 
+void ExternalDebugger::dbgRunFor(unsigned ms)
+{
+    if (m_runForTimer)
+        dbgCleanupTimer();
+    m_runForTimer = new DebugElapsedTimer(m_cpu);
+    m_runForTimer->start(ms);
+    dbgRun();
+}
+
+
+void ExternalDebugger::dbgCleanupTimer()
+{
+    if (!m_runForTimer)
+        return;
+    m_runForTimer->stop();
+    delete m_runForTimer;
+    m_runForTimer = nullptr;
+}
+
+
 void ExternalDebugger::dbgStepIn()
 {
     m_cpu->debugStepRequest();
@@ -2594,6 +2614,12 @@ void ExternalDebugger::dbgDelDataBreakpoint(uint16_t addr, BreakpointType type)
             ++it;
         }
     }
+}
+
+
+void DebugElapsedTimer::onElapse()
+{
+    g_emulation->debugRequest(m_cpu);
 }
 
 

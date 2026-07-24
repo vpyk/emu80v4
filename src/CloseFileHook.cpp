@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,32 +54,6 @@ bool CloseFileHook::setProperty(const string& propertyName, const EmuValuesList&
     }
 
     return false;
-}
-
-
-ElapsedTimer::ElapsedTimer()
-{
-    pause();
-}
-
-void ElapsedTimer::start(unsigned ms)
-{
-    uint64_t curTime = g_emulation->getCurClock();
-    m_curClock = curTime + ms * g_emulation->getFrequency() / 1000;
-    resume();
-}
-
-
-void ElapsedTimer::stop()
-{
-    pause();
-}
-
-
-void ElapsedTimer::operate()
-{
-    pause();
-    onElapse();
 }
 
 
