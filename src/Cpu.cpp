@@ -22,6 +22,7 @@
 #include "Globals.h"
 #include "Cpu.h"
 #include "CpuHook.h"
+#include "Debugger.h"
 #include "CpuWaits.h"
 #include "Emulation.h"
 #include "PlatformCore.h"
@@ -42,6 +43,10 @@ Cpu::~Cpu()
         if ((*it)->getName() == "") // breakponts
             delete (*it);
     }
+
+    for (auto& pair : m_dataBpMap)
+        pair.second->setCpu(nullptr);
+    m_dataBpMap.clear();
 }
 
 
@@ -82,14 +87,16 @@ void Cpu::removeHook(CpuHook* hook)
 
 int Cpu::as_input(int addr)
 {
+    int value;
     if (!m_cycleWaits)
-        return m_addrSpace->readByte(addr);
+        value = m_addrSpace->readByte(addr);
     else {
         int tag;
-        int read = m_addrSpace->readByteEx(addr, tag);
+        value = m_addrSpace->readByteEx(addr, tag);
         m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag, false);
-        return read;
     }
+    checkDataBreakpoint(addr & 0xFFFF, false);
+    return value;
 }
 
 
@@ -102,6 +109,41 @@ void Cpu::as_output(int addr, int value)
         m_addrSpace->writeByteEx(addr, value, tag);
         m_curClock += m_kDiv * m_cycleWaits->getCpuCycleWaitStates(tag, true);
     }
+    checkDataBreakpoint(addr & 0xFFFF, true);
+}
+
+
+void Cpu::addDataBreakpoint(DataBreakpoint* dbp)
+{
+    // One breakpoint per address — replace existing if any.
+    uint16_t addr = dbp->getAddr();
+    auto it = m_dataBpMap.find(addr);
+    if (it != m_dataBpMap.end())
+        delete it->second;
+    m_dataBpMap[addr] = dbp;
+    m_hasDataBreakpoints = true;
+}
+
+void Cpu::removeDataBreakpoint(DataBreakpoint* dbp)
+{
+    auto it = m_dataBpMap.find(dbp->getAddr());
+    if (it != m_dataBpMap.end() && it->second == dbp)
+        m_dataBpMap.erase(it);
+    m_hasDataBreakpoints = !m_dataBpMap.empty();
+}
+
+bool Cpu::checkDataBreakpoint(uint16_t addr, bool isWrite)
+{
+    if (!m_hasDataBreakpoints)
+        return false;
+
+    auto it = m_dataBpMap.find(addr);
+    if (it == m_dataBpMap.end())
+        return false;
+
+    it->second->check(isWrite);
+
+    return g_emulation->isDebuggerActive();
 }
 
 

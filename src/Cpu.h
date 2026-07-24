@@ -21,6 +21,7 @@
 
 //#include <vector>
 #include <list>
+#include <map>
 
 #include "EmuObjects.h"
 
@@ -29,6 +30,7 @@ class CpuHook;
 class CpuWaits;
 class CpuCycleWaits;
 class PlatformCore;
+class DataBreakpoint;
 
 
 class Cpu : public ActiveDevice
@@ -67,6 +69,11 @@ class Cpu : public ActiveDevice
         AddressableDevice* getAddrSpace() {return m_addrSpace;}
         AddressableDevice* getIoAddrSpace() {return m_ioAddrSpace;}
 
+        // Data breakpoints — fired on as_input/as_output.
+        void addDataBreakpoint(DataBreakpoint* dbp);
+        void removeDataBreakpoint(DataBreakpoint* dbp);
+        inline bool checkDataBreakpoint(uint16_t addr, bool isWrite);
+
     protected:
         int as_input(int addr);
         void as_output(int addr, int value);
@@ -79,6 +86,9 @@ class Cpu : public ActiveDevice
         std::vector<CpuHook*> m_hookVector;
         int m_nHooks = 0;
         bool m_hooksDisabled = false;
+
+        std::map<uint16_t, DataBreakpoint*> m_dataBpMap;
+        bool m_hasDataBreakpoints = false;
 
         bool m_stepReq = false;
 

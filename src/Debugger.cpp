@@ -2274,6 +2274,33 @@ bool CodeBreakpoint::hookProc()
 }
 
 
+DataBreakpoint::DataBreakpoint(uint16_t addr, BreakpointType type)
+    : m_addr(addr), m_type(type)
+{}
+
+DataBreakpoint::~DataBreakpoint()
+{
+    if (m_cpu)
+        m_cpu->removeDataBreakpoint(this);
+    m_cpu = nullptr;
+}
+
+bool DataBreakpoint::check(bool isWrite)
+{
+    if (m_skipCount > 0) {
+        --m_skipCount;
+        return false;
+    }
+    // BT_ACSESS fires on any access; BT_WRITE only on writes; BT_READ only on reads.
+    bool shouldBreak = (m_type == BT_ACSESS)
+                    || (m_type == BT_WRITE && isWrite)
+                    || (m_type == BT_READ  && !isWrite);
+    if (shouldBreak)
+        g_emulation->debugRequest(m_cpu);
+    return shouldBreak;
+}
+
+
 
 #ifdef WASM_DBG
 
@@ -2292,6 +2319,14 @@ ExternalDebugger::ExternalDebugger(Platform* platform) : IDebugger(platform)
     m_resetKeys = g_emulation->getDebuggerOptions().resetKeys;
 
     m_isRunning = true;
+}
+
+
+ExternalDebugger::~ExternalDebugger()
+{
+    for (auto* dbp : m_dataBpList)
+        delete dbp;
+    m_dataBpList.clear();
 }
 
 
@@ -2506,6 +2541,52 @@ void ExternalDebugger::dbgGetState(DbgCpuState& state)
 
     for (auto& bp: m_bpList)
         state.breakpoints.push_back(bp.addr);
+
+    for (auto* dbp: m_dataBpList)
+        state.dataBreakpoints.push_back({dbp->getAddr(), static_cast<int>(dbp->getType())});
+}
+
+
+void ExternalDebugger::dbgSetDataBreakpoint(uint16_t addr, BreakpointType type)
+{
+    // Remove any existing data breakpoint at this address from our list
+    // (addDataBreakpoint will replace it in the CPU map and delete the old one).
+    for (auto it = m_dataBpList.begin(); it != m_dataBpList.end(); ) {
+        if ((*it)->getAddr() == addr) {
+            delete *it;
+            it = m_dataBpList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    DataBreakpoint* dbp = new DataBreakpoint(addr, type);
+    if (m_cpu) {
+        dbp->setCpu(dynamic_cast<Cpu*>(m_cpu));
+        m_cpu->addDataBreakpoint(dbp);
+    }
+    m_dataBpList.push_back(dbp);
+}
+
+
+void ExternalDebugger::dbgDelDataBreakpoint(uint16_t addr, BreakpointType type)
+{
+    for (auto it = m_dataBpList.begin(); it != m_dataBpList.end(); ) {
+        if ((*it)->getAddr() == addr && (*it)->getType() == type) {
+            delete *it; // destructor calls removeDataBreakpoint on CPU
+            it = m_dataBpList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+
+void ExternalDebugger::dbgClearDataBreakpoints()
+{
+    for (auto* dbp : m_dataBpList)
+        delete dbp; // destructor calls removeDataBreakpoint on CPU
+    m_dataBpList.clear();
 }
 
 #endif // WASM_DBG

@@ -25,6 +25,7 @@
 #include "CpuHook.h"
 #include "EmuWindow.h"
 
+class Cpu;
 class Cpu8080Compatible;
 class CpuZ80;
 
@@ -104,6 +105,26 @@ struct BreakpointInfo {
     uint16_t addr;
     BreakpointType type;
     CodeBreakpoint* codeBp = nullptr;
+};
+
+
+class DataBreakpoint : public EmuObject
+{
+public:
+    DataBreakpoint(uint16_t addr, BreakpointType type);
+    virtual ~DataBreakpoint();
+
+    void setCpu(Cpu* cpu) { m_cpu = cpu; }
+    void setSkipCount(int skips) { m_skipCount = skips; }
+    uint16_t getAddr() { return m_addr; }
+    BreakpointType getType() { return m_type; }
+    bool check(bool isWrite);
+
+protected:
+    Cpu*   m_cpu = nullptr;
+    uint16_t m_addr;
+    BreakpointType m_type;
+    int    m_skipCount = 0;
 };
 
 
@@ -416,6 +437,11 @@ private:
 
 #ifdef WASM_DBG
 
+struct DbgDataBreakpoint {
+    uint16_t addr;
+    int type; // BreakpointType: BT_WRITE=1, BT_READ=2, BT_ACSESS=3
+};
+
 struct DbgCpuState {
     uint16_t af;
     uint16_t bc;
@@ -426,6 +452,7 @@ struct DbgCpuState {
     bool iff;
     uint8_t mem[0x10000];
     std::list<uint16_t> breakpoints;
+    std::list<DbgDataBreakpoint> dataBreakpoints;
 };
 
 
@@ -433,7 +460,7 @@ class ExternalDebugger : public IDebugger
 {
 public:
     ExternalDebugger(Platform* platform);
-    virtual ~ExternalDebugger() {}
+    virtual ~ExternalDebugger();
 
     virtual void initDbgWindow() override {}
     virtual void setCaption(std::string) override {}
@@ -454,6 +481,9 @@ public:
     void dbgStepOut() {}
     void dbgSetBreakpoints(const std::list<uint16_t>& breakpoints);
     void dbgDelBreakpoints(const std::list<uint16_t>& breakpoints);
+    void dbgSetDataBreakpoint(uint16_t addr, BreakpointType type);
+    void dbgDelDataBreakpoint(uint16_t addr, BreakpointType type);
+    void dbgClearDataBreakpoints();
     void dbgSetRegister(ExternalDebugger::Register reg, uint16_t value);
     void dbgWriteByte(uint16_t addr, uint8_t value);
     void dbgGetState(DbgCpuState& state);
@@ -462,6 +492,7 @@ public:
 
 private:
     std::list<BreakpointInfo> m_bpList;
+    std::list<DataBreakpoint*> m_dataBpList;
     CodeBreakpoint* m_tempBp = nullptr;
     AddressableDevice* m_as = nullptr;
     Cpu8080Compatible* m_cpu = nullptr;
