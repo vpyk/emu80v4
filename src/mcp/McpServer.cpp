@@ -166,6 +166,68 @@ namespace
     };
 
     // ================================================================
+    // Helper: fill json with CPU state (registers, flags, Z80 alt regs,
+    // instruction at PC). Must be called on the main thread.
+    // ================================================================
+    void FillCpuStateJson(Cpu8080Compatible* cpu, json& state)
+    {
+        json regs;
+        regs["af"] = RegVal(cpu->getAF());
+        regs["bc"] = RegVal(cpu->getBC());
+        regs["de"] = RegVal(cpu->getDE());
+        regs["hl"] = RegVal(cpu->getHL());
+        regs["sp"] = RegVal(cpu->getSP());
+        regs["pc"] = RegVal(cpu->getPC());
+        state["registers"] = regs;
+
+        const uint16_t af = cpu->getAF();
+        const uint16_t f  = af & 0xFF;
+        state["psw"] = RegVal(f);
+        state["flags"] = {
+            { "S", !!(f & 0x80) }, { "Z", !!(f & 0x40) },
+            { "H", !!(f & 0x10) }, { "P", !!(f & 0x04) },
+            { "N", !!(f & 0x02) }, { "C", !!(f & 0x01) },
+        };
+        state["iff"] = cpu->getInte();
+
+        CpuZ80* z80 = dynamic_cast<CpuZ80*>(cpu);
+        if (z80) {
+            state["cpu_type"] = "z80";
+            json alt;
+            alt["af2"] = RegVal(z80->getAF2());
+            alt["bc2"] = RegVal(z80->getBC2());
+            alt["de2"] = RegVal(z80->getDE2());
+            alt["hl2"] = RegVal(z80->getHL2());
+            alt["ix"]  = RegVal(z80->getIX());
+            alt["iy"]  = RegVal(z80->getIY());
+            alt["i"]   = RegVal(z80->getI());
+            alt["r"]   = RegVal(z80->getR());
+            alt["im"]  = z80->getIM();
+            state["z80_regs"] = alt;
+        } else {
+            state["cpu_type"] = "8080";
+        }
+
+        // Current instruction at PC
+        uint16_t pc = cpu->getPC();
+        AddressableDevice* as = cpu->getAddrSpace();
+        if (as) {
+            uint8_t buf[4];
+            buf[0] = as->readByte(pc);
+            buf[1] = as->readByte(pc + 1);
+            buf[2] = as->readByte(pc + 2);
+            buf[3] = as->readByte(pc + 3);
+            Cpu::CpuType ct = cpu->getType();
+            if (ct == Cpu::CPU_8080)
+                state["instruction"] = i8080GetInstructionMnemonic(buf);
+            else {
+                unsigned length; STEP_FLAG flag;
+                state["instruction"] = cpu_disassemble_z80(pc, buf, length, flag);
+            }
+        }
+    }
+
+    // ================================================================
     // Tool: cpu_state
     // ================================================================
     json Tool_CpuState(const json& /*args*/)
@@ -181,69 +243,9 @@ namespace
             Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
             if (!cpu) { err = "CPU is not available"; return; }
 
-            state["running"]  = !g_emulation->isDebuggerActive();
             state["breaked"]  = g_emulation->isDebuggerActive();
             state["paused"]   = g_emulation->getPausedState();
-
-            json regs;
-            regs["af"] = RegVal(cpu->getAF());
-            regs["bc"] = RegVal(cpu->getBC());
-            regs["de"] = RegVal(cpu->getDE());
-            regs["hl"] = RegVal(cpu->getHL());
-            regs["sp"] = RegVal(cpu->getSP());
-            regs["pc"] = RegVal(cpu->getPC());
-            state["registers"] = regs;
-
-            const uint16_t af = cpu->getAF();
-            const uint16_t f  = af & 0xFF;
-            state["psw"] = RegVal(f);
-            state["flags"] =
-            {
-                { "S",  !!(f & 0x80) },
-                { "Z",  !!(f & 0x40) },
-                { "H",  !!(f & 0x10) },
-                { "P",  !!(f & 0x04) },
-                { "N",  !!(f & 0x02) },
-                { "C",  !!(f & 0x01) },
-            };
-            state["iff"] = cpu->getInte();
-
-            CpuZ80* z80 = dynamic_cast<CpuZ80*>(cpu);
-            if (z80) {
-                state["cpu_type"] = "z80";
-                json alt;
-                alt["af2"] = RegVal(z80->getAF2());
-                alt["bc2"] = RegVal(z80->getBC2());
-                alt["de2"] = RegVal(z80->getDE2());
-                alt["hl2"] = RegVal(z80->getHL2());
-                alt["ix"]  = RegVal(z80->getIX());
-                alt["iy"]  = RegVal(z80->getIY());
-                alt["i"]   = RegVal(z80->getI());
-                alt["r"]   = RegVal(z80->getR());
-                alt["im"]  = z80->getIM();
-                state["z80_regs"] = alt;
-            } else {
-                state["cpu_type"] = "8080";
-            }
-
-            // Current instruction at PC
-            uint16_t pc = cpu->getPC();
-            AddressableDevice* as = cpu->getAddrSpace();
-            if (as) {
-                uint8_t buf[4];
-                buf[0] = as->readByte(pc);
-                buf[1] = as->readByte(pc + 1);
-                buf[2] = as->readByte(pc + 2);
-                buf[3] = as->readByte(pc + 3);
-                Cpu::CpuType ct = cpu->getType();
-                if (ct == Cpu::CPU_8080) {
-                    state["instruction"] = i8080GetInstructionMnemonic(buf);
-                } else {
-                    unsigned length;
-                    STEP_FLAG flag;
-                    state["instruction"] = cpu_disassemble_z80(pc, buf, length, flag);
-                }
-            }
+            FillCpuStateJson(cpu, state);
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -695,8 +697,7 @@ namespace
             const bool wasBreaked = g_emulation->isDebuggerActive();
             extDbg->dbgRun();
 
-            result["running"]  = !g_emulation->isDebuggerActive();
-            result["breaked"]  = false;
+            result["breaked"]  = g_emulation->isDebuggerActive();
             result["changed"]  = wasBreaked;
             result["pc"]       = Hex(cpu->getPC());
         });
@@ -745,14 +746,15 @@ namespace
         if (!ok1) throw std::runtime_error("emulator main thread is not ready");
         if (!err.empty()) throw std::runtime_error(err);
 
-        // Phase 2: poll until CPU stops.
-        int waited = 0;
-        while (!g_emulation->isDebuggerActive() && waited < ms + 5000) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(2));
-            waited += 2;
+        // Phase 2: poll until CPU stops (use real elapsed time).
+        auto start = std::chrono::steady_clock::now();
+        int pollTimeout = ms + 5000;
+        while (!g_emulation->isDebuggerActive()) {
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - start).count();
+            if (elapsed >= pollTimeout) break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        bool stoppedByTimeout = !g_emulation->isDebuggerActive();
-
         // Phase 3: clean up timer and read result.
         const bool ok3 = mcp::Run([&]
         {
@@ -766,10 +768,9 @@ namespace
             if (extDbg)
                 extDbg->dbgCleanupTimer();
 
-            result["stopped"]        = !stoppedByTimeout;
             result["stoppedByTimer"] = timerDidFire;
             result["breaked"]        = g_emulation->isDebuggerActive();
-            result["pc"]             = Hex(cpu->getPC());
+            FillCpuStateJson(cpu, result);
         });
 
         if (!ok3) throw std::runtime_error("emulator main thread is not ready");
@@ -797,7 +798,6 @@ namespace
                 g_emulation->debugRequest(dynamic_cast<Cpu*>(cpu));
 
             uint16_t pc = cpu->getPC();
-            result["running"]  = !g_emulation->isDebuggerActive();
             result["breaked"]  = g_emulation->isDebuggerActive();
             result["changed"]  = !wasBreaked;
             result["pc"]       = Hex(pc);
@@ -836,6 +836,17 @@ namespace
             mode = args["mode"].get<std::string>();
         if (mode != "into" && mode != "over" && mode != "skip")
             throw std::runtime_error("invalid mode (expected into|over|skip)");
+
+        int timeoutMs = STEP_TIMEOUT_MS;
+        if (args.contains("timeout_ms") && !args["timeout_ms"].is_null()) {
+            const json& t = args["timeout_ms"];
+            if (t.is_number())
+                timeoutMs = t.get<int>();
+            else if (t.is_string())
+                timeoutMs = std::stoi(t.get<std::string>());
+            if (timeoutMs < 1 || timeoutMs > 60000)
+                throw std::runtime_error("timeout_ms must be between 1 and 60000");
+        }
 
         json        result;
         std::string err;
@@ -896,10 +907,12 @@ namespace
         // Phase 2: wait for re-break.
         bool completed = true;
         if (async) {
-            int waited = 0;
-            while (!g_emulation->isDebuggerActive() && waited < STEP_TIMEOUT_MS) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(2));
-                waited += 2;
+            auto start = std::chrono::steady_clock::now();
+            while (!g_emulation->isDebuggerActive()) {
+                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - start).count();
+                if (elapsed >= timeoutMs) break;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             completed = g_emulation->isDebuggerActive();
         }
@@ -912,7 +925,6 @@ namespace
             if (!cpu) { err = "CPU unavailable after step"; return; }
 
             uint16_t pc = cpu->getPC();
-            result["running"]   = !g_emulation->isDebuggerActive();
             result["breaked"]   = g_emulation->isDebuggerActive();
             result["completed"] = completed;
             result["pc"]        = Hex(pc);
@@ -957,8 +969,7 @@ namespace
 
             p->reset();
             result["reset"]   = true;
-            result["running"] = true;
-            result["breaked"] = false;
+            result["breaked"] = g_emulation->isDebuggerActive();
             result["pc"]      = Hex(cpu->getPC());
         });
 
@@ -1440,11 +1451,13 @@ namespace
             "debug_step",
             "Single-step the paused CPU. 'mode': 'into' (one instruction; default), "
             "'over' (step over calls), or 'skip' (advance PC without executing). "
-            "Requires CPU paused. Returns new PC and instruction.",
+            "Optional 'timeout_ms' (1–60000, default 5000) limits wait for step "
+            "completion. Requires CPU paused. Returns new PC and instruction.",
             json{
                 { "type", "object" },
                 { "properties", {
-                    { "mode", { { "type", "string" }, { "enum", json::array({ "into", "over", "skip" }) }, { "description", "step mode (default into)" } } },
+                    { "mode",       { { "type", "string" }, { "enum", json::array({ "into", "over", "skip" }) }, { "description", "step mode (default into)" } } },
+                    { "timeout_ms", { { "type", "integer" }, { "minimum", 1 }, { "maximum", 60000 }, { "description", "timeout in ms (default 5000)" } } },
                 }}
             },
             &Tool_DebugStep
