@@ -1759,7 +1759,8 @@ namespace
 
         tools.push_back({
             "debug_break",
-            "Pause the CPU into the debugger at the current PC. Idempotent. "
+            "Pause the CPU into the debugger at the current PC. Also exits "
+            "paused state if the emulator was paused. Idempotent. "
             "Returns resulting state and the instruction at the PC.",
             json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_DebugBreak

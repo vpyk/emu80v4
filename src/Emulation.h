@@ -70,7 +70,7 @@ class Emulation : public ParentObject
         void registerActiveDevice(IActive* device);
         void unregisterActiveDevice(IActive* device);
 
-        inline void debugRequest(Cpu* cpu) {m_debugReqCpu = cpu;}
+        inline void debugRequest(Cpu* cpu) {m_debugReqCpu = cpu; m_isPaused = false;}
         inline void debugRun() {m_debugReqCpu = nullptr;}
         inline bool isDebuggerActive() {return m_debugReqCpu;}
 
