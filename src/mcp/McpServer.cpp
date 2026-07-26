@@ -23,6 +23,9 @@
 #include "../CrtRenderer.h"
 #include "../AddrSpace.h"
 #include "../EmuConfig.h"
+#include "../Keyboard.h"
+#include "../KbdLayout.h"
+#include "../KbdTapper.h"
 
 #include "McpServer.h"
 #include "McpMarshal.h"
@@ -151,6 +154,54 @@ namespace
             out.push_back('=');
         }
         return out;
+    }
+
+    // -----------------------------------------------------------------------
+    // Key name → EmuKey lookup
+    // -----------------------------------------------------------------------
+    EmuKey ParseKeyName(const std::string& name)
+    {
+        static const std::map<std::string, EmuKey> keyMap = {
+            {"0",EK_0},{"1",EK_1},{"2",EK_2},{"3",EK_3},{"4",EK_4},
+            {"5",EK_5},{"6",EK_6},{"7",EK_7},{"8",EK_8},{"9",EK_9},
+            {"a",EK_A},{"b",EK_B},{"c",EK_C},{"d",EK_D},{"e",EK_E},
+            {"f",EK_F},{"g",EK_G},{"h",EK_H},{"i",EK_I},{"j",EK_J},
+            {"k",EK_K},{"l",EK_L},{"m",EK_M},{"n",EK_N},{"o",EK_O},
+            {"p",EK_P},{"q",EK_Q},{"r",EK_R},{"s",EK_S},{"t",EK_T},
+            {"u",EK_U},{"v",EK_V},{"w",EK_W},{"x",EK_X},{"y",EK_Y},
+            {"z",EK_Z},
+            {"space",EK_SPACE},{"enter",EK_CR},{"esc",EK_ESC},
+            {"tab",EK_TAB},{"backspace",EK_BSP},{"caps",EK_LANG},
+            {"shift",EK_SHIFT},{"ctrl",EK_CTRL},
+            {"f1",EK_F1},{"f2",EK_F2},{"f3",EK_F3},{"f4",EK_F4},
+            {"f5",EK_F5},{"f6",EK_F6},{"f7",EK_F7},{"f8",EK_F8},
+            {"f9",EK_F9},{"f10",EK_F10},{"f11",EK_F11},
+            {"up",EK_UP},{"down",EK_DOWN},{"left",EK_LEFT},{"right",EK_RIGHT},
+            {"home",EK_HOME},{"end",EK_END},
+            {"ins",EK_INS},{"del",EK_DEL},
+            {"minus",EK_MINUS},{"equals",EK_EQU},
+            {"lbracket",EK_LBRACKET},{"rbracket",EK_RBRACKET},
+            {"backslash",EK_BKSLASH},{"semicolon",EK_SEMICOLON},
+            {"comma",EK_COMMA},{"period",EK_PERIOD},{"slash",EK_SLASH},
+            {"grave",EK_GRAVE},{"colon",EK_COLON},
+            {"caret",EK_CARET},{"at",EK_AT},{"tilde",EK_TILDE},
+            {"lbrace",EK_LBRACE},{"rbrace",EK_RBRACE},
+            {"clear",EK_CLEAR},
+            {"stop",EK_STOP},{"exec",EK_EXEC},{"reset",EK_RESET},
+            {"help",EK_HELP},{"lf",EK_LF},{"rpt",EK_RPT},
+            {"np0",EK_NP_0},{"np1",EK_NP_1},{"np2",EK_NP_2},
+            {"np3",EK_NP_3},{"np4",EK_NP_4},{"np5",EK_NP_5},
+            {"np6",EK_NP_6},{"np7",EK_NP_7},{"np8",EK_NP_8},
+            {"np9",EK_NP_9},{"np_period",EK_NP_PERIOD},
+            {"np_comma",EK_NP_COMMA},{"np_enter",EK_NP_CR},
+            {"js_up",EK_JS_UP},{"js_down",EK_JS_DOWN},
+            {"js_left",EK_JS_LEFT},{"js_right",EK_JS_RIGHT},
+            {"js_btn1",EK_JS_BTN1},{"js_btn2",EK_JS_BTN2},
+        };
+        auto it = keyMap.find(name);
+        if (it != keyMap.end())
+            return it->second;
+        throw std::runtime_error("unknown key: " + name);
     }
 
     // -----------------------------------------------------------------------
@@ -773,6 +824,219 @@ namespace
             FillCpuStateJson(cpu, result);
         });
 
+        if (!ok3) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
+    // Tool: kbd_send
+    // ================================================================
+    constexpr int KBD_TAP_MAX_MS = 60000;
+
+    json Tool_KbdSend(const json& args)
+    {
+        if (!args.contains("keys") || !args["keys"].is_array() || args["keys"].empty())
+            throw std::runtime_error("keys (non-empty array of strings) is required");
+
+        std::vector<EmuKey> keys;
+        for (auto& k : args["keys"]) {
+            if (!k.is_string())
+                throw std::runtime_error("keys must be strings");
+            std::string name = k.get<std::string>();
+            for (char& c : name) c = static_cast<char>(std::tolower(c));
+            keys.push_back(ParseKeyName(name));
+        }
+
+        std::string action = "tap";
+        if (args.contains("action") && args["action"].is_string())
+            action = args["action"].get<std::string>();
+        if (action != "press" && action != "release" && action != "tap")
+            throw std::runtime_error("invalid action (expected press|release|tap)");
+
+        int durationMs = 100;
+        if (args.contains("duration_ms") && !args["duration_ms"].is_null()) {
+            const json& t = args["duration_ms"];
+            if (t.is_number()) durationMs = t.get<int>();
+            else if (t.is_string()) durationMs = std::stoi(t.get<std::string>());
+            if (durationMs < 10 || durationMs > KBD_TAP_MAX_MS)
+                throw std::runtime_error("duration_ms must be between 10 and " + std::to_string(KBD_TAP_MAX_MS));
+        }
+
+        json        result;
+        std::string err;
+        result["action"] = action;
+        result["keys"]   = args["keys"];
+
+        // --- press / release: immediate ---
+        if (action == "press" || action == "release") {
+            bool isPressed = (action == "press");
+            const bool ok = mcp::Run([&] {
+                Platform* p = GetPlatform();
+                if (!p) { err = "no platform created"; return; }
+                Keyboard* kb = p->getKeyboard();
+                if (!kb) { err = "no keyboard found"; return; }
+                for (auto k : keys)
+                    kb->processKey(k, isPressed);
+            });
+            if (!ok) throw std::runtime_error("emulator main thread is not ready");
+            if (!err.empty()) throw std::runtime_error(err);
+            return result;
+        }
+
+        // --- tap: press, hold, release ---
+        // Phase 1: press keys, set up timer, start running if breaked.
+        const bool ok1 = mcp::Run([&] {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            if (!cpu) { err = "CPU not available"; return; }
+            Keyboard* kb = p->getKeyboard();
+            if (!kb) { err = "no keyboard found"; return; }
+
+            for (auto k : keys)
+                kb->processKey(k, true);
+
+            result["wasBreaked"] = g_emulation->isDebuggerActive();
+            if (g_emulation->isDebuggerActive()) {
+                // Need to run so keys take effect.
+                IDebugger* dbg = p->getDebugger();
+                if (!dbg) { p->createDebugger(); dbg = p->getDebugger(); }
+                ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+                if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+                extDbg->dbgRun();
+            }
+        });
+        if (!ok1) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+
+        bool wasBreaked = result["wasBreaked"].get<bool>();
+
+        // Phase 2: wait for duration or breakpoint.
+        {
+            auto start = std::chrono::steady_clock::now();
+            while (true) {
+                if (g_emulation->isDebuggerActive())
+                    break; // breakpoint fired
+                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - start).count();
+                if (elapsed >= durationMs)
+                    break; // timeout
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+        }
+
+        bool stoppedByBreakpoint = g_emulation->isDebuggerActive();
+
+        // Phase 3: release keys, return to breaked state if we were breaked.
+        const bool ok3 = mcp::Run([&] {
+            Platform* p = GetPlatform();
+            if (!p || !p->getKeyboard()) return;
+            for (auto k : keys)
+                p->getKeyboard()->processKey(k, false);
+
+            result["breaked"]            = g_emulation->isDebuggerActive();
+            result["stoppedByBreakpoint"] = stoppedByBreakpoint;
+            result["completed"]           = !stoppedByBreakpoint;
+            result["duration_ms"]         = durationMs;
+        });
+        if (!ok3) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
+    // Tool: kbd_reset
+    // ================================================================
+    json Tool_KbdReset(const json& /*args*/)
+    {
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&] {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            Keyboard* kb = p->getKeyboard();
+            if (kb) kb->resetKeys();
+            KbdTapper* kt = p->getKbdTapper();
+            if (kt) kt->stopTyping();
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
+    // Tool: kbd_text
+    // ================================================================
+    json Tool_KbdText(const json& args)
+    {
+        if (!args.contains("text") || !args["text"].is_string())
+            throw std::runtime_error("text (string) is required");
+
+        std::string text = args["text"].get<std::string>();
+        if (text.empty())
+            throw std::runtime_error("text must be non-empty");
+
+        json        result;
+        std::string err;
+        result["text"] = text;
+
+        // Phase 1: start typing.
+        const bool ok1 = mcp::Run([&] {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            KbdTapper* kt = p->getKbdTapper();
+            if (!kt) { err = "KbdTapper not available on this platform"; return; }
+
+            kt->typeText(text);
+
+            result["wasBreaked"] = g_emulation->isDebuggerActive();
+            if (g_emulation->isDebuggerActive()) {
+                IDebugger* dbg = p->getDebugger();
+                if (!dbg) { p->createDebugger(); dbg = p->getDebugger(); }
+                ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+                if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+                extDbg->dbgRun();
+            }
+        });
+        if (!ok1) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+
+        // Phase 2: wait for typing to complete or breakpoint.
+        bool stillTyping = true;
+        while (stillTyping && !g_emulation->isDebuggerActive()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            const bool ok = mcp::Run([&] {
+                Platform* p = GetPlatform();
+                if (!p) return;
+                KbdTapper* kt = p->getKbdTapper();
+                if (!kt || !kt->isTyping())
+                    stillTyping = false;
+            });
+            if (!ok) break;
+        }
+
+        bool stoppedByBreakpoint = g_emulation->isDebuggerActive();
+        bool wasBreaked = result["wasBreaked"].get<bool>();
+
+        // Phase 3: restore breaked state if needed, read result.
+        const bool ok3 = mcp::Run([&] {
+            Platform* p = GetPlatform();
+            if (!p) return;
+
+            // If was breaked and typing completed (not BP), return to breaked.
+            if (wasBreaked && !stoppedByBreakpoint) {
+                Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+                if (cpu)
+                    g_emulation->debugRequest(dynamic_cast<Cpu*>(cpu));
+            }
+
+            result["completed"]           = !stoppedByBreakpoint;
+            result["stoppedByBreakpoint"] = stoppedByBreakpoint;
+            result["breaked"]             = g_emulation->isDebuggerActive();
+        });
         if (!ok3) throw std::runtime_error("emulator main thread is not ready");
         if (!err.empty()) throw std::runtime_error(err);
         return result;
@@ -1413,6 +1677,48 @@ namespace
                 }}
             },
             &Tool_Screen
+        });
+
+        tools.push_back({
+            "kbd_send",
+            "Send keyboard events. 'keys' is an array of key name strings "
+            "(e.g. \"a\", \"enter\", \"f1\"). 'action' is \"press\" (press "
+            "and return), \"release\" (release and return), or \"tap\" "
+            "(press, hold for 'duration_ms', release; blocks until done, "
+            "or until a breakpoint fires). 'duration_ms' is required for "
+            "\"tap\" (10–60000).",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "keys",        { { "type", "array" }, { "items", json{ {"type","string"} } }, { "description", "key names (required)" } } },
+                    { "action",      { { "type", "string" }, { "enum", json::array({ "press", "release", "tap" }) }, { "description", "default tap" } } },
+                    { "duration_ms", { { "type", "integer" }, { "minimum", 10 }, { "maximum", KBD_TAP_MAX_MS }, { "description", "for tap: hold time in ms (default 100)" } } },
+                }},
+                { "required", json::array({ "keys" }) },
+            },
+            &Tool_KbdSend
+        });
+
+        tools.push_back({
+            "kbd_reset",
+            "Release all virtually pressed keys.",
+            json{ { "type", "object" }, { "properties", json::object() } },
+            &Tool_KbdReset
+        });
+
+        tools.push_back({
+            "kbd_text",
+            "Type a text string into the emulated machine. 'text' is required. "
+            "Blocks until typing completes or a breakpoint fires. Only available "
+            "on platforms that have a KbdTapper configured.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "text", { { "type", "string" }, { "description", "text to type (required)" } } },
+                }},
+                { "required", json::array({ "text" }) },
+            },
+            &Tool_KbdText
         });
 
         tools.push_back({

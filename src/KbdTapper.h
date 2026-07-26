@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2024-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@ class KbdTapper : public ActiveDevice
         void setDelayMs(uint64_t delay);
 
         void typeText(std::string str);
+        bool isTyping() { return m_typing; }
+        void stopTyping() { stop(); }
 
         static EmuObject* create(const EmuValuesList&) {return new KbdTapper();}
 

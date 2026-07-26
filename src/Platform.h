@@ -71,6 +71,7 @@ class Platform : public ParentObject
         KbdLayout* getKbdLayout() {return m_kbdLayout;}
         CrtRenderer* getRenderer() {return m_renderer;}
         Keyboard* getKeyboard() {return m_keyboard;}
+        KbdTapper* getKbdTapper() {return m_kbdTapper;}
 
         uint64_t getCpuClock();
 
