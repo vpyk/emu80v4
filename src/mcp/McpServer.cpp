@@ -885,11 +885,13 @@ namespace
         }
 
         // --- tap: press, hold, release ---
-        // Phase 1: press keys, set up timer, start running if breaked.
+        DebugElapsedTimer* kbdTimer = nullptr;
+
+        // Phase 1: press keys, set up emulation timer, run if breaked.
         const bool ok1 = mcp::Run([&] {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            Cpu* cpu = p->getCpu();
             if (!cpu) { err = "CPU not available"; return; }
             Keyboard* kb = p->getKeyboard();
             if (!kb) { err = "no keyboard found"; return; }
@@ -897,9 +899,11 @@ namespace
             for (auto k : keys)
                 kb->processKey(k, true);
 
+            kbdTimer = new DebugElapsedTimer(cpu);
+            kbdTimer->start(static_cast<unsigned>(durationMs));
+
             result["wasBreaked"] = g_emulation->isDebuggerActive();
             if (g_emulation->isDebuggerActive()) {
-                // Need to run so keys take effect.
                 IDebugger* dbg = p->getDebugger();
                 if (!dbg) { p->createDebugger(); dbg = p->getDebugger(); }
                 ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
@@ -912,30 +916,38 @@ namespace
 
         bool wasBreaked = result["wasBreaked"].get<bool>();
 
-        // Phase 2: wait for duration or breakpoint.
-        {
-            auto start = std::chrono::steady_clock::now();
-            while (true) {
-                if (g_emulation->isDebuggerActive())
-                    break; // breakpoint fired
-                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::steady_clock::now() - start).count();
-                if (elapsed >= durationMs)
-                    break; // timeout
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
-        }
+        // Phase 2: wait for emulation timer or breakpoint.
+        while (!g_emulation->isDebuggerActive())
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-        bool stoppedByBreakpoint = g_emulation->isDebuggerActive();
-
-        // Phase 3: release keys, return to breaked state if we were breaked.
+        // Phase 3: release keys, cleanup timer, preserve breaked state.
         const bool ok3 = mcp::Run([&] {
             Platform* p = GetPlatform();
-            if (!p || !p->getKeyboard()) return;
-            for (auto k : keys)
-                p->getKeyboard()->processKey(k, false);
+            if (!p) return;
 
-            result["breaked"]            = g_emulation->isDebuggerActive();
+            for (auto k : keys)
+                if (Keyboard* kb = p->getKeyboard())
+                    kb->processKey(k, false);
+
+            bool timerFired = kbdTimer && kbdTimer->isPaused();
+            if (kbdTimer) {
+                kbdTimer->stop();
+                delete kbdTimer;
+                kbdTimer = nullptr;
+            }
+
+            // Timer fires → debugRequest stops CPU. Only a BP stops it otherwise.
+            bool stoppedByBreakpoint = g_emulation->isDebuggerActive() && !timerFired;
+
+            // Restore CPU state after timer intervention.
+            if (timerFired) {
+                if (wasBreaked)
+                    g_emulation->debugRequest(p->getCpu());
+                else
+                    g_emulation->debugRun();
+            }
+
+            result["breaked"]             = g_emulation->isDebuggerActive();
             result["stoppedByBreakpoint"] = stoppedByBreakpoint;
             result["completed"]           = !stoppedByBreakpoint;
             result["duration_ms"]         = durationMs;
@@ -1028,9 +1040,9 @@ namespace
 
             // If was breaked and typing completed (not BP), return to breaked.
             if (wasBreaked && !stoppedByBreakpoint) {
-                Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+                Cpu* cpu = p->getCpu();
                 if (cpu)
-                    g_emulation->debugRequest(dynamic_cast<Cpu*>(cpu));
+                    g_emulation->debugRequest(cpu);
             }
 
             result["completed"]           = !stoppedByBreakpoint;
