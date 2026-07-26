@@ -42,11 +42,14 @@ class CodeBreakpoint : public CpuHook
         int  getRemaining() const { return m_remaining; }
         void setRemaining(int n)  { m_remaining = n; }
         int  getHitCount() const  { return m_hitCount; }
+        void setComment(const std::string& c) { m_comment = c; }
+        const std::string& getComment() const { return m_comment; }
 
     private:
         int m_skipCount = 0;    // fixed property
         int m_remaining = 0;    // decremented each hit, reset from skipCount on stop
         int m_hitCount = 0;     // hits since last stop
+        std::string m_comment;
 };
 
 
@@ -128,6 +131,8 @@ public:
     uint16_t getAddr()  { return m_addr; }
     BreakpointType getType() { return m_type; }
     int  getHitCount() const { return m_hitCount; }
+    void setComment(const std::string& c) { m_comment = c; }
+    const std::string& getComment() const { return m_comment; }
     bool check(bool isWrite);
 
 protected:
@@ -137,6 +142,7 @@ protected:
     int    m_skipCount = 0;   // fixed property
     int    m_remaining = 0;   // decremented each hit, reset from skipCount on stop
     int    m_hitCount = 0;    // hits since last stop
+    std::string m_comment;
 };
 
 
@@ -454,6 +460,7 @@ struct DbgExecBreakpoint {
     int hitCount;
     int skipCount;
     int remaining;
+    std::string comment;
 };
 
 struct DbgDataBreakpoint {
@@ -462,6 +469,7 @@ struct DbgDataBreakpoint {
     int hitCount;
     int skipCount;
     int remaining;
+    std::string comment;
 };
 
 struct DbgCpuState {
@@ -519,6 +527,8 @@ public:
     void dbgClearDataBreakpoints();
     void dbgSetExecSkipCount(uint16_t addr, int skipCount);
     void dbgSetDataSkipCount(uint16_t addr, int skipCount);
+    void dbgSetExecComment(uint16_t addr, const std::string& comment);
+    void dbgSetDataComment(uint16_t addr, const std::string& comment);
     void dbgSetRegister(ExternalDebugger::Register reg, uint16_t value);
     void dbgWriteByte(uint16_t addr, uint8_t value);
     void dbgGetState(DbgCpuState& state);

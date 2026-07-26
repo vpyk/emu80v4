@@ -2574,11 +2574,13 @@ void ExternalDebugger::dbgGetState(DbgCpuState& state)
         state.breakpoints.push_back({bp.addr,
             bp.codeBp ? bp.codeBp->getHitCount()  : 0,
             bp.codeBp ? bp.codeBp->getSkipCount() : 0,
-            bp.codeBp ? bp.codeBp->getRemaining() : 0});
+            bp.codeBp ? bp.codeBp->getRemaining() : 0,
+            bp.codeBp ? bp.codeBp->getComment()   : ""});
 
     for (auto* dbp: m_dataBpList)
         state.dataBreakpoints.push_back({dbp->getAddr(), static_cast<int>(dbp->getType()),
-            dbp->getHitCount(), dbp->getSkipCount(), dbp->getRemaining()});
+            dbp->getHitCount(), dbp->getSkipCount(), dbp->getRemaining(),
+            dbp->getComment()});
 }
 
 
@@ -2642,6 +2644,20 @@ void ExternalDebugger::dbgSetDataSkipCount(uint16_t addr, int skipCount)
     for (auto* dbp : m_dataBpList)
         if (dbp->getAddr() == addr)
             dbp->setSkipCount(skipCount);
+}
+
+void ExternalDebugger::dbgSetExecComment(uint16_t addr, const std::string& comment)
+{
+    for (auto& bp : m_bpList)
+        if (bp.addr == addr && bp.codeBp)
+            bp.codeBp->setComment(comment);
+}
+
+void ExternalDebugger::dbgSetDataComment(uint16_t addr, const std::string& comment)
+{
+    for (auto* dbp : m_dataBpList)
+        if (dbp->getAddr() == addr)
+            dbp->setComment(comment);
 }
 
 #endif // WASM_DBG || MCP_SERVER

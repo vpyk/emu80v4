@@ -1289,6 +1289,7 @@ namespace
                     { "hitCount",  bp.hitCount },
                     { "skipCount", bp.skipCount },
                     { "remaining", bp.remaining },
+                    { "comment",   bp.comment },
                 });
             }
             for (auto& dbp : state.dataBreakpoints) {
@@ -1302,6 +1303,7 @@ namespace
                     { "hitCount",  dbp.hitCount },
                     { "skipCount", dbp.skipCount },
                     { "remaining", dbp.remaining },
+                    { "comment",   dbp.comment },
                 });
             }
             result["count"]       = idx;
@@ -1331,6 +1333,11 @@ namespace
         int skipCount = -1; // -1 means "don't set"
         if (args.contains("skipCount") && args["skipCount"].is_number_integer())
             skipCount = args["skipCount"].get<int>();
+
+        std::string comment;
+        bool hasComment = args.contains("comment") && args["comment"].is_string();
+        if (hasComment)
+            comment = args["comment"].get<std::string>();
 
         json        result;
         std::string err;
@@ -1362,6 +1369,8 @@ namespace
                 }
                 if (skipCount >= 0)
                     extDbg->dbgSetExecSkipCount(addr, skipCount);
+                if (hasComment)
+                    extDbg->dbgSetExecComment(addr, comment);
             } else {
                 BreakpointType bt = (type == "write") ? BT_WRITE
                                  : (type == "read")  ? BT_READ
@@ -1375,6 +1384,8 @@ namespace
                     extDbg->dbgSetDataBreakpoint(addr, bt);
                 if (skipCount >= 0)
                     extDbg->dbgSetDataSkipCount(addr, skipCount);
+                if (hasComment)
+                    extDbg->dbgSetDataComment(addr, comment);
             }
 
             result["added"] = !exists;
@@ -1382,6 +1393,8 @@ namespace
             result["type"]  = type;
             if (skipCount >= 0)
                 result["skipCount"] = skipCount;
+            if (hasComment)
+                result["comment"] = comment;
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -1814,6 +1827,7 @@ namespace
                     { "addr",     { { "type", json::array({ "string", "integer" }) }, { "description", "breakpoint address (required)" } } },
                     { "type",     { { "type", "string" }, { "enum", json::array({ "exec", "write", "read", "access" }) }, { "description", "breakpoint type (default exec)" } } },
                     { "skipCount", { { "type", "integer" }, { "minimum", 0 }, { "description", "skip N hits before stopping (default 0)" } } },
+                    { "comment",   { { "type", "string" }, { "description", "optional comment stored with the breakpoint" } } },
                 }},
                 { "required", json::array({ "addr" }) },
             },
