@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2021
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -74,6 +74,11 @@ class Cpu : public ActiveDevice
         void removeDataBreakpoint(DataBreakpoint* dbp);
         inline bool checkDataBreakpoint(uint16_t addr, bool isWrite);
 
+        // Port breakpoints — fired on io_input/io_output.
+        void addPortBreakpoint(DataBreakpoint* dbp);
+        void removePortBreakpoint(DataBreakpoint* dbp);
+        inline bool checkPortBreakpoint(uint16_t port, bool isWrite);
+
     protected:
         int as_input(int addr);
         void as_output(int addr, int value);
@@ -89,6 +94,8 @@ class Cpu : public ActiveDevice
 
         std::map<uint16_t, DataBreakpoint*> m_dataBpMap;
         bool m_hasDataBreakpoints = false;
+        std::map<uint16_t, DataBreakpoint*> m_portBpMap;
+        bool m_hasPortBreakpoints = false;
 
         bool m_stepReq = false;
 

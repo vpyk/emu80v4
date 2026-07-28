@@ -107,7 +107,10 @@ enum BreakpointType {
     BT_EXEC,
     BT_WRITE,
     BT_READ,
-    BT_ACSESS
+    BT_ACSESS,
+    BT_PORT_WRITE,
+    BT_PORT_READ,
+    BT_PORT_ACSESS
 };
 
 struct BreakpointInfo {
@@ -483,6 +486,7 @@ struct DbgCpuState {
     uint8_t mem[0x10000];
     std::list<DbgExecBreakpoint> breakpoints;
     std::list<DbgDataBreakpoint> dataBreakpoints;
+    std::list<DbgDataBreakpoint> portBreakpoints;
 };
 
 
@@ -525,10 +529,15 @@ public:
     void dbgSetDataBreakpoint(uint16_t addr, BreakpointType type);
     void dbgDelDataBreakpoint(uint16_t addr, BreakpointType type);
     void dbgClearDataBreakpoints();
+    void dbgSetPortBreakpoint(uint16_t addr, BreakpointType type);
+    void dbgDelPortBreakpoint(uint16_t addr, BreakpointType type);
+    void dbgClearPortBreakpoints();
     void dbgSetExecSkipCount(uint16_t addr, int skipCount);
     void dbgSetDataSkipCount(uint16_t addr, int skipCount);
+    void dbgSetPortSkipCount(uint16_t addr, int skipCount);
     void dbgSetExecComment(uint16_t addr, const std::string& comment);
     void dbgSetDataComment(uint16_t addr, const std::string& comment);
+    void dbgSetPortComment(uint16_t addr, const std::string& comment);
     void dbgSetRegister(ExternalDebugger::Register reg, uint16_t value);
     void dbgWriteByte(uint16_t addr, uint8_t value);
     void dbgGetState(DbgCpuState& state);
@@ -541,6 +550,7 @@ public:
 private:
     std::list<BreakpointInfo> m_bpList;
     std::list<DataBreakpoint*> m_dataBpList;
+    std::list<DataBreakpoint*> m_portBpList;
     DebugElapsedTimer* m_runForTimer = nullptr;
     CodeBreakpoint* m_tempBp = nullptr;
     AddressableDevice* m_as = nullptr;

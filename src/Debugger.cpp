@@ -2298,10 +2298,11 @@ bool DataBreakpoint::check(bool isWrite)
         --m_remaining;
         return false;
     }
-    // BT_ACSESS fires on any access; BT_WRITE only on writes; BT_READ only on reads.
-    bool shouldBreak = (m_type == BT_ACSESS)
-                    || (m_type == BT_WRITE && isWrite)
-                    || (m_type == BT_READ  && !isWrite);
+    // BT_ACSESS/BT_PORT_ACSESS fire on any access; BT_WRITE/BT_PORT_WRITE only on
+    // writes; BT_READ/BT_PORT_READ only on reads.
+    bool shouldBreak = (m_type == BT_ACSESS || m_type == BT_PORT_ACSESS)
+                    || ((m_type == BT_WRITE || m_type == BT_PORT_WRITE) && isWrite)
+                    || ((m_type == BT_READ  || m_type == BT_PORT_READ)  && !isWrite);
     if (shouldBreak) {
         m_remaining = m_skipCount;
         m_hitCount = 0;
@@ -2581,6 +2582,11 @@ void ExternalDebugger::dbgGetState(DbgCpuState& state)
         state.dataBreakpoints.push_back({dbp->getAddr(), static_cast<int>(dbp->getType()),
             dbp->getHitCount(), dbp->getSkipCount(), dbp->getRemaining(),
             dbp->getComment()});
+
+    for (auto* dbp: m_portBpList)
+        state.portBreakpoints.push_back({dbp->getAddr(), static_cast<int>(dbp->getType()),
+            dbp->getHitCount(), dbp->getSkipCount(), dbp->getRemaining(),
+            dbp->getComment()});
 }
 
 
@@ -2656,6 +2662,57 @@ void ExternalDebugger::dbgSetExecComment(uint16_t addr, const std::string& comme
 void ExternalDebugger::dbgSetDataComment(uint16_t addr, const std::string& comment)
 {
     for (auto* dbp : m_dataBpList)
+        if (dbp->getAddr() == addr)
+            dbp->setComment(comment);
+}
+
+void ExternalDebugger::dbgSetPortBreakpoint(uint16_t addr, BreakpointType type)
+{
+    for (auto it = m_portBpList.begin(); it != m_portBpList.end(); ) {
+        if ((*it)->getAddr() == addr) {
+            delete *it;
+            it = m_portBpList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    DataBreakpoint* dbp = new DataBreakpoint(addr, type);
+    if (m_cpu) {
+        dbp->setCpu(dynamic_cast<Cpu*>(m_cpu));
+        m_cpu->addPortBreakpoint(dbp);
+    }
+    m_portBpList.push_back(dbp);
+}
+
+void ExternalDebugger::dbgDelPortBreakpoint(uint16_t addr, BreakpointType type)
+{
+    for (auto it = m_portBpList.begin(); it != m_portBpList.end(); ) {
+        if ((*it)->getAddr() == addr && (*it)->getType() == type) {
+            delete *it;
+            it = m_portBpList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void ExternalDebugger::dbgClearPortBreakpoints()
+{
+    for (auto* dbp : m_portBpList)
+        delete dbp;
+    m_portBpList.clear();
+}
+
+void ExternalDebugger::dbgSetPortSkipCount(uint16_t addr, int skipCount)
+{
+    for (auto* dbp : m_portBpList)
+        if (dbp->getAddr() == addr)
+            dbp->setSkipCount(skipCount);
+}
+
+void ExternalDebugger::dbgSetPortComment(uint16_t addr, const std::string& comment)
+{
+    for (auto* dbp : m_portBpList)
         if (dbp->getAddr() == addr)
             dbp->setComment(comment);
 }

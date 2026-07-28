@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2022
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,10 @@ Cpu::~Cpu()
     for (auto& pair : m_dataBpMap)
         pair.second->setCpu(nullptr);
     m_dataBpMap.clear();
+
+    for (auto& pair : m_portBpMap)
+        pair.second->setCpu(nullptr);
+    m_portBpMap.clear();
 }
 
 
@@ -139,6 +143,38 @@ bool Cpu::checkDataBreakpoint(uint16_t addr, bool isWrite)
 
     auto it = m_dataBpMap.find(addr);
     if (it == m_dataBpMap.end())
+        return false;
+
+    it->second->check(isWrite);
+
+    return g_emulation->isDebuggerActive();
+}
+
+void Cpu::addPortBreakpoint(DataBreakpoint* dbp)
+{
+    uint16_t port = dbp->getAddr();
+    auto it = m_portBpMap.find(port);
+    if (it != m_portBpMap.end())
+        delete it->second;
+    m_portBpMap[port] = dbp;
+    m_hasPortBreakpoints = true;
+}
+
+void Cpu::removePortBreakpoint(DataBreakpoint* dbp)
+{
+    auto it = m_portBpMap.find(dbp->getAddr());
+    if (it != m_portBpMap.end() && it->second == dbp)
+        m_portBpMap.erase(it);
+    m_hasPortBreakpoints = !m_portBpMap.empty();
+}
+
+bool Cpu::checkPortBreakpoint(uint16_t port, bool isWrite)
+{
+    if (!m_hasPortBreakpoints)
+        return false;
+
+    auto it = m_portBpMap.find(port);
+    if (it == m_portBpMap.end())
         return false;
 
     it->second->check(isWrite);
@@ -252,10 +288,13 @@ void Cpu8080Compatible::hrq(int ticks) {
 
 int Cpu8080Compatible::io_input(int port)
 {
+    int value;
     if (m_ioAddrSpace)
-        return m_ioAddrSpace->readByte(port);
+        value = m_ioAddrSpace->readByte(port);
     else
-        return m_addrSpace->readByte((port & 0xff) << 8 | (port & 0xff));
+        value = m_addrSpace->readByte((port & 0xff) << 8 | (port & 0xff));
+    checkPortBreakpoint(port & 0xFFFF, false);
+    return value;
 }
 
 
@@ -265,4 +304,5 @@ void Cpu8080Compatible::io_output(int port, int value)
         m_ioAddrSpace->writeByte(port, value);
     else
         m_addrSpace->writeByte((port & 0xff) <<8 | (port & 0xff), value);
+    checkPortBreakpoint(port & 0xFFFF, true);
 }

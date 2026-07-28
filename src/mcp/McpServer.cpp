@@ -1373,6 +1373,20 @@ namespace
                     { "comment",   dbp.comment },
                 });
             }
+            for (auto& dbp : state.portBreakpoints) {
+                const char* typeStr = (dbp.type == BT_PORT_WRITE)  ? "port_write"
+                                    : (dbp.type == BT_PORT_READ)   ? "port_read"
+                                    : "port_access";
+                items.push_back({
+                    { "index",     idx++ },
+                    { "addr",      Hex(dbp.addr) },
+                    { "type",      typeStr },
+                    { "hitCount",  dbp.hitCount },
+                    { "skipCount", dbp.skipCount },
+                    { "remaining", dbp.remaining },
+                    { "comment",   dbp.comment },
+                });
+            }
             result["count"]       = idx;
             result["breakpoints"] = items;
         });
@@ -1394,8 +1408,9 @@ namespace
         std::string type = "exec";
         if (args.contains("type") && args["type"].is_string())
             type = args["type"].get<std::string>();
-        if (type != "exec" && type != "write" && type != "read" && type != "access")
-            throw std::runtime_error("invalid type (expected exec|write|read|access)");
+        if (type != "exec" && type != "write" && type != "read" && type != "access"
+            && type != "port_read" && type != "port_write" && type != "port_access")
+            throw std::runtime_error("invalid type (expected exec|write|read|access|port_read|port_write|port_access)");
 
         int skipCount = -1; // -1 means "don't set"
         if (args.contains("skipCount") && args["skipCount"].is_number_integer())
@@ -1438,6 +1453,21 @@ namespace
                     extDbg->dbgSetExecSkipCount(addr, skipCount);
                 if (hasComment)
                     extDbg->dbgSetExecComment(addr, comment);
+            } else if (type == "port_read" || type == "port_write" || type == "port_access") {
+                BreakpointType bt = (type == "port_write") ? BT_PORT_WRITE
+                                 : (type == "port_read")  ? BT_PORT_READ
+                                 : BT_PORT_ACSESS;
+                DbgCpuState state;
+                extDbg->dbgGetState(state);
+                for (auto& dbp : state.portBreakpoints)
+                    if (dbp.addr == addr && dbp.type == static_cast<int>(bt))
+                        { exists = true; break; }
+                if (!exists)
+                    extDbg->dbgSetPortBreakpoint(addr, bt);
+                if (skipCount >= 0)
+                    extDbg->dbgSetPortSkipCount(addr, skipCount);
+                if (hasComment)
+                    extDbg->dbgSetPortComment(addr, comment);
             } else {
                 BreakpointType bt = (type == "write") ? BT_WRITE
                                  : (type == "read")  ? BT_READ
@@ -1524,6 +1554,13 @@ namespace
                     ++removed;
                 }
             }
+            // Remove port breakpoints at addr.
+            for (auto& dbp : state.portBreakpoints) {
+                if (dbp.addr == addr) {
+                    extDbg->dbgDelPortBreakpoint(dbp.addr, static_cast<BreakpointType>(dbp.type));
+                    ++removed;
+                }
+            }
 
             result["removed"] = removed;
             result["addr"]    = Hex(addr);
@@ -1566,6 +1603,7 @@ namespace
             extDbg->dbgGetState(state);
             int execCount = static_cast<int>(state.breakpoints.size());
             int dataCount = static_cast<int>(state.dataBreakpoints.size());
+            int portCount = static_cast<int>(state.portBreakpoints.size());
 
             if (execCount > 0) {
                 std::list<uint16_t> addrs;
@@ -1574,7 +1612,9 @@ namespace
             }
             if (dataCount > 0)
                 extDbg->dbgClearDataBreakpoints();
-            result["cleared"] = execCount + dataCount;
+            if (portCount > 0)
+                extDbg->dbgClearPortBreakpoints();
+            result["cleared"] = execCount + dataCount + portCount;
             result["count"]   = 0;
         });
 
@@ -1912,8 +1952,9 @@ namespace
             "Add or configure a breakpoint. 'addr' is required "
             "(JSON integer = decimal, JSON string = hex by default, "
             "0x=hex, 0o=octal, leading 0=decimal). "
-            "'type' is \"exec\" (code execution, default), \"write\" (memory "
-            "write), \"read\" (memory read), or \"access\" (read or write). "
+            "'type' is \"exec\" (code execution, default), \"write\" / \"read\" "
+            "/ \"access\" (memory), or \"port_write\" / \"port_read\" / "
+            "\"port_access\" (I/O ports). "
             "Optional 'skipCount' sets how many hits to skip before "
             "actually stopping (default 0 = stop immediately). "
             "Duplicates of the same type+addr are a no-op (but skipCount "
@@ -1922,7 +1963,7 @@ namespace
                 { "type", "object" },
                 { "properties", {
                     { "addr",     { { "type", json::array({ "string", "integer" }) }, { "description", "breakpoint address (required)" } } },
-                    { "type",     { { "type", "string" }, { "enum", json::array({ "exec", "write", "read", "access" }) }, { "description", "breakpoint type (default exec)" } } },
+                    { "type",     { { "type", "string" }, { "enum", json::array({ "exec", "write", "read", "access", "port_read", "port_write", "port_access" }) }, { "description", "breakpoint type (default exec)" } } },
                     { "skipCount", { { "type", "integer" }, { "minimum", 0 }, { "description", "skip N hits before stopping (default 0)" } } },
                     { "comment",   { { "type", "string" }, { "description", "optional comment stored with the breakpoint" } } },
                 }},
