@@ -442,7 +442,7 @@ namespace
             if (ec) {
                 json ap = json::array();
                 for (const auto& pi : *ec->getPlatformInfos())
-                    ap.push_back({ { "name", pi.platformName }, { "option", pi.cmdLineOption } });
+                    ap.push_back({ { "name", pi.platformName }, { "platform", pi.objName } });
                 info["available_platforms"] = ap;
             }
         });
@@ -1393,6 +1393,42 @@ namespace
     }
 
     // ================================================================
+    // Tool: switch_platform
+    // ================================================================
+    json Tool_SwitchPlatform(const json& args)
+    {
+        if (!args.contains("platform") || !args["platform"].is_string())
+            throw std::runtime_error("platform (string) is required");
+
+        std::string target = args["platform"].get<std::string>();
+
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&] {
+            Platform* p = GetPlatform();
+            std::string curName = p ? p->getBaseName() : "(none)";
+            result["previous"] = curName;
+
+            if (target == curName) {
+                result["switched"] = false;
+                result["note"] = "already on this platform";
+                return;
+            }
+
+            emuSelectPlatform(target);
+            Platform* newP = GetPlatform();
+            std::string newName = newP ? newP->getBaseName() : "(none)";
+            result["switched"] = (newName == target);
+            result["current"]  = newName;
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
     // Tool: bp_list
     // ================================================================
     json Tool_BpList(const json& /*args*/)
@@ -2064,6 +2100,21 @@ namespace
             "and the PC at the reset vector.",
             json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_EmuReset
+        });
+
+        tools.push_back({
+            "switch_platform",
+            "Switch to a different emulated platform. 'platform' is the platform "
+            "name from sys_info's available_platforms. Returns previous and current "
+            "platform name.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "platform", { { "type", "string" }, { "description", "platform name from available_platforms (required)" } } },
+                }},
+                { "required", json::array({ "platform" }) },
+            },
+            &Tool_SwitchPlatform
         });
 
         tools.push_back({
