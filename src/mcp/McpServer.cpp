@@ -711,14 +711,8 @@ namespace
     // ================================================================
     // Tool: screen
     // ================================================================
-    json Tool_Screen(const json& args)
+    json Tool_Screen(const json& /*args*/)
     {
-        std::string size = "native";
-        if (args.contains("size") && args["size"].is_string())
-            size = args["size"].get<std::string>();
-        if (size != "native" && size != "view")
-            throw std::runtime_error("invalid size (expected native|view)");
-
         std::string b64;
         json        meta;
         std::string err;
@@ -785,6 +779,34 @@ namespace
             })}
         };
 
+        return result;
+    }
+
+    // ================================================================
+    // Tool: text_screen
+    // ================================================================
+    json Tool_TextScreen(const json& /*args*/)
+    {
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            CrtRenderer* renderer = p->getRenderer();
+            if (!renderer) { err = "no renderer"; return; }
+
+            const char* text = renderer->getTextScreen();
+            if (!text) {
+                err = "text screen not available on this platform";
+                return;
+            }
+            result["text"] = text;
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
         return result;
     }
 
@@ -1854,16 +1876,19 @@ namespace
 
         tools.push_back({
             "screen",
-            "Capture the current display as a PNG image (visible to the model). "
-            "'size' is 'native' (raw texture; default) or 'view' (stretched to "
-            "viewport). Returns MCP image content block.",
-            json{
-                { "type", "object" },
-                { "properties", {
-                    { "size", { { "type", "string" }, { "enum", json::array({ "native", "view" }) }, { "description", "native (default) or view" } } },
-                }}
-            },
+            "Capture the current display as a PNG image at native resolution. "
+            "Returns MCP image content block.",
+            json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_Screen
+        });
+
+        tools.push_back({
+            "text_screen",
+            "Return the current screen contents as a text string (UTF-8). "
+            "Only available on platforms with a text-mode renderer. "
+            "Leading/trailing empty lines and leading whitespace are trimmed.",
+            json{ { "type", "object" }, { "properties", json::object() } },
+            &Tool_TextScreen
         });
 
         tools.push_back({
