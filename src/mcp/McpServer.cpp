@@ -1509,6 +1509,16 @@ namespace
 
         const uint16_t addr = ParseNumArg(args["addr"], "addr");
 
+        // Optional type filter — if provided, only remove matching BPs.
+        std::string type;
+        bool hasType = args.contains("type") && args["type"].is_string();
+        if (hasType) {
+            type = args["type"].get<std::string>();
+            if (type != "exec" && type != "write" && type != "read" && type != "access"
+                && type != "port_read" && type != "port_write" && type != "port_access")
+                throw std::runtime_error("invalid type (expected exec|write|read|access|port_read|port_write|port_access)");
+        }
+
         json        result;
         std::string err;
 
@@ -1535,28 +1545,41 @@ namespace
             DbgCpuState state;
             extDbg->dbgGetState(state);
 
-            // Remove exec breakpoints at addr.
-            std::list<uint16_t> toRemove;
             int removed = 0;
-            for (auto& bp : state.breakpoints) {
-                if (bp.addr == addr) {
-                    toRemove.push_back(bp.addr);
-                    ++removed;
-                }
-            }
-            if (!toRemove.empty())
-                extDbg->dbgDelBreakpoints(toRemove);
 
-            // Remove data breakpoints at addr.
-            for (auto& dbp : state.dataBreakpoints) {
-                if (dbp.addr == addr) {
+            // Remove exec breakpoints.
+            if (!hasType || type == "exec") {
+                std::list<uint16_t> toRemove;
+                for (auto& bp : state.breakpoints) {
+                    if (bp.addr == addr) { toRemove.push_back(bp.addr); ++removed; }
+                }
+                if (!toRemove.empty())
+                    extDbg->dbgDelBreakpoints(toRemove);
+            }
+
+            // Remove data breakpoints.
+            if (!hasType || type == "write" || type == "read" || type == "access") {
+                for (auto& dbp : state.dataBreakpoints) {
+                    if (dbp.addr != addr) continue;
+                    if (hasType) {
+                        BreakpointType bt = (type == "write") ? BT_WRITE
+                                          : (type == "read")  ? BT_READ : BT_ACSESS;
+                        if (dbp.type != static_cast<int>(bt)) continue;
+                    }
                     extDbg->dbgDelDataBreakpoint(dbp.addr, static_cast<BreakpointType>(dbp.type));
                     ++removed;
                 }
             }
-            // Remove port breakpoints at addr.
-            for (auto& dbp : state.portBreakpoints) {
-                if (dbp.addr == addr) {
+
+            // Remove port breakpoints.
+            if (!hasType || type == "port_read" || type == "port_write" || type == "port_access") {
+                for (auto& dbp : state.portBreakpoints) {
+                    if (dbp.addr != addr) continue;
+                    if (hasType) {
+                        BreakpointType bt = (type == "port_write") ? BT_PORT_WRITE
+                                          : (type == "port_read")  ? BT_PORT_READ : BT_PORT_ACSESS;
+                        if (dbp.type != static_cast<int>(bt)) continue;
+                    }
                     extDbg->dbgDelPortBreakpoint(dbp.addr, static_cast<BreakpointType>(dbp.type));
                     ++removed;
                 }
@@ -1564,6 +1587,8 @@ namespace
 
             result["removed"] = removed;
             result["addr"]    = Hex(addr);
+            if (hasType)
+                result["type"] = type;
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -1974,14 +1999,18 @@ namespace
 
         tools.push_back({
             "bp_remove",
-            "Remove all breakpoints at an address. 'addr' format: "
+            "Remove breakpoints at an address. 'addr' format: "
             "JSON integer = decimal, JSON string = hex by default "
             "(0x=hex, 0o=octal, leading 0=decimal). "
+            "Optional 'type' filters removal to only matching type "
+            "(exec|write|read|access|port_read|port_write|port_access). "
+            "Without 'type', removes all breakpoints at the address. "
             "Returns count of removed breakpoints.",
             json{
                 { "type", "object" },
                 { "properties", {
                     { "addr", { { "type", json::array({ "string", "integer" }) }, { "description", "breakpoint address (required)" } } },
+                    { "type", { { "type", "string" }, { "enum", json::array({ "exec", "write", "read", "access", "port_read", "port_write", "port_access" }) }, { "description", "filter by type (optional)" } } },
                 }},
                 { "required", json::array({ "addr" }) },
             },
