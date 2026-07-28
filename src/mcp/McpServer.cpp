@@ -642,6 +642,73 @@ namespace
     }
 
     // ================================================================
+    // Tool: port_read
+    // ================================================================
+    json Tool_PortRead(const json& args)
+    {
+        if (!args.contains("port") || args["port"].is_null())
+            throw std::runtime_error("port is required");
+
+        const uint16_t port = ParseNumArg(args["port"], "port") & 0xFF;
+
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            Cpu* cpu = p->getCpu();
+            if (!cpu) { err = "CPU is not available"; return; }
+            AddressableDevice* io = cpu->getIoAddrSpace();
+            if (!io) { err = "no I/O address space"; return; }
+
+            uint8_t value = io->readByte(port);
+            result["port"]  = Hex(static_cast<uint16_t>(port));
+            result["value"] = Hex(static_cast<uint16_t>(value));
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
+    // Tool: port_write
+    // ================================================================
+    json Tool_PortWrite(const json& args)
+    {
+        if (!args.contains("port") || args["port"].is_null())
+            throw std::runtime_error("port is required");
+        if (!args.contains("value") || args["value"].is_null())
+            throw std::runtime_error("value is required");
+
+        const uint16_t port  = ParseNumArg(args["port"],  "port") & 0xFF;
+        const uint16_t value = ParseNumArg(args["value"], "value") & 0xFF;
+
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            Cpu* cpu = p->getCpu();
+            if (!cpu) { err = "CPU is not available"; return; }
+            AddressableDevice* io = cpu->getIoAddrSpace();
+            if (!io) { err = "no I/O address space"; return; }
+
+            io->writeByte(port, static_cast<uint8_t>(value));
+            result["port"]  = Hex(static_cast<uint16_t>(port));
+            result["value"] = Hex(value);
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
     // Tool: screen
     // ================================================================
     json Tool_Screen(const json& args)
@@ -1688,6 +1755,36 @@ namespace
                 { "required", json::array({ "addr", "data" }) },
             },
             &Tool_MemWrite
+        });
+
+        tools.push_back({
+            "port_read",
+            "Read a single byte from an I/O port. 'port' (0–255) is required. "
+            "Number format: JSON integer = decimal, JSON string = hex by default.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "port", { { "type", json::array({ "string", "integer" }) }, { "description", "port number 0–255 (required)" } } },
+                }},
+                { "required", json::array({ "port" }) },
+            },
+            &Tool_PortRead
+        });
+
+        tools.push_back({
+            "port_write",
+            "Write a single byte to an I/O port. 'port' (0–255) and 'value' "
+            "(byte) are required. Number format: JSON integer = decimal, "
+            "JSON string = hex by default.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "port",  { { "type", json::array({ "string", "integer" }) }, { "description", "port number 0–255 (required)" } } },
+                    { "value", { { "type", json::array({ "string", "integer" }) }, { "description", "value to write (required)" } } },
+                }},
+                { "required", json::array({ "port", "value" }) },
+            },
+            &Tool_PortWrite
         });
 
         tools.push_back({
