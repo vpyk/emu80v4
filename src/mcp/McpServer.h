@@ -11,6 +11,8 @@
 
 #include <memory>
 
+constexpr unsigned short MCP_SERVER_PORT = 19781;
+
 class CMcpServer
 {
     public:

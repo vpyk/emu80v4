@@ -129,7 +129,7 @@ int main (int argc, char** argv)
     palStart();
 
 #ifdef MCP_SERVER
-    g_McpServer.Start(19266);
+    g_McpServer.Start(MCP_SERVER_PORT);
 #endif
 
     palExecute();
