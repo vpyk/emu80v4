@@ -14,6 +14,7 @@
 // Emu80 headers.
 #include "../Globals.h"
 #include "../Emulation.h"
+#include "../EmuCalls.h"
 #include "../Platform.h"
 #include "../Debugger.h"
 #include "../Cpu8080.h"
@@ -924,7 +925,7 @@ namespace
     json Tool_EmuLoad(const json& args)
     {
         if (!args.contains("file") || !args["file"].is_string())
-            throw std::runtime_error("path (string) is required");
+            throw std::runtime_error("file (string) is required");
 
         std::string path = args["file"].get<std::string>();
         bool autorun = true;
@@ -1730,15 +1731,16 @@ namespace
     json Tool_DiskAttach(const json& args)
     {
         if (!args.contains("drive") || !args["drive"].is_string())
-            throw std::runtime_error("drive (letter A-D) is required");
+            throw std::runtime_error("drive (A-D or HDD) is required");
         std::string drive = args["drive"].get<std::string>();
-        if (!drive.empty()) { drive[0] = static_cast<char>(std::toupper(drive[0])); }
-        if (drive.size() != 1 || drive[0] < 'A' || drive[0] > 'D')
-            throw std::runtime_error("invalid drive (expected A, B, C or D)");
+        for (char& c : drive) c = static_cast<char>(std::toupper(c));
+        bool isHdd = (drive == "HDD");
+        if (!isHdd && (drive.size() != 1 || drive[0] < 'A' || drive[0] > 'D'))
+            throw std::runtime_error("invalid drive (expected A, B, C, D or HDD)");
 
-        if (!args.contains("path") || !args["path"].is_string())
-            throw std::runtime_error("path (string) is required");
-        std::string path = args["path"].get<std::string>();
+        if (!args.contains("file") || !args["file"].is_string())
+            throw std::runtime_error("file (string) is required");
+        std::string fileName = args["file"].get<std::string>();
 
         json        result;
         std::string err;
@@ -1748,12 +1750,15 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            std::string propName = std::string("disk") + drive[0];
-            p->setProperty(propName, {path});
+            std::string propName = isHdd ? std::string(".hdd") : std::string(".disk") + drive[0];
+            bool success = emuSetPropertyValue(p->getName() + propName, "fileName", fileName);
 
-            result["attached"] = true;
-            result["drive"]    = drive;
-            result["path"]     = path;
+            result["attached"] = success;
+                result["drive"]    = drive;
+            if (success) {
+                palUpdateConfig();
+                result["file"]     = fileName;
+            }
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -1767,11 +1772,12 @@ namespace
     json Tool_DiskDetach(const json& args)
     {
         if (!args.contains("drive") || !args["drive"].is_string())
-            throw std::runtime_error("drive (letter A-D) is required");
+            throw std::runtime_error("drive (A-D or HDD) is required");
         std::string drive = args["drive"].get<std::string>();
-        if (!drive.empty()) { drive[0] = static_cast<char>(std::toupper(drive[0])); }
-        if (drive.size() != 1 || drive[0] < 'A' || drive[0] > 'D')
-            throw std::runtime_error("invalid drive (expected A, B, C or D)");
+        for (char& c : drive) c = static_cast<char>(std::toupper(c));
+        bool isHdd = (drive == "HDD");
+        if (!isHdd && (drive.size() != 1 || drive[0] < 'A' || drive[0] > 'D'))
+            throw std::runtime_error("invalid drive (expected A, B, C, D or HDD)");
 
         json        result;
         std::string err;
@@ -1781,11 +1787,14 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            std::string propName = std::string("disk") + drive[0];
-            p->setProperty(propName, {""});
+            std::string propName = isHdd ? std::string(".hdd") : std::string(".disk") + drive[0];
+            bool success = !emuSetPropertyValue(p->getName() + propName, "fileName", "");
 
-            result["detached"] = true;
-            result["drive"]    = drive;
+            result["detached"] = success;
+            if (success) {
+                palUpdateConfig();
+                result["drive"] = drive;
+            }
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -1983,7 +1992,7 @@ namespace
 
         tools.push_back({
             "emu_load",
-            "Load a file into the emulated machine. 'path' is required. "
+            "Load a file into the emulated machine. 'file' is required. "
             "Optional 'autorun' (bool, default true) auto-starts after load. "
             "Optional 'break_after_load' (bool, default false) breaks into "
             "debugger right after load if autorun is true, and includes "
@@ -2150,27 +2159,26 @@ namespace
 
         tools.push_back({
             "disk_attach",
-            "Mount a disk image into drive A-D. 'drive' (A-D) and 'path' are "
-            "required. Note: this sets the platform property; the emulator may "
-            "need a reset for it to take effect on some platforms.",
+            "Mount a disk image into drive A-D or HDD. 'drive' (A-D or HDD) "
+            "and 'file' are required.",
             json{
                 { "type", "object" },
                 { "properties", {
-                    { "drive", { { "type", "string" }, { "description", "drive letter A-D (required)" } } },
-                    { "path",  { { "type", "string" }, { "description", "image file path (required)" } } },
+                    { "drive", { { "type", "string" }, { "description", "drive: A, B, C, D or HDD (required)" } } },
+                    { "file",  { { "type", "string" }, { "description", "image file path (required)" } } },
                 }},
-                { "required", json::array({ "drive", "path" }) },
+                { "required", json::array({ "drive", "file" }) },
             },
             &Tool_DiskAttach
         });
 
         tools.push_back({
             "disk_detach",
-            "Eject the disk from drive A-D. 'drive' (A-D) is required.",
+            "Eject the disk from drive A-D or HDD. 'drive' (A-D or HDD) is required.",
             json{
                 { "type", "object" },
                 { "properties", {
-                    { "drive", { { "type", "string" }, { "description", "drive letter A-D (required)" } } },
+                    { "drive", { { "type", "string" }, { "description", "drive: A, B, C, D or HDD (required)" } } },
                 }},
                 { "required", json::array({ "drive" }) },
             },
