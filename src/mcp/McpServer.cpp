@@ -919,6 +919,54 @@ namespace
     }
 
     // ================================================================
+    // Tool: emu_load
+    // ================================================================
+    json Tool_EmuLoad(const json& args)
+    {
+        if (!args.contains("file") || !args["file"].is_string())
+            throw std::runtime_error("path (string) is required");
+
+        std::string path = args["file"].get<std::string>();
+        bool autorun = true;
+        bool breakAfterLoad = false;
+        if (args.contains("autorun") && args["autorun"].is_boolean())
+            autorun = args["autorun"].get<bool>();
+        if (args.contains("break_after_load") && args["break_after_load"].is_boolean())
+            breakAfterLoad = args["break_after_load"].get<bool>();
+
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+
+            if (!p->loadFile(path, autorun)) {
+                err = "failed to load file";
+                return;
+            }
+
+            result["loaded"]  = true;
+            result["file"]    = path;
+            result["autorun"] = autorun;
+
+            if (autorun && breakAfterLoad) {
+                Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+                if (cpu) {
+                    g_emulation->debugRequest(dynamic_cast<Cpu*>(cpu));
+                    FillCpuStateJson(cpu, result);
+                }
+                result["breaked"] = g_emulation->isDebuggerActive();
+            }
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
     // Tool: kbd_send
     // ================================================================
     constexpr int KBD_TAP_MAX_MS = 60000;
@@ -1931,6 +1979,25 @@ namespace
                 { "required", json::array({ "text" }) },
             },
             &Tool_KbdText
+        });
+
+        tools.push_back({
+            "emu_load",
+            "Load a file into the emulated machine. 'path' is required. "
+            "Optional 'autorun' (bool, default true) auto-starts after load. "
+            "Optional 'break_after_load' (bool, default false) breaks into "
+            "debugger right after load if autorun is true, and includes "
+            "full CPU state in the response.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "file",             { { "type", "string" },  { "description", "file path (required)" } } },
+                    { "autorun",          { { "type", "boolean" }, { "description", "auto-start after load (default true)" } } },
+                    { "break_after_load", { { "type", "boolean" }, { "description", "break into debugger after load (default false)" } } },
+                }},
+                { "required", json::array({ "file" }) },
+            },
+            &Tool_EmuLoad
         });
 
         tools.push_back({
