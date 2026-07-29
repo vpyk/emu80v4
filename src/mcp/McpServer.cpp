@@ -431,7 +431,7 @@ namespace
                 Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
                 json& cpuInfo = info["cpu"];
                 cpuInfo["type"] = (cpu && dynamic_cast<CpuZ80*>(cpu)) ? "z80" : "8080";
-                cpuInfo["clock"] = p->getCpuClock();
+                cpuInfo["frequency_hz"] = cpu ? g_emulation->getFrequency() / cpu->getKDiv() : 0;
                 cpuInfo["breaked"] = g_emulation->isDebuggerActive();
                 cpuInfo["paused"]  = g_emulation->getPausedState();
                 cpuInfo["speed_factor"] = g_emulation->getSpeedUpFactor();
