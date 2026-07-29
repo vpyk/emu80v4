@@ -295,8 +295,9 @@ namespace
             Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
             if (!cpu) { err = "CPU is not available"; return; }
 
-            state["breaked"]  = g_emulation->isDebuggerActive();
-            state["paused"]   = g_emulation->getPausedState();
+            state["breaked"]   = g_emulation->isDebuggerActive();
+            state["paused"]    = g_emulation->getPausedState();
+            state["cpu_ticks"] = p->getCpuElapsedTicks();
             FillCpuStateJson(cpu, state);
         });
 

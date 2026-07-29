@@ -183,6 +183,7 @@ void Platform::shutdown()
 
 void Platform::reset()
 {
+    m_emuCpuTicksAtReset = m_cpu ? m_cpu->getClock() : 0;
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
         (*it)->reset();
 }
@@ -533,4 +534,11 @@ void Platform::updateScreenOnce()
 uint64_t Platform::getCpuClock()
 {
     return m_cpu->getClock();
+}
+
+uint64_t Platform::getCpuElapsedTicks()
+{
+    return m_cpu && m_cpu->getKDiv()
+        ? (m_cpu->getClock() - m_emuCpuTicksAtReset) / m_cpu->getKDiv()
+        : 0;
 }
