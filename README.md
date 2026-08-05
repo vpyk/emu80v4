@@ -48,6 +48,12 @@ For license info, see the file "COPYING.txt".
 
 В зависимости от дистрибутива Linux и желаемой версии Qt, необходимая версия qmake может содержаться в нем под именем qmake-qt5, qmake6 и т.п.
 
+Для сборки версии со встроенным MCP-сервером нужно на этапе сборки добавить определение MCP_SERVER=1:
+
+    qmake MCP_SERVER=1 src/Emu80qt.pro
+
+Более подробную информацию о встроенном MCP-сервере см. в файлах doc/MCP-сервер.md и src/mcp/README.md
+
 #### Порядок компиляции и установки SDL/wx-версии:
     git clone https://github.com/vpyk/emu80v4.git
     cd emu80v4    
