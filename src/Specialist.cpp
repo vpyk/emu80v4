@@ -775,6 +775,27 @@ string SpecKeyboard::getPropertyStringValue(const string& propertyName)
 
 EmuKey SpecKbdLayout::translateKey(PalKeyCode keyCode)
 {
+    if (m_mode == KLM_JCUKEN) {
+        switch (keyCode) {
+        case PK_TILDE:
+            return EK_SEMICOLON;
+        case PK_RBRACKET:
+            return EK_COLON;
+        case PK_EQU:
+            return EK_SLASH;
+        case PK_SLASH:
+            return EK_COMMA;
+        case PK_BSLASH:
+            return EK_PERIOD;
+        case PK_CAPSLOCK:
+            return EK_LANG;
+        case PK_MENU:
+            return EK_LF;
+        default:
+            ;
+        }
+    }
+
     switch (keyCode) {
     case PK_LCTRL:
     case PK_RCTRL:
