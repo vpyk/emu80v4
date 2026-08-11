@@ -278,6 +278,7 @@ install.commands = mkdir -p $$INSTALLDIR && mkdir -p $$INSTALLDIR/_settings && c
 # or set environment variable: MCP_SERVER=1 qmake src/Emu80qt.pro
 isEmpty(MCP_SERVER):MCP_SERVER = $$(MCP_SERVER)
 !isEmpty(MCP_SERVER):equals(MCP_SERVER, 1) {
+    TARGET = Emu80qt-mcp
     DEFINES += MCP_SERVER
     SOURCES += \
         mcp/McpMarshal.cpp \
