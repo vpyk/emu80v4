@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ void Pit8253Counter::planIrq()
     else if (m_mode == 0 && !m_out)
         ticksToUpdate = m_counter + m_countDelay;
     else if (m_mode == 4 && m_isCounting)
-        ticksToUpdate = m_counter != 0 ? m_counter : 1;
+        ticksToUpdate = !m_out ? 1 : (m_wasShot ? 0 : m_counter);
 
     if (ticksToUpdate)
         m_helper->updateAndScheduleNext((g_emulation->getCurClock() / m_kDiv + ticksToUpdate) * m_kDiv);
@@ -194,14 +194,17 @@ void Pit8253Counter::operateForTicks(int ticks)
             }
             break;
         case 4:
-            m_tempSumOut += ticks;
-            if (m_isCounting && ticks >= m_counter) {
-                m_tempSumOut--;
-                m_sumOutTicks++;
-                m_isCounting = false;
+            if (m_isCounting) {
+                m_tempSumOut += ticks;
+                if (!m_wasShot && ticks > m_counter) {
+                    m_tempSumOut--;
+                    m_sumOutTicks++;
+                    m_wasShot = true;
+                }
                 m_counter = (m_counter - ticks) & 0xffff;
-            }
-            m_out = !m_isCounting || m_counter != 0;
+            } else if (m_out)
+                m_tempSumOut += ticks;
+            m_out = m_wasShot || m_counter != 0;
             break;
         case 1:
         case 5:
@@ -301,6 +304,7 @@ void Pit8253Counter::setMode(int mode)
         updateState();
 
     m_mode = mode;
+    m_wasShot = false;
 
     switch (m_mode) {
         case 0:
@@ -399,6 +403,7 @@ void Pit8253Counter::setGate(bool gate)
     m_gate = gate;
     switch (m_mode) {
         case 0:
+        case 4:
             m_isCounting = gate;
             break;
         case 2:
