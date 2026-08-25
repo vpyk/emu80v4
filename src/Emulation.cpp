@@ -379,7 +379,7 @@ void Emulation::processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed, u
     Platform* platform = platformByWindow(wnd);
     if (platform)
         platform->processKey(keyCode, isPressed, unicodeKey);
-    else if (keyCode != PK_NONE)
+    else if (wnd && keyCode != PK_NONE)
         wnd->processKey(keyCode, isPressed);
 }
 

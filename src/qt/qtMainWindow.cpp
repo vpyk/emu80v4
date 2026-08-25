@@ -2779,6 +2779,7 @@ void MainWindow::onLoadRunLastFiles()
 void MainWindow::onExit()
 {
     emuSysReq(m_palWindow, SR_EXIT);
+    m_palWindow = nullptr;
 }
 
 
