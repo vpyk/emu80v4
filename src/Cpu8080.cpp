@@ -1935,3 +1935,19 @@ bool Cpu8080::setProperty(const string& propertyName, const EmuValuesList& value
     return false;
 }
 */
+
+
+void Cpu8080IoToMemTranslator::writeByte(int addr, uint8_t value)
+{
+    addr &= 0xFF;
+    addr = (addr << 8) | addr;
+    m_as->writeByte(addr, value);
+}
+
+
+uint8_t Cpu8080IoToMemTranslator::readByte(int addr)
+{
+    addr &= 0xFF;
+    addr = (addr << 8) | addr;
+    return m_as->readByte(addr);
+}

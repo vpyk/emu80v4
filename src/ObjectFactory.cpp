@@ -99,6 +99,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(NullSpace);
     REG_EMU_CLASS(Cpu8080);
     REG_EMU_CLASS(Cpu8080StatusWordSpace);
+    REG_EMU_CLASS(Cpu8080IoToMemTranslator);
     REG_EMU_CLASS(CpuZ80);
     REG_EMU_CLASS(Ppi8255);
     REG_EMU_CLASS(Dma8257);

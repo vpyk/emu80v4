@@ -150,4 +150,20 @@ class Cpu8080StatusWordSpace : public AddressableDevice
         Cpu8080* m_cpu;
 };
 
+
+class Cpu8080IoToMemTranslator : public AddressableDevice
+{
+public:
+    Cpu8080IoToMemTranslator(AddressableDevice* addrSpace) : m_as(addrSpace) {}
+
+    void writeByte(int addr, uint8_t value) override;
+    uint8_t readByte(int addr) override;
+
+    static EmuObject* create(const EmuValuesList& parameters) {return new Cpu8080IoToMemTranslator(static_cast<AddressableDevice*>(findObj(parameters[0].asString())));}
+
+private:
+    AddressableDevice* m_as;
+};
+
+
 #endif // CPU8080_H
