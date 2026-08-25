@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2024
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@
 #include "PrnWriter.h"
 #include "FileLoader.h"
 #include "EmuCalls.h"
+
+#include "Debugger.h"
 
 #ifdef MCP_SERVER
 #include "mcp/McpMarshal.h"
@@ -770,7 +772,19 @@ bool Emulation::setProperty(const string& propertyName, const EmuValuesList& val
         }
     } else if (propertyName == "debugForceZ80Mnemonics") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
+            bool oldVal = m_debuggerOptions.forceZ80Mnemonics;
             m_debuggerOptions.forceZ80Mnemonics = values[0].asString() == "yes";
+            if (oldVal != m_debuggerOptions.forceZ80Mnemonics) {
+                if (m_debugReqCpu) {
+                    for (auto it = m_platformList.begin(); it != m_platformList.end(); it++)
+                    if ((*it)->getCpu() == m_debugReqCpu) {
+                        DebugWindow* dbg = dynamic_cast<DebugWindow*>((*it)->getDebugger());
+                        if (dbg)
+                            dbg->sendCmd(DCMD_REPAINT);
+                        break;
+                    }
+                }
+            }
             return true;
         }
     } else if (propertyName == "debugSwapF5F9") {
