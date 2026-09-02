@@ -1122,7 +1122,7 @@ bool ZxFileLoader::loadSna(uint8_t* data, int len)
     static_cast<ZxRenderer*>(m_platform->getRenderer())->setBorderColor(borderColor);
 
     if (cur128kMode)
-        ports->writeByte(0x7ffd, sna128Mode ? data[49181] : 0);
+        ports->writeByte(0x7ffd, sna128Mode ? data[49181] : 0x10);
 
     for (int i = 0; i < 0xC000; i++)
         as->writeByte(0x4000 + i, data[27 + i]);
