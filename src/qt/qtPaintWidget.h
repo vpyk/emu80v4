@@ -107,6 +107,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         QTimer m_hideCursorTimer;
         bool m_cursorHidden = false;
         bool m_cursorTimerPaused = false;
+        int m_shaderFrameCount = 0;
 
         QOpenGLShaderProgram* m_program = nullptr;
         QOpenGLBuffer m_vbo;
