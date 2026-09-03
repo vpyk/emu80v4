@@ -342,6 +342,9 @@ void PalWindow::drawImageGl(uint32_t* pixels, int imageWidth, int imageHeight, d
     if (inpSizeLocation >= 0)
         glUniform2f(inpSizeLocation, float(imageWidth), float(imageHeight));
 
+    int frameCountLocation = glGetUniformLocation(m_program, "FrameCount");
+    glUniform1i(frameCountLocation, float(m_shaderFrameCount++));
+
     int mvpMatrixLocation = glGetUniformLocation(m_program, "MVPMatrix");
     if (mvpMatrixLocation >= 0)
         glUniformMatrix4fv(mvpMatrixLocation, 1, false, c_mvpMatrix);

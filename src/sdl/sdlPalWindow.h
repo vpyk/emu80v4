@@ -108,6 +108,7 @@ class PalWindow
         SmoothingType m_smoothing = ST_SHARP;
         std::string m_shaderFileName;
         bool m_needToRecreateProgram = true;
+        int m_shaderFrameCount = 0;
 
         static std::map<uint32_t, PalWindow*> m_windowsMap;
 
