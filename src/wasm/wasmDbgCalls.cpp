@@ -145,7 +145,11 @@ void* wasmDbgGetState()
     int nBps = dbgState->breakpoints.size();
     breakpoints = static_cast<uint16_t*>(malloc((nBps + 1) * sizeof(uint16_t)));
     breakpoints[0] = nBps;
-    std::copy(dbgState->breakpoints.begin(), dbgState->breakpoints.end(), breakpoints + 1);
+
+    int i = 1;
+    for (auto& bp : dbgState->breakpoints)
+        breakpoints[i++] = bp.addr;
+
     state[1] = breakpoints;
 
     mem = static_cast<uint8_t*>(malloc(0x10000));
