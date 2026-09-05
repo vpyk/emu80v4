@@ -28,7 +28,7 @@
 PaintWidget::PaintWidget(QWidget *parent) :
     QOpenGLWidget(parent)
 {
-    setAttribute(Qt::WA_AlwaysStackOnTop);
+    //setAttribute(Qt::WA_AlwaysStackOnTop);
     setAttribute(Qt::WA_NoSystemBackground);
     //setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
