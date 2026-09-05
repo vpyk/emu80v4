@@ -72,11 +72,15 @@
             <Add option="-Wall" />
             <Add option="-std=c++11" />
             <Add option="`sdl2-config --cflags`" />
+            <Add directory="3rdparty" />
         </Compiler>
         <Linker>
             <Add option="`sdl2-config --libs`" />
             <Add library="libGL" />
         </Linker>
+        <Unit filename="3rdparty/z80/Z80.cpp" />
+        <Unit filename="3rdparty/z80/Z80.h" />
+        <Unit filename="3rdparty/z80/zdefs.h" />
         <Unit filename="AddrSpace.cpp" />
         <Unit filename="AddrSpace.h" />
         <Unit filename="Apogey.cpp" />

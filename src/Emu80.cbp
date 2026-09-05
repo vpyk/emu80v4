@@ -79,6 +79,7 @@
 			<Add directory="$(#sdl2.include)" />
 			<Add directory="$(#wx)/lib/mswu" />
 			<Add directory="$(#wx)/include" />
+			<Add directory="3rdparty" />
 		</Compiler>
 		<Linker>
 			<Add library="mingw32" />
@@ -92,6 +93,9 @@
 			<Add directory="$(#sdl2.lib)" />
 			<Add directory="$(#wx)/lib" />
 		</Linker>
+		<Unit filename="3rdparty/z80/Z80.cpp" />
+		<Unit filename="3rdparty/z80/Z80.h" />
+		<Unit filename="3rdparty/z80/zdefs.h" />
 		<Unit filename="AddrSpace.cpp" />
 		<Unit filename="AddrSpace.h" />
 		<Unit filename="Apogey.cpp" />

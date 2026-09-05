@@ -11,9 +11,10 @@ SRC = $(SRCDIR)/*.cpp
 SRCSDL = $(SRCDIR)/sdl/*.cpp
 SRCLITE = $(SRCDIR)/lite/*.cpp
 SRCWX = $(SRCDIR)/wx/*.cpp
+SRCZ80 = $(SRCDIR)/3rdparty/z80 
 
-SOURCES = $(shell echo $(SRC)) $(shell echo $(SRCSDL)) $(shell echo $(SRCWX))
-SOURCES_LITE = $(shell echo $(SRC)) $(shell echo $(SRCSDL)) $(shell echo $(SRCLITE))
+SOURCES = $(shell echo $(SRC)) $(shell echo $(SRCSDL)) $(shell echo $(SRCWX)) $(shell echo $(SRCZ80))
+SOURCES_LITE = $(shell echo $(SRC)) $(shell echo $(SRCSDL)) $(shell echo $(SRCLITE)) $(shell echo $(SRCZ80))
 
 OBJECTS = $(SOURCES:.cpp=.o)
 OBJECTS_LITE = $(SOURCES_LITE:.cpp=.o)
