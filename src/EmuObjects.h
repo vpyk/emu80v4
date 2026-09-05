@@ -232,7 +232,7 @@ class EmuObjectGroup : public EmuObject
 class DebugInfo : public EmuObject
 {
 public:
-    void initConnections();
+    void initConnections() override;
     bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
     std::string getDebugInfo() override;
 
