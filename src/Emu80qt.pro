@@ -274,10 +274,6 @@ MOC_DIR = $${BUILDDIR}/moc
 RCC_DIR = $${BUILDDIR}/qrc
 UI_DIR = $${BUILDDIR}/ui
 
-INSTALLDIR = ~/emu80
-QMAKE_EXTRA_TARGETS += install
-install.commands = mkdir -p $$INSTALLDIR && mkdir -p $$INSTALLDIR/_settings && cp Emu80qt $$INSTALLDIR && cp -r dist/* $$INSTALLDIR && cp COPYING.txt $$INSTALLDIR && cp whatsnew.txt $$INSTALLDIR && cp doc/* $$INSTALLDIR
-
 # MCP Server support — enable with: qmake MCP_SERVER=1 src/Emu80qt.pro
 # or set environment variable: MCP_SERVER=1 qmake src/Emu80qt.pro
 isEmpty(MCP_SERVER):MCP_SERVER = $$(MCP_SERVER)
@@ -292,3 +288,7 @@ isEmpty(MCP_SERVER):MCP_SERVER = $$(MCP_SERVER)
         mcp/McpServer.h
     win32:LIBS += -lws2_32
 }
+
+INSTALLDIR = ~/emu80
+QMAKE_EXTRA_TARGETS += install
+install.commands = mkdir -p $$INSTALLDIR && mkdir -p $$INSTALLDIR/_settings && cp $$TARGET $$INSTALLDIR && cp -r dist/* $$INSTALLDIR && cp COPYING.txt $$INSTALLDIR && cp whatsnew.txt $$INSTALLDIR && cp -r doc/* $$INSTALLDIR

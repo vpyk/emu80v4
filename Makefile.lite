@@ -39,5 +39,5 @@ install: Emu80lite
 	cp -r dist/* $(INSTALLDIR)
 	cp COPYING.txt $(INSTALLDIR)
 	cp whatsnew.txt $(INSTALLDIR)
-	cp doc/* $(INSTALLDIR)
+	cp -r doc/* $(INSTALLDIR)
 	echo emulation.runPlatform = apogey > $(INSTALLDIR)/emu80.run

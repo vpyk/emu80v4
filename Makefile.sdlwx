@@ -39,4 +39,4 @@ install: Emu80
 	cp -r dist/* $(INSTALLDIR)
 	cp COPYING.txt $(INSTALLDIR)
 	cp whatsnew.txt $(INSTALLDIR)
-	cp doc/* $(INSTALLDIR)
+	cp -r doc/* $(INSTALLDIR)
