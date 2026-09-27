@@ -52,7 +52,7 @@ For license info, see the file "COPYING.txt".
 
     qmake MCP_SERVER=1 src/Emu80qt.pro
 
-Более подробную информацию о встроенном MCP-сервере см. в файлах doc/MCP-сервер.md и src/mcp/README.md
+Более подробную информацию о встроенном MCP-сервере см. в файлах doc/MCP-server.md и src/mcp/README.md
 
 #### Порядок компиляции и установки SDL/wx-версии:
     git clone https://github.com/vpyk/emu80v4.git
