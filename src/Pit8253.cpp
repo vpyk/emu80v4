@@ -92,9 +92,10 @@ void Pit8253Counter::operateForTicks(int ticks)
         m_countDelay -= ticksToSkip;
         if (m_out)
             m_tempSumOut += ticksToSkip;
-        if (!ticks)
-            return;
     }
+
+    if (!ticks)
+        return;
 
     if (!m_gate) {
         if (m_out)
