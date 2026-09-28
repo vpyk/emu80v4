@@ -53,7 +53,7 @@ EmuWindow::EmuWindow()
 EmuWindow::~EmuWindow()
 {
     if (m_interlacedImage)
-        delete m_interlacedImage;
+        delete[] m_interlacedImage;
 }
 
 
@@ -335,7 +335,7 @@ void EmuWindow::interlaceFields(EmuPixelData frame)
     int requiredSize = frame.height * 2 * frame.width;
     if (requiredSize > m_interlacedImageSize) {
         if (m_interlacedImage)
-            delete m_interlacedImage;
+            delete[] m_interlacedImage;
         m_interlacedImage = new uint32_t[requiredSize];
         m_interlacedImageSize = requiredSize;
     }
@@ -352,7 +352,7 @@ void EmuWindow::mixFields(EmuPixelData frame)
     int requiredSize = frame.height * frame.width;
     if (requiredSize > m_interlacedImageSize) {
         if (m_interlacedImage)
-            delete m_interlacedImage;
+            delete[] m_interlacedImage;
         m_interlacedImage = new uint32_t[requiredSize];
         m_interlacedImageSize = requiredSize;
     }
@@ -377,7 +377,7 @@ void EmuWindow::prepareScanline(EmuPixelData frame)
     int requiredSize = frame.height * 2 * frame.width;
     if (requiredSize > m_interlacedImageSize) {
         if (m_interlacedImage)
-            delete m_interlacedImage;
+            delete[] m_interlacedImage;
         m_interlacedImage = new uint32_t[requiredSize];
         m_interlacedImageSize = requiredSize;
     }

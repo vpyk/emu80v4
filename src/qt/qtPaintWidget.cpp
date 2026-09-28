@@ -107,7 +107,7 @@ void PaintWidget::drawImage(uint32_t* pixels, int imageWidth, int imageHeight, d
 
     if (m_image) {
         delete m_image;
-        delete m_imageData;
+        delete[] m_imageData;
     }
     m_imageData = new uchar[imageWidth * imageHeight * 4];
     memcpy(m_imageData, pixels, imageWidth * imageHeight * 4);
