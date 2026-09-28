@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ Rom::Rom(unsigned memSize, string fileName, unsigned offset)
 
 Rom::~Rom()
 {
-    if (!m_buf)
+    if (m_buf)
         delete[] m_buf;
 }
 
