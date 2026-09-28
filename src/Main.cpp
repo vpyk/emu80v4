@@ -89,7 +89,7 @@ void displayCmdLineHelp()
             " --hdd <image_file>\n"\
             " --edd <image_file>\n"\
             " --edd2 <image_file>\n\n"\
-            "For more help see \"Emu80 v4 Manual.rtf\"\n");
+            "For more help see \"emu80_manual.md/.pdf\"\n");
 }
 
 int main (int argc, char** argv)
