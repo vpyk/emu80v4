@@ -5,3 +5,77 @@ iframe {
     border-color: #888;
 }
 
+/* Размер обёртки и transform: scale() у iframe выставляет updateIframeSize() (emu80.js),
+   чтобы кадр эмулятора умещался в ширину экрана. */
+#iframeWrap {
+    overflow: hidden;
+}
+
+#iframe {
+    display: block;
+    transform-origin: 0 0;
+}
+
+/* Панель кнопок: переносится по строкам с равными промежутками */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.25rem;
+}
+
+.toolbar-sep {
+    width: 0.5rem;
+}
+
+/* Колонки Bulma по умолчанию не уже своего min-content, а длинные <select> сами не сжимаются,
+   поэтому последняя колонка (полноэкранный режим) вылезала за пределы блока. */
+.columns > .column {
+    min-width: 0;
+}
+
+.column .select,
+.column .select select {
+    max-width: 100%;
+}
+
+.hotkeys {
+    column-count: 2;
+    column-gap: 4%;
+    font-size: 80%;
+}
+
+/*button, select {
+    height: 24px;
+}*/
+
+@media screen and (max-width: 768px) {
+    .section {
+        padding: 1rem 0.5rem;
+    }
+
+    .box {
+        padding: 0.75rem;
+    }
+
+    .columns {
+        --bulma-column-gap: 0.25rem;
+    }
+
+    /* Пустой список примеров не должен занимать место, когда колонки идут друг под другом */
+    .column.is-invisible {
+        display: none;
+    }
+
+    .card-content {
+        padding: 0.75rem;
+    }
+
+    .hotkeys {
+        column-count: 1;
+    }
+
+    .footer {
+        padding: 1.5rem 0.5rem;
+    }
+}

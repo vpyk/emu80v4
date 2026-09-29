@@ -1,4 +1,5 @@
 const iframe = document.getElementById("iframe");
+const iframeWrap = document.getElementById("iframeWrap");
 const platformSelect = document.getElementById("platformSelect");
 const fileSelect = document.getElementById("fileSelect");
 const fileSelectDiv = document.getElementById("fileSelectDiv");
@@ -80,21 +81,52 @@ iframe.addEventListener("load", () => {
 window.addEventListener("popstate", () => {processParams(false)});
 
 
+// Размер canvas задаёт эмулятор, поэтому iframe подгоняется под него опросом.
+// Если кадр шире доступного места (мобильные устройства), он уменьшается через scale.
+function updateIframeSize()
+{
+    const canvas = iframe.contentDocument && iframe.contentDocument.getElementById("canvas");
+    if (!canvas)
+        return;
+
+    // В полноэкранном режиме размер iframe задаёт браузер, наш масштаб только мешает
+    if (document.fullscreenElement) {
+        iframe.style.transform = "";
+        return;
+    }
+
+    const width = canvas.width + extraIframeSize;
+    const height = canvas.height + extraIframeSize;
+    const available = iframeWrap.parentElement.clientWidth;
+    const scale = available > 0 ? Math.min(1, available / width) : 1;
+
+    iframe.style.width = width + "px";
+    iframe.style.height = height + "px";
+    iframe.style.transform = scale < 1 ? `scale(${scale})` : "";
+
+    // transform не влияет на раскладку, поэтому обёртка получает уже масштабированный размер
+    iframeWrap.style.width = Math.floor(width * scale) + "px";
+    iframeWrap.style.height = Math.ceil(height * scale) + "px";
+}
+
+
+function updateTitle()
+{
+    const title = iframe.contentDocument && iframe.contentDocument.title;
+    if (title && document.title != title) {
+        document.title = title;
+        caption.innerHTML = title;
+    }
+}
+
+
 setInterval( () => {
-        const canvasHeight = iframe.contentWindow.document.getElementById("canvas").height;
-        const canvasWidth = iframe.contentWindow.document.getElementById("canvas").width;
-
-        if (iframe.height != canvasHeight)
-            iframe.style.height = canvasHeight + extraIframeSize + "px";
-
-        if (iframe.width != canvasWidth)
-            iframe.style.width = canvasWidth + extraIframeSize + "px";
-
-        if (iframe.contentDocument.title && document.title != iframe.contentDocument.title) {
-            document.title = iframe.contentDocument.title;
-            caption.innerHTML = iframe.contentDocument.title;
-        }
+        updateIframeSize();
+        updateTitle();
     }, 100);
+
+window.addEventListener("resize", updateIframeSize);
+document.addEventListener("fullscreenchange", updateIframeSize);
 
 
 fetch("catalog/platforms.json")
@@ -153,6 +185,8 @@ function platformChange() {
     for(let i = fileSelect.options.length - 1; i >= 1; i--)
         fileSelect.remove(i);
 
+    fileSelectDiv.classList.toggle("is-invisible", !platformSelect.value);
+
     if (platformSelect.value) {
         const platform = platforms.find(item => item.name === platformSelect.value);
         if (platform) {
@@ -161,11 +195,10 @@ function platformChange() {
             fileInput.setAttribute("accept", ".*");
         }
 
-        fileSelectDiv.style.visibility = "visible"
         return fillFiles(platformSelect.value)
-    } else
-        fileSelectDiv.style.visibility = "hidden"
-        return Promise.resolve()
+    }
+
+    return Promise.resolve()
 }
 
 

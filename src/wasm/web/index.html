@@ -2,7 +2,6 @@
 <html lang="ru">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <link rel="stylesheet" type="text/css" href="emu80.css">
@@ -35,7 +34,7 @@
               </div>
               <button class="button is-small" onClick="runPlatform()">Запустить</button>
             </div>
-            <div id="fileSelectDiv" class="column" style="visibility: hidden">
+            <div id="fileSelectDiv" class="column is-invisible">
               <div class="select is-small">
                 <select id="fileSelect" onChange="fileChange()">
                   <option value="">--Примеры программ--</option>
@@ -43,8 +42,8 @@
               </div>
               <button class="button is-small" onClick="runFile()">Запустить</button>
             </div>
-            <div class="column">
-              <button id="fullscreenButton" class="button is-small" style="float: right;" onClick="emuSysReq(SR_FULLSCREEN)" title="Полноэкранный режим (Alt-Enter)">
+            <div class="column has-text-right">
+              <button id="fullscreenButton" class="button is-small" onClick="emuSysReq(SR_FULLSCREEN)" title="Полноэкранный режим (Alt-Enter)">
                 На полный экран
               </button>
             </div>
@@ -52,7 +51,7 @@
         </div>
 
         <div class="box">
-          <div class="block">
+          <div class="block toolbar">
             <button id="fileButton" class="button is-small" onClick="openFile()" disabled="disabled" title="Открыть и запустить (Alt-F3)">
               <img src="icons/open_run.png" alt="">&nbsp;
               Открыть...
@@ -65,14 +64,14 @@
               <img src="icons/disk_b.png" alt="">&nbsp;
               ...
             </button>
-            &nbsp;&nbsp;
+            <span class="toolbar-sep"></span>
             <button id = "resetButton" class="button is-small" onClick="emuSysReq(SR_RESET)" disabled="disabled" title="Перезагрузить (Alt-F11)">
               <img src="icons/reset.png" alt="">&nbsp;Сброс
             </button>
             <button id="pauseButton" class="button is-small" onClick="onPause(this)" title="Пауза (Alt-P)">
               <img src="icons/pause.png" alt="">&nbsp;
             </button>
-            &nbsp;&nbsp;
+            <span class="toolbar-sep"></span>
             <div class="select is-small">
               <select id="scalingSelect" onChange="onScalingChange(this)" title="Размер экрана (Alt-1/2/3/4,8,9)">
                 <option value="1x">1x</option>
@@ -102,7 +101,7 @@
                 <option value="sharp">Sharp</option>
               </select>
             </div>
-            &nbsp;&nbsp;
+            <span class="toolbar-sep"></span>
             <div class="select is-small">
               <select id="layoutSelect" onChange="onLayoutChange(this)" title="Раскладка клавиатуры (Alt-K/Q/J)">
                 <option value="smart">Smart</option>
@@ -123,7 +122,7 @@
             <button id="muteButton" class="button is-small" onClick="onMute(this)" title="Отключить звук (Alt-M)">
               <img id="muteIcon" src="icons/mute.png" alt="">&nbsp;
             </button>
-            &nbsp;&nbsp;
+            <span class="toolbar-sep"></span>
             <button id="infoButton" class="button is-small" onClick="onInfo(this)" title="Показать техническую информацию">
               <span class="icon is-small">
                 <i class="fas fa-info"></i>
@@ -132,8 +131,11 @@
             <!--<button id="testButton" class="button is-small" onClick="test()">Test</button>-->
           </div>
           <div>
-            <iframe id="iframe" src="dummyframe.html" marginwidth="0" marginheight="0" allow="fullscreen">
-            </iframe>
+            <!-- размер обёртки и масштаб iframe выставляет updateIframeSize() в emu80.js -->
+            <div id="iframeWrap">
+              <iframe id="iframe" src="dummyframe.html" marginwidth="0" marginheight="0" allow="fullscreen">
+              </iframe>
+            </div>
           </div>
           <div id="infoDiv" style="display:none;">
             Screen mode: <span id="screenModeSpan"></span>&nbsp;&nbsp;DMA %: <span id="dmaSpan"></span>
@@ -153,7 +155,7 @@
           </header>
           <div id="collapsible-card" class="is-collapsible">
             <div class="card-content">
-              <div style="column-count: 2; column-gap: 4%; font-size: 80%;">
+              <div class="hotkeys">
                 Alt-F11 – reset<br>
                 Alt-Q – раскладка Querty<br>
                 Alt-J – раскладка Йцукен<br>
@@ -197,7 +199,7 @@
               The <a href="https://github.com/vpyk/emu80v4">source code</a> is licensed under
               <a href="https://opensource.org/license/gpl-3-0">GPL v.3</a> open source license.
             </p>
-            <p>Последнее обновление 26.02.2026</p>
+            <p>Последнее обновление 30.09.2026</p>
           </div>
         </footer>    
 
