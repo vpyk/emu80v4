@@ -86,6 +86,8 @@ static bool checkIniFile(const QString& fileName);
 
 bool palQtInit(int& argc, char** argv)
 {
+    timer.start();
+
 #ifdef Q_OS_WIN32
     // Graphics driver options
     for (int i = 1; i < argc; i++) {
