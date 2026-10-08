@@ -59,7 +59,7 @@ qint64 EmuAudioIoDevice::readData(char *data, qint64 maxSize)
         return read;
     } else {
         memcpy(data, m_buf, maxSize);
-        memcpy(m_buf, m_buf + maxSize / 4, m_pos * 4 - maxSize);
+        memmove(m_buf, m_buf + maxSize / 4, m_pos * 4 - maxSize);
         m_pos = m_pos - maxSize / 4;
         return maxSize;
     }
