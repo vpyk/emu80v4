@@ -409,6 +409,9 @@ bool TapeFileParser::getNextBlock(int& pos, int& size)
                 m_nextBlockPos = curPos + blockSize;
                 return true;
             }
+            default:
+                // Unsupported block type
+                return false;
             }
         }
         return false; // this should never occur
