@@ -580,7 +580,7 @@ bool Pit8253::setProperty(const std::string& propertyName, const EmuValuesList& 
 
     if (propertyName == "helper") {
         int cnt = values[0].asInt();
-        if (cnt >=0 && cnt <= 3) {
+        if (cnt >=0 && cnt < 3) {
             m_counters[cnt]->m_helper = static_cast<Pit8253Helper*>(g_emulation->findObject(values[1].asString()));
             m_counters[cnt]->m_helper->setCounter(m_counters[cnt]);
         } else
@@ -588,7 +588,7 @@ bool Pit8253::setProperty(const std::string& propertyName, const EmuValuesList& 
         return true;
     } else if (propertyName == "core") {
         int cnt = values[0].asInt();
-        if (cnt >=0 && cnt <= 3) {
+        if (cnt >=0 && cnt < 3) {
             m_counters[cnt]->m_core = static_cast<PlatformCore*>(g_emulation->findObject(values[1].asString()));
         } else
             return false;
