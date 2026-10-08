@@ -13,7 +13,7 @@
 #### Обсуждение:
 * Обсуждение на форуме zx-pk.ru: [http://zx-pk.ru/threads/27488-emu80-v-4.html](http://zx-pk.ru/threads/27488-emu80-v-4.html)
 * Обсуждение на форуме nedopc.org: [http://www.nedopc.org/forum/viewtopic.php?f=43&t=17234](http://www.nedopc.org/forum/viewtopic.php?f=43&t=17234)
-* Чат подедржки в Telegram: [https://t.me/emu80_chat](https://t.me/emu80_chat)
+* Чат поддержки в Telegram: [https://t.me/emu80_chat](https://t.me/emu80_chat)
 
 #### Проекты, использующие Emu80:
 * Pretty Intel 8080 Assembler Вячеслава Славинского, содержит встроенный Emu80: [https://svofski.github.io/pretty-8080-assembler/](https://svofski.github.io/pretty-8080-assembler/)
@@ -88,4 +88,6 @@ For license info, see the file "COPYING.txt".
     cd emu80v4    
     make -f Makefile.wasm
 
-Результирующие файлы будут находиться в директории wasm_build. Пояснения по использованию - в файле wasm_build/readme.txt
+Результирующие файлы будут находиться в директории build_wasm. Пояснения по использованию - в файле build_wasm/readme.txt
+
+Для сборки варианта с поддержкой внешнего отладчика (`-DWASM_DBG`) используется `make -f Makefile.wasm_dbg`; результат помещается в ту же директорию build_wasm.
