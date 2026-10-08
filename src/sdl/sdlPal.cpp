@@ -56,7 +56,7 @@ static int audioBufferPos;
 static int audioBufferNumIn;
 static int audioBufferNumOut;
 
-static uint16_t lastSample;
+static uint32_t lastSample;
 
 //static bool quitReq = false;
 
