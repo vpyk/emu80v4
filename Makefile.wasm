@@ -44,9 +44,12 @@ WEB_FILES := $(foreach file,$(SRC_WEB_FILES),$(BUILD_DIR)/$(notdir $(file)))
 
 all: $(TARGETS) $(WEB_FILES)
 
-$(TARGETS): $(OBJECTS)
+# The linker produces both .js and .wasm in one run
+$(BUILD_DIR)/$(OUTPUT).js: $(OBJECTS)
 	@mkdir -p $(dir $@)
-	$(EMCC) $(OBJECTS) $(LDFLAGS) -o $(BUILD_DIR)/$(OUTPUT).js
+	$(EMCC) $(OBJECTS) $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/$(OUTPUT).wasm: $(BUILD_DIR)/$(OUTPUT).js ;
 
 $(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(OBJ_DIR)/%.d
 	$(EMCC) $(EMFLAGS) $< -o $@
@@ -55,9 +58,9 @@ $(DEPENDS): $(OBJ_DIR)/%.d: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(EMCC) -MM -MP -MT"$(@:.d=.o)" $(EMFLAGS) $< > $@
 
-$(WEB_FILES): $(SRC_WEB_FILES)
+$(WEB_FILES): $(BUILD_DIR)/%: $(SRC_DIR)/wasm/web/%
 	@mkdir -p $(BUILD_DIR)
-	cp -f $(SRC_WEB_FILES) $(BUILD_DIR)
+	cp -f $< $@
 
 clean:
 	-rm -f $(OBJECTS) $(DEPENDS) $(TARGETS) $(WEB_FILES)
