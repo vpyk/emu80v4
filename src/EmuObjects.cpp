@@ -29,8 +29,9 @@ using namespace std;
 
 EmuInput::~EmuInput()
 {
-    if (m_setFunc)
-        delete m_setFunc;
+    delete m_setFunc;
+    delete m_setFuncIndexed;
+    delete m_setFuncMasked;
 }
 
 
