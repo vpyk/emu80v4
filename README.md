@@ -90,4 +90,4 @@ For license info, see the file "COPYING.txt".
 
 Результирующие файлы будут находиться в директории build_wasm. Пояснения по использованию - в файле build_wasm/readme.txt
 
-Для сборки варианта с поддержкой внешнего отладчика (`-DWASM_DBG`) используется `make -f Makefile.wasm_dbg`; результат помещается в ту же директорию build_wasm.
+Для сборки варианта с поддержкой внешнего отладчика (`-DWASM_DBG`) используется `make -f Makefile.wasm DBG=1`; результат помещается в директорию build_wasm_dbg.

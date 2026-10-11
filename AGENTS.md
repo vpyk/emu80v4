@@ -17,12 +17,12 @@ One source tree, four front-ends selected by a `PAL_*` define (see "Platform Abs
 | SDL + wx | `make -f Makefile.sdlwx` | `Emu80` |
 | Lite (SDL, no UI) | `make -f Makefile.lite` | `Emu80lite` |
 | WebAssembly | `make -f Makefile.wasm` (needs Emscripten) | `build_wasm/` |
-| WASM + debugger | `make -f Makefile.wasm_dbg` (adds `-DWASM_DBG`) | `build_wasm/` |
+| WASM + debugger | `make -f Makefile.wasm DBG=1` (adds `-DWASM_DBG`) | `build_wasm_dbg/` |
 
 - `make install [-f Makefile.xxx]` does a portable install to `~/emu80` (binary + `dist/*` + docs). The emulator needs the `dist/` files (`emu80.conf`, platform dirs, shaders) next to the executable to run at all.
 - Qt build intermediates go to `src/build/` (`obj`, `moc`, `ui`, `qrc`).
 - **Language standard differs per target**: Qt is `c++17`, but the SDL/wx/Lite/WASM Makefiles compile with `-std=c++11`. Core code in `src/*.cpp` (shared by all variants) must stay C++11-compatible; C++17 is only safe in `src/qt/` and `src/mcp/`.
-- **Adding a source file**: `Makefile.sdlwx`/`.lite`/`.wasm*` glob `src/*.cpp`, so nothing to do there, but `src/Emu80qt.pro` (SOURCES/HEADERS) and the Code::Blocks projects `src/Emu80.cbp`/`src/Emu80lnx.cbp` list files explicitly and must be updated by hand.
+- **Adding a source file**: `Makefile.sdlwx`/`.lite`/`.wasm` glob `src/*.cpp`, so nothing to do there, but `src/Emu80qt.pro` (SOURCES/HEADERS) and the Code::Blocks projects `src/Emu80.cbp`/`src/Emu80lnx.cbp` list files explicitly and must be updated by hand.
 - Run with command-line options such as `--platform <name>`, `--conf-file`, `--run <file>`, `--load <file>`, `--disk-a <image>` (see `displayCmdLineHelp()` in `src/Main.cpp`). The start platform comes from `emu80.run`, else the platform chooser.
 
 ## Architecture
