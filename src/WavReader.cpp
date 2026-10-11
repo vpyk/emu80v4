@@ -126,6 +126,7 @@ bool WavReader::tryWavFormat()
     }
     len -= 4;
 
+    bool fmtFound = false;
     while (len >= 8) {
         signature = m_file.read32();
         dataSize = m_file.read32();
@@ -140,7 +141,8 @@ bool WavReader::tryWavFormat()
             m_channels = m_file.read16();
             m_sampleRate = m_file.read32();
             m_file.skip(6);
-            m_bytesPerSample = m_file.read16() / 8;
+            uint16_t bitsPerSample = m_file.read16();
+            m_bytesPerSample = bitsPerSample / 8;
             len -= 16;
             m_file.skip(dataSize - 16);
             len -= (dataSize - 16);
@@ -150,16 +152,28 @@ bool WavReader::tryWavFormat()
                 m_file.close();
                 return false;
             }
-            if (m_channels > 2 || m_bytesPerSample > 2) {
+            if (m_channels < 1 || m_channels > 2 || (bitsPerSample != 8 && bitsPerSample != 16)) {
                 reportError("Invalid WAV file format, should be mono or stereo and 8 or 16 bit:");
                 m_file.close();
                 return false;
             }
+            if (m_sampleRate <= 0) {
+                reportError("Invalid WAV sample rate:");
+                m_file.close();
+                return false;
+            }
+            fmtFound = true;
             break;
         } else {
             m_file.skip(dataSize);
             len -= dataSize;
         }
+    }
+
+    if (!fmtFound) {
+        reportError("Invalid WAV file format:");
+        m_file.close();
+        return false;
     }
 
     while (len >= 8) {
@@ -214,6 +228,12 @@ bool WavReader::tryCswFormat()
     }
 
     m_sampleRate = m_file.read16();
+
+    if (m_sampleRate == 0) {
+        reportError("Invalid CSW sample rate:");
+        m_file.close();
+        return false;
+    }
 
     uint8_t compression = m_file.read8();
 
