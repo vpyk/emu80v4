@@ -14,8 +14,8 @@ One source tree, four front-ends selected by a `PAL_*` define (see "Platform Abs
 |---|---|---|
 | Qt (primary) | `qmake src/Emu80qt.pro && make` (`qmake6`/`qmake-qt5` on some distros; `mingw32-make` on Windows) | `Emu80qt` |
 | Qt + MCP server | `qmake MCP_SERVER=1 src/Emu80qt.pro && make` (or env var `MCP_SERVER=1`) | `Emu80qt-mcp` |
-| SDL + wx | `make -f Makefile.sdlwx` | `Emu80` |
-| Lite (SDL, no UI) | `make -f Makefile.lite` | `Emu80lite` |
+| SDL + wx | `make -f Makefile.sdlwx` | `build_sdlwx/Emu80` (objects in `obj_sdlwx/`) |
+| Lite (SDL, no UI) | `make -f Makefile.lite` | `build_lite/Emu80lite` (objects in `obj_lite/`) |
 | WebAssembly | `make -f Makefile.wasm` (needs Emscripten) | `build_wasm/` |
 | WASM + debugger | `make -f Makefile.wasm DBG=1` (adds `-DWASM_DBG`) | `build_wasm_dbg/` |
 

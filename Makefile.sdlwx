@@ -1,42 +1,45 @@
 #!/usr/bin/make -f
 
-SRCDIR = src
-INSTALLDIR= ~/emu80
+SRC_DIR = src
+OBJ_DIR = obj_sdlwx
+BUILD_DIR = build_sdlwx
+TARGET = $(BUILD_DIR)/Emu80
+INSTALLDIR = ~/emu80
 
-CC = c++
-CFLAGS = -c -Wall -std=c++11 `wx-config --cflags` `sdl2-config --cflags` -DPAL_SDL -DPAL_WX -I$(SRCDIR)/3rdparty
-LDFLAGS = `sdl2-config --libs` `wx-config --libs` -lGL
+ifeq ($(origin CXX),default)
+CXX = c++
+endif
+CXXFLAGS ?= -O2 -Wall
 
-SRC = $(SRCDIR)/*.cpp
-SRCSDL = $(SRCDIR)/sdl/*.cpp
-SRCLITE = $(SRCDIR)/lite/*.cpp
-SRCWX = $(SRCDIR)/wx/*.cpp
-SRCZ80 = $(SRCDIR)/3rdparty/z80/*.cpp
+# Mandatory flags are kept separately, so overriding CXXFLAGS doesn't drop them
+EMU_CXXFLAGS := -std=c++11 $(shell wx-config --cflags) $(shell sdl2-config --cflags) -DPAL_SDL -DPAL_WX -I$(SRC_DIR)/3rdparty
+LDLIBS := $(shell sdl2-config --libs) $(shell wx-config --libs) -lGL
 
-SOURCES = $(shell echo $(SRC)) $(shell echo $(SRCSDL)) $(shell echo $(SRCWX)) $(shell echo $(SRCZ80))
-SOURCES_LITE = $(shell echo $(SRC)) $(shell echo $(SRCSDL)) $(shell echo $(SRCLITE)) $(shell echo $(SRCZ80))
+SOURCES := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/sdl/*.cpp $(SRC_DIR)/wx/*.cpp $(SRC_DIR)/3rdparty/z80/*.cpp)
+OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SOURCES))
+DEPENDS := $(OBJECTS:.o=.d)
 
-OBJECTS = $(SOURCES:.cpp=.o)
-OBJECTS_LITE = $(SOURCES_LITE:.cpp=.o)
+.PHONY: all clean install
 
-all: Emu80
+all: $(TARGET)
 
-Emu80: $(OBJECTS) 
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+$(TARGET): $(OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(LDFLAGS) $(OBJECTS) $(LDLIBS) -o $@
 
-.cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(EMU_CXXFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS)
-	rm -f $(OBJECTS_LITE)
-	rm -f Emu80
-	rm -f Emu80lite
+	rm -rf $(OBJ_DIR) $(BUILD_DIR)
 
-install: Emu80
+install: $(TARGET)
 	mkdir -p $(INSTALLDIR)
-	cp Emu80 $(INSTALLDIR)
+	cp $(TARGET) $(INSTALLDIR)
 	cp -r dist/* $(INSTALLDIR)
 	cp COPYING.txt $(INSTALLDIR)
 	cp whatsnew.txt $(INSTALLDIR)
 	cp -r doc/* $(INSTALLDIR)
+
+-include $(DEPENDS)
