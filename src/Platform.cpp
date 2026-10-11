@@ -48,12 +48,14 @@ Platform::Platform(string configFileName, string name)
 
     // Если платформа с таким именем уже есть, добавляем в конец "$" и номер, начиная от 1
     if (g_emulation->findObject(name)) {
-        ostringstream oss;
+        string newName;
         int i = 1;
-        do
-            oss << i++;
-        while (g_emulation->findObject(name + "$" + oss.str()));
-        name = name + "$" + oss.str();
+        do {
+            ostringstream oss;
+            oss << name << "$" << i++;
+            newName = oss.str();
+        } while (g_emulation->findObject(newName));
+        name = newName;
     }
 
     setName(name);
