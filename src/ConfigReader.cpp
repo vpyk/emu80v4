@@ -738,8 +738,6 @@ bool ConfigReader::processConfigFile(ParentObject* parent)
             else
                 o = m_prefix + o;
             obj = g_emulation->findObject(o);
-            if (!obj)
-                obj = g_emulation->findObject(o);
             if (!obj) {
                 logPrefix();
                 emuLog << "Object " << o << " not found" << "\n";
