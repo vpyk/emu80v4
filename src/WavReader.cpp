@@ -131,11 +131,11 @@ bool WavReader::tryWavFormat()
         signature = m_file.read32();
         dataSize = m_file.read32();
         len -= 8;
-            if (len < dataSize || dataSize < 16) {
-                reportError("Invalid WAV file format:");
-                m_file.close();
-                return false;
-            }
+        if (len < dataSize || (signature == 0x20746D66 && dataSize < 16)) { // "fmt " chunk is at least 16 bytes
+            reportError("Invalid WAV file format:");
+            m_file.close();
+            return false;
+        }
         if (signature == 0x20746D66) { // "fmt "
             uint16_t compression = m_file.read16();
             m_channels = m_file.read16();
