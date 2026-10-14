@@ -38,11 +38,17 @@ namespace mcp
             cmd->err = std::current_exception();
         }
 
+        // Notify while holding the mutex. The waiting thread in Run() keeps
+        // `cmd` on its own stack and destroys it once wait() returns, so the
+        // notify must happen before Run() can reacquire the mutex and leave
+        // wait(). Releasing the lock first lets Run() destroy `cmd`, after
+        // which notify_one() would touch a destroyed condition_variable
+        // (SIGBUS under frequent requests).
         {
             std::lock_guard<std::mutex> lk(cmd->mtx);
             cmd->done = true;
+            cmd->cv.notify_one();
         }
-        cmd->cv.notify_one();
     }
 
     bool Run(std::function<void()> fn)
