@@ -81,6 +81,9 @@ public:
 
     void mouseClick(int x, int y, PalMouseKey key);
     void mouseDrag(bool pressed, int x, int y);
+    void mouseMove(int x, int y, int buttons);
+    void mouseWheel(int steps);
+    bool isEmuMouseActive();
 
     void setClientSize(int width, int height);
     void setAutoresizeFlag(bool autoresize);

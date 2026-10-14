@@ -389,6 +389,26 @@ void Platform::mouseDrag(bool pressed, int x, int y)
 }
 
 
+void Platform::mouseMove(int x, int y, bool inside, int buttons)
+{
+    if (m_mouse)
+        m_mouse->hostMouseMove(x, y, inside, buttons);
+}
+
+
+void Platform::mouseWheel(int steps)
+{
+    if (m_mouse)
+        m_mouse->hostMouseWheel(steps);
+}
+
+
+bool Platform::isMouseActive()
+{
+    return m_mouse && m_mouse->isMouseActive();
+}
+
+
 bool Platform::loadFile(string fileName, bool run)
 {
     if (m_loader) {
@@ -482,6 +502,9 @@ bool Platform::setProperty(const string& propertyName, const EmuValuesList& valu
     } else if (propertyName == "fastResetCpuTicks") {
             m_fastResetCpuTicks = values[0].asInt();
             return true;
+    } else if (propertyName == "mouse") {
+        m_mouse = dynamic_cast<MouseDevice*>(g_emulation->findObject(values[0].asString()));
+        return m_mouse != nullptr;
     }
     return false;
 }

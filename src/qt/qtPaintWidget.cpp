@@ -407,10 +407,39 @@ void PaintWidget::mouseDrag(bool pressed, int x, int y)
   #define POS_Y position().y
 #endif
 
+static int emuMouseButtons(Qt::MouseButtons b)
+{
+    return (b & Qt::LeftButton ? 1 : 0) | (b & Qt::RightButton ? 2 : 0) | (b & Qt::MiddleButton ? 4 : 0);
+}
+
+
 void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 {
+    MainWindow* mw = static_cast<MainWindow*>(parent());
+    mw->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+
     if (event->buttons() & Qt::LeftButton)
         mouseDrag(true, event->POS_X(), event->POS_Y());
+
+    // программа включила мышь Вектора: свой указатель рисует она, стрелку системы над картинкой прячем.
+    // Смотрим на m_cursorHidden: уход указателя с картинки (leaveEvent) возвращает стрелку, и после возврата
+    // её надо спрятать снова
+    if (mw->isEmuMouseActive()) {
+        m_emuMouseHid = true;
+        if (!m_cursorHidden) {
+            setCursor(Qt::BlankCursor);
+            m_cursorHidden = true;
+        }
+        m_hideCursorTimer.stop();
+        return;
+    }
+    if (m_emuMouseHid) {
+        m_emuMouseHid = false;
+        setCursor(Qt::ArrowCursor);
+        m_cursorHidden = false;
+        if (m_hideCursor && !m_cursorTimerPaused)
+            m_hideCursorTimer.start();
+    }
 
     if (!m_hideCursor || m_cursorTimerPaused)
         return;
@@ -425,6 +454,8 @@ void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 
 void PaintWidget::mousePressEvent(QMouseEvent *event)
 {
+    static_cast<MainWindow*>(parent())->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+
     if (event->button() & Qt::LeftButton)
         static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_CLICK);
 
@@ -435,6 +466,8 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
 
 void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
 {
+    static_cast<MainWindow*>(parent())->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+
     if (event->button() & Qt::LeftButton)
         mouseDrag(false, event->POS_X(), event->POS_Y());
 }
@@ -450,6 +483,14 @@ void PaintWidget::mouseDoubleClickEvent(QMouseEvent *event)
 void PaintWidget::wheelEvent(QWheelEvent *event)
 {
     static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), event->angleDelta().y() > 0 ? PM_WHEEL_UP : PM_WHEEL_DOWN);
+
+    // колесо мыши Вектора: щелчок колеса = 120 единиц; тачпад даёт мелкие доли — копим до целого
+    m_wheelAcc += event->angleDelta().y();
+    int steps = m_wheelAcc / 120;
+    if (steps) {
+        m_wheelAcc -= steps * 120;
+        static_cast<MainWindow*>(parent())->mouseWheel(steps);
+    }
 }
 
 
