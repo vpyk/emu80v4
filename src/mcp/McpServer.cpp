@@ -1119,6 +1119,43 @@ namespace
     }
 
     // ================================================================
+    // Tool: mouse — мышь платформы (Вектор: контроллер KTSerg, порт D4h)
+    // ================================================================
+    json Tool_Mouse(const json& args)
+    {
+        json        result;
+        std::string err;
+
+        auto optInt = [&](const char* name, int& v) {
+            if (!args.contains(name) || args[name].is_null()) return false;
+            v = ParseNumArg(args[name], name);
+            return true;
+        };
+        int x = -1, y = -1, buttons = -1, wheel = 0;
+        const bool hasX = optInt("x", x), hasY = optInt("y", y), hasB = optInt("buttons", buttons);
+        if (args.contains("wheel") && args["wheel"].is_number_integer())
+            wheel = args["wheel"].get<int>();
+        if (hasX != hasY)
+            throw std::runtime_error("x and y go together");
+
+        const bool ok = mcp::Run([&] {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            MouseDevice* m = p->getMouse();
+            if (!m) { err = "this platform has no mouse"; return; }
+            if (hasX || hasB)
+                m->emuMouseSet(x, y, buttons);   // -1 — оставить как есть
+            if (wheel)
+                m->hostMouseWheel(wheel);
+            result["state"] = m->getMouseInfo();
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
     // Tool: kbd_text
     // ================================================================
     json Tool_KbdText(const json& args)
@@ -2010,6 +2047,24 @@ namespace
             "Release all virtually pressed keys.",
             json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_KbdReset
+        });
+
+        tools.push_back({
+            "mouse",
+            "Emulated mouse (Vector-06C: KTSerg USB mouse controller, port D4h, as on ComboLite). "
+            "'x' 0-511 (512-pixel mode points; 256-mode X = x/2) and 'y' 0-255 (grows upward, 255 = top line) "
+            "move the pointer like the host cursor over the screen; 'buttons' bit 0 left, bit 1 right, "
+            "bit 2 middle; 'wheel' adds wheel steps. All optional; returns the controller state.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "x",       { { "type", json::array({ "string", "integer" }) }, { "description", "0-511" } } },
+                    { "y",       { { "type", json::array({ "string", "integer" }) }, { "description", "0-255, upward" } } },
+                    { "buttons", { { "type", json::array({ "string", "integer" }) }, { "description", "bit0 left, bit1 right, bit2 middle" } } },
+                    { "wheel",   { { "type", "integer" }, { "description", "wheel steps, + away from user" } } },
+                }},
+            },
+            &Tool_Mouse
         });
 
         tools.push_back({
