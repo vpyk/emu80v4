@@ -26,6 +26,7 @@
 #include "Keyboard.h"
 #include "KbdLayout.h"
 #include "CpuWaits.h"
+#include "Platform.h"
 
 class Ram;
 class Rom;
@@ -64,6 +65,7 @@ class VectorRenderer : public CrtRenderer, public IActive
         void setLineOffset(uint8_t lineOffset);
         void setPaletteColor(uint8_t color);
         void vidMemWriteNotify();
+        bool frameToScreen(int fx, int fy, int& x512, int& row);   // точка кадра -> точка 0..511 и строка 0..255 сверху
 
         static EmuObject* create(const EmuValuesList&) {return new VectorRenderer();}
 
@@ -321,6 +323,51 @@ class VectorColorRegister : public AddressableDevice
 
     private:
         VectorRenderer* m_renderer = nullptr;
+};
+
+
+// Контроллер USB-мыши KTSerg на шине ВУ, порт D4h (его же повторяет ComboLite). Запись: разряд 5 «1» —
+// выключить и сбросить (координаты 128/128), «0» — включить; разряды 3:0 — номер регистра. Чтение — регистр.
+// Регистры (шапка mous_r12.asm): 0 кнопки (7 левая, 6 правая, 5 средняя) и младший разряд X режима 512 — он
+// обновляется при чтении регистра 1; 1 X 0..255; 2 Y 0..255, растёт вверх; 3 колесо; 4, 5 смещение X, Y между
+// чтениями ЭТОГО регистра, -128..127; 6, 7 то же, 0..127 и разряд 7 — направление (1 влево / вниз); 8 кнопки
+// (0 левая, 1 правая, 2 средняя); 9, 10 смещение X, Y -127..127; 15 — 6Dh («m»).
+// В эмуляторе X и Y — место указателя системы над картинкой, смещения считаются по его движению.
+class VectorMouse : public AddressableDevice, public MouseDevice
+{
+    public:
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        void reset() override;
+
+        void writeByte(int addr, uint8_t value) override;
+        uint8_t readByte(int addr) override;
+
+        bool hostMouseMove(int x, int y, bool inside, int buttons) override;
+        void hostMouseWheel(int steps) override;
+        void emuMouseSet(int x, int y, int buttons) override;
+        bool isMouseActive() override {return m_enabled;}
+        std::string getMouseInfo() override;
+
+        static EmuObject* create(const EmuValuesList&) {return new VectorMouse();}
+
+    private:
+        VectorRenderer* m_renderer = nullptr;
+        uint8_t m_reg = 15;
+        bool m_enabled = false;
+        int m_x = 256;          // 0..511, точки режима 512
+        int m_y = 128;          // 0..255, вверх
+        int m_hostButtons = 0;  // кнопки мыши системы: 1 левая, 2 правая, 4 средняя
+        int m_emuButtons = 0;   // кнопки, заданные через MCP; держатся, пока MCP их не сменит
+        uint8_t m_wheel = 0;
+        uint8_t m_xLsb = 0;
+        int m_acc[6] = {};      // накопители смещений регистров 4, 5, 6, 7, 9, 10 (X — в точках режима 512)
+        bool m_haveHost = false;
+        int m_hostX = 0;
+        int m_hostY = 0;
+
+        void moveTo(int x, int y);
+        void center();
+        int buttons() {return m_hostButtons | m_emuButtons;}
 };
 
 

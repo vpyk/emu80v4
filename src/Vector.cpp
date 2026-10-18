@@ -409,6 +409,20 @@ void VectorRenderer::setPaletteColor(uint8_t color)
 }
 
 
+bool VectorRenderer::frameToScreen(int fx, int fy, int& x512, int& row)
+{
+    if (m_showBorder) {
+        fx -= 57;   // картинка в рамке: та же область, что вырезает renderFrame без рамки
+        fy -= 16;
+    }
+    if (fx < 0 || fx >= 512 || fy < 0 || fy >= 256)
+        return false;
+    x512 = fx;
+    row = fy;
+    return true;
+}
+
+
 void VectorRenderer::vidMemWriteNotify()
 {
     advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 40);
@@ -840,6 +854,168 @@ bool VectorColorRegister::setProperty(const std::string& propertyName, const Emu
         return true;
     }
     return false;
+}
+
+
+bool VectorMouse::setProperty(const std::string& propertyName, const EmuValuesList& values)
+{
+    if (AddressableDevice::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "crtRenderer") {
+        m_renderer = static_cast<VectorRenderer*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+    return false;
+}
+
+
+void VectorMouse::center()
+{
+    m_x = 256;
+    m_y = 128;
+    m_xLsb = 0;
+    m_wheel = 0;
+    for (int& a : m_acc)
+        a = 0;
+}
+
+
+void VectorMouse::reset()
+{
+    m_reg = 15;
+    m_enabled = false;   // после сброса управляющий байт FFh: контроллер выключен
+    center();
+}
+
+
+void VectorMouse::writeByte(int, uint8_t value)
+{
+    m_reg = value & 0x0F;
+    if (value & 0x20) {
+        m_enabled = false;
+        center();
+    } else if (!m_enabled) {
+        m_enabled = true;
+        for (int& a : m_acc)
+            a = 0;
+        if (m_haveHost) {   // включили — указатель там, где стоит стрелка системы
+            m_x = m_hostX;
+            m_y = m_hostY;
+        }
+    }
+}
+
+
+static uint8_t takeDelta(int& acc, int div, int lo, int hi)
+{
+    int v = acc / div;
+    if (v < lo)
+        v = lo;
+    else if (v > hi)
+        v = hi;
+    acc -= v * div;   // что не влезло, отдаётся следующими чтениями
+    return uint8_t(v);
+}
+
+
+static uint8_t takeDeltaDir(int& acc, int div)
+{
+    int8_t v = int8_t(takeDelta(acc, div, -127, 127));
+    return v < 0 ? uint8_t(0x80 | -v) : uint8_t(v);
+}
+
+
+uint8_t VectorMouse::readByte(int)
+{
+    switch (m_reg) {
+    case 0:
+        return (buttons() & 1 ? 0x80 : 0) | (buttons() & 2 ? 0x40 : 0) | (buttons() & 4 ? 0x20 : 0) | m_xLsb;
+    case 1:
+        m_xLsb = m_x & 1;
+        return uint8_t(m_x >> 1);
+    case 2:
+        return uint8_t(m_y);
+    case 3:
+        return m_wheel;
+    case 4:
+        return takeDelta(m_acc[0], 2, -128, 127);
+    case 5:
+        return takeDelta(m_acc[1], 1, -128, 127);
+    case 6:
+        return takeDeltaDir(m_acc[2], 2);
+    case 7:
+        return takeDeltaDir(m_acc[3], 1);
+    case 8:
+        return uint8_t(buttons());
+    case 9:
+        return takeDelta(m_acc[4], 2, -127, 127);
+    case 10:
+        return takeDelta(m_acc[5], 1, -127, 127);
+    case 15:
+        return 0x6D;
+    default:
+        return 0;
+    }
+}
+
+
+void VectorMouse::moveTo(int x, int y)
+{
+    if (m_haveHost && m_enabled) {
+        int dx = x - m_hostX;
+        int dy = y - m_hostY;
+        // накопитель регистра, который программа не читает, иначе растёт без предела;
+        // больше размера экрана копить смысла нет
+        for (int i = 0; i < 6; i += 2) {
+            m_acc[i] = std::max(-512, std::min(m_acc[i] + dx, 512));
+            m_acc[i + 1] = std::max(-256, std::min(m_acc[i + 1] + dy, 256));
+        }
+    }
+    m_hostX = x;
+    m_hostY = y;
+    m_haveHost = true;
+    if (m_enabled) {
+        m_x = x;
+        m_y = y;
+    }
+}
+
+
+bool VectorMouse::hostMouseMove(int x, int y, bool inside, int buttons)
+{
+    m_hostButtons = buttons & 7;
+    int x512, row;
+    if (!inside || !m_renderer || !m_renderer->frameToScreen(x, y, x512, row))
+        return false;
+    moveTo(x512, 255 - row);
+    return true;
+}
+
+
+void VectorMouse::hostMouseWheel(int steps)
+{
+    if (m_enabled)
+        m_wheel = uint8_t(m_wheel + steps);
+}
+
+
+void VectorMouse::emuMouseSet(int x, int y, int buttons)
+{
+    if (buttons >= 0)
+        m_emuButtons = buttons & 7;
+    if (x >= 0 && y >= 0)
+        moveTo(std::min(x, 511), std::min(y, 255));
+}
+
+
+std::string VectorMouse::getMouseInfo()
+{
+    std::ostringstream oss;
+    oss << "enabled=" << m_enabled << " reg=" << int(m_reg) << " x=" << m_x << " y=" << m_y
+        << " buttons=" << buttons() << " wheel=" << int(m_wheel)
+        << " acc=" << m_acc[0] << "," << m_acc[1] << "," << m_acc[2] << "," << m_acc[3] << "," << m_acc[4] << "," << m_acc[5];
+    return oss.str();
 }
 
 

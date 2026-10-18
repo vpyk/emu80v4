@@ -2020,6 +2020,30 @@ void MainWindow::mouseDrag(bool pressed, int x, int y)
 }
 
 
+bool MainWindow::mouseMove(int x, int y, int buttons)
+{
+    if (m_windowType != EWT_EMULATION)
+        return false;
+
+    return m_palWindow->mouseMove(x, y, buttons);   // координаты виджета, как у mouseDrag
+}
+
+
+void MainWindow::mouseWheel(int steps)
+{
+    if (m_windowType != EWT_EMULATION)
+        return;
+
+    m_palWindow->mouseWheel(steps);
+}
+
+
+bool MainWindow::isEmuMouseActive()
+{
+    return m_windowType == EWT_EMULATION && m_palWindow && m_palWindow->isEmuMouseActive();
+}
+
+
 void MainWindow::onFpsTimer()
 {
     if (m_windowType != EWT_EMULATION)

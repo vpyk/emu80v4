@@ -68,6 +68,9 @@ class EmuWindow : public EmuObject, public PalWindow
         void calcDstRect(int srcWidth, int srcHeight, double srcAspectRatio, int wndWidth, int wndHeight, int& dstWidth, int& dstHeight, int& dstX, int& dstY) override;
 
         void mouseDrag(bool pressed, int x, int y) override;
+        bool mouseMove(int x, int y, int buttons) override;
+        void mouseWheel(int steps) override;
+        bool isEmuMouseActive() override;
 
         virtual void processKey(PalKeyCode, bool) {}
         virtual void closeRequest() {}

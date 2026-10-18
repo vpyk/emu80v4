@@ -63,6 +63,9 @@ class PalWindow
 
         virtual void mouseClick(int x, int y, PalMouseKey key) {}
         virtual void mouseDrag(bool pressed, int x, int y) = 0;
+        virtual bool mouseMove(int /*x*/, int /*y*/, int /*buttons*/) {return false;}   // true — указатель над картинкой
+        virtual void mouseWheel(int /*steps*/) {}
+        virtual bool isEmuMouseActive() {return false;}
 
         virtual std::string getPlatformObjectName() = 0;
         EmuWindowType getWindowType() {return m_windowType;}

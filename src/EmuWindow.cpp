@@ -632,6 +632,28 @@ void EmuWindow::mouseDrag(bool pressed, int x, int y)
 }
 
 
+bool EmuWindow::mouseMove(int x, int y, int buttons)
+{
+    if (!m_platform)
+        return false;
+    bool inside = translateCoords(x, y);
+    return m_platform->mouseMove(x, y, inside, buttons);
+}
+
+
+void EmuWindow::mouseWheel(int steps)
+{
+    if (m_platform)
+        m_platform->mouseWheel(steps);
+}
+
+
+bool EmuWindow::isEmuMouseActive()
+{
+    return m_platform && m_platform->isMouseActive();
+}
+
+
 bool EmuWindow::setProperty(const string& propertyName, const EmuValuesList& values)
 {
     if (EmuObject::setProperty(propertyName, values))

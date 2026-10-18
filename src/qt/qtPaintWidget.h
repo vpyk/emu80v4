@@ -106,6 +106,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         bool m_hideCursor = true;
         QTimer m_hideCursorTimer;
         bool m_cursorHidden = false;
+        int m_wheelAcc = 0;
+        bool m_emuMouseHid = false;   // стрелка спрятана, пока программа держит мышь Вектора
         bool m_cursorTimerPaused = false;
         int m_shaderFrameCount = 0;
 
