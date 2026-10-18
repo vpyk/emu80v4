@@ -965,9 +965,11 @@ void VectorMouse::moveTo(int x, int y)
     if (m_haveHost && m_enabled) {
         int dx = x - m_hostX;
         int dy = y - m_hostY;
+        // накопитель регистра, который программа не читает, иначе растёт без предела;
+        // больше размера экрана копить смысла нет
         for (int i = 0; i < 6; i += 2) {
-            m_acc[i] += dx;
-            m_acc[i + 1] += dy;
+            m_acc[i] = std::max(-512, std::min(m_acc[i] + dx, 512));
+            m_acc[i + 1] = std::max(-256, std::min(m_acc[i + 1] + dy, 256));
         }
     }
     m_hostX = x;
