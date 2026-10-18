@@ -163,15 +163,15 @@ void SpecRenderer::renderLine(int line)
                 fgColor = 0xC0C0C0;
                 break;
             case SCM_4COLOR:
-                fgColor = spec4ColorPalette[(colorByte & 0xC0) >> 6];
+                fgColor = c_spec4ColorPalette[(colorByte & 0xC0) >> 6];
                 break;
             case SCM_8COLOR:
-                fgColor = spec8ColorPalette[((colorByte & 0xC0) >> 5) | ((colorByte & 0x10) >> 4)];
+                fgColor = c_spec8ColorPalette[((colorByte & 0xC0) >> 5) | ((colorByte & 0x10) >> 4)];
                 break;
             case SCM_MX:
             default:
-                fgColor = spec16ColorPalette[(colorByte & 0xF0) >> 4];
-                bgColor = spec16ColorPalette[colorByte & 0xF];
+                fgColor = c_spec16ColorPalette[(colorByte & 0xF0) >> 4];
+                bgColor = c_spec16ColorPalette[colorByte & 0xF];
         }
         for (int pt = 0; pt < 8; pt++, bt <<= 1)
             m_frameBuf[line * 384 + col * 8 + pt] = (bt & 0x80) ? fgColor : bgColor;
@@ -183,19 +183,31 @@ void SpecRenderer::setMx2MemMode(int mx2MemMode)
 {
     if (!m_mx2Mode)
         return;
+
     m_mx2MxMode = mx2MemMode != 3;
+
     if (m_mx2MxMode)
-        m_colorMode = SCM_MX;
+        m_mx2ColorMode = SCM_MX;
     else
-        m_colorMode = m_mx2Color8 ? SCM_8COLOR : SCM_4COLOR;
+        m_mx2ColorMode = m_mx2Color8 ? SCM_8COLOR : SCM_4COLOR;
+
+    m_videoRam->setMxColorMode(m_mx2ColorMode);
 }
 
 
 void SpecRenderer::set8Color(bool color8)
 {
+    if (!m_mx2Mode)
+        return;
+
     m_mx2Color8 = color8;
-    if (!m_mx2MxMode)
-        m_colorMode = m_mx2Color8 ? SCM_8COLOR : SCM_4COLOR;
+
+    if (m_mx2MxMode)
+        m_mx2ColorMode = SCM_MX;
+    else
+        m_mx2ColorMode = m_mx2Color8 ? SCM_8COLOR : SCM_4COLOR;
+
+    m_videoRam->setMxColorMode(m_mx2ColorMode);
 }
 
 
@@ -244,6 +256,8 @@ void SpecRenderer::operate()
 
 void SpecRenderer::attachScreenMemory(SpecVideoRam *videoMemory)
 {
+    m_videoRam = videoMemory;
+
     m_screenMemory = videoMemory->getDataPtr();
     m_colorMemory = videoMemory->getColorDataPtr();
     m_colorMemoryMx = videoMemory->getColorDataPtrMx();
@@ -286,7 +300,7 @@ bool SpecRenderer::setProperty(const string& propertyName, const EmuValuesList& 
         } else if (values[0].asString() == "mx") {
             m_colorMode = SCM_MX;
         } else if (values[0].asString() == "mx2") {
-            m_colorMode = SCM_8COLOR;
+            m_colorMode = SCM_MX;
             m_mx2Mode = true;
         } else
             return false;
@@ -383,9 +397,29 @@ void SpecVideoRam::writeByte(int addr, uint8_t value)
 }
 
 
+void SpecVideoRam::setMxColorMode(SpecColorMode mode)
+{
+    bool needChColor = m_mxColorMode != mode;
+    m_mxColorMode = mode;
+
+    if (needChColor)
+        setCurColor(m_color);
+}
+
+
 void SpecVideoRam::setCurColor(uint8_t color)
 {
     m_color = color;
+    switch (m_mxColorMode) {
+    case SCM_4COLOR:
+        m_colorMx = c_spec4Colors[(color & 0xC0) >> 6] << 4;
+        break;
+    case SCM_8COLOR:
+        m_colorMx = c_spec8Colors[((color & 0xC0) >> 5) | ((color & 0x10) >> 4)] << 4;
+        break;
+    default: // MX
+        m_colorMx = color;
+    }
 }
 
 

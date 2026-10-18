@@ -33,6 +33,13 @@ class AddrSpaceMapper;
 class SpecMxPit8253SoundSource;
 
 
+enum SpecColorMode {
+    SCM_MONO,
+    SCM_4COLOR,
+    SCM_8COLOR,
+    SCM_MX // 16-color MX mode
+};
+
 class SpecVideoRam : public Ram
 {
     public:
@@ -49,14 +56,28 @@ class SpecVideoRam : public Ram
         void setCurColor(uint8_t color);
         void setCurColorMx(uint8_t color);
 
+        void setMxColorMode(SpecColorMode mode);
+
         static EmuObject* create(const EmuValuesList& parameters) {return parameters[0].isInt() ? new SpecVideoRam(parameters[0].asInt()) : nullptr;}
 
     private:
+        const uint8_t c_spec4Colors[4] = {
+            //15, 12, 10, 9
+            7, 4, 2, 1
+        };
+
+        const uint32_t c_spec8Colors[8] = {
+            //15, 14, 13, 12, 11, 10, 9, 0
+            7, 6, 5, 4, 3, 2, 1, 0
+        };
+
         int m_memSize;
         uint8_t m_color = 0;
         uint8_t m_colorMx = 0;
         uint8_t* m_colorBuf = nullptr;
         uint8_t* m_colorBufMx = nullptr;
+
+        SpecColorMode m_mxColorMode = SCM_MX;
 };
 
 
@@ -80,23 +101,16 @@ class SpecMxColorRegister : public AddressableDevice
 
 class SpecRenderer : public CrtRenderer, public IActive
 {
-    enum SpecColorMode {
-        SCM_MONO,
-        SCM_4COLOR,
-        SCM_8COLOR,
-        SCM_MX // 16-color MX mode
+    const uint32_t c_spec4ColorPalette[4] = {
+        0xFFFFFF, 0xFF0000, 0x00FF00, 0x0000FF
     };
 
-    const uint32_t spec4ColorPalette[4] = {
-        0xFFFFFF, 0xFF0000, 0x00FF00, 0x0000FF,
-    };
-
-    const uint32_t spec8ColorPalette[8] = {
+    const uint32_t c_spec8ColorPalette[8] = {
         0xFFFFFF, 0xFFFF00, 0xFF00FF, 0xFF0000,
         0x00FFFF, 0x00FF00, 0x0000FF, 0x000000
     };
 
-    const uint32_t spec16ColorPalette[16] = {
+    const uint32_t c_spec16ColorPalette[16] = {
         0x000000, 0x0000C0, 0x00C000, 0x00C0C0,
         0xC00000, 0xC000C0, 0xC0C000, 0xC0C0C0,
         0x808080, 0x0000FF, 0x00FF00, 0x00FFFF,
@@ -127,6 +141,8 @@ class SpecRenderer : public CrtRenderer, public IActive
         static EmuObject* create(const EmuValuesList&) {return new SpecRenderer();}
 
     private:
+        SpecVideoRam* m_videoRam = nullptr;
+
         const uint8_t* m_screenMemory = nullptr;
         const uint8_t* m_colorMemory = nullptr;
         const uint8_t* m_colorMemoryMx = nullptr;
@@ -134,6 +150,7 @@ class SpecRenderer : public CrtRenderer, public IActive
         uint32_t* m_frameBuf = nullptr;
 
         SpecColorMode m_colorMode = SCM_8COLOR;
+        SpecColorMode m_mx2ColorMode = SCM_8COLOR;
         bool m_showBorder = false;
         bool m_mx2Mode = false;
 
