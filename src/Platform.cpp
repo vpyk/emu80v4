@@ -161,6 +161,11 @@ Platform::Platform(string configFileName, string name)
         if ((m_kbdTapper = dynamic_cast<KbdTapper*>(*it)))
             break;
 
+    // ищем мышь, должна быть единственной
+    for (auto it = m_objList.begin(); it != m_objList.end(); it++)
+        if ((m_mouse = dynamic_cast<MouseDevice*>(*it)))
+            break;
+
     Platform::init();
 
     Platform::reset();
@@ -502,9 +507,6 @@ bool Platform::setProperty(const string& propertyName, const EmuValuesList& valu
     } else if (propertyName == "fastResetCpuTicks") {
             m_fastResetCpuTicks = values[0].asInt();
             return true;
-    } else if (propertyName == "mouse") {
-        m_mouse = dynamic_cast<MouseDevice*>(g_emulation->findObject(values[0].asString()));
-        return m_mouse != nullptr;
     }
     return false;
 }
