@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2026
+ *  © Viktor Pykhonin <pyk@mail.ru> and contributors, 2019-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
