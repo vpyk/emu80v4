@@ -1127,15 +1127,37 @@ namespace
         json        result;
         std::string err;
 
-        auto optInt = [&](const char* name, int& v) {
+        auto checkRange = [](const char* name, long long v, int lo, int hi) {
+            if (v < lo || v > hi)
+                throw std::runtime_error(std::string(name) + " must be between " + std::to_string(lo) + " and " + std::to_string(hi));
+        };
+        auto optInt = [&](const char* name, int& v, int lo, int hi) {
             if (!args.contains(name) || args[name].is_null()) return false;
             v = ParseNumArg(args[name], name);
+            checkRange(name, v, lo, hi);
             return true;
         };
         int x = -1, y = -1, buttons = -1, wheel = 0;
-        const bool hasX = optInt("x", x), hasY = optInt("y", y), hasB = optInt("buttons", buttons);
-        if (args.contains("wheel") && args["wheel"].is_number_integer())
-            wheel = args["wheel"].get<int>();
+        const bool hasX = optInt("x", x, 0, 511), hasY = optInt("y", y, 0, 255), hasB = optInt("buttons", buttons, 0, 7);
+        // wheel бывает отрицательным, поэтому ParseNumArg (беззнаковый) применяется к строке без знака
+        if (args.contains("wheel") && !args["wheel"].is_null()) {
+            const json& w = args["wheel"];
+            long long v;
+            if (w.is_number_integer()) {
+                v = w.get<long long>();
+            } else if (w.is_string()) {
+                std::string s = w.get<std::string>();
+                const size_t b = s.find_first_not_of(" \t");
+                const bool neg = b != std::string::npos && s[b] == '-';
+                v = ParseNumArg(json(neg ? s.substr(b + 1) : s), "wheel");
+                if (neg)
+                    v = -v;
+            } else {
+                throw std::runtime_error("invalid wheel value");
+            }
+            checkRange("wheel", v, -127, 127);
+            wheel = int(v);
+        }
         if (hasX != hasY)
             throw std::runtime_error("x and y go together");
 
@@ -2062,7 +2084,7 @@ namespace
                     { "x",       { { "type", json::array({ "string", "integer" }) }, { "description", "0-511" } } },
                     { "y",       { { "type", json::array({ "string", "integer" }) }, { "description", "0-255, upward" } } },
                     { "buttons", { { "type", json::array({ "string", "integer" }) }, { "description", "bit0 left, bit1 right, bit2 middle" } } },
-                    { "wheel",   { { "type", "integer" }, { "description", "wheel steps, + away from user" } } },
+                    { "wheel",   { { "type", json::array({ "string", "integer" }) }, { "description", "wheel steps -127..127, + away from user" } } },
                 }},
             },
             &Tool_Mouse
