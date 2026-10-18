@@ -475,6 +475,9 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void PaintWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    // второе нажатие двойного щелчка Qt присылает сюда, а не в mousePressEvent
+    static_cast<MainWindow*>(parent())->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+
     if (event->button() & Qt::LeftButton)
         static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_DBLCLICK);
 }
