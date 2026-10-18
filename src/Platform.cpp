@@ -389,10 +389,9 @@ void Platform::mouseDrag(bool pressed, int x, int y)
 }
 
 
-void Platform::mouseMove(int x, int y, bool inside, int buttons)
+bool Platform::mouseMove(int x, int y, bool inside, int buttons)
 {
-    if (m_mouse)
-        m_mouse->hostMouseMove(x, y, inside, buttons);
+    return m_mouse && m_mouse->hostMouseMove(x, y, inside, buttons);
 }
 
 

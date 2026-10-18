@@ -342,7 +342,7 @@ class VectorMouse : public AddressableDevice, public MouseDevice
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
 
-        void hostMouseMove(int x, int y, bool inside, int buttons) override;
+        bool hostMouseMove(int x, int y, bool inside, int buttons) override;
         void hostMouseWheel(int steps) override;
         void emuMouseSet(int x, int y, int buttons) override;
         bool isMouseActive() override {return m_enabled;}

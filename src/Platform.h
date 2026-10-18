@@ -45,7 +45,8 @@ class MouseDevice
 {
     public:
         virtual ~MouseDevice() = default;
-        virtual void hostMouseMove(int x, int y, bool inside, int buttons) = 0;   // кнопки: 1 левая, 2 правая, 4 средняя
+        virtual bool hostMouseMove(int x, int y, bool inside, int buttons) = 0;   // кнопки: 1 левая, 2 правая, 4 средняя;
+                                                                                   // true — указатель над картинкой
         virtual void hostMouseWheel(int steps) = 0;                                // + от себя, - на себя
         virtual void emuMouseSet(int x, int y, int buttons) = 0;                   // для MCP: x 0..511, y 0..255 (вверх); -1 — не менять
         virtual bool isMouseActive() = 0;                                          // программа включила мышь
@@ -74,7 +75,7 @@ class Platform : public ParentObject
         void resetKeys();
         bool loadFile(std::string fileName, bool run = true);
         void mouseDrag(bool pressed, int x, int y);
-        void mouseMove(int x, int y, bool inside, int buttons);
+        bool mouseMove(int x, int y, bool inside, int buttons);
         void mouseWheel(int steps);
         bool isMouseActive();
         MouseDevice* getMouse() {return m_mouse;}

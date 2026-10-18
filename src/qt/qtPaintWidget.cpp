@@ -416,15 +416,16 @@ static int emuMouseButtons(Qt::MouseButtons b)
 void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 {
     MainWindow* mw = static_cast<MainWindow*>(parent());
-    mw->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+    bool overPicture = mw->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
 
     if (event->buttons() & Qt::LeftButton)
         mouseDrag(true, event->POS_X(), event->POS_Y());
 
     // программа включила мышь Вектора: свой указатель рисует она, стрелку системы над картинкой прячем.
+    // На полях и рамке, где мышь Вектора не двигается, стрелку показываем.
     // Смотрим на m_cursorHidden: уход указателя с картинки (leaveEvent) возвращает стрелку, и после возврата
     // её надо спрятать снова
-    if (mw->isEmuMouseActive()) {
+    if (overPicture && mw->isEmuMouseActive()) {
         m_emuMouseHid = true;
         if (!m_cursorHidden) {
             setCursor(Qt::BlankCursor);

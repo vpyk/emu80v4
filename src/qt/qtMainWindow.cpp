@@ -2020,12 +2020,12 @@ void MainWindow::mouseDrag(bool pressed, int x, int y)
 }
 
 
-void MainWindow::mouseMove(int x, int y, int buttons)
+bool MainWindow::mouseMove(int x, int y, int buttons)
 {
     if (m_windowType != EWT_EMULATION)
-        return;
+        return false;
 
-    m_palWindow->mouseMove(x, y, buttons);   // координаты виджета, как у mouseDrag
+    return m_palWindow->mouseMove(x, y, buttons);   // координаты виджета, как у mouseDrag
 }
 
 

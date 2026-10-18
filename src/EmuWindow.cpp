@@ -632,12 +632,12 @@ void EmuWindow::mouseDrag(bool pressed, int x, int y)
 }
 
 
-void EmuWindow::mouseMove(int x, int y, int buttons)
+bool EmuWindow::mouseMove(int x, int y, int buttons)
 {
     if (!m_platform)
-        return;
+        return false;
     bool inside = translateCoords(x, y);
-    m_platform->mouseMove(x, y, inside, buttons);
+    return m_platform->mouseMove(x, y, inside, buttons);
 }
 
 

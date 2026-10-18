@@ -982,12 +982,14 @@ void VectorMouse::moveTo(int x, int y)
 }
 
 
-void VectorMouse::hostMouseMove(int x, int y, bool inside, int buttons)
+bool VectorMouse::hostMouseMove(int x, int y, bool inside, int buttons)
 {
     m_hostButtons = buttons & 7;
     int x512, row;
-    if (inside && m_renderer && m_renderer->frameToScreen(x, y, x512, row))
-        moveTo(x512, 255 - row);
+    if (!inside || !m_renderer || !m_renderer->frameToScreen(x, y, x512, row))
+        return false;
+    moveTo(x512, 255 - row);
+    return true;
 }
 
 
