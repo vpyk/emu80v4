@@ -96,7 +96,7 @@ All numbers: JSON integer = decimal, JSON string = hex by default
 | `kbd_send` | `keys` (array), `action` (`press`/`release`/`tap`), `duration_ms` | Press/release/hold keys. `tap` blocks until done or breakpoint |
 | `kbd_reset` | — | Release all virtually pressed keys. Also stops KbdTapper |
 | `kbd_text` | `text` | Type a string via KbdTapper (platform-dependent). Blocks until done or breakpoint |
-| `mouse` | `x` (0-511), `y` (0-255, upward), `buttons` (bit 0 left, 1 right, 2 middle), `wheel` (steps) | Platform mouse (Vector: KTSerg controller on port D4h). All optional; returns the controller state |
+| `mouse` | `x` (0-511), `y` (0-255, upward), `buttons` (bit 0 left, 1 right, 2 middle; held until the next call with `buttons`), `wheel` (steps) | Platform mouse (Vector: KTSerg controller on port D4h). All optional; returns the controller state |
 
 ### Disks
 

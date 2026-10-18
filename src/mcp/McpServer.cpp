@@ -2054,7 +2054,7 @@ namespace
             "Emulated mouse (Vector-06C: KTSerg USB mouse controller, port D4h, as on ComboLite). "
             "'x' 0-511 (512-pixel mode points; 256-mode X = x/2) and 'y' 0-255 (grows upward, 255 = top line) "
             "move the pointer like the host cursor over the screen; 'buttons' bit 0 left, bit 1 right, "
-            "bit 2 middle; 'wheel' adds wheel steps. All optional; returns the controller state.",
+            "bit 2 middle, held until changed by another call and combined with the host mouse buttons; 'wheel' adds wheel steps. All optional; returns the controller state.",
             json{
                 { "type", "object" },
                 { "properties", {

@@ -930,7 +930,7 @@ uint8_t VectorMouse::readByte(int)
 {
     switch (m_reg) {
     case 0:
-        return (m_buttons & 1 ? 0x80 : 0) | (m_buttons & 2 ? 0x40 : 0) | (m_buttons & 4 ? 0x20 : 0) | m_xLsb;
+        return (buttons() & 1 ? 0x80 : 0) | (buttons() & 2 ? 0x40 : 0) | (buttons() & 4 ? 0x20 : 0) | m_xLsb;
     case 1:
         m_xLsb = m_x & 1;
         return uint8_t(m_x >> 1);
@@ -947,7 +947,7 @@ uint8_t VectorMouse::readByte(int)
     case 7:
         return takeDeltaDir(m_acc[3], 1);
     case 8:
-        return uint8_t(m_buttons & 7);
+        return uint8_t(buttons());
     case 9:
         return takeDelta(m_acc[4], 2, -127, 127);
     case 10:
@@ -984,7 +984,7 @@ void VectorMouse::moveTo(int x, int y)
 
 void VectorMouse::hostMouseMove(int x, int y, bool inside, int buttons)
 {
-    m_buttons = buttons & 7;
+    m_hostButtons = buttons & 7;
     int x512, row;
     if (inside && m_renderer && m_renderer->frameToScreen(x, y, x512, row))
         moveTo(x512, 255 - row);
@@ -1001,7 +1001,7 @@ void VectorMouse::hostMouseWheel(int steps)
 void VectorMouse::emuMouseSet(int x, int y, int buttons)
 {
     if (buttons >= 0)
-        m_buttons = buttons & 7;
+        m_emuButtons = buttons & 7;
     if (x >= 0 && y >= 0)
         moveTo(std::min(x, 511), std::min(y, 255));
 }
@@ -1011,7 +1011,7 @@ std::string VectorMouse::getMouseInfo()
 {
     std::ostringstream oss;
     oss << "enabled=" << m_enabled << " reg=" << int(m_reg) << " x=" << m_x << " y=" << m_y
-        << " buttons=" << m_buttons << " wheel=" << int(m_wheel)
+        << " buttons=" << buttons() << " wheel=" << int(m_wheel)
         << " acc=" << m_acc[0] << "," << m_acc[1] << "," << m_acc[2] << "," << m_acc[3] << "," << m_acc[4] << "," << m_acc[5];
     return oss.str();
 }

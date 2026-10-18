@@ -356,7 +356,8 @@ class VectorMouse : public AddressableDevice, public MouseDevice
         bool m_enabled = false;
         int m_x = 256;          // 0..511, точки режима 512
         int m_y = 128;          // 0..255, вверх
-        int m_buttons = 0;      // 1 левая, 2 правая, 4 средняя
+        int m_hostButtons = 0;  // кнопки мыши системы: 1 левая, 2 правая, 4 средняя
+        int m_emuButtons = 0;   // кнопки, заданные через MCP; держатся, пока MCP их не сменит
         uint8_t m_wheel = 0;
         uint8_t m_xLsb = 0;
         int m_acc[6] = {};      // накопители смещений регистров 4, 5, 6, 7, 9, 10 (X — в точках режима 512)
@@ -366,6 +367,7 @@ class VectorMouse : public AddressableDevice, public MouseDevice
 
         void moveTo(int x, int y);
         void center();
+        int buttons() {return m_hostButtons | m_emuButtons;}
 };
 
 
