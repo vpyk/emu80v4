@@ -35,6 +35,7 @@
 #include "RamDisk.h"
 #include "Debugger.h"
 #include "KbdTapper.h"
+#include "MouseDevice.h"
 
 using namespace std;
 

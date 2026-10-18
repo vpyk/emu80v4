@@ -27,6 +27,7 @@
 #include "../Keyboard.h"
 #include "../KbdLayout.h"
 #include "../KbdTapper.h"
+#include "../MouseDevice.h"
 
 #include "McpServer.h"
 #include "McpMarshal.h"

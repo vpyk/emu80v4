@@ -38,20 +38,7 @@ class Keyboard;
 class DiskImage;
 class DebugWindow;
 
-
-// Мышь платформы (Вектор: контроллер USB-мыши KTSerg на порту D4h). Координаты — в точках кадра
-// после EmuWindow::translateCoords; inside = false, когда указатель вне картинки
-class MouseDevice
-{
-    public:
-        virtual ~MouseDevice() = default;
-        virtual bool hostMouseMove(int x, int y, bool inside, int buttons) = 0;   // кнопки: 1 левая, 2 правая, 4 средняя;
-                                                                                   // true — указатель над картинкой
-        virtual void hostMouseWheel(int steps) = 0;                                // + от себя, - на себя
-        virtual void emuMouseSet(int x, int y, int buttons) = 0;                   // для MCP: x 0..511, y 0..255 (вверх); -1 — не менять
-        virtual bool isMouseActive() = 0;                                          // программа включила мышь
-        virtual std::string getMouseInfo() = 0;
-};
+class MouseDevice;
 class KbdTapper;
 class IDebugger;
 

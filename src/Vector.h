@@ -26,7 +26,7 @@
 #include "Keyboard.h"
 #include "KbdLayout.h"
 #include "CpuWaits.h"
-#include "Platform.h"
+#include "MouseDevice.h"
 
 class Ram;
 class Rom;

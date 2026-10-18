@@ -181,6 +181,7 @@ HEADERS  += \
     Memory.h \
     Mikro80.h \
     Mikrosha.h \
+    MouseDevice.h \
     MsxTapeHooks.h \
     ObjectFactory.h \
     Okean.h \

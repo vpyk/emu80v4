@@ -164,6 +164,7 @@
         <Unit filename="Mikro80.h" />
         <Unit filename="Mikrosha.cpp" />
         <Unit filename="Mikrosha.h" />
+        <Unit filename="MouseDevice.h" />
         <Unit filename="MsxTapeHooks.cpp" />
         <Unit filename="MsxTapeHooks.h" />
         <Unit filename="ObjectFactory.cpp" />
