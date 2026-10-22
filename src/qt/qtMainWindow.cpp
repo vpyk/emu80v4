@@ -96,6 +96,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_shaderIcon = QIcon(m_darkTheme ? ":/icons/shader-dark.png" : ":/icons/shader.png");
     m_presetIcon = QIcon(m_darkTheme ? ":/icons/preset-dark.png" : ":/icons/preset.png");
 
+    qApp->installEventFilter(this);
+
 #ifdef _WIN32
     m_shiftF10shortcut = new QShortcut(this);
     m_shiftF10shortcut->setKey(Qt::SHIFT | Qt::Key_F10);
@@ -105,6 +107,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    qApp->removeEventFilter(this);
+
     g_renderHelper->removeWindow(this);
     if (m_settingsDialog)
         delete m_settingsDialog;
@@ -2029,6 +2033,15 @@ bool MainWindow::mouseMove(int x, int y, int buttons)
 }
 
 
+void MainWindow::mouseMoveRelative(int dx, int dy, int buttons)
+{
+    if (m_windowType != EWT_EMULATION)
+        return;
+
+    m_palWindow->mouseMoveRelative(dx, dy, buttons);
+}
+
+
 void MainWindow::mouseWheel(int steps)
 {
     if (m_windowType != EWT_EMULATION)
@@ -2041,6 +2054,18 @@ void MainWindow::mouseWheel(int steps)
 bool MainWindow::isEmuMouseActive()
 {
     return m_windowType == EWT_EMULATION && m_palWindow && m_palWindow->isEmuMouseActive();
+}
+
+
+bool MainWindow::isEmuMouseRelative()
+{
+    return m_windowType == EWT_EMULATION && m_palWindow && m_palWindow->isEmuMouseRelative();
+}
+
+
+bool MainWindow::isEmuMouseOverPicture(int x, int y)
+{
+    return m_windowType == EWT_EMULATION && m_palWindow && m_palWindow->isEmuMouseOverPicture(x, y);
 }
 
 
@@ -2445,6 +2470,30 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     event->ignore();
     emuSysReq(m_palWindow, SR_CLOSE);
+}
+
+
+void MainWindow::changeEvent(QEvent* event)
+{
+    QMainWindow::changeEvent(event);
+
+    if (m_paintWidget && event->type() == QEvent::ActivationChange && !isActiveWindow())
+        m_paintWidget->releaseEmuMouseCapture();
+}
+
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Alt || keyEvent->key() == Qt::Key_Meta ||
+            (keyEvent->modifiers() & (Qt::AltModifier | Qt::MetaModifier))) {
+            if (isActiveWindow() && m_paintWidget)
+                m_paintWidget->releaseEmuMouseCapture();
+        }
+    }
+
+    return QMainWindow::eventFilter(watched, event);
 }
 
 

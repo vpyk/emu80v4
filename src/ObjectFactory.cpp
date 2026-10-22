@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(SpecKeyboard);
     REG_EMU_CLASS(SpecKbdLayout);
     REG_EMU_CLASS(SpecPpi8255Circuit);
+    REG_EMU_CLASS(SpecMouse);
     REG_EMU_CLASS(SpecRomDisk);
     REG_EMU_CLASS(SpecFileLoader);
     REG_EMU_CLASS(Sp580FileLoader);

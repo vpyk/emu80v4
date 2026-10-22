@@ -615,6 +615,224 @@ bool SpecPpi8255Circuit::setProperty(const string& propertyName, const EmuValues
 }
 
 
+void SpecMouse::reset()
+{
+    m_packet[0] = 0x7F;
+    m_packet[1] = 0x08;
+    m_packet[2] = 0x00;
+    m_packet[3] = 0x00;
+    m_packet[4] = 0x00;
+
+    m_curByte = 0x7F;
+    m_index = 0;
+    m_prevStrobe = false;
+    m_active = false;
+
+    m_accX = m_accY = m_accZ = 0;
+    m_buttons = 0;
+    m_pressedSincePacket = 0;
+
+    m_haveHostPos = false;
+
+    m_emuX = m_emuY = 0;
+    m_haveEmuPos = false;
+}
+
+
+bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (Ppi8255Circuit::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "relative") {
+        if (values[0].asString() == "yes") {
+            m_relative = true;
+            return true;
+        } else if (values[0].asString() == "no") {
+            m_relative = false;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+string SpecMouse::getPropertyStringValue(const string& propertyName)
+{
+    string res = Ppi8255Circuit::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "relative")
+        return m_relative ? "yes" : "no";
+
+    return "";
+}
+
+
+uint8_t SpecMouse::getPortA()
+{
+    return m_curByte;
+}
+
+
+void SpecMouse::setPortB(uint8_t value)
+{
+    bool strobe = value & 1;
+    if (!strobe && m_prevStrobe)
+        deliverByte();
+    m_prevStrobe = strobe;
+}
+
+
+void SpecMouse::setPortBMode(bool /*isInput*/)
+{
+    m_prevStrobe = false;
+}
+
+
+void SpecMouse::updateButtons(int buttons)
+{
+    buttons &= 7;
+    m_pressedSincePacket |= buttons & ~m_buttons;
+    m_buttons = buttons;
+}
+
+
+void SpecMouse::addMovement(int dx, int dy)
+{
+    if (!m_active)
+        return;
+
+    static const int c_limit = 1000000;
+
+    m_accX += dx * c_scale;
+    m_accY += dy * c_scale;
+
+    if (m_accX > c_limit)
+        m_accX = c_limit;
+    else if (m_accX < -c_limit)
+        m_accX = -c_limit;
+
+    if (m_accY > c_limit)
+        m_accY = c_limit;
+    else if (m_accY < -c_limit)
+        m_accY = -c_limit;
+}
+
+
+void SpecMouse::deliverByte()
+{
+    if (m_index == 0) {
+        m_packet[0] = 0x7F;
+        m_packet[1] = 0x08 | ((m_buttons | m_pressedSincePacket) & 7);
+        m_pressedSincePacket = 0;
+        m_packet[2] = takeDelta(m_accX);
+        m_packet[3] = takeDelta(m_accY);
+        m_packet[4] = takeDelta(m_accZ);
+    }
+
+    m_curByte = m_packet[m_index];
+    m_index = (m_index + 1) % 5;
+    m_active = true;
+}
+
+
+uint8_t SpecMouse::takeDelta(int& acc)
+{
+    int value = acc;
+    if (value > 126)
+        value = 126;
+    else if (value < -126)
+        value = -126;
+
+    acc = 0;
+
+    return static_cast<uint8_t>(static_cast<int8_t>(value));
+}
+
+
+bool SpecMouse::hostMouseMove(int x, int y, bool inside, int buttons)
+{
+    updateButtons(buttons);
+
+    if (!inside) {
+        m_haveHostPos = false;
+        return false;
+    }
+
+    if (!m_haveHostPos) {
+        m_hostX = x;
+        m_hostY = y;
+        m_haveHostPos = true;
+        return true;
+    }
+
+    int dx = x - m_hostX;
+    int dy = m_hostY - y;
+
+    m_hostX = x;
+    m_hostY = y;
+
+    addMovement(dx, dy);
+
+    return true;
+}
+
+
+void SpecMouse::hostMouseMoveRelative(int dx, int dy, int buttons)
+{
+    updateButtons(buttons);
+    addMovement(dx, dy);
+}
+
+
+void SpecMouse::hostMouseWheel(int steps)
+{
+    if (!m_active)
+        return;
+
+    m_accZ += steps;
+    if (m_accZ > 1000000)
+        m_accZ = 1000000;
+    else if (m_accZ < -1000000)
+        m_accZ = -1000000;
+}
+
+
+void SpecMouse::emuMouseSet(int x, int y, int buttons)
+{
+    if (buttons >= 0)
+        m_buttons = buttons & 7;
+
+    if (x < 0 || y < 0)
+        return;
+
+    if (x > 383)
+        x = 383;
+    if (y > 255)
+        y = 255;
+
+    if (m_haveEmuPos)
+        addMovement(x - m_emuX, y - m_emuY);
+
+    m_emuX = x;
+    m_emuY = y;
+    m_haveEmuPos = true;
+}
+
+
+std::string SpecMouse::getMouseInfo()
+{
+    std::ostringstream oss;
+    oss << "active=" << m_active << " relative=" << m_relative << " index=" << m_index
+        << " acc=" << m_accX << "," << m_accY << "," << m_accZ
+        << " buttons=" << m_buttons << " byte=" << int(m_curByte);
+    return oss.str();
+}
+
+
 SpecKeyboard::SpecKeyboard()
 {
     SpecKeyboard::resetKeys();

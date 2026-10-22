@@ -641,6 +641,28 @@ bool EmuWindow::mouseMove(int x, int y, int buttons)
 }
 
 
+void EmuWindow::mouseMoveRelative(int dx, int dy, int buttons)
+{
+    if (!m_platform)
+        return;
+
+    if (m_dstWidth > 0 && m_dstHeight > 0 && m_curImgWidth > 0 && m_curImgHeight > 0) {
+        m_relAccX += double(dx) * m_curImgWidth / m_dstWidth;
+        m_relAccY += double(dy) * m_curImgHeight / m_dstHeight;
+
+        int intDx = int(m_relAccX);
+        int intDy = int(m_relAccY);
+
+        m_relAccX -= intDx;
+        m_relAccY -= intDy;
+
+        m_platform->mouseMoveRelative(intDx, intDy, buttons);
+    } else {
+        m_platform->mouseMoveRelative(dx, dy, buttons);
+    }
+}
+
+
 void EmuWindow::mouseWheel(int steps)
 {
     if (m_platform)
@@ -651,6 +673,19 @@ void EmuWindow::mouseWheel(int steps)
 bool EmuWindow::isEmuMouseActive()
 {
     return m_platform && m_platform->isMouseActive();
+}
+
+
+bool EmuWindow::isEmuMouseRelative()
+{
+    return m_platform && m_platform->isMouseRelative();
+}
+
+
+bool EmuWindow::isEmuMouseOverPicture(int x, int y)
+{
+    return x >= m_dstX && x < m_dstX + m_dstWidth &&
+           y >= m_dstY && y < m_dstY + m_dstHeight;
 }
 
 

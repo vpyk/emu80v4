@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void screenshot(const QString& ssFileName);
         void setHideCursor(bool hide);
         void pauseCursorTimer(bool paused);
+        void releaseEmuMouseCapture();
 
         void setSmoothingAndShaderFile(SmoothingType smoothing, const QString& shaderFileName);
         void setDesaturate(bool desaturate) {m_desaturate = desaturate;}
@@ -75,6 +76,8 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void paintImageGL(QImage* img/*, double aspectRatio*/);
 
         void mouseDrag(bool pressed, int x, int y);
+        void startEmuMouseCapture(const QPoint& globalPos);
+        void endEmuMouseCapture();
 
         bool m_useCustomShader = false;
         QString m_shaderFileName;
@@ -108,6 +111,11 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         bool m_cursorHidden = false;
         int m_wheelAcc = 0;
         bool m_emuMouseHid = false;   // стрелка спрятана, пока программа держит мышь Вектора
+        bool m_emuMouseCaptured = false;
+        bool m_ignoreEmuMouseUntilRelease = false;
+        bool m_warpPending = false;
+        QPoint m_lastMouseGlobalPos;
+        QPoint m_warpTarget;
         bool m_cursorTimerPaused = false;
         int m_shaderFrameCount = 0;
 

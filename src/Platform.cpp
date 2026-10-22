@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -401,6 +401,13 @@ bool Platform::mouseMove(int x, int y, bool inside, int buttons)
 }
 
 
+void Platform::mouseMoveRelative(int dx, int dy, int buttons)
+{
+    if (m_mouse)
+        m_mouse->hostMouseMoveRelative(dx, dy, buttons);
+}
+
+
 void Platform::mouseWheel(int steps)
 {
     if (m_mouse)
@@ -411,6 +418,12 @@ void Platform::mouseWheel(int steps)
 bool Platform::isMouseActive()
 {
     return m_mouse && m_mouse->isMouseActive();
+}
+
+
+bool Platform::isMouseRelative()
+{
+    return m_mouse && m_mouse->isRelative();
 }
 
 

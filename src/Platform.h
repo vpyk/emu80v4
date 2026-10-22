@@ -63,8 +63,10 @@ class Platform : public ParentObject
         bool loadFile(std::string fileName, bool run = true);
         void mouseDrag(bool pressed, int x, int y);
         bool mouseMove(int x, int y, bool inside, int buttons);
+        void mouseMoveRelative(int dx, int dy, int buttons);
         void mouseWheel(int steps);
         bool isMouseActive();
+        bool isMouseRelative();
         MouseDevice* getMouse() {return m_mouse;}
         void updateScreenOnce();
 

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2019-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -64,8 +64,11 @@ class PalWindow
         virtual void mouseClick(int x, int y, PalMouseKey key) {}
         virtual void mouseDrag(bool pressed, int x, int y) = 0;
         virtual bool mouseMove(int /*x*/, int /*y*/, int /*buttons*/) {return false;}   // true — указатель над картинкой
+        virtual void mouseMoveRelative(int /*dx*/, int /*dy*/, int /*buttons*/) {}
         virtual void mouseWheel(int /*steps*/) {}
         virtual bool isEmuMouseActive() {return false;}
+        virtual bool isEmuMouseRelative() {return false;}
+        virtual bool isEmuMouseOverPicture(int /*x*/, int /*y*/) {return false;}
 
         virtual std::string getPlatformObjectName() = 0;
         EmuWindowType getWindowType() {return m_windowType;}

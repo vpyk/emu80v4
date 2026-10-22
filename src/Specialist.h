@@ -26,6 +26,7 @@
 #include "Ppi8255Circuit.h"
 #include "FileLoader.h"
 #include "Pit8253Sound.h"
+#include "MouseDevice.h"
 
 class Fdc1793;
 class AddrSpaceMapper;
@@ -353,6 +354,61 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
         bool m_portCloInputMode;
         bool m_portAInputMode;
         bool m_portBInputMode;
+};
+
+
+class SpecMouse : public Ppi8255Circuit, public MouseDevice
+{
+    public:
+        void reset() override;
+
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
+
+        uint8_t getPortA() override;
+        void setPortB(uint8_t value) override;
+        void setPortBMode(bool isInput) override;
+
+        bool hostMouseMove(int x, int y, bool inside, int buttons) override;
+        void hostMouseMoveRelative(int dx, int dy, int buttons) override;
+        bool isRelative() override {return m_relative;}
+        void hostMouseWheel(int steps) override;
+        void emuMouseSet(int x, int y, int buttons) override;
+        bool isMouseActive() override {return m_active;}
+        std::string getMouseInfo() override;
+
+        static EmuObject* create(const EmuValuesList&) {return new SpecMouse();}
+
+    private:
+        static const int c_scale = 2;
+
+        bool m_relative = true;
+
+        uint8_t m_packet[5] = {0x7F, 0x08, 0x00, 0x00, 0x00};
+        uint8_t m_curByte = 0x7F;
+        int m_index = 0;
+        bool m_prevStrobe = false;
+        bool m_active = false;
+
+        int m_accX = 0;
+        int m_accY = 0;
+        int m_accZ = 0;
+
+        int m_buttons = 0;
+        int m_pressedSincePacket = 0;
+
+        int m_hostX = 0;
+        int m_hostY = 0;
+        bool m_haveHostPos = false;
+
+        int m_emuX = 0;
+        int m_emuY = 0;
+        bool m_haveEmuPos = false;
+
+        void updateButtons(int buttons);
+        void addMovement(int dx, int dy);
+        void deliverByte();
+        static uint8_t takeDelta(int& acc);
 };
 
 

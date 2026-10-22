@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2017-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #include <QOpenGLTexture>
 #include <QMouseEvent>
 #include <QGuiApplication>
+#include <QApplication>
+#include <QCursor>
 #include <QClipboard>
 #include <QFile>
 
@@ -44,6 +46,8 @@ PaintWidget::PaintWidget(QWidget *parent) :
 
 PaintWidget::~PaintWidget()
 {
+    endEmuMouseCapture();
+
     if (m_image)
         delete m_image;
     if (m_image2)
@@ -413,10 +417,80 @@ static int emuMouseButtons(Qt::MouseButtons b)
 }
 
 
+static QPoint emuMouseGlobalPos(QMouseEvent* event)
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return event->globalPos();
+#else
+    return event->globalPosition().toPoint();
+#endif
+}
+
+
 void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 {
     MainWindow* mw = static_cast<MainWindow*>(parent());
-    bool overPicture = mw->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+    int buttons = emuMouseButtons(event->buttons());
+
+    if (mw->isEmuMouseRelative() && mw->isEmuMouseActive() && mw->isEmuMouseOverPicture(event->POS_X(), event->POS_Y())) {
+        if (QApplication::activePopupWidget() || QApplication::activeModalWidget()) {
+            endEmuMouseCapture();
+            return;
+        }
+
+        if (!m_emuMouseCaptured) {
+            if (m_cursorHidden) {
+                setCursor(Qt::ArrowCursor);
+                m_cursorHidden = false;
+            }
+            if (m_hideCursor && !m_cursorTimerPaused)
+                m_hideCursorTimer.start();
+            return;
+        }
+
+        QPoint globalPos = emuMouseGlobalPos(event);
+
+        if (m_ignoreEmuMouseUntilRelease) {
+            m_lastMouseGlobalPos = globalPos;
+            return;
+        }
+
+        if (m_warpPending) {
+            m_warpPending = false;
+            if ((globalPos - m_warpTarget).manhattanLength() <= 2) {
+                m_lastMouseGlobalPos = globalPos;
+                return;
+            }
+        }
+
+        int dx = globalPos.x() - m_lastMouseGlobalPos.x();
+        int dy = m_lastMouseGlobalPos.y() - globalPos.y();
+        m_lastMouseGlobalPos = globalPos;
+
+        mw->mouseMoveRelative(dx, dy, buttons);
+
+        QPoint localPos = mapFromGlobal(globalPos);
+        const int margin = 16;
+        if (localPos.x() < margin || localPos.y() < margin ||
+            localPos.x() >= width() - margin || localPos.y() >= height() - margin) {
+            QPoint target = mapToGlobal(QPoint(width() / 2, height() / 2));
+            QCursor::setPos(target);
+            QPoint actual = QCursor::pos();
+            if ((actual - target).manhattanLength() <= 2) {
+                m_lastMouseGlobalPos = target;
+                m_warpTarget = target;
+                m_warpPending = true;
+            } else {
+                m_lastMouseGlobalPos = actual;
+            }
+        }
+        return;
+    }
+
+    if (m_emuMouseCaptured)
+        endEmuMouseCapture();
+
+    bool overPicture = mw->mouseMove(event->POS_X(), event->POS_Y(), buttons);
 
     if (event->buttons() & Qt::LeftButton)
         mouseDrag(true, event->POS_X(), event->POS_Y());
@@ -453,12 +527,67 @@ void PaintWidget::mouseMoveEvent(QMouseEvent* event)
 }
 
 
+void PaintWidget::startEmuMouseCapture(const QPoint& globalPos)
+{
+    m_emuMouseCaptured = true;
+    m_lastMouseGlobalPos = globalPos;
+    m_emuMouseHid = true;
+    m_warpPending = false;
+
+    if (!m_cursorHidden) {
+        setCursor(Qt::BlankCursor);
+        m_cursorHidden = true;
+    }
+    m_hideCursorTimer.stop();
+}
+
+
+void PaintWidget::endEmuMouseCapture()
+{
+    if (!m_emuMouseCaptured)
+        return;
+
+    m_emuMouseCaptured = false;
+    m_emuMouseHid = false;
+    m_ignoreEmuMouseUntilRelease = false;
+    m_warpPending = false;
+
+    if (m_cursorHidden) {
+        setCursor(Qt::ArrowCursor);
+        m_cursorHidden = false;
+    }
+    if (m_hideCursor && !m_cursorTimerPaused)
+        m_hideCursorTimer.start();
+}
+
+
+void PaintWidget::releaseEmuMouseCapture()
+{
+    endEmuMouseCapture();
+}
+
+
 void PaintWidget::mousePressEvent(QMouseEvent *event)
 {
-    static_cast<MainWindow*>(parent())->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+    MainWindow* mw = static_cast<MainWindow*>(parent());
+    int buttons = emuMouseButtons(event->buttons());
+
+    if (mw->isEmuMouseRelative() && mw->isEmuMouseActive() && mw->isEmuMouseOverPicture(event->POS_X(), event->POS_Y())) {
+        QPoint globalPos = emuMouseGlobalPos(event);
+        if (!m_emuMouseCaptured) {
+            startEmuMouseCapture(globalPos);
+            m_ignoreEmuMouseUntilRelease = true;
+            return;
+        }
+        m_lastMouseGlobalPos = globalPos;
+        mw->mouseMoveRelative(0, 0, buttons);
+        return;
+    }
+
+    mw->mouseMove(event->POS_X(), event->POS_Y(), buttons);
 
     if (event->button() & Qt::LeftButton)
-        static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_CLICK);
+        mw->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_CLICK);
 
     if (event->button() & Qt::LeftButton)
         mouseDrag(true, event->POS_X(), event->POS_Y());
@@ -467,7 +596,24 @@ void PaintWidget::mousePressEvent(QMouseEvent *event)
 
 void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    static_cast<MainWindow*>(parent())->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+    MainWindow* mw = static_cast<MainWindow*>(parent());
+    int buttons = emuMouseButtons(event->buttons());
+
+    if (mw->isEmuMouseRelative() && mw->isEmuMouseActive() && mw->isEmuMouseOverPicture(event->POS_X(), event->POS_Y())) {
+        QPoint globalPos = emuMouseGlobalPos(event);
+        if (m_ignoreEmuMouseUntilRelease) {
+            m_ignoreEmuMouseUntilRelease = false;
+            m_lastMouseGlobalPos = globalPos;
+            return;
+        }
+        if (!m_emuMouseCaptured)
+            return;
+        m_lastMouseGlobalPos = globalPos;
+        mw->mouseMoveRelative(0, 0, buttons);
+        return;
+    }
+
+    mw->mouseMove(event->POS_X(), event->POS_Y(), buttons);
 
     if (event->button() & Qt::LeftButton)
         mouseDrag(false, event->POS_X(), event->POS_Y());
@@ -476,11 +622,26 @@ void PaintWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void PaintWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    MainWindow* mw = static_cast<MainWindow*>(parent());
+    int buttons = emuMouseButtons(event->buttons());
+
+    if (mw->isEmuMouseRelative() && mw->isEmuMouseActive() && mw->isEmuMouseOverPicture(event->POS_X(), event->POS_Y())) {
+        QPoint globalPos = emuMouseGlobalPos(event);
+        if (!m_emuMouseCaptured) {
+            startEmuMouseCapture(globalPos);
+            m_ignoreEmuMouseUntilRelease = true;
+            return;
+        }
+        m_lastMouseGlobalPos = globalPos;
+        mw->mouseMoveRelative(0, 0, buttons);
+        return;
+    }
+
     // второе нажатие двойного щелчка Qt присылает сюда, а не в mousePressEvent
-    static_cast<MainWindow*>(parent())->mouseMove(event->POS_X(), event->POS_Y(), emuMouseButtons(event->buttons()));
+    mw->mouseMove(event->POS_X(), event->POS_Y(), buttons);
 
     if (event->button() & Qt::LeftButton)
-        static_cast<MainWindow*>(parent())->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_DBLCLICK);
+        mw->mouseClick(event->POS_X(), event->POS_Y(), PM_LEFT_DBLCLICK);
 }
 
 
@@ -507,6 +668,8 @@ void PaintWidget::enterEvent(QEnterEvent* /*event*/)
 
 void PaintWidget::leaveEvent(QEvent* /*event*/)
 {
+    endEmuMouseCapture();
+
     if (!m_cursorTimerPaused)
         pauseCursorTimer(true);
 }

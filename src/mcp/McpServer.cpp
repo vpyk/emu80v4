@@ -2074,7 +2074,7 @@ namespace
 
         tools.push_back({
             "mouse",
-            "Emulated mouse (Vector-06C: KTSerg USB mouse controller, port D4h, as on ComboLite). "
+            "Emulated platform mouse (Vector-06C: KTSerg controller on port D4h; Specialist: adapter on the second PPI, ports F004/F005). "
             "'x' 0-511 (512-pixel mode points; 256-mode X = x/2) and 'y' 0-255 (grows upward, 255 = top line) "
             "move the pointer like the host cursor over the screen; 'buttons' bit 0 left, bit 1 right, "
             "bit 2 middle, held until changed by another call and combined with the host mouse buttons; 'wheel' adds wheel steps. All optional; returns the controller state.",

@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2016-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -69,8 +69,11 @@ class EmuWindow : public EmuObject, public PalWindow
 
         void mouseDrag(bool pressed, int x, int y) override;
         bool mouseMove(int x, int y, int buttons) override;
+        void mouseMoveRelative(int dx, int dy, int buttons) override;
         void mouseWheel(int steps) override;
         bool isEmuMouseActive() override;
+        bool isEmuMouseRelative() override;
+        bool isEmuMouseOverPicture(int x, int y) override;
 
         virtual void processKey(PalKeyCode, bool) {}
         virtual void closeRequest() {}
@@ -134,10 +137,13 @@ class EmuWindow : public EmuObject, public PalWindow
         int m_curImgWidth = 0;
         int m_curImgHeight = 0;
 
-        int m_dstX;
-        int m_dstY;
-        int m_dstWidth;
-        int m_dstHeight;
+        int m_dstX = 0;
+        int m_dstY = 0;
+        int m_dstWidth = 0;
+        int m_dstHeight = 0;
+
+        double m_relAccX = 0;
+        double m_relAccY = 0;
 
         void interlaceFields(EmuPixelData frame);
         void mixFields(EmuPixelData frame);

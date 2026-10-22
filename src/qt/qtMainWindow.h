@@ -82,8 +82,11 @@ public:
     void mouseClick(int x, int y, PalMouseKey key);
     void mouseDrag(bool pressed, int x, int y);
     bool mouseMove(int x, int y, int buttons);
+    void mouseMoveRelative(int dx, int dy, int buttons);
     void mouseWheel(int steps);
     bool isEmuMouseActive();
+    bool isEmuMouseRelative();
+    bool isEmuMouseOverPicture(int x, int y);
 
     void setClientSize(int width, int height);
     void setAutoresizeFlag(bool autoresize);
@@ -101,6 +104,8 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+    void changeEvent(QEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
     void keyPressEvent(QKeyEvent* evt) override;
     void keyReleaseEvent(QKeyEvent* evt) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
