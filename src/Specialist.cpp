@@ -638,7 +638,8 @@ void SpecMouse::reset()
     m_emuX = m_emuY = 0;
     m_haveEmuPos = false;
 
-    m_dataOutput->setValue(m_curByte);
+    if (m_dataOutput)
+        m_dataOutput->setValue(m_curByte);
 }
 
 
@@ -652,6 +653,9 @@ void SpecMouse::initConnections()
 
 bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& values)
 {
+    if (EmuObject::setProperty(propertyName, values))
+        return true;
+
     if (propertyName == "relative") {
         if (values[0].asString() == "yes") {
             m_relative = true;
@@ -673,6 +677,10 @@ bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& val
 
 string SpecMouse::getPropertyStringValue(const string& propertyName)
 {
+    string res = EmuObject::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
     if (propertyName == "relative")
         return m_relative ? "yes" : "no";
     else if (propertyName == "activityTimeout")
@@ -694,24 +702,12 @@ bool SpecMouse::isMouseActive()
 }
 
 
-/*uint8_t SpecMouse::getPortA()
-{
-    return m_curByte;
-}*/
-
-
 void SpecMouse::setStrobe(bool strobe)
 {
     if (!strobe && m_prevStrobe)
         deliverByte();
     m_prevStrobe = strobe;
 }
-
-
-/*void SpecMouse::setPortBMode(bool)
-{
-    m_prevStrobe = false;
-}*/
 
 
 void SpecMouse::updateButtons(int buttons)

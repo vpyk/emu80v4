@@ -1120,7 +1120,7 @@ namespace
     }
 
     // ================================================================
-    // Tool: mouse — мышь платформы (Вектор: контроллер KTSerg, порт D4h)
+    // Tool: mouse
     // ================================================================
     json Tool_Mouse(const json& args)
     {
@@ -1165,7 +1165,7 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
             MouseDevice* m = p->getMouse();
-            if (!m) { err = "this platform has no mouse"; return; }
+            if (!m) { err = "this platform has no mouse or it is disabled in the platform settings"; return; }
             if (hasX || hasB)
                 m->emuMouseSet(x, y, buttons);   // -1 — оставить как есть
             if (wheel)
@@ -2074,7 +2074,8 @@ namespace
 
         tools.push_back({
             "mouse",
-            "Emulated platform mouse (Vector-06C: KTSerg controller on port D4h; Specialist: adapter on the second PPI, ports F004/F005). "
+            "Emulated platform mouse (Vector-06C: KTSerg controller on port D4h; Specialist: adapter on the PPI at F000h, ports F004/F005; "
+            "Specialist-MX2: adapter on the second PPI, ports FFE4h/FFE5h). The mouse is optional and off by default (CFG_MOUSE in the platform settings). "
             "'x' 0-511 (512-pixel mode points; 256-mode X = x/2) and 'y' 0-255 (grows upward, 255 = top line) "
             "move the pointer like the host cursor over the screen; 'buttons' bit 0 left, bit 1 right, "
             "bit 2 middle, held until changed by another call and combined with the host mouse buttons; 'wheel' adds wheel steps. All optional; returns the controller state.",

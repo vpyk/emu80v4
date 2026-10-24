@@ -26,7 +26,7 @@
 #include "Pal.h"
 #include "PalFile.h"
 
-#include "Ppi8255Circuit.h"
+#include "EmuObjects.h"
 
 
 class RkSdController : public EmuObject
@@ -97,6 +97,8 @@ class RkSdController : public EmuObject
         ERR_OK_BLOCK = 0x4F
     };
 
+        // The "model" property selects the protocol only (strobe bit, address byte order, BOOT/*.RK or *.RKS files).
+        // Which PPI ports the "data" and "cmd" lines are wired to is defined in the config (connect)
         bool m_specModel = false;
 
         bool m_readOnly = false;

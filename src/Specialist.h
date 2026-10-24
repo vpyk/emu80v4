@@ -357,7 +357,7 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
 };
 
 
-class SpecMouse : public MouseDevice, public EmuObject
+class SpecMouse : public EmuObject, public MouseDevice
 {
     public:
         void reset() override;
@@ -366,10 +366,6 @@ class SpecMouse : public MouseDevice, public EmuObject
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
         std::string getPropertyStringValue(const std::string& propertyName) override;
-
-        /*uint8_t getPortA() override;
-        void setPortB(uint8_t value) override;
-        void setPortBMode(bool isInput) override;*/
 
         bool hostMouseMove(int x, int y, bool inside, int buttons) override;
         void hostMouseMoveRelative(int dx, int dy, int buttons) override;
