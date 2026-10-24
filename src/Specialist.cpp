@@ -625,8 +625,9 @@ void SpecMouse::reset()
 
     m_curByte = 0x7F;
     m_index = 0;
-    m_prevStrobe = false;
-    m_active = false;
+    // m_prevStrobe не трогаем: уровень PB0 выставляет сама ВВ55, в том числе при своём сбросе,
+    // а порядок сброса объектов не определён
+    m_strobeSeen = false;
 
     m_accX = m_accY = m_accZ = 0;
     m_buttons = 0;
@@ -659,6 +660,11 @@ bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& val
             m_relative = false;
             return true;
         }
+    } else if (propertyName == "activityTimeout") {
+        if (values[0].isInt() && values[0].asInt() >= 0) {
+            m_activityTimeout = int(values[0].asInt());
+            return true;
+        }
     }
 
     return false;
@@ -669,8 +675,22 @@ string SpecMouse::getPropertyStringValue(const string& propertyName)
 {
     if (propertyName == "relative")
         return m_relative ? "yes" : "no";
+    else if (propertyName == "activityTimeout")
+        return std::to_string(m_activityTimeout);
 
     return "";
+}
+
+
+// мышь активна, пока программа её опрашивает: с последнего строба прошло меньше m_activityTimeout мс
+bool SpecMouse::isMouseActive()
+{
+    if (!m_strobeSeen)
+        return false;
+    if (m_activityTimeout == 0)
+        return true;
+    uint64_t timeout = uint64_t(g_emulation->getFrequency()) * m_activityTimeout / 1000;
+    return g_emulation->getCurClock() - m_lastStrobeClock < timeout;
 }
 
 
@@ -704,7 +724,7 @@ void SpecMouse::updateButtons(int buttons)
 
 void SpecMouse::addMovement(int dx, int dy)
 {
-    if (!m_active)
+    if (!isMouseActive())
         return;
 
     static const int c_limit = 1000000;
@@ -726,6 +746,14 @@ void SpecMouse::addMovement(int dx, int dy)
 
 void SpecMouse::deliverByte()
 {
+    if (!isMouseActive()) {
+        // программа (снова) начала опрос: накопленное раньше движение и нажатия не отдаём
+        m_accX = m_accY = m_accZ = 0;
+        m_pressedSincePacket = 0;
+    }
+    m_lastStrobeClock = g_emulation->getCurClock();
+    m_strobeSeen = true;
+
     if (m_index == 0) {
         m_packet[0] = 0x7F;
         m_packet[1] = 0x08 | ((m_buttons | m_pressedSincePacket) & 7);
@@ -737,7 +765,6 @@ void SpecMouse::deliverByte()
 
     m_curByte = m_packet[m_index];
     m_index = (m_index + 1) % 5;
-    m_active = true;
 
     m_dataOutput->setValue(m_curByte);
 }
@@ -794,7 +821,7 @@ void SpecMouse::hostMouseMoveRelative(int dx, int dy, int buttons)
 
 void SpecMouse::hostMouseWheel(int steps)
 {
-    if (!m_active)
+    if (!isMouseActive())
         return;
 
     m_accZ += steps;
@@ -830,7 +857,10 @@ void SpecMouse::emuMouseSet(int x, int y, int buttons)
 std::string SpecMouse::getMouseInfo()
 {
     std::ostringstream oss;
-    oss << "active=" << m_active << " relative=" << m_relative << " index=" << m_index
+    oss << "active=" << isMouseActive();
+    if (m_strobeSeen)
+        oss << " idle_ms=" << (g_emulation->getCurClock() - m_lastStrobeClock) * 1000 / g_emulation->getFrequency();
+    oss << " relative=" << m_relative << " index=" << m_index
         << " acc=" << m_accX << "," << m_accY << "," << m_accZ
         << " buttons=" << m_buttons << " byte=" << int(m_curByte);
     return oss.str();

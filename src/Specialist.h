@@ -376,7 +376,7 @@ class SpecMouse : public MouseDevice, public EmuObject
         bool isRelative() override {return m_relative;}
         void hostMouseWheel(int steps) override;
         void emuMouseSet(int x, int y, int buttons) override;
-        bool isMouseActive() override {return m_active;}
+        bool isMouseActive() override;
         std::string getMouseInfo() override;
 
         static EmuObject* create(const EmuValuesList&) {return new SpecMouse();}
@@ -389,8 +389,10 @@ class SpecMouse : public MouseDevice, public EmuObject
         uint8_t m_packet[5] = {0x7F, 0x08, 0x00, 0x00, 0x00};
         uint8_t m_curByte = 0x7F;
         int m_index = 0;
-        bool m_prevStrobe = false;
-        bool m_active = false;
+        bool m_prevStrobe = true;          // PB0 в режиме ввода подтянут к 1
+        bool m_strobeSeen = false;         // был строб после сброса
+        uint64_t m_lastStrobeClock = 0;
+        int m_activityTimeout = 1000;      // мс эмулированного времени без стробов до отключения, 0 — не отключать
 
         int m_accX = 0;
         int m_accY = 0;
