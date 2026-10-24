@@ -72,10 +72,13 @@ void EmuOutput::setValue(uint32_t value)
         switch (conn.params.type) {
         case EmuConnectionParams::OutputType::Ordinary:
             conn.input->setValue(((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift);
+            break;
         case EmuConnectionParams::OutputType::Indexed:
             conn.input->setValue(conn.params.index, ((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift);
+            break;
         case EmuConnectionParams::OutputType::Masked:
             conn.input->setMaskedValue(((value ^ conn.params.xorMask) & conn.params.andMask) >> conn.params.shift << conn.params.outputShift, conn.params.outputMask);
+            break;
         }
     }
 }
