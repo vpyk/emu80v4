@@ -811,7 +811,7 @@ bool SpecMouse::hostMouseMove(int x, int y, bool inside, int buttons)
 void SpecMouse::hostMouseMoveRelative(int dx, int dy, int buttons)
 {
     updateButtons(buttons);
-    addMovement(dx, dy);
+    addMovement(dx, -dy);
 }
 
 

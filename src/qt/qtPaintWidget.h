@@ -76,8 +76,12 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void paintImageGL(QImage* img/*, double aspectRatio*/);
 
         void mouseDrag(bool pressed, int x, int y);
+
+        bool canCaptureEmuMouse(MainWindow* mw, QMouseEvent* event);
+        bool keepEmuMouseCapture(MainWindow* mw);
         void startEmuMouseCapture(const QPoint& globalPos);
-        void endEmuMouseCapture();
+        bool emuMousePress(MainWindow* mw, QMouseEvent* event);
+        void emuMouseCapturedMove(MainWindow* mw, const QPoint& globalPos, int buttons);
 
         bool m_useCustomShader = false;
         QString m_shaderFileName;
@@ -112,8 +116,9 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         int m_wheelAcc = 0;
         bool m_emuMouseHid = false;   // стрелка спрятана, пока программа держит мышь Вектора
         bool m_emuMouseCaptured = false;
-        bool m_ignoreEmuMouseUntilRelease = false;
-        bool m_warpPending = false;
+        bool m_ignoreEmuMouseUntilRelease = false;  // buttons of the click that started the capture are not passed
+        bool m_warpPending = false;                 // pointer moved to the center, waiting for an event from there
+        bool m_warpUnsupported = false;             // QCursor::setPos doesn't work (Wayland), no capture
         QPoint m_lastMouseGlobalPos;
         QPoint m_warpTarget;
         bool m_cursorTimerPaused = false;

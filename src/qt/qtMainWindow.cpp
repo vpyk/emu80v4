@@ -96,7 +96,12 @@ MainWindow::MainWindow(QWidget *parent)
     m_shaderIcon = QIcon(m_darkTheme ? ":/icons/shader-dark.png" : ":/icons/shader.png");
     m_presetIcon = QIcon(m_darkTheme ? ":/icons/preset-dark.png" : ":/icons/preset.png");
 
-    qApp->installEventFilter(this);
+    // one application-wide filter for all windows
+    static MouseCaptureKeyFilter* mouseCaptureKeyFilter = nullptr;
+    if (!mouseCaptureKeyFilter) {
+        mouseCaptureKeyFilter = new MouseCaptureKeyFilter(qApp);
+        qApp->installEventFilter(mouseCaptureKeyFilter);
+    }
 
 #ifdef _WIN32
     m_shiftF10shortcut = new QShortcut(this);
@@ -107,8 +112,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    qApp->removeEventFilter(this);
-
     g_renderHelper->removeWindow(this);
     if (m_settingsDialog)
         delete m_settingsDialog;
@@ -2477,23 +2480,31 @@ void MainWindow::changeEvent(QEvent* event)
 {
     QMainWindow::changeEvent(event);
 
-    if (m_paintWidget && event->type() == QEvent::ActivationChange && !isActiveWindow())
+    if (event->type() == QEvent::ActivationChange && !isActiveWindow())
+        releaseEmuMouseCapture();
+}
+
+
+void MainWindow::releaseEmuMouseCapture()
+{
+    if (m_paintWidget)
         m_paintWidget->releaseEmuMouseCapture();
 }
 
 
-bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+bool MouseCaptureKeyFilter::eventFilter(QObject* watched, QEvent* event)
 {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->key() == Qt::Key_Alt || keyEvent->key() == Qt::Key_Meta ||
             (keyEvent->modifiers() & (Qt::AltModifier | Qt::MetaModifier))) {
-            if (isActiveWindow() && m_paintWidget)
-                m_paintWidget->releaseEmuMouseCapture();
+            MainWindow* mw = qobject_cast<MainWindow*>(QApplication::activeWindow());
+            if (mw)
+                mw->releaseEmuMouseCapture();
         }
     }
 
-    return QMainWindow::eventFilter(watched, event);
+    return QObject::eventFilter(watched, event);
 }
 
 

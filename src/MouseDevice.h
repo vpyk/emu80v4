@@ -29,7 +29,8 @@ class MouseDevice
         virtual ~MouseDevice() = default;
         virtual bool hostMouseMove(int x, int y, bool inside, int buttons) = 0;   // кнопки: 1 левая, 2 правая, 4 средняя;
                                                                                    // true — указатель над картинкой
-        virtual void hostMouseMoveRelative(int /*dx*/, int /*dy*/, int /*buttons*/) {} // dx/dy — смещение в точках кадра
+        virtual void hostMouseMoveRelative(int /*dx*/, int /*dy*/, int /*buttons*/) {} // dx/dy: offset in frame pixels,
+                                                                                    // screen direction (dy > 0 — down)
         virtual bool isRelative() {return false;}
         virtual void hostMouseWheel(int steps) = 0;                                // + от себя, - на себя
         virtual void emuMouseSet(int x, int y, int buttons) = 0;                   // для MCP: x 0..511, y 0..255 (вверх); -1 — не менять

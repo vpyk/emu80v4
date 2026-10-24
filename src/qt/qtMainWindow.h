@@ -87,6 +87,7 @@ public:
     bool isEmuMouseActive();
     bool isEmuMouseRelative();
     bool isEmuMouseOverPicture(int x, int y);
+    void releaseEmuMouseCapture();
 
     void setClientSize(int width, int height);
     void setAutoresizeFlag(bool autoresize);
@@ -105,7 +106,6 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent* event) override;
-    bool eventFilter(QObject* watched, QEvent* event) override;
     void keyPressEvent(QKeyEvent* evt) override;
     void keyReleaseEvent(QKeyEvent* evt) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -498,6 +498,18 @@ private:
     QShortcut* m_shiftF10shortcut;
 
     QMap<QPair<int, int>, QPair<QAction*, QIcon*>> m_fixedSizeActionMap;
+};
+
+
+// Releases the emulated mouse capture of the active window on Alt/Meta
+// before the key reaches any shortcut
+class MouseCaptureKeyFilter : public QObject
+{
+public:
+    using QObject::QObject;
+
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
 };
 
 
