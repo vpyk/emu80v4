@@ -259,6 +259,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("ramDisk2.autoLoad");
     loadRunningConfigValue("ramDisk2.autoSave");
     loadRunningConfigValue("ramDisk2.permanentFileName", m_options.contains("ramDisk2.autoLoad"));
+    loadRunningConfigValue("mouse.relative");
 }
 
 
@@ -646,6 +647,11 @@ void SettingsDialog::fillControlValues()
     val = m_options.value("gsSoundSource.mixing", "");
     ui->gsStereoCheckBox->setVisible(val != "");
     ui->gsStereoCheckBox->setChecked(val == "stereo");
+
+    // Capture mouse
+    val = m_options.value("mouse.relative", "");
+    ui->mouseCaptureCheckBox->setVisible(val != "");
+    ui->mouseCaptureCheckBox->setChecked(val == "yes");
 }
 
 
@@ -1085,6 +1091,9 @@ void SettingsDialog::on_applyPushButton_clicked()
     else if (ui->kbdEurekaRadioButton->isChecked())
         val = "eureka";
     m_options["keyboard.matrix"] = val;
+
+    if (ui->mouseCaptureCheckBox->isVisible())
+        m_options["mouse.relative"] = ui->mouseCaptureCheckBox->isChecked() ? "yes" : "no";
 
     saveEnabledPlatformList();
 

@@ -1476,13 +1476,13 @@
      </widget>
      <widget class="QWidget" name="keybTab">
       <attribute name="title">
-       <string>Keyboard</string>
+       <string>Input</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_15">
        <item>
         <widget class="QGroupBox" name="layoutGroupBox">
          <property name="title">
-          <string>Layout</string>
+          <string>Keyboard layout</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_13">
           <item>
@@ -1567,6 +1567,13 @@
         <widget class="QCheckBox" name="upAsNumpad5CheckBox">
          <property name="text">
           <string>Up key acts as Numpad 5 (Menu)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="mouseCaptureCheckBox">
+         <property name="text">
+          <string>Capture mouse</string>
          </property>
         </widget>
        </item>
@@ -1776,8 +1783,10 @@
   <tabstop>numpadJoystickCheckBox</tabstop>
   <tabstop>downAsNumpad5CheckBox</tabstop>
   <tabstop>upAsNumpad5CheckBox</tabstop>
+  <tabstop>mouseCaptureCheckBox</tabstop>
   <tabstop>fastResetCheckBox</tabstop>
   <tabstop>ayStereoCheckBox</tabstop>
+  <tabstop>gsStereoCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections>

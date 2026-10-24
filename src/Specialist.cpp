@@ -636,14 +636,21 @@ void SpecMouse::reset()
 
     m_emuX = m_emuY = 0;
     m_haveEmuPos = false;
+
+    m_dataOutput->setValue(m_curByte);
+}
+
+
+void SpecMouse::initConnections()
+{
+    EmuObject::initConnections();
+    REG_INPUT("strobe", SpecMouse::setStrobe);
+    REG_OUTPUT("data", m_dataOutput);
 }
 
 
 bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& values)
 {
-    if (Ppi8255Circuit::setProperty(propertyName, values))
-        return true;
-
     if (propertyName == "relative") {
         if (values[0].asString() == "yes") {
             m_relative = true;
@@ -660,10 +667,6 @@ bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& val
 
 string SpecMouse::getPropertyStringValue(const string& propertyName)
 {
-    string res = Ppi8255Circuit::getPropertyStringValue(propertyName);
-    if (res != "")
-        return res;
-
     if (propertyName == "relative")
         return m_relative ? "yes" : "no";
 
@@ -671,25 +674,24 @@ string SpecMouse::getPropertyStringValue(const string& propertyName)
 }
 
 
-uint8_t SpecMouse::getPortA()
+/*uint8_t SpecMouse::getPortA()
 {
     return m_curByte;
-}
+}*/
 
 
-void SpecMouse::setPortB(uint8_t value)
+void SpecMouse::setStrobe(bool strobe)
 {
-    bool strobe = value & 1;
     if (!strobe && m_prevStrobe)
         deliverByte();
     m_prevStrobe = strobe;
 }
 
 
-void SpecMouse::setPortBMode(bool /*isInput*/)
+/*void SpecMouse::setPortBMode(bool)
 {
     m_prevStrobe = false;
-}
+}*/
 
 
 void SpecMouse::updateButtons(int buttons)
@@ -736,6 +738,8 @@ void SpecMouse::deliverByte()
     m_curByte = m_packet[m_index];
     m_index = (m_index + 1) % 5;
     m_active = true;
+
+    m_dataOutput->setValue(m_curByte);
 }
 
 

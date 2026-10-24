@@ -352,9 +352,11 @@ void VectorConfigWidget::loadConfig()
 {
     m_defValues["CFG_EDD"] = "EDD";
     m_defValues["CFG_TS"] = "OFF";
+    m_defValues["CFG_MOUSE"] = "OFF";
 
     optBegin();
     ui->tsCheckBox->setChecked(optLoad("CFG_TS").toString() == "ON");
+    ui->mouseCheckBox->setChecked(optLoad("CFG_MOUSE").toString() == "ON");
     QString val = optLoad("CFG_EDD").toString();
     optEnd();
 
@@ -383,6 +385,7 @@ void VectorConfigWidget::saveConfig()
     optBegin();
     optSave("CFG_EDD", val);
     optSave("CFG_TS", ui->tsCheckBox->isChecked() ? "ON" : "OFF");
+    optSave("CFG_MOUSE", ui->mouseCheckBox->isChecked() ? "ON" : "OFF");
     optEnd();
 }
 
@@ -391,6 +394,7 @@ void VectorConfigWidget::setDefaults()
 {
     ui->edd1RadioButton->setChecked(m_defValues["CFG_EDD"] == "EDD");
     ui->tsCheckBox->setChecked(m_defValues["CFG_TS"] == "ON");
+    ui->mouseCheckBox->setChecked(m_defValues["CFG_MOUSE"] == "ON");
 }
 
 
@@ -455,11 +459,13 @@ SpecConfigWidget::SpecConfigWidget(QWidget *parent) :
 void SpecConfigWidget::loadConfig()
 {
     m_defValues["CFG_INTS"] = "OFF";
+    m_defValues["CFG_MOUSE"] = "OFF";
     m_defValues["CFG_AY"] = "NONE";
 
     optBegin();
 
     ui->intsCheckBox->setChecked(optLoad("CFG_INTS").toString() == "ON");
+    ui->mouseCheckBox->setChecked(optLoad("CFG_MOUSE").toString() == "ON");
     QString val = optLoad("CFG_AY").toString();
     if (val == "NONE")
         ui->noneRadioButton->setChecked(true);
@@ -476,6 +482,7 @@ void SpecConfigWidget::saveConfig()
     optBegin();
 
     optSave("CFG_INTS", ui->intsCheckBox->isChecked() ? "ON" : "OFF");
+    optSave("CFG_MOUSE", ui->mouseCheckBox->isChecked() ? "ON" : "OFF");
     QString val;
     if (ui->noneRadioButton->isChecked())
         val = "NONE";
@@ -495,6 +502,7 @@ void SpecConfigWidget::setDefaults()
     ui->ayRadioButton->setChecked(m_defValues["CFG_AY"] == "AY");
     ui->tsRadioButton->setChecked(m_defValues["CFG_TS"] == "TS");
     ui->intsCheckBox->setChecked(m_defValues["CFG_INTS"] == "ON");
+    ui->mouseCheckBox->setChecked(m_defValues["CFG_MOUSE"] == "ON");
 }
 
 
@@ -689,9 +697,11 @@ SpMx2ConfigWidget::SpMx2ConfigWidget(QWidget *parent) :
 void SpMx2ConfigWidget::loadConfig()
 {
     m_defValues["CFG_DISABLE_5COLOR"] = "OFF";
+    m_defValues["CFG_MOUSE"] = "OFF";
 
     optBegin();
     ui->disable5colorCheckBox->setChecked(optLoad("CFG_DISABLE_5COLOR").toString() == "ON");
+    ui->mouseCheckBox->setChecked(optLoad("CFG_MOUSE").toString() == "ON");
     optEnd();
 }
 
@@ -699,10 +709,12 @@ void SpMx2ConfigWidget::saveConfig()
 {
     optBegin();
     optSave("CFG_DISABLE_5COLOR", ui->disable5colorCheckBox->isChecked() ? "ON" : "OFF");
+    optSave("CFG_MOUSE", ui->mouseCheckBox->isChecked() ? "ON" : "OFF");
     optEnd();
 }
 
 void SpMx2ConfigWidget::setDefaults()
 {
     ui->disable5colorCheckBox->setChecked(m_defValues["CFG_DISABLE_5COLOR"] == "ON");
+    ui->mouseCheckBox->setChecked(m_defValues["CFG_MOUSE"] == "ON");
 }
