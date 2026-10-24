@@ -29,21 +29,16 @@
 #include "Ppi8255Circuit.h"
 
 
-class RkSdController : public Ppi8255Circuit
+class RkSdController : public EmuObject
 {
     public:
         RkSdController(std::string sdDir);
         ~RkSdController() override;
 
+        void initConnections() override;
+
         void reset() override;
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-
-        uint8_t getPortA() override;
-        uint8_t getPortB() override {return 0xff;}
-        uint8_t getPortC() override;
-        void setPortA(uint8_t value) override;
-        void setPortB(uint8_t value) override;
-        void setPortC(uint8_t value) override;
 
         static EmuObject* create(const EmuValuesList& parameters) {return new RkSdController(parameters[0].asString());}
 
@@ -163,6 +158,11 @@ class RkSdController : public Ppi8255Circuit
         bool cmdRead();
         bool cmdWrite();
         bool cmdMove();
+
+        EmuOutput* m_dataOutput = nullptr;
+
+        void setData(uint8_t data);
+        void setCmd(uint8_t data);
 };
 
 

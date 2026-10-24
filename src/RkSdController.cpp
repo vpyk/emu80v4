@@ -59,44 +59,35 @@ RkSdController::~RkSdController()
 }
 
 
+void RkSdController::initConnections()
+{
+    EmuObject::initConnections();
+    REG_INPUT("data", RkSdController::setData);
+    REG_OUTPUT("data", m_dataOutput);
+    REG_INPUT("cmd", RkSdController::setCmd);
+}
+
+
 void RkSdController::reset()
 {
     resetState();
 }
 
 
-uint8_t RkSdController::getPortA()
+void RkSdController::setData(uint8_t value)
 {
-    return m_specModel ? 0xFF : m_outValue;
+    m_inValue = value;
 }
 
 
-uint8_t RkSdController::getPortC()
-{
-    return m_specModel ? m_outValue : 0xFF;
-}
-
-
-void RkSdController::setPortA(uint8_t value)
-{
-    if (!m_specModel)
-        m_inValue = value;
-}
-
-
-void RkSdController::setPortC(uint8_t value)
-{
-    if (m_specModel)
-        m_inValue = value;
-}
-
-
-void RkSdController::setPortB(uint8_t value)
+void RkSdController::setCmd(uint8_t value)
 {
     m_outValue = m_romBuffer[value & 0x7F];
 
     if (!m_specModel && m_stage !=CS_WAIT0 && m_stage !=CS_WAIT40 && value == 0x44) {
         resetState();
+        m_dataOutput->setValue(m_outValue);
+
         return;
     }
 
@@ -195,6 +186,8 @@ void RkSdController::setPortB(uint8_t value)
     }
 
     m_prevValue = value;
+
+    m_dataOutput->setValue(m_outValue);
 }
 
 
