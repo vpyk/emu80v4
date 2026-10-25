@@ -1166,6 +1166,10 @@ namespace
             if (!p) { err = "no platform created"; return; }
             MouseDevice* m = p->getMouse();
             if (!m) { err = "this platform has no mouse or it is disabled in the platform settings"; return; }
+            if (hasX && x > m->emuMouseMaxX()) {
+                err = "x must be between 0 and " + std::to_string(m->emuMouseMaxX()) + " for this platform";
+                return;
+            }
             if (hasX || hasB)
                 m->emuMouseSet(x, y, buttons);   // -1 — оставить как есть
             if (wheel)
@@ -2076,13 +2080,15 @@ namespace
             "mouse",
             "Emulated platform mouse (Vector-06C: KTSerg controller on port D4h; Specialist: adapter on the PPI at F000h, ports F004/F005; "
             "Specialist-MX2: adapter on the second PPI, ports FFE4h/FFE5h). The mouse is optional and off by default (CFG_MOUSE in the platform settings). "
-            "'x' 0-511 (512-pixel mode points; 256-mode X = x/2) and 'y' 0-255 (grows upward, 255 = top line) "
-            "move the pointer like the host cursor over the screen; 'buttons' bit 0 left, bit 1 right, "
-            "bit 2 middle, held until changed by another call and combined with the host mouse buttons; 'wheel' adds wheel steps. All optional; returns the controller state.",
+            "'x' and 'y' (0-255, grows upward, 255 = top line) move the pointer like the host cursor over the screen. "
+            "Vector: 'x' 0-511 in 512-pixel mode points (256-mode X = x/2). Specialist: 'x' 0-383; its mouse reports movement only, "
+            "so x/y set a virtual pointer (the screen center after reset) and the program receives the offset from its previous position. "
+            "'buttons' bit 0 left, bit 1 right, bit 2 middle, held until changed by another call and combined with the host mouse buttons; "
+            "on Vector hold them until the program has read them. 'wheel' adds wheel steps. All optional; returns the controller state.",
             json{
                 { "type", "object" },
                 { "properties", {
-                    { "x",       { { "type", json::array({ "string", "integer" }) }, { "description", "0-511" } } },
+                    { "x",       { { "type", json::array({ "string", "integer" }) }, { "description", "0-511 (Vector), 0-383 (Specialist)" } } },
                     { "y",       { { "type", json::array({ "string", "integer" }) }, { "description", "0-255, upward" } } },
                     { "buttons", { { "type", json::array({ "string", "integer" }) }, { "description", "bit0 left, bit1 right, bit2 middle" } } },
                     { "wheel",   { { "type", json::array({ "string", "integer" }) }, { "description", "wheel steps -127..127, + away from user" } } },

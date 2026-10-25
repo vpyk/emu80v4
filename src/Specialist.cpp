@@ -17,6 +17,7 @@
  */
 
 #include <sstream>
+#include <algorithm>
 
 #include <string.h>
 
@@ -630,13 +631,13 @@ void SpecMouse::reset()
     m_strobeSeen = false;
 
     m_accX = m_accY = m_accZ = 0;
-    m_buttons = 0;
+    m_hostButtons = m_emuButtons = 0;
     m_pressedSincePacket = 0;
 
     m_haveHostPos = false;
 
-    m_emuX = m_emuY = 0;
-    m_haveEmuPos = false;
+    m_emuX = c_screenWidth / 2;
+    m_emuY = c_screenHeight / 2;
 
     if (m_dataOutput)
         m_dataOutput->setValue(m_curByte);
@@ -710,11 +711,14 @@ void SpecMouse::setStrobe(bool strobe)
 }
 
 
-void SpecMouse::updateButtons(int buttons)
+// Host and MCP buttons are combined; a button pressed and released between packets
+// is reported as pressed in the next packet
+void SpecMouse::updateButtons(int hostButtons, int emuButtons)
 {
-    buttons &= 7;
-    m_pressedSincePacket |= buttons & ~m_buttons;
-    m_buttons = buttons;
+    int prev = m_hostButtons | m_emuButtons;
+    m_hostButtons = hostButtons & 7;
+    m_emuButtons = emuButtons & 7;
+    m_pressedSincePacket |= (m_hostButtons | m_emuButtons) & ~prev;
 }
 
 
@@ -752,7 +756,7 @@ void SpecMouse::deliverByte()
 
     if (m_index == 0) {
         m_packet[0] = 0x7F;
-        m_packet[1] = 0x08 | ((m_buttons | m_pressedSincePacket) & 7);
+        m_packet[1] = 0x08 | ((m_hostButtons | m_emuButtons | m_pressedSincePacket) & 7);
         m_pressedSincePacket = 0;
         m_packet[2] = takeDelta(m_accX);
         m_packet[3] = takeDelta(m_accY);
@@ -782,7 +786,7 @@ uint8_t SpecMouse::takeDelta(int& acc)
 
 bool SpecMouse::hostMouseMove(int x, int y, bool inside, int buttons)
 {
-    updateButtons(buttons);
+    updateButtons(buttons, m_emuButtons);
 
     if (!inside) {
         m_haveHostPos = false;
@@ -810,7 +814,7 @@ bool SpecMouse::hostMouseMove(int x, int y, bool inside, int buttons)
 
 void SpecMouse::hostMouseMoveRelative(int dx, int dy, int buttons)
 {
-    updateButtons(buttons);
+    updateButtons(buttons, m_emuButtons);
     addMovement(dx, -dy);
 }
 
@@ -831,22 +835,20 @@ void SpecMouse::hostMouseWheel(int steps)
 void SpecMouse::emuMouseSet(int x, int y, int buttons)
 {
     if (buttons >= 0)
-        m_buttons = buttons & 7;
+        updateButtons(m_hostButtons, buttons);
 
     if (x < 0 || y < 0)
         return;
 
-    if (x > 383)
-        x = 383;
-    if (y > 255)
-        y = 255;
+    // MCP checks the range, this is just a safeguard
+    x = std::min(x, c_screenWidth - 1);
+    y = std::min(y, c_screenHeight - 1);
 
-    if (m_haveEmuPos)
-        addMovement(x - m_emuX, y - m_emuY);
+    // y grows upward, as the mouse Y offset does
+    addMovement(x - m_emuX, y - m_emuY);
 
     m_emuX = x;
     m_emuY = y;
-    m_haveEmuPos = true;
 }
 
 
@@ -858,7 +860,8 @@ std::string SpecMouse::getMouseInfo()
         oss << " idle_ms=" << (g_emulation->getCurClock() - m_lastStrobeClock) * 1000 / g_emulation->getFrequency();
     oss << " relative=" << m_relative << " index=" << m_index
         << " acc=" << m_accX << "," << m_accY << "," << m_accZ
-        << " buttons=" << m_buttons << " byte=" << int(m_curByte);
+        << " buttons=" << (m_hostButtons | m_emuButtons) << " mcp_buttons=" << m_emuButtons
+        << " pointer=" << m_emuX << "," << m_emuY << " byte=" << int(m_curByte);
     return oss.str();
 }
 

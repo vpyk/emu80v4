@@ -34,6 +34,7 @@ class MouseDevice
         virtual bool isRelative() {return false;}
         virtual void hostMouseWheel(int steps) = 0;                                // + от себя, - на себя
         virtual void emuMouseSet(int x, int y, int buttons) = 0;                   // для MCP: x 0..511, y 0..255 (вверх); -1 — не менять
+        virtual int emuMouseMaxX() {return 511;}                                   // max x for emuMouseSet
         virtual bool isMouseActive() = 0;                                          // программа включила мышь
         virtual std::string getMouseInfo() = 0;
 };

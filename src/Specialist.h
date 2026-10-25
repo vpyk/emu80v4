@@ -372,6 +372,7 @@ class SpecMouse : public EmuObject, public MouseDevice
         bool isRelative() override {return m_relative;}
         void hostMouseWheel(int steps) override;
         void emuMouseSet(int x, int y, int buttons) override;
+        int emuMouseMaxX() override {return c_screenWidth - 1;}
         bool isMouseActive() override;
         std::string getMouseInfo() override;
 
@@ -379,6 +380,8 @@ class SpecMouse : public EmuObject, public MouseDevice
 
     private:
         static const int c_scale = 2;
+        static const int c_screenWidth = 384;
+        static const int c_screenHeight = 256;
 
         bool m_relative = true;
 
@@ -394,21 +397,22 @@ class SpecMouse : public EmuObject, public MouseDevice
         int m_accY = 0;
         int m_accZ = 0;
 
-        int m_buttons = 0;
+        int m_hostButtons = 0;      // host mouse buttons: 1 left, 2 right, 4 middle
+        int m_emuButtons = 0;       // buttons set via MCP, held until MCP changes them
         int m_pressedSincePacket = 0;
 
         int m_hostX = 0;
         int m_hostY = 0;
         bool m_haveHostPos = false;
 
-        int m_emuX = 0;
-        int m_emuY = 0;
-        bool m_haveEmuPos = false;
+        // virtual pointer for MCP: x/y set its position, the program gets the offset from the previous one
+        int m_emuX = c_screenWidth / 2;
+        int m_emuY = c_screenHeight / 2;
 
         void setStrobe(bool strobe);
         EmuOutput* m_dataOutput = nullptr;
 
-        void updateButtons(int buttons);
+        void updateButtons(int hostButtons, int emuButtons);
         void addMovement(int dx, int dy);
         void deliverByte();
         static uint8_t takeDelta(int& acc);
