@@ -1170,6 +1170,10 @@ namespace
                 err = "x must be between 0 and " + std::to_string(m->emuMouseMaxX()) + " for this platform";
                 return;
             }
+            if (hasY && y > m->emuMouseMaxY()) {
+                err = "y must be between 0 and " + std::to_string(m->emuMouseMaxY()) + " for this platform";
+                return;
+            }
             if (hasX || hasB)
                 m->emuMouseSet(x, y, buttons);   // -1 — оставить как есть
             if (wheel)

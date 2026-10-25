@@ -17,7 +17,6 @@
  */
 
 #include <sstream>
-#include <algorithm>
 
 #include <string.h>
 
@@ -616,8 +615,19 @@ bool SpecPpi8255Circuit::setProperty(const string& propertyName, const EmuValues
 }
 
 
+SpecMouse::SpecMouse()
+{
+    setScreenSize(c_screenWidth, c_screenHeight);
+    m_relative = true;
+    m_scale = 2;
+    useActivityTimeout(1000);
+}
+
+
 void SpecMouse::reset()
 {
+    MouseDevice::reset();
+
     m_packet[0] = 0x7F;
     m_packet[1] = 0x08;
     m_packet[2] = 0x00;
@@ -628,16 +638,8 @@ void SpecMouse::reset()
     m_index = 0;
     // m_prevStrobe не трогаем: уровень PB0 выставляет сама ВВ55, в том числе при своём сбросе,
     // а порядок сброса объектов не определён
-    m_strobeSeen = false;
 
     m_accX = m_accY = m_accZ = 0;
-    m_hostButtons = m_emuButtons = 0;
-    m_pressedSincePacket = 0;
-
-    m_haveHostPos = false;
-
-    m_emuX = c_screenWidth / 2;
-    m_emuY = c_screenHeight / 2;
 
     if (m_dataOutput)
         m_dataOutput->setValue(m_curByte);
@@ -646,67 +648,9 @@ void SpecMouse::reset()
 
 void SpecMouse::initConnections()
 {
-    EmuObject::initConnections();
+    MouseDevice::initConnections();
     REG_INPUT("strobe", SpecMouse::setStrobe);
     REG_OUTPUT("data", m_dataOutput);
-}
-
-
-bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& values)
-{
-    if (EmuObject::setProperty(propertyName, values))
-        return true;
-
-    if (propertyName == "relative") {
-        if (values[0].asString() == "yes") {
-            m_relative = true;
-            return true;
-        } else if (values[0].asString() == "no") {
-            m_relative = false;
-            return true;
-        }
-    } else if (propertyName == "activityTimeout") {
-        if (values[0].isInt() && values[0].asInt() >= 0) {
-            m_activityTimeout = int(values[0].asInt());
-            return true;
-        }
-    } else if (propertyName == "scale") {
-        if (values[0].isInt() && values[0].asInt() >= 1 && values[0].asInt() <= 16) {
-            m_scale = int(values[0].asInt());
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-string SpecMouse::getPropertyStringValue(const string& propertyName)
-{
-    string res = EmuObject::getPropertyStringValue(propertyName);
-    if (res != "")
-        return res;
-
-    if (propertyName == "relative")
-        return m_relative ? "yes" : "no";
-    else if (propertyName == "activityTimeout")
-        return std::to_string(m_activityTimeout);
-    else if (propertyName == "scale")
-        return std::to_string(m_scale);
-
-    return "";
-}
-
-
-// мышь активна, пока программа её опрашивает: с последнего строба прошло меньше m_activityTimeout мс
-bool SpecMouse::isMouseActive()
-{
-    if (!m_strobeSeen)
-        return false;
-    if (m_activityTimeout == 0)
-        return true;
-    uint64_t timeout = uint64_t(g_emulation->getFrequency()) * m_activityTimeout / 1000;
-    return g_emulation->getCurClock() - m_lastStrobeClock < timeout;
 }
 
 
@@ -718,51 +662,39 @@ void SpecMouse::setStrobe(bool strobe)
 }
 
 
-// Host and MCP buttons are combined; a button pressed and released between packets
-// is reported as pressed in the next packet
-void SpecMouse::updateButtons(int hostButtons, int emuButtons)
-{
-    int prev = m_hostButtons | m_emuButtons;
-    m_hostButtons = hostButtons & 7;
-    m_emuButtons = emuButtons & 7;
-    m_pressedSincePacket |= (m_hostButtons | m_emuButtons) & ~prev;
-}
-
-
 static int clampAbs(int value, int limit)
 {
     return value < -limit ? -limit : (value > limit ? limit : value);
 }
 
 
-void SpecMouse::addMovement(int dx, int dy)
+void SpecMouse::onMove(int dx, int dy)
 {
-    if (!isMouseActive())
-        return;
-
     // movement not yet passed to the program is limited to one screen,
     // otherwise the mouse would keep moving long after the host one has stopped
-    int limitX = c_screenWidth * m_scale;
-    int limitY = c_screenHeight * m_scale;
-    m_accX = clampAbs(m_accX + dx * m_scale, limitX);
-    m_accY = clampAbs(m_accY + dy * m_scale, limitY);
+    m_accX = clampAbs(m_accX + dx, c_screenWidth * m_scale);
+    m_accY = clampAbs(m_accY + dy, c_screenHeight * m_scale);
+}
+
+
+void SpecMouse::onWheel(int steps)
+{
+    m_accZ = clampAbs(m_accZ + steps, c_maxDelta);
 }
 
 
 void SpecMouse::deliverByte()
 {
     if (!isMouseActive()) {
-        // программа (снова) начала опрос: накопленное раньше движение и нажатия не отдаём
+        // the program starts (again) polling the mouse: the earlier movement and presses are dropped
         m_accX = m_accY = m_accZ = 0;
-        m_pressedSincePacket = 0;
+        takeButtons();
     }
-    m_lastStrobeClock = g_emulation->getCurClock();
-    m_strobeSeen = true;
+    markActivity();
 
     if (m_index == 0) {
         m_packet[0] = 0x7F;
-        m_packet[1] = 0x08 | ((m_hostButtons | m_emuButtons | m_pressedSincePacket) & 7);
-        m_pressedSincePacket = 0;
+        m_packet[1] = 0x08 | takeButtons();
         m_packet[2] = takeDelta(m_accX);
         m_packet[3] = takeDelta(m_accY);
         m_packet[4] = takeDelta(m_accZ);
@@ -785,80 +717,11 @@ uint8_t SpecMouse::takeDelta(int& acc)
 }
 
 
-bool SpecMouse::hostMouseMove(int x, int y, bool inside, int buttons)
-{
-    updateButtons(buttons, m_emuButtons);
-
-    if (!inside) {
-        m_haveHostPos = false;
-        return false;
-    }
-
-    if (!m_haveHostPos) {
-        m_hostX = x;
-        m_hostY = y;
-        m_haveHostPos = true;
-        return true;
-    }
-
-    int dx = x - m_hostX;
-    int dy = m_hostY - y;
-
-    m_hostX = x;
-    m_hostY = y;
-
-    addMovement(dx, dy);
-
-    return true;
-}
-
-
-void SpecMouse::hostMouseMoveRelative(int dx, int dy, int buttons)
-{
-    updateButtons(buttons, m_emuButtons);
-    addMovement(dx, -dy);
-}
-
-
-void SpecMouse::hostMouseWheel(int steps)
-{
-    if (!isMouseActive())
-        return;
-
-    m_accZ = clampAbs(m_accZ + steps, c_maxDelta);
-}
-
-
-void SpecMouse::emuMouseSet(int x, int y, int buttons)
-{
-    if (buttons >= 0)
-        updateButtons(m_hostButtons, buttons);
-
-    if (x < 0 || y < 0)
-        return;
-
-    // MCP checks the range, this is just a safeguard
-    x = std::min(x, c_screenWidth - 1);
-    y = std::min(y, c_screenHeight - 1);
-
-    // y grows upward, as the mouse Y offset does
-    addMovement(x - m_emuX, y - m_emuY);
-
-    m_emuX = x;
-    m_emuY = y;
-}
-
-
-std::string SpecMouse::getMouseInfo()
+std::string SpecMouse::getMouseInfoExt()
 {
     std::ostringstream oss;
-    oss << "active=" << isMouseActive();
-    if (m_strobeSeen)
-        oss << " idle_ms=" << (g_emulation->getCurClock() - m_lastStrobeClock) * 1000 / g_emulation->getFrequency();
-    oss << " relative=" << m_relative << " index=" << m_index
-        << " acc=" << m_accX << "," << m_accY << "," << m_accZ
-        << " buttons=" << (m_hostButtons | m_emuButtons) << " mcp_buttons=" << m_emuButtons
-        << " pointer=" << m_emuX << "," << m_emuY << " byte=" << int(m_curByte);
+    oss << "index=" << m_index << " acc=" << m_accX << "," << m_accY << "," << m_accZ
+        << " byte=" << int(m_curByte);
     return oss.str();
 }
 

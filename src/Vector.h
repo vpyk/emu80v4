@@ -333,46 +333,42 @@ class VectorColorRegister : public AddressableDevice
 // чтениями ЭТОГО регистра, -128..127; 6, 7 то же, 0..127 и разряд 7 — направление (1 влево / вниз); 8 кнопки
 // (0 левая, 1 правая, 2 средняя); 9, 10 смещение X, Y -127..127; 15 — 6Dh («m»).
 // В эмуляторе X и Y — место указателя системы над картинкой, смещения считаются по его движению.
-class VectorMouse : public AddressableDevice, public MouseDevice
+// Connected in the config via a Register on port D4h: Register.output -> "control" (port write),
+// Register.query -> "query" (port read: the mouse puts the register value on "data" -> Register.input).
+// Properties (see MouseDevice): crtRenderer, relative (default no), scale (default 1)
+class VectorMouse : public MouseDevice
 {
     public:
+        VectorMouse();
+
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        std::string getPropertyStringValue(const std::string& propertyName) override;
         void reset() override;
+        void initConnections() override;
 
-        void writeByte(int addr, uint8_t value) override;
-        uint8_t readByte(int addr) override;
-
-        bool hostMouseMove(int x, int y, bool inside, int buttons) override;
-        void hostMouseMoveRelative(int dx, int dy, int buttons) override;
-        bool isRelative() override {return m_relative;}
-        void hostMouseWheel(int steps) override;
-        void emuMouseSet(int x, int y, int buttons) override;
         bool isMouseActive() override {return m_enabled;}
-        std::string getMouseInfo() override;
 
         static EmuObject* create(const EmuValuesList&) {return new VectorMouse();}
 
+    protected:
+        bool frameToMouse(int fx, int fy, int& x, int& y) override;
+        void onMove(int dx, int dy) override;
+        void onWheel(int steps) override;
+        std::string getMouseInfoExt() override;
+
     private:
         VectorRenderer* m_renderer = nullptr;
-        bool m_relative = false;    // pointer capture: the host mouse movement is passed without the screen edge limits
         uint8_t m_reg = 15;
         bool m_enabled = false;
-        int m_x = 256;          // 0..511, точки режима 512
-        int m_y = 128;          // 0..255, вверх
-        int m_hostButtons = 0;  // кнопки мыши системы: 1 левая, 2 правая, 4 средняя
-        int m_emuButtons = 0;   // кнопки, заданные через MCP; держатся, пока MCP их не сменит
         uint8_t m_wheel = 0;
         uint8_t m_xLsb = 0;
         int m_acc[6] = {};      // накопители смещений регистров 4, 5, 6, 7, 9, 10 (X — в точках режима 512)
-        bool m_haveHost = false;
-        int m_hostX = 0;
-        int m_hostY = 0;
 
-        void moveTo(int x, int y);
-        void addDelta(int dx, int dy);
-        void center();
-        int buttons() {return m_hostButtons | m_emuButtons;}
+        EmuOutput* m_dataOutput = nullptr;
+
+        void control(uint8_t value);
+        void query(int);
+        uint8_t readReg();
+        void resetRegs();
 };
 
 

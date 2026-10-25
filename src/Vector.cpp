@@ -857,44 +857,36 @@ bool VectorColorRegister::setProperty(const std::string& propertyName, const Emu
 }
 
 
+VectorMouse::VectorMouse()
+{
+    setScreenSize(512, 256);
+}
+
+
 bool VectorMouse::setProperty(const std::string& propertyName, const EmuValuesList& values)
 {
-    if (AddressableDevice::setProperty(propertyName, values))
+    if (MouseDevice::setProperty(propertyName, values))
         return true;
 
     if (propertyName == "crtRenderer") {
         m_renderer = static_cast<VectorRenderer*>(g_emulation->findObject(values[0].asString()));
         return true;
-    } else if (propertyName == "relative") {
-        if (values[0].asString() == "yes") {
-            m_relative = true;
-            return true;
-        } else if (values[0].asString() == "no") {
-            m_relative = false;
-            return true;
-        }
     }
     return false;
 }
 
 
-std::string VectorMouse::getPropertyStringValue(const std::string& propertyName)
+void VectorMouse::initConnections()
 {
-    std::string res = AddressableDevice::getPropertyStringValue(propertyName);
-    if (res != "")
-        return res;
-
-    if (propertyName == "relative")
-        return m_relative ? "yes" : "no";
-
-    return "";
+    MouseDevice::initConnections();
+    REG_INPUT("control", VectorMouse::control);
+    REG_INPUT("query", VectorMouse::query);
+    REG_OUTPUT("data", m_dataOutput);
 }
 
 
-void VectorMouse::center()
+void VectorMouse::resetRegs()
 {
-    m_x = 256;
-    m_y = 128;
     m_xLsb = 0;
     m_wheel = 0;
     for (int& a : m_acc)
@@ -904,27 +896,33 @@ void VectorMouse::center()
 
 void VectorMouse::reset()
 {
+    MouseDevice::reset();
     m_reg = 15;
     m_enabled = false;   // после сброса управляющий байт FFh: контроллер выключен
-    center();
+    resetRegs();
 }
 
 
-void VectorMouse::writeByte(int, uint8_t value)
+// Port write
+void VectorMouse::control(uint8_t value)
 {
     m_reg = value & 0x0F;
     if (value & 0x20) {
         m_enabled = false;
-        center();
+        resetRegs();
     } else if (!m_enabled) {
+        // the coordinates are where the host pointer is (MouseDevice keeps it while disabled too)
         m_enabled = true;
         for (int& a : m_acc)
             a = 0;
-        if (m_haveHost) {   // включили — указатель там, где стоит стрелка системы
-            m_x = m_hostX;
-            m_y = m_hostY;
-        }
     }
+}
+
+
+// Port read: the value goes to the Register input before the Register returns it
+void VectorMouse::query(int)
+{
+    m_dataOutput->setValue(readReg());
 }
 
 
@@ -947,16 +945,20 @@ static uint8_t takeDeltaDir(int& acc, int div)
 }
 
 
-uint8_t VectorMouse::readByte(int)
+uint8_t VectorMouse::readReg()
 {
+    // the disabled controller keeps the coordinates at the center
+    int x = m_enabled ? pointerX() : 256;
+    int y = m_enabled ? pointerY() : 128;
+
     switch (m_reg) {
     case 0:
         return (buttons() & 1 ? 0x80 : 0) | (buttons() & 2 ? 0x40 : 0) | (buttons() & 4 ? 0x20 : 0) | m_xLsb;
     case 1:
-        m_xLsb = m_x & 1;
-        return uint8_t(m_x >> 1);
+        m_xLsb = x & 1;
+        return uint8_t(x >> 1);
     case 2:
-        return uint8_t(m_y);
+        return uint8_t(y);
     case 3:
         return m_wheel;
     case 4:
@@ -981,7 +983,18 @@ uint8_t VectorMouse::readByte(int)
 }
 
 
-void VectorMouse::addDelta(int dx, int dy)
+// A frame pixel is a 512-mode point; the border doesn't belong to the screen
+bool VectorMouse::frameToMouse(int fx, int fy, int& x, int& y)
+{
+    int row;
+    if (!m_renderer || !m_renderer->frameToScreen(fx, fy, x, row))
+        return false;
+    y = 255 - row;
+    return true;
+}
+
+
+void VectorMouse::onMove(int dx, int dy)
 {
     // накопитель регистра, который программа не читает, иначе растёт без предела;
     // больше размера экрана копить смысла нет
@@ -992,68 +1005,16 @@ void VectorMouse::addDelta(int dx, int dy)
 }
 
 
-void VectorMouse::moveTo(int x, int y)
+void VectorMouse::onWheel(int steps)
 {
-    if (m_haveHost && m_enabled)
-        addDelta(x - m_hostX, y - m_hostY);
-    m_hostX = x;
-    m_hostY = y;
-    m_haveHost = true;
-    if (m_enabled) {
-        m_x = x;
-        m_y = y;
-    }
+    m_wheel = uint8_t(m_wheel + steps);
 }
 
 
-bool VectorMouse::hostMouseMove(int x, int y, bool inside, int buttons)
-{
-    m_hostButtons = buttons & 7;
-    int x512, row;
-    if (!inside || !m_renderer || !m_renderer->frameToScreen(x, y, x512, row))
-        return false;
-    moveTo(x512, 255 - row);
-    return true;
-}
-
-
-// Pointer capture: a frame pixel is a 512-mode point, so dx/dy need no conversion (dy > 0 is down).
-// The offset registers get the whole movement, the coordinates stay within the screen
-void VectorMouse::hostMouseMoveRelative(int dx, int dy, int buttons)
-{
-    m_hostButtons = buttons & 7;
-    // the host pointer position is unknown now: the next absolute move only syncs it
-    m_haveHost = false;
-    if (!m_enabled)
-        return;
-
-    addDelta(dx, -dy);
-    m_x = std::max(0, std::min(m_x + dx, 511));
-    m_y = std::max(0, std::min(m_y - dy, 255));
-}
-
-
-void VectorMouse::hostMouseWheel(int steps)
-{
-    if (m_enabled)
-        m_wheel = uint8_t(m_wheel + steps);
-}
-
-
-void VectorMouse::emuMouseSet(int x, int y, int buttons)
-{
-    if (buttons >= 0)
-        m_emuButtons = buttons & 7;
-    if (x >= 0 && y >= 0)
-        moveTo(std::min(x, 511), std::min(y, 255));
-}
-
-
-std::string VectorMouse::getMouseInfo()
+std::string VectorMouse::getMouseInfoExt()
 {
     std::ostringstream oss;
-    oss << "enabled=" << m_enabled << " reg=" << int(m_reg) << " x=" << m_x << " y=" << m_y
-        << " buttons=" << buttons() << " wheel=" << int(m_wheel)
+    oss << "reg=" << int(m_reg) << " wheel=" << int(m_wheel)
         << " acc=" << m_acc[0] << "," << m_acc[1] << "," << m_acc[2] << "," << m_acc[3] << "," << m_acc[4] << "," << m_acc[5];
     return oss.str();
 }

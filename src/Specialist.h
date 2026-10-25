@@ -364,66 +364,39 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
 // Offsets are signed bytes -126..126; movement accumulated since the previous packet is reported,
 // the excess goes to the next packets. A button pressed and released between packets is reported as pressed.
 // The mouse is active while the program strobes it (activityTimeout ms of emulated time since the last strobe).
-// Properties: relative (yes/no, pointer capture), activityTimeout (ms, 0 - always active),
-// scale (mouse units per frame pixel, 1..16, default 2).
-class SpecMouse : public EmuObject, public MouseDevice
+// Properties (see MouseDevice): relative (default yes), activityTimeout (default 1000), scale (default 2).
+class SpecMouse : public MouseDevice
 {
     public:
-        void reset() override;
+        SpecMouse();
 
+        void reset() override;
         void initConnections() override;
 
-        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
-        std::string getPropertyStringValue(const std::string& propertyName) override;
-
-        bool hostMouseMove(int x, int y, bool inside, int buttons) override;
-        void hostMouseMoveRelative(int dx, int dy, int buttons) override;
-        bool isRelative() override {return m_relative;}
-        void hostMouseWheel(int steps) override;
-        void emuMouseSet(int x, int y, int buttons) override;
-        int emuMouseMaxX() override {return c_screenWidth - 1;}
-        bool isMouseActive() override;
-        std::string getMouseInfo() override;
-
         static EmuObject* create(const EmuValuesList&) {return new SpecMouse();}
+
+    protected:
+        void onMove(int dx, int dy) override;
+        void onWheel(int steps) override;
+        std::string getMouseInfoExt() override;
 
     private:
         static const int c_screenWidth = 384;
         static const int c_screenHeight = 256;
         static const int c_maxDelta = 126;
 
-        bool m_relative = true;
-        int m_scale = 2;                   // mouse units per frame pixel
-
         uint8_t m_packet[5] = {0x7F, 0x08, 0x00, 0x00, 0x00};
         uint8_t m_curByte = 0x7F;
         int m_index = 0;
-        bool m_prevStrobe = true;          // PB0 в режиме ввода подтянут к 1
-        bool m_strobeSeen = false;         // был строб после сброса
-        uint64_t m_lastStrobeClock = 0;
-        int m_activityTimeout = 1000;      // мс эмулированного времени без стробов до отключения, 0 — не отключать
+        bool m_prevStrobe = true;          // PB0 is pulled up while the port is an input
 
         int m_accX = 0;
         int m_accY = 0;
         int m_accZ = 0;
 
-        int m_hostButtons = 0;      // host mouse buttons: 1 left, 2 right, 4 middle
-        int m_emuButtons = 0;       // buttons set via MCP, held until MCP changes them
-        int m_pressedSincePacket = 0;
-
-        int m_hostX = 0;
-        int m_hostY = 0;
-        bool m_haveHostPos = false;
-
-        // virtual pointer for MCP: x/y set its position, the program gets the offset from the previous one
-        int m_emuX = c_screenWidth / 2;
-        int m_emuY = c_screenHeight / 2;
-
-        void setStrobe(bool strobe);
         EmuOutput* m_dataOutput = nullptr;
 
-        void updateButtons(int hostButtons, int emuButtons);
-        void addMovement(int dx, int dy);
+        void setStrobe(bool strobe);
         void deliverByte();
         static uint8_t takeDelta(int& acc);
 };

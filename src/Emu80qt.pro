@@ -79,6 +79,7 @@ SOURCES += \
     Memory.cpp \
     Mikro80.cpp \
     Mikrosha.cpp \
+    MouseDevice.cpp \
     MsxTapeHooks.cpp \
     ObjectFactory.cpp \
     Okean.cpp \
