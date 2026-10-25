@@ -1749,6 +1749,16 @@ void MainWindow::createActions()
     m_presetAction->setShortcuts(presetKeyList);*/
     connect(m_presetAction, SIGNAL(triggered()), this, SLOT(onPreset()));
 
+    // Mouse capture on/off
+    m_mouseCaptureAction = new QAction(tr("Capture mouse"), this);
+    m_mouseCaptureAction->setCheckable(true);
+    QList<QKeySequence> mouseCaptureKeyList;
+    ADD_HOTKEY(mouseCaptureKeyList, Qt::Key_G);
+    m_mouseCaptureAction->setToolTip(tr("Capture mouse pointer (relative mouse mode)"));
+    m_mouseCaptureAction->setShortcuts(mouseCaptureKeyList);
+    settingsMenu->addAction(m_mouseCaptureAction);
+    connect(m_mouseCaptureAction, SIGNAL(triggered()), this, SLOT(onMouseCapture()));
+
     viewMenu->addSeparator();
     viewMenu->addAction(m_screenshotAction);
     viewMenu->addAction(m_copyImageAction);
@@ -3239,6 +3249,14 @@ void MainWindow::onFastReset()
 }
 
 
+void MainWindow::onMouseCapture()
+{
+    emuSetPropertyValue(m_palWindow->getPlatformObjectName() + ".mouse", "relative", m_mouseCaptureAction->isChecked() ? "yes" : "no");
+    m_settingsDialog->updateConfig();
+    saveConfig();
+}
+
+
 void MainWindow::onSettings()
 {
     if (m_settingsDialog)
@@ -3886,6 +3904,14 @@ void MainWindow::updateActions()
     else {
         m_muteTapeAction->setVisible(true);
         m_muteTapeAction->setChecked(val == "yes");
+    }
+
+    val = emuGetPropertyValue(platform + "mouse", "relative");
+    if (val == "")
+        m_mouseCaptureAction->setVisible(false);
+    else {
+        m_mouseCaptureAction->setVisible(true);
+        m_mouseCaptureAction->setChecked(val == "yes");
     }
 
     val = emuGetPropertyValue(m_palWindow->getPlatformObjectName(), "fastReset");

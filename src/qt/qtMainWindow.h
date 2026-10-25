@@ -199,6 +199,7 @@ private slots:
     void onResetAll();
     void onMute();
     void onFastReset();
+    void onMouseCapture();
     void onEdd();
     void onEddSave();
     void onEddSaveAs();
@@ -482,6 +483,7 @@ private:
     QAction* m_muteAction;
     QAction* m_fastResetAction;
     QAction* m_printerCaptureAction;
+    QAction* m_mouseCaptureAction;
 
     QAction* m_loadLastFilesActions[LAST_FILES_QTY];
     QAction* m_loadRunLastFilesActions[LAST_FILES_QTY];
