@@ -127,8 +127,9 @@ void MouseDevice::hostMouseMoveRelative(int dx, int dy, int buttons)
     // the host pointer position is unknown now: the next absolute move only syncs it
     m_haveHost = false;
 
+    // there's no host pointer to follow, so scale works as the mouse sensitivity for the pointer too
     reportMove(dx, -dy);
-    setPointer(m_x + dx, m_y - dy);
+    setPointer(m_x + dx * m_scale, m_y - dy * m_scale);
 }
 
 

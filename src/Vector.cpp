@@ -860,6 +860,15 @@ bool VectorColorRegister::setProperty(const std::string& propertyName, const Emu
 VectorMouse::VectorMouse()
 {
     setScreenSize(512, 256);
+    useActivityTimeout(0);
+}
+
+
+// The controller is enabled by the program and, if activityTimeout is set, the program has accessed
+// the port recently: a program that exits without disabling the mouse doesn't keep the pointer captured
+bool VectorMouse::isMouseActive()
+{
+    return m_enabled && MouseDevice::isMouseActive();
 }
 
 
@@ -906,6 +915,7 @@ void VectorMouse::reset()
 // Port write
 void VectorMouse::control(uint8_t value)
 {
+    markActivity();
     m_reg = value & 0x0F;
     if (value & 0x20) {
         m_enabled = false;
@@ -922,6 +932,7 @@ void VectorMouse::control(uint8_t value)
 // Port read: the value goes to the Register input before the Register returns it
 void VectorMouse::query(int)
 {
+    markActivity();
     m_dataOutput->setValue(readReg());
 }
 
@@ -996,11 +1007,10 @@ bool VectorMouse::frameToMouse(int fx, int fy, int& x, int& y)
 
 void VectorMouse::onMove(int dx, int dy)
 {
-    // накопитель регистра, который программа не читает, иначе растёт без предела;
-    // больше размера экрана копить смысла нет
+    // накопитель регистра, который программа не читает, иначе растёт без предела
     for (int i = 0; i < 6; i += 2) {
-        m_acc[i] = std::max(-512, std::min(m_acc[i] + dx, 512));
-        m_acc[i + 1] = std::max(-256, std::min(m_acc[i + 1] + dy, 256));
+        m_acc[i] = std::max(-moveLimitX(), std::min(m_acc[i] + dx, moveLimitX()));
+        m_acc[i + 1] = std::max(-moveLimitY(), std::min(m_acc[i + 1] + dy, moveLimitY()));
     }
 }
 

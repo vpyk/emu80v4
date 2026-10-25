@@ -33,8 +33,9 @@
 //
 // Properties:
 //   relative        - yes/no, pointer capture in the Qt frontend
-//   scale           - device movement units per device screen point, 1..16
-//   activityTimeout - ms of emulated time, only for mice using markActivity() (see below)
+//   scale           - device movement units per device screen point, 1..16; with pointer capture
+//                     it also applies to the pointer position
+//   activityTimeout - ms of emulated time, 0 - no timeout; only for mice using markActivity() (see below)
 class MouseDevice : public EmuObject
 {
     public:
@@ -80,6 +81,11 @@ class MouseDevice : public EmuObject
 
         int pointerX() {return m_x;}
         int pointerY() {return m_y;}
+
+        // Limits for movement accumulated but not yet passed to the program: one screen in device units,
+        // otherwise the mouse would keep moving long after the host one has stopped
+        int moveLimitX() {return m_width * m_scale;}
+        int moveLimitY() {return m_height * m_scale;}
 
         // Current buttons: host | MCP
         int buttons() {return m_hostButtons | m_emuButtons;}

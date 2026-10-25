@@ -670,10 +670,8 @@ static int clampAbs(int value, int limit)
 
 void SpecMouse::onMove(int dx, int dy)
 {
-    // movement not yet passed to the program is limited to one screen,
-    // otherwise the mouse would keep moving long after the host one has stopped
-    m_accX = clampAbs(m_accX + dx, c_screenWidth * m_scale);
-    m_accY = clampAbs(m_accY + dy, c_screenHeight * m_scale);
+    m_accX = clampAbs(m_accX + dx, moveLimitX());
+    m_accY = clampAbs(m_accY + dy, moveLimitY());
 }
 
 

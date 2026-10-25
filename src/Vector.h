@@ -335,7 +335,8 @@ class VectorColorRegister : public AddressableDevice
 // В эмуляторе X и Y — место указателя системы над картинкой, смещения считаются по его движению.
 // Connected in the config via a Register on port D4h: Register.output -> "control" (port write),
 // Register.query -> "query" (port read: the mouse puts the register value on "data" -> Register.input).
-// Properties (see MouseDevice): crtRenderer, relative (default no), scale (default 1)
+// Properties (see MouseDevice): crtRenderer, relative (default no), scale (default 1),
+// activityTimeout (default 0 - the mouse is active while enabled by the program)
 class VectorMouse : public MouseDevice
 {
     public:
@@ -345,7 +346,7 @@ class VectorMouse : public MouseDevice
         void reset() override;
         void initConnections() override;
 
-        bool isMouseActive() override {return m_enabled;}
+        bool isMouseActive() override;
 
         static EmuObject* create(const EmuValuesList&) {return new VectorMouse();}
 
