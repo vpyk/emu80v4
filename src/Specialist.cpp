@@ -670,6 +670,11 @@ bool SpecMouse::setProperty(const string& propertyName, const EmuValuesList& val
             m_activityTimeout = int(values[0].asInt());
             return true;
         }
+    } else if (propertyName == "scale") {
+        if (values[0].isInt() && values[0].asInt() >= 1 && values[0].asInt() <= 16) {
+            m_scale = int(values[0].asInt());
+            return true;
+        }
     }
 
     return false;
@@ -686,6 +691,8 @@ string SpecMouse::getPropertyStringValue(const string& propertyName)
         return m_relative ? "yes" : "no";
     else if (propertyName == "activityTimeout")
         return std::to_string(m_activityTimeout);
+    else if (propertyName == "scale")
+        return std::to_string(m_scale);
 
     return "";
 }
@@ -722,25 +729,23 @@ void SpecMouse::updateButtons(int hostButtons, int emuButtons)
 }
 
 
+static int clampAbs(int value, int limit)
+{
+    return value < -limit ? -limit : (value > limit ? limit : value);
+}
+
+
 void SpecMouse::addMovement(int dx, int dy)
 {
     if (!isMouseActive())
         return;
 
-    static const int c_limit = 1000000;
-
-    m_accX += dx * c_scale;
-    m_accY += dy * c_scale;
-
-    if (m_accX > c_limit)
-        m_accX = c_limit;
-    else if (m_accX < -c_limit)
-        m_accX = -c_limit;
-
-    if (m_accY > c_limit)
-        m_accY = c_limit;
-    else if (m_accY < -c_limit)
-        m_accY = -c_limit;
+    // movement not yet passed to the program is limited to one screen,
+    // otherwise the mouse would keep moving long after the host one has stopped
+    int limitX = c_screenWidth * m_scale;
+    int limitY = c_screenHeight * m_scale;
+    m_accX = clampAbs(m_accX + dx * m_scale, limitX);
+    m_accY = clampAbs(m_accY + dy * m_scale, limitY);
 }
 
 
@@ -770,16 +775,12 @@ void SpecMouse::deliverByte()
 }
 
 
+// Offsets are limited to -126..126 so they never match the sync byte 7Fh,
+// the rest is passed in the next packets
 uint8_t SpecMouse::takeDelta(int& acc)
 {
-    int value = acc;
-    if (value > 126)
-        value = 126;
-    else if (value < -126)
-        value = -126;
-
-    acc = 0;
-
+    int value = clampAbs(acc, c_maxDelta);
+    acc -= value;
     return static_cast<uint8_t>(static_cast<int8_t>(value));
 }
 
@@ -824,11 +825,7 @@ void SpecMouse::hostMouseWheel(int steps)
     if (!isMouseActive())
         return;
 
-    m_accZ += steps;
-    if (m_accZ > 1000000)
-        m_accZ = 1000000;
-    else if (m_accZ < -1000000)
-        m_accZ = -1000000;
+    m_accZ = clampAbs(m_accZ + steps, c_maxDelta);
 }
 
 

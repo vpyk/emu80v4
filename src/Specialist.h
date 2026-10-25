@@ -357,6 +357,15 @@ class SpecPpi8255Circuit : public Ppi8255Circuit
 };
 
 
+// Mouse adapter on a PPI (Specialist: F000h, MX2: the second PPI).
+// Connected in the config: PB0 -> "strobe" input, "data" output -> port A.
+// On every falling edge of the strobe the adapter puts the next byte of a 5-byte packet on port A:
+//   7Fh (sync), 08h | buttons (bit 0 left, 1 right, 2 middle), dX (right > 0), dY (up > 0), dZ (wheel, away > 0).
+// Offsets are signed bytes -126..126; movement accumulated since the previous packet is reported,
+// the excess goes to the next packets. A button pressed and released between packets is reported as pressed.
+// The mouse is active while the program strobes it (activityTimeout ms of emulated time since the last strobe).
+// Properties: relative (yes/no, pointer capture), activityTimeout (ms, 0 - always active),
+// scale (mouse units per frame pixel, 1..16, default 2).
 class SpecMouse : public EmuObject, public MouseDevice
 {
     public:
@@ -379,11 +388,12 @@ class SpecMouse : public EmuObject, public MouseDevice
         static EmuObject* create(const EmuValuesList&) {return new SpecMouse();}
 
     private:
-        static const int c_scale = 2;
         static const int c_screenWidth = 384;
         static const int c_screenHeight = 256;
+        static const int c_maxDelta = 126;
 
         bool m_relative = true;
+        int m_scale = 2;                   // mouse units per frame pixel
 
         uint8_t m_packet[5] = {0x7F, 0x08, 0x00, 0x00, 0x00};
         uint8_t m_curByte = 0x7F;
