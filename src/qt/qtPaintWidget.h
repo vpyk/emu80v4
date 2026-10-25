@@ -118,7 +118,7 @@ class PaintWidget : public QOpenGLWidget, protected QOpenGLFunctions
         bool m_emuMouseCaptured = false;
         bool m_ignoreEmuMouseUntilRelease = false;  // buttons of the click that started the capture are not passed
         bool m_warpPending = false;                 // pointer moved to the center, waiting for an event from there
-        bool m_warpUnsupported = false;             // QCursor::setPos doesn't work (Wayland), no capture
+        bool m_warpUnsupported = false;             // QCursor::setPos doesn't work (Wayland, macOS without permission), no capture
         QPoint m_lastMouseGlobalPos;
         QPoint m_warpTarget;
         bool m_cursorTimerPaused = false;

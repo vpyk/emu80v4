@@ -22,6 +22,7 @@
 #include <QGuiApplication>
 #include <QApplication>
 #include <QCursor>
+#include <QScreen>
 #include <QClipboard>
 #include <QFile>
 
@@ -576,7 +577,14 @@ void PaintWidget::emuMouseCapturedMove(MainWindow* mw, const QPoint& globalPos, 
 
     QCursor::setPos(center);
     if ((QCursor::pos() - center).manhattanLength() > 2) {
-        // the pointer can't be moved, e.g. the center is off-screen
+        // The pointer wasn't moved. If the center is on a screen, the system doesn't allow moving
+        // the pointer (e.g. macOS without the Accessibility permission): fall back to the absolute
+        // mode for the session. If the center is off-screen, just release the capture
+        for (QScreen* screen : QGuiApplication::screens())
+            if (screen->geometry().contains(center)) {
+                m_warpUnsupported = true;
+                break;
+            }
         releaseEmuMouseCapture();
         return;
     }
