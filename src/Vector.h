@@ -337,12 +337,15 @@ class VectorMouse : public AddressableDevice, public MouseDevice
 {
     public:
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+        std::string getPropertyStringValue(const std::string& propertyName) override;
         void reset() override;
 
         void writeByte(int addr, uint8_t value) override;
         uint8_t readByte(int addr) override;
 
         bool hostMouseMove(int x, int y, bool inside, int buttons) override;
+        void hostMouseMoveRelative(int dx, int dy, int buttons) override;
+        bool isRelative() override {return m_relative;}
         void hostMouseWheel(int steps) override;
         void emuMouseSet(int x, int y, int buttons) override;
         bool isMouseActive() override {return m_enabled;}
@@ -352,6 +355,7 @@ class VectorMouse : public AddressableDevice, public MouseDevice
 
     private:
         VectorRenderer* m_renderer = nullptr;
+        bool m_relative = false;    // pointer capture: the host mouse movement is passed without the screen edge limits
         uint8_t m_reg = 15;
         bool m_enabled = false;
         int m_x = 256;          // 0..511, точки режима 512
@@ -366,6 +370,7 @@ class VectorMouse : public AddressableDevice, public MouseDevice
         int m_hostY = 0;
 
         void moveTo(int x, int y);
+        void addDelta(int dx, int dy);
         void center();
         int buttons() {return m_hostButtons | m_emuButtons;}
 };

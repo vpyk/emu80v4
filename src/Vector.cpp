@@ -865,8 +865,29 @@ bool VectorMouse::setProperty(const std::string& propertyName, const EmuValuesLi
     if (propertyName == "crtRenderer") {
         m_renderer = static_cast<VectorRenderer*>(g_emulation->findObject(values[0].asString()));
         return true;
+    } else if (propertyName == "relative") {
+        if (values[0].asString() == "yes") {
+            m_relative = true;
+            return true;
+        } else if (values[0].asString() == "no") {
+            m_relative = false;
+            return true;
+        }
     }
     return false;
+}
+
+
+std::string VectorMouse::getPropertyStringValue(const std::string& propertyName)
+{
+    std::string res = AddressableDevice::getPropertyStringValue(propertyName);
+    if (res != "")
+        return res;
+
+    if (propertyName == "relative")
+        return m_relative ? "yes" : "no";
+
+    return "";
 }
 
 
@@ -960,18 +981,21 @@ uint8_t VectorMouse::readByte(int)
 }
 
 
+void VectorMouse::addDelta(int dx, int dy)
+{
+    // накопитель регистра, который программа не читает, иначе растёт без предела;
+    // больше размера экрана копить смысла нет
+    for (int i = 0; i < 6; i += 2) {
+        m_acc[i] = std::max(-512, std::min(m_acc[i] + dx, 512));
+        m_acc[i + 1] = std::max(-256, std::min(m_acc[i + 1] + dy, 256));
+    }
+}
+
+
 void VectorMouse::moveTo(int x, int y)
 {
-    if (m_haveHost && m_enabled) {
-        int dx = x - m_hostX;
-        int dy = y - m_hostY;
-        // накопитель регистра, который программа не читает, иначе растёт без предела;
-        // больше размера экрана копить смысла нет
-        for (int i = 0; i < 6; i += 2) {
-            m_acc[i] = std::max(-512, std::min(m_acc[i] + dx, 512));
-            m_acc[i + 1] = std::max(-256, std::min(m_acc[i + 1] + dy, 256));
-        }
-    }
+    if (m_haveHost && m_enabled)
+        addDelta(x - m_hostX, y - m_hostY);
     m_hostX = x;
     m_hostY = y;
     m_haveHost = true;
@@ -990,6 +1014,22 @@ bool VectorMouse::hostMouseMove(int x, int y, bool inside, int buttons)
         return false;
     moveTo(x512, 255 - row);
     return true;
+}
+
+
+// Pointer capture: a frame pixel is a 512-mode point, so dx/dy need no conversion (dy > 0 is down).
+// The offset registers get the whole movement, the coordinates stay within the screen
+void VectorMouse::hostMouseMoveRelative(int dx, int dy, int buttons)
+{
+    m_hostButtons = buttons & 7;
+    // the host pointer position is unknown now: the next absolute move only syncs it
+    m_haveHost = false;
+    if (!m_enabled)
+        return;
+
+    addDelta(dx, -dy);
+    m_x = std::max(0, std::min(m_x + dx, 511));
+    m_y = std::max(0, std::min(m_y - dy, 255));
 }
 
 
