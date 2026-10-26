@@ -30,6 +30,7 @@
 #include "Pit8253.h"
 #include "Fdc1793.h"
 #include "Pic8259.h"
+#include "Pci8251.h"
 #include "Pit8253Sound.h"
 #include "Orion.h"
 #include "Specialist.h"
@@ -107,6 +108,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(Pit8253);
     REG_EMU_CLASS(Fdc1793);
     REG_EMU_CLASS(Pic8259);
+    REG_EMU_CLASS(Pci8251);
     REG_EMU_CLASS(GeneralSoundSource);
     REG_EMU_CLASS(Pit8253SoundSource);
     REG_EMU_CLASS(RkPit8253SoundSource);

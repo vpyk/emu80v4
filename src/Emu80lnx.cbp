@@ -185,6 +185,8 @@
         <Unit filename="Parameters.h" />
         <Unit filename="Partner.cpp" />
         <Unit filename="Partner.h" />
+        <Unit filename="Pci8251.cpp" />
+        <Unit filename="Pci8251.h" />
         <Unit filename="Pic8259.cpp" />
         <Unit filename="Pic8259.h" />
         <Unit filename="Pit8253.cpp" />

@@ -88,6 +88,7 @@ SOURCES += \
     Palmira.cpp \
     Parameters.cpp \
     Partner.cpp \
+    Pci8251.cpp \
     Pic8259.cpp \
     Pit8253.cpp \
     Pit8253Sound.cpp \
@@ -194,6 +195,7 @@ HEADERS  += \
     PalWindow.h \
     Parameters.h \
     Partner.h \
+    Pci8251.h \
     Pic8259.h \
     Pit8253.h \
     Pit8253Sound.h \
