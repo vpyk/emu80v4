@@ -28,15 +28,16 @@
 
 
 // Two-button Microsoft serial mouse, platform independent. Connected to a serial port (e.g. Pci8251):
-// "data" output -> serial port data input, serial port dtr/rts outputs -> "dtr"/"rts" inputs.
+// "data" output -> serial port data input, serial port rts output -> "rts" input.
 // Line format 1200 baud 7N1: a byte every 9 bit times (7.5 ms), the mouse paces the bytes itself.
-// The mouse is powered by DTR and RTS: when both become active it sends the identifier 'M' (4Dh).
+// The mouse is powered by RTS: when RTS becomes active it sends the identifier 'M' (4Dh).
+// DTR isn't used: e.g. the Korvet ABRIS editor and CP/M BIOS set RTS only.
 // When the mouse moves or the buttons change it sends a 3-byte packet:
 //   1 L R Y7 Y6 X7 X6  (bit 6 marks the first byte)
 //   0 0 X5 X4 X3 X2 X1 X0
 //   0 0 Y5 Y4 Y3 Y2 Y1 Y0
 // dX right > 0, dY down > 0, -128..127; the excess goes to the next packets.
-// Inputs are logical (true = active), unconnected inputs are considered active.
+// The input is logical (true = active), unconnected input is considered active.
 // The mouse is active while powered.
 // Properties (see MouseDevice): relative (default yes), scale (default 1).
 class MsMouse : public MouseDevice, public IActive
@@ -59,7 +60,6 @@ class MsMouse : public MouseDevice, public IActive
     private:
         static const int c_bitsPerByte = 9; // start bit, 7 data bits, stop bit
 
-        bool m_dtr = true;
         bool m_rts = true;
         bool m_powered = false;
 
@@ -73,9 +73,7 @@ class MsMouse : public MouseDevice, public IActive
 
         EmuOutput* m_dataOutput = nullptr;
 
-        void setDtr(bool val);
         void setRts(bool val);
-        void updatePower();
         void makePacket();
 };
 

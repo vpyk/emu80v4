@@ -38,45 +38,30 @@ void MsMouse::reset()
 {
     MouseDevice::reset();
 
-    // m_dtr and m_rts are kept: they are set by the serial port, and the reset order of objects is undefined
+    // m_rts is kept: it is set by the serial port, and the reset order of objects is undefined
     m_powered = false;
     m_queueLen = m_queuePos = 0;
     pause();
-    updatePower();
+    setRts(m_rts);
 }
 
 
 void MsMouse::initConnections()
 {
     MouseDevice::initConnections();
-    REG_INPUT("dtr", MsMouse::setDtr);
     REG_INPUT("rts", MsMouse::setRts);
     REG_OUTPUT("data", m_dataOutput);
-}
-
-
-void MsMouse::setDtr(bool val)
-{
-    m_dtr = val;
-    updatePower();
 }
 
 
 void MsMouse::setRts(bool val)
 {
     m_rts = val;
-    updatePower();
-}
-
-
-void MsMouse::updatePower()
-{
-    bool powered = m_dtr && m_rts;
-    if (powered == m_powered)
+    if (val == m_powered)
         return;
-    m_powered = powered;
+    m_powered = val;
 
-    if (powered) {
+    if (val) {
         // power on: the earlier movement and presses are dropped, the identifier goes first
         m_accX = m_accY = 0;
         takeButtons();
@@ -155,7 +140,7 @@ void MsMouse::makePacket()
 std::string MsMouse::getMouseInfoExt()
 {
     std::ostringstream oss;
-    oss << "dtr=" << m_dtr << " rts=" << m_rts << " acc=" << m_accX << "," << m_accY
+    oss << "rts=" << m_rts << " acc=" << m_accX << "," << m_accY
         << " queue=" << m_queuePos << "/" << m_queueLen;
     return oss.str();
 }
