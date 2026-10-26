@@ -69,6 +69,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="mouseCheckBox">
+     <property name="text">
+      <string>Mouse</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -87,6 +94,7 @@
   <tabstop>opts1RadioButton</tabstop>
   <tabstop>opts2RadioButton</tabstop>
   <tabstop>psgCheckBox</tabstop>
+  <tabstop>mouseCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>

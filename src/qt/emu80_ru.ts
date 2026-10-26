@@ -155,6 +155,11 @@
         <source>3d PPI</source>
         <translation>ППА №3</translation>
     </message>
+    <message>
+        <location filename="qtKorvetConfig.ui" line="74"/>
+        <source>Mouse</source>
+        <translation>Мышь</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>

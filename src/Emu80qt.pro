@@ -80,6 +80,7 @@ SOURCES += \
     Mikro80.cpp \
     Mikrosha.cpp \
     MouseDevice.cpp \
+    MsMouse.cpp \
     MsxTapeHooks.cpp \
     ObjectFactory.cpp \
     Okean.cpp \
@@ -184,6 +185,7 @@ HEADERS  += \
     Mikro80.h \
     Mikrosha.h \
     MouseDevice.h \
+    MsMouse.h \
     MsxTapeHooks.h \
     ObjectFactory.h \
     Okean.h \

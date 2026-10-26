@@ -307,9 +307,11 @@ void KorvetConfigWidget::loadConfig()
 {
     m_defValues["CFG_PPI3"] = "AY";
     m_defValues["CFG_OPTS"] = "2";
+    m_defValues["CFG_MOUSE"] = "OFF";
 
     optBegin();
     ui->psgCheckBox->setChecked(optLoad("CFG_PPI3").toString() == "AY");
+    ui->mouseCheckBox->setChecked(optLoad("CFG_MOUSE").toString() == "ON");
     QString val = optLoad("CFG_OPTS").toString();
     optEnd();
 
@@ -327,6 +329,7 @@ void KorvetConfigWidget::saveConfig()
     optBegin();
     optSave("CFG_PPI3", ui->psgCheckBox->isChecked() ? "AY" : "NONE");
     optSave("CFG_OPTS", ui->opts1RadioButton->isChecked() ? "1" : "2");
+    optSave("CFG_MOUSE", ui->mouseCheckBox->isChecked() ? "ON" : "OFF");
     optEnd();
 }
 
@@ -335,6 +338,7 @@ void KorvetConfigWidget::setDefaults()
     ui->psgCheckBox->setChecked(m_defValues["CFG_PPI3"] == "AY");
     ui->opts1RadioButton->setChecked(m_defValues["CFG_OPTS"] == "1");
     ui->opts2RadioButton->setChecked(m_defValues["CFG_OPTS"] == "2");
+    ui->mouseCheckBox->setChecked(m_defValues["CFG_MOUSE"] == "ON");
 }
 
 
