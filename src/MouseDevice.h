@@ -35,7 +35,7 @@
 //   relative        - yes/no, pointer capture in the Qt frontend
 //   scale           - device movement units per device screen point, 1..16; with pointer capture
 //                     it also applies to the pointer position
-//   activityTimeout - ms of emulated time, 0 - no timeout; only for mice using markActivity() (see below)
+//   activityTimeout - ms of emulated time, 0 - no timeout; only for mice calling useActivityTimeout() (see below)
 class MouseDevice : public EmuObject
 {
     public:
@@ -70,9 +70,13 @@ class MouseDevice : public EmuObject
         // Default: the frame is the device screen
         virtual bool frameToMouse(int fx, int fy, int& x, int& y);
 
-        // Movement in device units (scale applied, y up); called only while the mouse is active
+        // Movement and wheel are passed to onMove()/onWheel() only while this returns true.
+        // Default: while the mouse is active
+        virtual bool acceptsInput() {return isMouseActive();}
+
+        // Movement in device units (scale applied, y up); called only while acceptsInput()
         virtual void onMove(int /*dx*/, int /*dy*/) {}
-        // Wheel steps; called only while the mouse is active
+        // Wheel steps; called only while acceptsInput()
         virtual void onWheel(int /*steps*/) {}
         // Device specific part of getMouseInfo()
         virtual std::string getMouseInfoExt() {return "";}
@@ -96,6 +100,7 @@ class MouseDevice : public EmuObject
         // accesses it, activityTimeout ms of emulated time since the last markActivity()
         void useActivityTimeout(int defaultTimeout);
         void markActivity();
+        int activityTimeout() {return m_activityTimeout;}
 
         bool m_relative = false;
         int m_scale = 1;

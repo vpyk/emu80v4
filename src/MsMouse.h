@@ -28,7 +28,8 @@
 
 
 // Two-button Microsoft serial mouse, platform independent. Connected to a serial port (e.g. Pci8251):
-// "data" output -> serial port data input, serial port rts output -> "rts" input.
+// "data" output -> serial port data input, serial port rts output -> "rts" input,
+// serial port rxrdy output -> "rxrdy" input (optional, see below).
 // Line format 1200 baud 7N1: a byte every 9 bit times (7.5 ms), the mouse paces the bytes itself.
 // The mouse is powered by RTS: when RTS becomes active it sends the identifier 'M' (4Dh).
 // DTR isn't used: e.g. the Korvet ABRIS editor and CP/M BIOS set RTS only.
@@ -37,9 +38,14 @@
 //   0 0 X5 X4 X3 X2 X1 X0
 //   0 0 Y5 Y4 Y3 Y2 Y1 Y0
 // dX right > 0, dY down > 0, -128..127; the excess goes to the next packets.
-// The input is logical (true = active), unconnected input is considered active.
-// The mouse is active while powered.
-// Properties (see MouseDevice): relative (default yes), scale (default 1).
+// Inputs are logical (true = active), unconnected rts is considered active.
+// While powered, the mouse always sends its movement. It is active (the pointer can be captured) while
+// the program reads the bytes: a falling edge of rxrdy after a byte was sent means the byte was read.
+// The mouse becomes inactive when a sent byte stays unread for activityTimeout ms of emulated time,
+// e.g. on Korvet CP/M BIOS sets RTS, but nobody reads the mouse. Without rxrdy connected the mouse
+// is active while powered.
+// Properties (see MouseDevice): relative (default yes), scale (default 1),
+// activityTimeout (default 1000, 0 - once read, the mouse is active until powered off).
 class MsMouse : public MouseDevice, public IActive
 {
     public:
@@ -54,6 +60,7 @@ class MsMouse : public MouseDevice, public IActive
         static EmuObject* create(const EmuValuesList&) {return new MsMouse();}
 
     protected:
+        bool acceptsInput() override {return m_powered;}
         void onMove(int dx, int dy) override;
         std::string getMouseInfoExt() override;
 
@@ -62,6 +69,12 @@ class MsMouse : public MouseDevice, public IActive
 
         bool m_rts = true;
         bool m_powered = false;
+
+        bool m_rxRdyConnected = false;  // rxrdy input has got a value at least once
+        bool m_rxRdy = false;
+        bool m_unread = false;          // a sent byte hasn't been read yet
+        uint64_t m_unreadClock = 0;     // when the oldest unread byte was sent
+        bool m_reader = false;          // the program reads the bytes
 
         uint8_t m_queue[3] = {0, 0, 0};
         int m_queueLen = 0;
@@ -74,6 +87,7 @@ class MsMouse : public MouseDevice, public IActive
         EmuOutput* m_dataOutput = nullptr;
 
         void setRts(bool val);
+        void setRxRdy(bool val);
         void makePacket();
 };
 

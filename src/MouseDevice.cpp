@@ -135,7 +135,7 @@ void MouseDevice::hostMouseMoveRelative(int dx, int dy, int buttons)
 
 void MouseDevice::hostMouseWheel(int steps)
 {
-    if (isMouseActive())
+    if (acceptsInput())
         onWheel(steps);
 }
 
@@ -166,7 +166,7 @@ void MouseDevice::setPointer(int x, int y)
 
 void MouseDevice::reportMove(int dx, int dy)
 {
-    if ((dx || dy) && isMouseActive())
+    if ((dx || dy) && acceptsInput())
         onMove(dx * m_scale, dy * m_scale);
 }
 

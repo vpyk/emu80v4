@@ -23,12 +23,15 @@
 #include <sstream>
 #include <algorithm>
 
+#include "Globals.h"
+#include "Emulation.h"
 #include "MsMouse.h"
 
 
 MsMouse::MsMouse()
 {
     m_relative = true;
+    useActivityTimeout(1000);
     pause();
     EmuObject::setFrequency(1200); // bit time
 }
@@ -39,8 +42,10 @@ void MsMouse::reset()
     MouseDevice::reset();
 
     // m_rts is kept: it is set by the serial port, and the reset order of objects is undefined
+    // m_rxRdy and m_rxRdyConnected are kept for the same reason
     m_powered = false;
     m_queueLen = m_queuePos = 0;
+    m_unread = m_reader = false;
     pause();
     setRts(m_rts);
 }
@@ -50,6 +55,7 @@ void MsMouse::initConnections()
 {
     MouseDevice::initConnections();
     REG_INPUT("rts", MsMouse::setRts);
+    REG_INPUT("rxrdy", MsMouse::setRxRdy);
     REG_OUTPUT("data", m_dataOutput);
 }
 
@@ -60,6 +66,7 @@ void MsMouse::setRts(bool val)
     if (val == m_powered)
         return;
     m_powered = val;
+    m_unread = m_reader = false;
 
     if (val) {
         // power on: the earlier movement and presses are dropped, the identifier goes first
@@ -79,9 +86,33 @@ void MsMouse::setRts(bool val)
 }
 
 
+void MsMouse::setRxRdy(bool val)
+{
+    m_rxRdyConnected = true;
+    bool fall = m_rxRdy && !val;
+    m_rxRdy = val;
+
+    // the serial port reset also drops rxrdy, but then RTS goes off too and m_unread is cleared
+    if (fall && m_powered && m_unread) {
+        m_unread = false;
+        m_reader = true;
+    }
+}
+
+
 bool MsMouse::isMouseActive()
 {
-    return m_powered;
+    if (!m_powered)
+        return false;
+    if (!m_rxRdyConnected)
+        return true;
+
+    if (m_reader && m_unread && activityTimeout()) {
+        uint64_t timeout = uint64_t(g_emulation->getFrequency()) * activityTimeout() / 1000;
+        if (g_emulation->getCurClock() - m_unreadClock >= timeout)
+            m_reader = false;
+    }
+    return m_reader;
 }
 
 
@@ -92,8 +123,13 @@ void MsMouse::operate()
 
     if (m_queuePos == m_queueLen)
         makePacket();
-    if (m_queuePos < m_queueLen)
+    if (m_queuePos < m_queueLen) {
+        if (!m_unread) {
+            m_unread = true;
+            m_unreadClock = g_emulation->getCurClock();
+        }
         m_dataOutput->setValue(m_queue[m_queuePos++]);
+    }
 }
 
 
@@ -140,7 +176,8 @@ void MsMouse::makePacket()
 std::string MsMouse::getMouseInfoExt()
 {
     std::ostringstream oss;
-    oss << "rts=" << m_rts << " acc=" << m_accX << "," << m_accY
+    oss << "rts=" << m_rts << " reader=" << m_reader << " unread=" << m_unread
+        << " acc=" << m_accX << "," << m_accY
         << " queue=" << m_queuePos << "/" << m_queueLen;
     return oss.str();
 }
