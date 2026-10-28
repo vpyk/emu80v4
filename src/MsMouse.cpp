@@ -66,7 +66,9 @@ void MsMouse::setRts(bool val)
     if (val == m_powered)
         return;
     m_powered = val;
-    m_unread = m_reader = false;
+    // m_reader is kept: programs reinitialize the serial port (e.g. ABRIS after loading an overlay),
+    // and the mouse would be inactive until the identifier is read
+    m_unread = false;
 
     if (val) {
         // power on: the earlier movement and presses are dropped, the identifier goes first

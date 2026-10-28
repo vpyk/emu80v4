@@ -45,7 +45,7 @@
 // e.g. on Korvet CP/M BIOS sets RTS, but nobody reads the mouse. Without rxrdy connected the mouse
 // is active while powered.
 // Properties (see MouseDevice): relative (default yes), scale (default 1),
-// activityTimeout (default 1000, 0 - once read, the mouse is active until powered off).
+// activityTimeout (default 1000, 0 - once read, the mouse stays active while powered).
 class MsMouse : public MouseDevice, public IActive
 {
     public:
