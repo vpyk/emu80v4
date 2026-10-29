@@ -324,12 +324,6 @@ bool CpuZ80::checkForStackOperation()
 }
 
 
-int CpuZ80::getCurIoInstructionDuration()
-{
-    return z80_out_cycle(m_z80) + 4;
-}
-
-
 int CpuZ80::getCurMCycleTState()
 {
     return m_inInstruction ? m_insnClock->cycles : 0;

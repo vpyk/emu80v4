@@ -153,7 +153,6 @@ class Cpu8080Compatible : public Cpu
 
         virtual bool getInte() = 0;
         virtual bool checkForStackOperation() = 0;
-        virtual int getCurIoInstructionDuration() = 0; // w/o waits for now
         //virtual bool getM1Status() = 0; // not implemented yet
 
     protected:

@@ -101,7 +101,6 @@ class CpuZ80 : public Cpu8080Compatible
         void setR(uint8_t value);
 
         bool checkForStackOperation() override;
-        int getCurIoInstructionDuration() override;
         int getCurMCycleTState() override;
         bool getM1Status();
 

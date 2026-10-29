@@ -101,6 +101,7 @@ public:
         uint8_t m_savedAttr = 0;
 
         void advanceTo(uint64_t clocks);
+        void advanceToBusAccess();
         void drawLine(int line, int fromTState, int toTState);
 
         void setModel(ZxModel model);

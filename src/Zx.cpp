@@ -414,10 +414,17 @@ void ZxRenderer::initConnections()
 }
 
 
+void ZxRenderer::advanceToBusAccess()
+{
+    // An I/O or memory write takes effect 3 T-states after the M-cycle begins
+    int shift = m_cpu->getCurMCycleTState() + 3;
+    advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
+}
+
+
 void ZxRenderer::setBorderColor(uint8_t color)
 {
-    int shift = m_cpu->getCurIoInstructionDuration() - 1;
-    advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
+    advanceToBusAccess();
     m_borderColor = color;
 }
 
@@ -425,8 +432,7 @@ void ZxRenderer::setBorderColor(uint8_t color)
 void ZxRenderer::setScreenPage(int screenPage)
 {
     if (screenPage >=0 && screenPage <= 1) {
-        int shift = m_cpu->getCurIoInstructionDuration() - 1;
-        advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
+        advanceToBusAccess();
         m_screenPage = screenPage;
     }
 }
@@ -434,10 +440,8 @@ void ZxRenderer::setScreenPage(int screenPage)
 
 void ZxRenderer::vidMemWriteNotify(int screenPage)
 {
-    if (screenPage == m_screenPage) {
-        int shift = m_cpu->getCurIoInstructionDuration() - 1;
-        advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
-    }
+    if (screenPage == m_screenPage)
+        advanceToBusAccess();
 }
 
 
