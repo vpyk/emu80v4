@@ -312,7 +312,7 @@ private:
 
     uint8_t* m_font = nullptr;
 
-    DbgWSymbol m_screen[96][48];
+    DbgWSymbol m_screen[100][50];
 
     int m_curX = 0;
     int m_curY = 0;

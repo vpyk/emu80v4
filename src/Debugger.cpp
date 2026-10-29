@@ -82,8 +82,8 @@ DebugWindow::DebugWindow(Platform* platform) : IDebugger(platform)
     m_compactLayout.aux.width = 0;
     m_compactLayout.aux.height = 0;
 
-    m_stdLayout.cols = 96;
-    m_stdLayout.rows = 48;
+    m_stdLayout.cols = 100;
+    m_stdLayout.rows = 50;
     m_stdLayout.code.left = 1;
     m_stdLayout.code.top = 1;
     m_stdLayout.code.width = 37;
@@ -102,28 +102,28 @@ DebugWindow::DebugWindow(Platform* platform) : IDebugger(platform)
     m_stdLayout.stack.height = 8;
     m_stdLayout.bpts.left = 88;
     m_stdLayout.bpts.top = 1;
-    m_stdLayout.bpts.width = 7;
-    m_stdLayout.bpts.height = 8;
+    m_stdLayout.bpts.width = 11;
+    m_stdLayout.bpts.height = 18;
     m_stdLayout.regMemHex.left = 39;
     m_stdLayout.regMemHex.top = 10;
-    m_stdLayout.regMemHex.width = 57;
+    m_stdLayout.regMemHex.width = 49;
     m_stdLayout.regMemHex.height = 9;
     m_stdLayout.regMemSmb.left = 39;
     m_stdLayout.regMemSmb.top = 20;
-    m_stdLayout.regMemSmb.width = 42;
+    m_stdLayout.regMemSmb.width = 39;
     m_stdLayout.regMemSmb.height = 9;
     m_stdLayout.dump.left = 1;
     m_stdLayout.dump.top = 30;
-    m_stdLayout.dump.width = 80;
-    m_stdLayout.dump.height = 16;
+    m_stdLayout.dump.width = 79;
+    m_stdLayout.dump.height = 18;
     m_stdLayout.menu.left = 0;
-    m_stdLayout.menu.top = 47;
-    m_stdLayout.menu.width = 96;
+    m_stdLayout.menu.top = 49;
+    m_stdLayout.menu.width = 100;
     m_stdLayout.menu.height = 1;
-    m_stdLayout.aux.left = 82;
+    m_stdLayout.aux.left = 81;
     m_stdLayout.aux.top = 20;
-    m_stdLayout.aux.width = 13;
-    m_stdLayout.aux.height = 26;
+    m_stdLayout.aux.width = 20;
+    m_stdLayout.aux.height = 28;
 
     m_platform = platform;
     m_cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
@@ -139,8 +139,8 @@ DebugWindow::DebugWindow(Platform* platform) : IDebugger(platform)
 
     m_isRunning = true;
 
-    for (int i = 0; i < 96; i++)
-        for (int j = 0; j < 48; j++) {
+    for (int i = 0; i < 100; i++)
+        for (int j = 0; j < 50; j++) {
             m_screen[i][j].chr = 0;
             m_screen[i][j].fgColor = 14;
             m_screen[i][j].bgColor = 1;
@@ -489,7 +489,11 @@ void DebugWindow::drawDbgFrame()
         putChars(m_curLayout->cols - 1, m_curLayout->dump.top - 1, 0xb6, 1);
     putChars(m_curLayout->flags.left - 1, m_curLayout->regMemHex.top - 1, 0xc1, 1);
     putChars(m_curLayout->stack.left - 1, m_curLayout->regMemHex.top - 1, 0xc1, 1);
-    putChars(m_curLayout->bpts.left - 1, m_curLayout->regMemHex.top - 1, 0xc1, 1);
+    if (!m_compactMode) {
+        putChars(m_curLayout->bpts.left - 1, m_curLayout->regs.height + 1, 0xb4, 1, true);
+        putChars(m_curLayout->bpts.left - 1, m_curLayout->bpts.height + 1, 0xc1, 1, true);
+    } else
+        putChars(m_curLayout->bpts.left - 1, m_curLayout->regMemHex.top - 1, 0xc1, 1);
     putChars(m_curLayout->regs.left - 1, m_curLayout->dump.top - 1, 0xc1, 1);
 
     if (m_curLayout->aux.width != 0) {
@@ -564,8 +568,8 @@ void DebugWindow::drawDbgFrame()
         putString(m_curLayout->regMemHex.left + 1, m_curLayout->regMemHex.top + 7, "  IX=    :");
         putString(m_curLayout->regMemHex.left + 1, m_curLayout->regMemHex.top + 8, "  IY=    :");
     } else if (!m_compactMode) {
-        putChars(m_curLayout->regMemHex.left + 1, m_curLayout->regMemHex.top + 7, 0, 52);
-        putChars(m_curLayout->regMemHex.left + 1, m_curLayout->regMemHex.top + 8, 0, 52);
+        putChars(m_curLayout->regMemHex.left + 1, m_curLayout->regMemHex.top + 7, 0, 46);
+        putChars(m_curLayout->regMemHex.left + 1, m_curLayout->regMemHex.top + 8, 0, 46);
     }
     putString(m_curLayout->regMemSmb.left + 1, m_curLayout->regMemSmb.top + 1, "  HL=    :");
     putString(m_curLayout->regMemSmb.left + 1, m_curLayout->regMemSmb.top + 2, "  BC=    :");
@@ -587,9 +591,12 @@ void DebugWindow::drawDbgFrame()
     if (m_compactMode)
         putString(m_curLayout->regMemHex.left + 12, m_curLayout->regMemHex.top, "-4 -3 -2 -1  0 +1 +2 +3 +4 +5");
     else
-        putString(m_curLayout->regMemHex.left + 12, m_curLayout->regMemHex.top, "-6 -5 -4 -3 -2 -1  0 +1 +2 +3 +4 +5 +6 +7");
+        putString(m_curLayout->regMemHex.left + 12, m_curLayout->regMemHex.top, "-5 -4 -3 -2 -1  0 +1 +2 +3 +4 +5 +6");
 
-    putString(m_curLayout->regMemSmb.left + 11, m_curLayout->regMemSmb.top, "-DCBA9876543210123456789ABCDEF+");
+    if (m_compactMode)
+        putString(m_curLayout->regMemSmb.left + 11, m_curLayout->regMemSmb.top, "-DCBA9876543210123456789ABCDEF+");
+    else
+        putString(m_curLayout->regMemSmb.left + 11, m_curLayout->regMemSmb.top, "-BA9876543210123456789ABCDEF+");
 }
 
 
@@ -853,8 +860,8 @@ void DebugWindow::displayCpuStatus()
 
     baseY = m_curLayout->regMemHex.top + 1;
     baseX = m_curLayout->regMemHex.left + 12;
-    int first = m_compactMode ? 9 : 7;
-    int len = m_compactMode ? 10 : 14;
+    int first = m_compactMode ? 9 : 8;
+    int len = m_compactMode ? 10 : 12;
     drawHexSeq(baseX,  baseY++, m_states[m_stateNum].mem_hl + first, m_states[1-m_stateNum].mem_hl + first, len);
     drawHexSeq(baseX, baseY++, m_states[m_stateNum].mem_bc + first, m_states[1-m_stateNum].mem_bc + first, len);
     drawHexSeq(baseX, baseY++, m_states[m_stateNum].mem_de + first, m_states[1-m_stateNum].mem_de + first, len);
@@ -866,27 +873,29 @@ void DebugWindow::displayCpuStatus()
         drawHexSeq(baseX, baseY, m_states[m_stateNum].mem_iy + first, m_states[1-m_stateNum].mem_iy + first, len);
     }
     baseY = m_curLayout->regMemHex.top + 1;
-    baseX += m_compactMode ? 12 : 18;
+    baseX += m_compactMode ? 12 : 15;
     highlight(baseX, baseY, 3, m_z80Mode ? 8 : 6, true);
     highlight(baseX + 1, baseY, 3, m_z80Mode ? 8 : 6, true);
 
     baseY = m_curLayout->regMemSmb.top + 1;
     baseX = m_curLayout->regMemSmb.left + 12;
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_hl, m_states[1-m_stateNum].mem_hl, 29);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_bc, m_states[1-m_stateNum].mem_bc, 29);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_de, m_states[1-m_stateNum].mem_de, 29);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_sp, m_states[1-m_stateNum].mem_sp, 29);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_hl, m_states[1-m_stateNum].mem_mem_hl, 29);
+    first = m_compactMode ? 0 : 2;
+    len = m_compactMode ? 29 : 27;
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_hl + first, m_states[1-m_stateNum].mem_hl, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_bc + first, m_states[1-m_stateNum].mem_bc, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_de + first, m_states[1-m_stateNum].mem_de, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_sp + first, m_states[1-m_stateNum].mem_sp, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_hl + first, m_states[1-m_stateNum].mem_mem_hl, len);
     if (!m_compactMode)
-        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_sp, m_states[1-m_stateNum].mem_mem_sp, 29);
+        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_sp + first, m_states[1-m_stateNum].mem_mem_sp, len);
     if (m_z80Mode) {
-        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_ix, m_states[1-m_stateNum].mem_ix, 29);
-        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_iy, m_states[1-m_stateNum].mem_iy, 29);
+        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_ix + first, m_states[1-m_stateNum].mem_ix, len);
+        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_iy + first, m_states[1-m_stateNum].mem_iy, len);
     }
     baseY = m_curLayout->regMemHex.top + 1;
-    baseX += m_compactMode ? 12 : 18;
+    baseX += m_compactMode ? 13 : 11;
     len = m_z80Mode ? 8 : (m_compactMode ? 5 : 6);
-    highlight(m_curLayout->regMemSmb.left + 25, m_curLayout->regMemSmb.top + 1, 3, len, true);
+    highlight(baseX, m_curLayout->regMemSmb.top + 1, 3, len, true);
 
     regsDraw();
     flagsDraw();
@@ -2173,8 +2182,8 @@ void DebugWindow::bpointsDraw()
 
     if (m_bpList.size() == 0) {
         setColors(10, 1);
-        putString(m_curLayout->bpts.left + 1, m_curLayout->bpts.top + 1, "Emu80");
-        putString(m_curLayout->bpts.left + 2, m_curLayout->bpts.top + 2, "v.4");
+        putString(m_curLayout->bpts.left + (m_compactMode ? 1 : 3), m_curLayout->bpts.top + 1, "Emu80");
+        putString(m_curLayout->bpts.left + (m_compactMode ? 2 : 4), m_curLayout->bpts.top + 2, "v.4");
     } else {
         if (m_firstVisibleBpoint > m_bpList.size() - m_curLayout->bpts.height)
             m_firstVisibleBpoint = m_bpList.size() - m_curLayout->bpts.height;
