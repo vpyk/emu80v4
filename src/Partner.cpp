@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include "Pal.h"
 
 #include "Partner.h"
@@ -234,6 +236,21 @@ bool PartnerAddrSpaceSelector::setProperty(const string& propertyName, const Emu
     }
 
     return false;
+}
+
+
+void PartnerAddrSpaceSelector::writeByte(int, uint8_t value)
+{
+    m_curMap = (value & 0xf0) >> 4;
+    m_partnerAddrSpace->m_mapNum = m_curMap;
+}
+
+
+string PartnerAddrSpaceSelector::getDebugInfo()
+{
+    stringstream ss;
+    ss << "Mem. map: " << m_curMap;
+    return ss.str();
 }
 
 

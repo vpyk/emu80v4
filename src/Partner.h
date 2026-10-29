@@ -73,12 +73,15 @@ class PartnerAddrSpaceSelector : public AddressableDevice
 
         void attachPartnerAddrSpace(PartnerAddrSpace* partnerAddrSpace) {m_partnerAddrSpace = partnerAddrSpace;}
 
-        void writeByte(int, uint8_t value) override {m_partnerAddrSpace->m_mapNum = (value & 0xf0) >> 4;}
+        void writeByte(int, uint8_t value) override;
         uint8_t readByte(int)  override {return 0xff;}
+
+        std::string getDebugInfo() override;
 
         static EmuObject* create(const EmuValuesList&) {return new PartnerAddrSpaceSelector();}
 
     private:
+        int m_curMap = 0;
         PartnerAddrSpace* m_partnerAddrSpace = nullptr;
 };
 
