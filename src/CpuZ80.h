@@ -23,9 +23,12 @@
 
 
 struct Z80;
+struct CpuZ80InsnClock;
 
 uint8_t fetchOpcodeCb(void* ctx, uint16_t address);
 uint8_t readCb(void* ctx, uint16_t address);
+uint8_t nopCb(void* ctx, uint16_t address);
+uint8_t peekCb(void* ctx, uint16_t address);
 void writeCb(void* ctx, uint16_t address, uint8_t value);
 uint8_t inCb(void* ctx, uint16_t address);
 void outCb(void* ctx, uint16_t address, uint8_t value);
@@ -35,6 +38,8 @@ class CpuZ80 : public Cpu8080Compatible
 {
     friend uint8_t fetchOpcodeCb(void* ctx, uint16_t address);
     friend uint8_t readCb(void* ctx, uint16_t address);
+    friend uint8_t nopCb(void* ctx, uint16_t address);
+    friend uint8_t peekCb(void* ctx, uint16_t address);
     friend void writeCb(void* ctx, uint16_t address, uint8_t value);
     friend uint8_t inCb(void* ctx, uint16_t address);
     friend void outCb(void* ctx, uint16_t address, uint8_t value);
@@ -97,12 +102,15 @@ class CpuZ80 : public Cpu8080Compatible
 
         bool checkForStackOperation() override;
         int getCurIoInstructionDuration() override;
+        int getCurMCycleTState() override;
         bool getM1Status();
 
         static EmuObject* create(const EmuValuesList&) {return new CpuZ80();}
 
     private:
         Z80* m_z80 = nullptr;
+        CpuZ80InsnClock* m_insnClock = nullptr;
+        bool m_inInstruction = false;
 
         bool m_m1Status = false;
         bool m_16bitPorts = false;
@@ -115,6 +123,8 @@ class CpuZ80 : public Cpu8080Compatible
 
         uint8_t fetchOpcode(uint16_t address);
         uint8_t read(uint16_t address);
+        uint8_t nop(uint16_t address);
+        uint8_t peek(uint16_t address);
         void write(uint16_t address, uint8_t value);
         uint8_t in(uint16_t address);
         void out(uint16_t address, uint8_t value);

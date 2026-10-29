@@ -30,8 +30,16 @@
 #define Z80_EXTERNAL_HEADER "zdefs.h"
 #include "z80/Z80.h"
 
+#define Z80_INSN_CLOCK_STATIC
+#define Z80_INSN_CLOCK_EXTERNAL_HEADER "zdefs.h"
+#include "z80/Z80InsnClock.h"
+
 
 using namespace std;
+
+
+// Z80InsnClock is an anonymous struct and can't be forward declared in CpuZ80.h
+struct CpuZ80InsnClock : Z80InsnClock {};
 
 
 CpuZ80::CpuZ80()
@@ -45,7 +53,7 @@ CpuZ80::CpuZ80()
     m_z80->write = writeCb;
     m_z80->in = inCb;
     m_z80->out = outCb;
-    m_z80->nop = readCb;
+    m_z80->nop = nopCb;
 
     m_z80->halt = nullptr;
     m_z80->nmia = nullptr;
@@ -63,18 +71,28 @@ CpuZ80::CpuZ80()
     m_z80->options = 0;
 
     z80_power(m_z80, true);
+
+    m_insnClock = new CpuZ80InsnClock();
+    z80_insn_clock_initialize(m_insnClock, &m_z80->af, &m_z80->bc, &m_z80->hl, this, peekCb);
+    z80_insn_clock_start(m_insnClock, 0);
 }
 
 
 CpuZ80::~CpuZ80()
 {
+    delete m_insnClock;
     delete m_z80;
 }
 
 
 unsigned CpuZ80::simz80()
 {
+    // Z80InsnClock expects one instruction per z80_run() call: a DDh/FDh prefix
+    // ends the step, and the next one resumes with the prefix already fetched
+    z80_insn_clock_start(m_insnClock, m_z80->resume);
+    m_inInstruction = true;
     int cycles = z80_run(m_z80, 1);
+    m_inInstruction = false;
 
     if (m_z80->iff1 != m_inte) {
         m_inte = m_z80->iff1;
@@ -312,6 +330,12 @@ int CpuZ80::getCurIoInstructionDuration()
 }
 
 
+int CpuZ80::getCurMCycleTState()
+{
+    return m_inInstruction ? m_insnClock->cycles : 0;
+}
+
+
 bool CpuZ80::getM1Status()
 {
     return m_m1Status;
@@ -390,42 +414,72 @@ bool CpuZ80::setProperty(const string& propertyName, const EmuValuesList& values
 }
 
 
+// While a bus access is performed, m_insnClock->cycles holds the cycle at which
+// the current M-cycle begins; after the access it is advanced past the M-cycle
+
 uint8_t CpuZ80::fetchOpcode(uint16_t address)
 {
+    uint8_t opcode;
     if (!m_performRet) {
         m_m1Status = true;
-        uint8_t opcode = as_input(address);
+        opcode = as_input(address);
         m_stackOperation = ((opcode & 0xc7) == 0xc5 || (opcode & 0xc7) == 0xc1);
-        return opcode;
     } else {
         m_performRet = false;
-        return 0xc9;
+        opcode = 0xc9;
     }
+    z80_insn_clock_extra_add_m1(m_insnClock, z80_insn_clock_extra_m1(m_insnClock, opcode));
+    return opcode;
 }
 
 
 uint8_t CpuZ80::read(uint16_t address)
 {
     m_m1Status = false;
-    return as_input(address);
+    zuint8 extraCycles = z80_insn_clock_extra_m(m_insnClock);
+    uint8_t value = as_input(address);
+    z80_insn_clock_extra_add_m(m_insnClock, extraCycles);
+    return value;
+}
+
+
+uint8_t CpuZ80::nop(uint16_t address)
+{
+    // Internal NOP (M1 cycle) in the HALT state
+    m_m1Status = false;
+    uint8_t value = as_input(address);
+    z80_insn_clock_extra_add_m1(m_insnClock, z80_insn_clock_extra_m1(m_insnClock, 0x00));
+    return value;
+}
+
+
+uint8_t CpuZ80::peek(uint16_t address)
+{
+    // Used by Z80InsnClock to predict cpir/cpdr timing, so no side effects
+    return m_addrSpace->readByte(address);
 }
 
 
 void CpuZ80::write(uint16_t address, uint8_t value)
 {
+    zuint8 extraCycles = z80_insn_clock_extra_m(m_insnClock);
     as_output(address, value);
+    z80_insn_clock_extra_add_m(m_insnClock, extraCycles);
 }
 
 
 uint8_t CpuZ80::in(uint16_t address)
 {
-    return io_input(m_16bitPorts ? address : address & 0xFF);
+    uint8_t value = io_input(m_16bitPorts ? address : address & 0xFF);
+    z80_insn_clock_extra_add_in(m_insnClock);
+    return value;
 }
 
 
 void CpuZ80::out(uint16_t address, uint8_t value)
 {
     io_output(m_16bitPorts ? address : address & 0xFF, value);
+    z80_insn_clock_extra_add_in(m_insnClock); // I/O write takes 4 cycles as well
 }
 
 
@@ -433,7 +487,9 @@ uint8_t CpuZ80::fetchIntOpcode(uint16_t /*address*/)
 {
     m_m1Status = true;
     z80_int(m_z80, false); // !!! temporarily
-    return (m_rstNum << 3) | 0xe7;
+    uint8_t opcode = (m_rstNum << 3) | 0xe7;
+    z80_insn_clock_extra_add_inta(m_insnClock, z80_insn_clock_extra_inta(m_insnClock, m_z80->im, opcode));
+    return opcode;
 }
 
 
@@ -448,6 +504,18 @@ uint8_t fetchOpcodeCb(void* ctx, uint16_t address)
 uint8_t readCb(void* ctx, uint16_t address)
 {
     return static_cast<CpuZ80*>(ctx)->read(address);
+}
+
+
+uint8_t nopCb(void* ctx, uint16_t address)
+{
+    return static_cast<CpuZ80*>(ctx)->nop(address);
+}
+
+
+uint8_t peekCb(void* ctx, uint16_t address)
+{
+    return static_cast<CpuZ80*>(ctx)->peek(address);
 }
 
 

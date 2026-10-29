@@ -43,6 +43,8 @@ typedef unsigned* zuintptr;
 
 #define Z_UNUSED(variable) (void)variable;
 
+#define Z_SAME(x) x
+
 #define Z_USIZE
 #define Z_USIZE_MAXIMUM SIZE_MAX
 

@@ -38,6 +38,7 @@ DEFINES += PAL_QT
 
 SOURCES += \
     3rdparty/z80/Z80.cpp \
+    3rdparty/z80/Z80InsnClock.cpp \
     CmdLine.cpp \
     Covox.cpp \
     DbgCalls.cpp \
@@ -139,6 +140,7 @@ SOURCES += \
 
 HEADERS  += \
     3rdparty/z80/Z80.h \
+    3rdparty/z80/Z80InsnClock.h \
     3rdparty/z80/zdefs.h \
     AddrSpace.h \
     Apogey.h \

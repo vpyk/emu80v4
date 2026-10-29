@@ -66,6 +66,12 @@ class Cpu : public ActiveDevice
 
         void debugStepRequest() {m_stepReq = true;}
 
+        // Cycle, relative to the start of the current instruction, at which the ongoing
+        // M-cycle begins (w/o waits); 0 if no instruction is being executed
+        virtual int getCurMCycleTState() {return 0;}
+        // CPU clock at the start of the ongoing M-cycle
+        uint64_t getCurMCycleClock() {return m_curClock + uint64_t(m_kDiv) * getCurMCycleTState();}
+
         AddressableDevice* getAddrSpace() {return m_addrSpace;}
         AddressableDevice* getIoAddrSpace() {return m_ioAddrSpace;}
 

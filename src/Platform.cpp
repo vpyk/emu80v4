@@ -573,7 +573,7 @@ void Platform::updateScreenOnce()
 
 uint64_t Platform::getCpuClock()
 {
-    return m_cpu->getClock();
+    return m_cpu->getCurMCycleClock();
 }
 
 uint64_t Platform::getCpuElapsedTicks()

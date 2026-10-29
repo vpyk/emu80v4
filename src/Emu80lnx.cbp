@@ -80,6 +80,8 @@
         </Linker>
         <Unit filename="3rdparty/z80/Z80.cpp" />
         <Unit filename="3rdparty/z80/Z80.h" />
+        <Unit filename="3rdparty/z80/Z80InsnClock.cpp" />
+        <Unit filename="3rdparty/z80/Z80InsnClock.h" />
         <Unit filename="3rdparty/z80/zdefs.h" />
         <Unit filename="AddrSpace.cpp" />
         <Unit filename="AddrSpace.h" />
