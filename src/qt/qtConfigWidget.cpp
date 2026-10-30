@@ -449,7 +449,7 @@ void ZxConfigWidget::setDefaults()
     ui->ay48kCheckBox->setChecked(m_defValues["CFG_AY_48K"] == "ON");
     ui->tsCheckBox->setChecked(m_defValues["CFG_AY_TS"] == "ON");
     ui->gsCheckBox->setChecked(m_defValues["CFG_GS"] == "ON");
-    ui->bdiCheckBox->setChecked(m_defValues["CFG_BDI_48_128"] == "OFF");
+    ui->bdiCheckBox->setChecked(m_defValues["CFG_BDI_48_128"] == "ON");
     ui->contentionCheckBox->setChecked(m_defValues["CFG_CONTENTION"] == "ON");
 }
 
