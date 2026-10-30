@@ -19,11 +19,14 @@
 // SoundMixer.cpp
 // Реализация класса звукового микшера и базовых классов источника звука
 
+#include <algorithm>
+
 #include "Globals.h"
 #include "Emulation.h"
 
 #include "Pal.h"
 #include "SoundMixer.h"
+#include "Cpu.h"
 
 using namespace std;
 
@@ -183,24 +186,36 @@ std::string SoundSource::getPropertyStringValue(const std::string& propertyName)
 }
 
 
+// A change timed by the CPU may be ahead of the emulation clock (by the part of
+// the instruction already executed), but never earlier than the previous change
+uint64_t GeneralSoundSource::getChangeClock()
+{
+    return m_cpu ? m_cpu->getCurMCycleClock() : g_emulation->getCurClock();
+}
+
+
 void GeneralSoundSource::setValue(int value)
 {
-    updateStats();
+    updateStats(getChangeClock());
+    m_prevValue = m_curValue;
     m_curValue = value;
 }
 
 
 void GeneralSoundSource::setFlip(int)
 {
-    updateStats();
+    updateStats(getChangeClock());
+    m_prevValue = m_curValue;
     m_curValue ^= 1;
 }
 
 
 // Обновляет внутренние счетчики, вызывается перед установкой нового значения либо перед получением текущего
-void GeneralSoundSource::updateStats()
+void GeneralSoundSource::updateStats(uint64_t curClock)
 {
-    uint64_t curClock = g_emulation->getCurClock();
+    if (curClock <= prevClock)
+        return;
+
     if (m_curValue) {
         int clocks = curClock - prevClock;
         sumVal += clocks;
@@ -212,17 +227,39 @@ void GeneralSoundSource::updateStats()
 // Получение текущего значения
 int GeneralSoundSource::calcValue()
 {
-    updateStats();
+    uint64_t curClock = g_emulation->getCurClock();
+    updateStats(curClock);
+
+    // The last change may be ahead of the end of this sample: the time from the end
+    // of the sample to the change belongs to the next one
+    int carry = 0;
+    if (prevClock > curClock && m_prevValue)
+        carry = min(int(prevClock - curClock), sumVal);
+    sumVal -= carry;
 
     int res = 0;
 
-    uint64_t ticks = g_emulation->getCurClock() - initClock;
+    uint64_t ticks = curClock - initClock;
     if (ticks)
             res = sumVal * MAX_SND_AMP / ticks;
-    sumVal = 0;
-    initClock = g_emulation->getCurClock();
+    sumVal = carry;
+    initClock = curClock;
 
     return res;
+}
+
+
+bool GeneralSoundSource::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (SoundSource::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "cpu") {
+        m_cpu = static_cast<Cpu*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+
+    return false;
 }
 
 

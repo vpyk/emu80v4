@@ -33,6 +33,7 @@ struct StereoSample {
 
 
 class SoundMixer;
+class Cpu;
 
 // Базовый класс источника звука
 class SoundSource : public EmuObject
@@ -74,6 +75,8 @@ class GeneralSoundSource : public SoundSource
 
         void initConnections() override;
 
+        bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
         // Установка текущего значения источника звука
         void setValue(int value);
 
@@ -83,12 +86,15 @@ class GeneralSoundSource : public SoundSource
         static EmuObject* create(const EmuValuesList&) {return new GeneralSoundSource();}
 
     private:
+        Cpu* m_cpu = nullptr; // if set, changes are timed by the ongoing CPU M-cycle
         int m_curValue = 0;
+        int m_prevValue = 0;
         uint64_t initClock = 0;
         uint64_t prevClock = 0;
         int sumVal = 0;
 
-        void updateStats();
+        uint64_t getChangeClock();
+        void updateStats(uint64_t curClock);
 };
 
 // Звуковой микшер
