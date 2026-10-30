@@ -409,20 +409,47 @@ bool CpuZ80::setProperty(const string& propertyName, const EmuValuesList& values
 
 
 // While a bus access is performed, m_insnClock->cycles holds the cycle at which
-// the current M-cycle begins; after the access it is advanced past the M-cycle
+// the current M-cycle begins; after the access it is advanced past the M-cycle.
+// Contention (if any) is checked at the start of each M-cycle and at each extra
+// cycle, with the address that is on the bus (IR for extra cycles of M1), as in FUSE.
+
+uint16_t CpuZ80::getIrAddr()
+{
+    return (m_z80->i << 8) | (m_z80->r & 0x7F) | (m_z80->r7 & 0x80);
+}
+
+
+void CpuZ80::contend(uint16_t addr, int offset)
+{
+    uint64_t clock = m_curClock + uint64_t(m_kDiv) * (m_insnClock->cycles + offset);
+    m_curClock += m_kDiv * m_contention->getMemContention(addr, clock);
+}
+
+
+void CpuZ80::contendExtra(uint16_t addr, int offset, int nCycles)
+{
+    for (int i = 0; i < nCycles; i++)
+        contend(addr, offset + i);
+}
+
 
 uint8_t CpuZ80::fetchOpcode(uint16_t address)
 {
     uint8_t opcode;
     if (!m_performRet) {
         m_m1Status = true;
+        if (m_contention)
+            contend(address, 0);
         opcode = as_input(address);
         m_stackOperation = ((opcode & 0xc7) == 0xc5 || (opcode & 0xc7) == 0xc1);
     } else {
         m_performRet = false;
         opcode = 0xc9;
     }
-    z80_insn_clock_extra_add_m1(m_insnClock, z80_insn_clock_extra_m1(m_insnClock, opcode));
+    zuint8 extraCycles = z80_insn_clock_extra_m1(m_insnClock, opcode);
+    if (m_contention)
+        contendExtra(getIrAddr(), 4, extraCycles);
+    z80_insn_clock_extra_add_m1(m_insnClock, extraCycles);
     return opcode;
 }
 
@@ -431,7 +458,11 @@ uint8_t CpuZ80::read(uint16_t address)
 {
     m_m1Status = false;
     zuint8 extraCycles = z80_insn_clock_extra_m(m_insnClock);
+    if (m_contention)
+        contend(address, 0);
     uint8_t value = as_input(address);
+    if (m_contention)
+        contendExtra(address, 3, extraCycles);
     z80_insn_clock_extra_add_m(m_insnClock, extraCycles);
     return value;
 }
@@ -441,6 +472,8 @@ uint8_t CpuZ80::nop(uint16_t address)
 {
     // Internal NOP (M1 cycle) in the HALT state
     m_m1Status = false;
+    if (m_contention)
+        contend(address, 0);
     uint8_t value = as_input(address);
     z80_insn_clock_extra_add_m1(m_insnClock, z80_insn_clock_extra_m1(m_insnClock, 0x00));
     return value;
@@ -457,13 +490,19 @@ uint8_t CpuZ80::peek(uint16_t address)
 void CpuZ80::write(uint16_t address, uint8_t value)
 {
     zuint8 extraCycles = z80_insn_clock_extra_m(m_insnClock);
+    if (m_contention)
+        contend(address, 0);
     as_output(address, value);
+    if (m_contention)
+        contendExtra(address, 3, extraCycles);
     z80_insn_clock_extra_add_m(m_insnClock, extraCycles);
 }
 
 
 uint8_t CpuZ80::in(uint16_t address)
 {
+    if (m_contention)
+        m_curClock += m_kDiv * m_contention->getIoContention(address, getCurMCycleClock());
     uint8_t value = io_input(m_16bitPorts ? address : address & 0xFF);
     z80_insn_clock_extra_add_in(m_insnClock);
     return value;
@@ -472,7 +511,11 @@ uint8_t CpuZ80::in(uint16_t address)
 
 void CpuZ80::out(uint16_t address, uint8_t value)
 {
+    if (m_contention)
+        m_curClock += m_kDiv * m_contention->getIoContention(address, getCurMCycleClock());
     io_output(m_16bitPorts ? address : address & 0xFF, value);
+    if (m_contention)
+        contendExtra(address, 4, z80_insn_clock_extra_out(m_insnClock)); // otir/otdr
     z80_insn_clock_extra_add_in(m_insnClock); // I/O write takes 4 cycles as well
 }
 

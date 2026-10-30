@@ -29,6 +29,7 @@
 class CpuHook;
 class CpuWaits;
 class CpuCycleWaits;
+class CpuContention;
 class PlatformCore;
 class DataBreakpoint;
 
@@ -67,9 +68,10 @@ class Cpu : public ActiveDevice
         void debugStepRequest() {m_stepReq = true;}
 
         // Cycle, relative to the start of the current instruction, at which the ongoing
-        // M-cycle begins (w/o waits); 0 if no instruction is being executed
+        // M-cycle begins (nominal, w/o waits); 0 if no instruction is being executed
         virtual int getCurMCycleTState() {return 0;}
-        // CPU clock at the start of the ongoing M-cycle
+        // CPU clock at the start of the ongoing M-cycle, including waits and contention
+        // already applied during the instruction (they are added to m_curClock)
         uint64_t getCurMCycleClock() {return m_curClock + uint64_t(m_kDiv) * getCurMCycleTState();}
 
         AddressableDevice* getAddrSpace() {return m_addrSpace;}
@@ -110,6 +112,7 @@ class Cpu : public ActiveDevice
 
         CpuWaits* m_waits = nullptr;
         CpuCycleWaits* m_cycleWaits = nullptr;
+        CpuContention* m_contention = nullptr;
 };
 
 

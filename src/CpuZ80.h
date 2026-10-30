@@ -128,6 +128,10 @@ class CpuZ80 : public Cpu8080Compatible
         uint8_t in(uint16_t address);
         void out(uint16_t address, uint8_t value);
         uint8_t fetchIntOpcode(uint16_t address);
+
+        uint16_t getIrAddr();
+        void contend(uint16_t addr, int offset);
+        void contendExtra(uint16_t addr, int offset, int nCycles);
 };
 
 #endif // CPUZ80_H

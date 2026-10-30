@@ -219,6 +219,9 @@ bool Cpu::setProperty(const string& propertyName, const EmuValuesList& values)
     } else if (propertyName == "cpuCycleWaits") {
         m_cycleWaits = (static_cast<CpuCycleWaits*>(g_emulation->findObject(values[0].asString())));
         return true;
+    } else if (propertyName == "cpuContention") {
+        m_contention = (static_cast<CpuContention*>(g_emulation->findObject(values[0].asString())));
+        return true;
     }
 
     return false;

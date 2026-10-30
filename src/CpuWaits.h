@@ -36,4 +36,16 @@ class CpuCycleWaits : public EmuObject
         virtual int getCpuCycleWaitStates(int memTag, bool write) = 0;
 };
 
+
+// Bus contention (e.g. ZX Spectrum ULA): delays in T-states, applied by the CPU
+// before the corresponding cycle
+class CpuContention : public EmuObject
+{
+    public:
+        // Delay for a cycle with addr on the bus starting at the given CPU clock
+        virtual int getMemContention(uint16_t addr, uint64_t clock) = 0;
+        // Delay for an I/O cycle starting at the given CPU clock
+        virtual int getIoContention(uint16_t port, uint64_t clock) = 0;
+};
+
 #endif //CPUWAITS_H
