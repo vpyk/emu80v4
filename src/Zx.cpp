@@ -417,8 +417,34 @@ void ZxRenderer::initConnections()
 void ZxRenderer::advanceToBusAccess()
 {
     // An I/O or memory write takes effect 3 T-states after the M-cycle begins
-    int shift = m_cpu->getCurMCycleTState() + 3;
-    advanceTo(g_emulation->getCurClock() + shift * m_ticksPerTState);
+    advanceTo(m_cpu->getCurMCycleClock() + 3 * m_ticksPerTState);
+}
+
+
+int ZxRenderer::getContentionDelay(uint64_t clock)
+{
+    static const int delays[8] = {6, 5, 4, 3, 2, 1, 0, 0};
+
+    int contentionStart;
+    switch (m_model) {
+    case ZM_48K:
+        contentionStart = m_visibleScanLine * m_lineTStates - 1; // 14335
+        break;
+    case ZM_128K:
+        contentionStart = m_visibleScanLine * m_lineTStates - 3; // 14361
+        break;
+    default:
+        return 0;
+    }
+
+    // A frame boundary may be crossed during an instruction
+    int frameTState = (int64_t(clock) - int64_t(m_curFrameClock)) / m_ticksPerTState % (m_lineTStates * m_scanLines);
+    int t = frameTState - contentionStart;
+    if (t < 0 || t >= 192 * m_lineTStates)
+        return 0;
+
+    int linePos = t % m_lineTStates;
+    return linePos < 128 ? delays[linePos % 8] : 0;
 }
 
 
@@ -1199,6 +1225,69 @@ void ZxVidMemAdapter::writeByte(int addr, uint8_t value)
 {
     m_renderer->vidMemWriteNotify(m_screenPage);
     m_mem->writeByte(addr, value);
+}
+
+
+void ZxContention::initConnections()
+{
+    CpuContention::initConnections();
+
+    REG_INPUT("highBank", ZxContention::setHighBankContended);
+}
+
+
+bool ZxContention::setProperty(const string& propertyName, const EmuValuesList& values)
+{
+    if (CpuContention::setProperty(propertyName, values))
+        return true;
+
+    if (propertyName == "renderer") {
+        m_renderer = static_cast<ZxRenderer*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    }
+
+    return false;
+}
+
+
+bool ZxContention::isContended(uint16_t addr)
+{
+    return (addr & 0xC000) == 0x4000 || ((addr & 0xC000) == 0xC000 && m_highBankContended);
+}
+
+
+int ZxContention::getMemContention(uint16_t addr, uint64_t clock)
+{
+    return isContended(addr) ? m_renderer->getContentionDelay(clock) : 0;
+}
+
+
+int ZxContention::getIoContention(uint16_t port, uint64_t clock)
+{
+    // Patterns by high byte (C - contended, N - not) and low bit (0 - ULA port):
+    // C/0: C:1, C:3; C/1: C:1 x4; N/0: N:1, C:3; N/1: N:4
+    unsigned ticksPerTState = m_renderer->getTicksPerTState();
+    bool highContended = isContended(port);
+    bool ulaPort = !(port & 1);
+    int t = 0;
+
+    if (highContended || ulaPort) {
+        if (highContended)
+            t += m_renderer->getContentionDelay(clock);
+        t += 1;
+        if (ulaPort) {
+            t += m_renderer->getContentionDelay(clock + t * ticksPerTState);
+            t += 3;
+        } else {
+            for (int i = 0; i < 3; i++) {
+                t += m_renderer->getContentionDelay(clock + t * ticksPerTState);
+                t += 1;
+            }
+        }
+    } else
+        t = 4;
+
+    return t - 4;
 }
 
 

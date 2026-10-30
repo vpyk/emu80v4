@@ -318,6 +318,7 @@ ObjectFactory::ObjectFactory()
     REG_EMU_CLASS(ZxTapeOutHook);
     REG_EMU_CLASS(ZxFileLoader);
     REG_EMU_CLASS(ZxVidMemAdapter);
+    REG_EMU_CLASS(ZxContention);
     //REG_EMU_CLASS(ZxCpuWaits);
     REG_EMU_CLASS(GsPorts);
     REG_EMU_CLASS(GsInternalPorts);

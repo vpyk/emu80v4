@@ -2144,5 +2144,10 @@
         <source>TR-DOS in 48K &amp;&amp; 128K confugurations</source>
         <translation>TR-DOS в конфигурациях 48K и 128K</translation>
     </message>
+    <message>
+        <location filename="qtZxConfig.ui" line="72"/>
+        <source>Contended memory (48K &amp;&amp; 128K)</source>
+        <translation>Contended memory в 48K и 128K</translation>
+    </message>
 </context>
 </TS>

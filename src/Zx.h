@@ -25,7 +25,7 @@
 #include "Keyboard.h"
 #include "FileLoader.h"
 #include "CpuHook.h"
-//#include "CpuWaits.h"
+#include "CpuWaits.h"
 
 class GeneralSoundSource;
 class CpuZ80;
@@ -65,6 +65,10 @@ public:
         void setScreenPage(int screenPage);
 
         void vidMemWriteNotify(int screenPage);
+
+        // ULA delay in T-states for a contended cycle starting at the given clock
+        int getContentionDelay(uint64_t clock);
+        unsigned getTicksPerTState() {return m_ticksPerTState;}
 
         static EmuObject* create(const EmuValuesList&) {return new ZxRenderer();}
 
@@ -299,6 +303,28 @@ private:
     ZxRenderer* m_renderer = nullptr;
 
     int m_screenPage = 0;
+};
+
+
+// Contended memory and I/O of the original ZX Spectrum 48K/128K ULA
+class ZxContention : public CpuContention
+{
+public:
+    void initConnections() override;
+
+    bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
+
+    int getMemContention(uint16_t addr, uint64_t clock) override;
+    int getIoContention(uint16_t port, uint64_t clock) override;
+
+    static EmuObject* create(const EmuValuesList&) {return new ZxContention();}
+
+private:
+    ZxRenderer* m_renderer = nullptr;
+    bool m_highBankContended = false; // odd 128K bank at C000-FFFF
+
+    bool isContended(uint16_t addr);
+    void setHighBankContended(int bank) {m_highBankContended = bank & 1;}
 };
 
 

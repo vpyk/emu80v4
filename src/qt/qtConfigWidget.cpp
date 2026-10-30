@@ -418,6 +418,7 @@ void ZxConfigWidget::loadConfig()
     m_defValues["CFG_AY_TS"] = "ON";
     m_defValues["CFG_GS"] = "OFF";
     m_defValues["CFG_BDI_48_128"] = "OFF";
+    m_defValues["CFG_CONTENTION"] = "ON";
 
     optBegin();
 
@@ -425,6 +426,7 @@ void ZxConfigWidget::loadConfig()
     ui->tsCheckBox->setChecked(optLoad("CFG_AY_TS").toString() == "ON");
     ui->gsCheckBox->setChecked(optLoad("CFG_GS").toString() == "ON");
     ui->bdiCheckBox->setChecked(optLoad("CFG_BDI_48_128").toString() == "ON");
+    ui->contentionCheckBox->setChecked(optLoad("CFG_CONTENTION").toString() == "ON");
 
     optEnd();
 }
@@ -437,6 +439,7 @@ void ZxConfigWidget::saveConfig()
     optSave("CFG_AY_TS", ui->tsCheckBox->isChecked() ? "ON" : "OFF");
     optSave("CFG_GS", ui->gsCheckBox->isChecked() ? "ON" : "OFF");
     optSave("CFG_BDI_48_128", ui->bdiCheckBox->isChecked() ? "ON" : "OFF");
+    optSave("CFG_CONTENTION", ui->contentionCheckBox->isChecked() ? "ON" : "OFF");
 
     optEnd();
 }
@@ -447,6 +450,7 @@ void ZxConfigWidget::setDefaults()
     ui->tsCheckBox->setChecked(m_defValues["CFG_AY_TS"] == "ON");
     ui->gsCheckBox->setChecked(m_defValues["CFG_GS"] == "ON");
     ui->bdiCheckBox->setChecked(m_defValues["CFG_BDI_48_128"] == "OFF");
+    ui->contentionCheckBox->setChecked(m_defValues["CFG_CONTENTION"] == "ON");
 }
 
 
