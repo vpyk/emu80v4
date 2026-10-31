@@ -31,10 +31,10 @@ using namespace std;
 
 // Cpu8080 types and macroses
 
-#define RD_BYTE(addr) (as_input(addr))
+#define RD_BYTE(addr) rdByte(addr)
 #define RD_WORD(addr) rdWord(addr)
 
-#define WR_BYTE(addr, value) as_output(addr, value)
+#define WR_BYTE(addr, value) wrByte(addr, value)
 #define WR_WORD(addr, value) wrWord(addr, value)
 
 #define FLAGS           cpu.f
@@ -230,6 +230,42 @@ using namespace std;
 // Cpu8080 Implementation
 
 
+// M1 cycle duration in T-states
+static const uint8_t i8080_m1_cycles[256] = {
+    4, 4, 4, 5, 5, 5, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, // 00
+    4, 4, 4, 5, 5, 5, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, // 10
+    4, 4, 4, 5, 5, 5, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, // 20
+    4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, // 30
+    5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 4, 5, // 40
+    5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 4, 5, // 50
+    5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 4, 5, // 60
+    4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 4, 5, // 70
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, // 80
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, // 90
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, // A0
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, // B0
+    5, 4, 4, 4, 5, 5, 4, 5, 5, 4, 4, 4, 5, 5, 4, 5, // C0
+    5, 4, 4, 4, 5, 5, 4, 5, 5, 4, 4, 4, 5, 5, 4, 5, // D0
+    5, 4, 4, 4, 5, 5, 4, 5, 5, 5, 4, 4, 5, 5, 4, 5, // E0
+    5, 4, 4, 4, 5, 5, 4, 5, 5, 5, 4, 4, 5, 5, 4, 5, // F0
+};
+
+
+// Every bus cycle after M1 takes 3 T-states, except for the last one of xthl,
+// so the counter gives the start of the next one
+inline int Cpu8080::rdByte(int addr) {
+    int value = as_input(addr);
+    m_mCycleTState += 3;
+    return value;
+}
+
+
+inline void Cpu8080::wrByte(int addr, int value) {
+    as_output(addr, value);
+    m_mCycleTState += 3;
+}
+
+
 inline uint16_t Cpu8080::rdWord(uint16_t addr) {
     uint8_t lo = RD_BYTE(addr);
     return (RD_BYTE((addr + 1) & 0xFFFF) << 8) | lo;
@@ -307,6 +343,7 @@ int Cpu8080::i8080_execute(int opcode) {
     uint8_t carry, add;
 
     m_statusWord = 0x82;
+    m_mCycleTState = m_m1Cycles[opcode];
 
     switch (opcode) {
         // Undocumented NOP.
@@ -1730,6 +1767,7 @@ int Cpu8080::i8080_execute(int opcode) {
         }
 
     m_statusWord = 0xA2;
+    m_mCycleTState = 0;
 
     return cpu_cycles;
 }
@@ -1738,6 +1776,7 @@ int Cpu8080::i8080_execute(int opcode) {
 
 Cpu8080::Cpu8080() {
     //reset();
+    m_m1Cycles = i8080_m1_cycles;
 }
 
 
@@ -1779,6 +1818,8 @@ void Cpu8080::operate() {
 
 void Cpu8080::ret() {
     POP(PC);
+    m_statusWord = 0xA2;
+    m_mCycleTState = 0;
 }
 
 
@@ -1786,12 +1827,14 @@ void Cpu8080::intRst(int vect) {
     if (IFF != 0) {
         IFF = 0;
         m_core->inte(false);
-        if (RD_BYTE(PC) == 0x76) {
+        if (as_input(PC) == 0x76) {
             PC++;
             m_curClock = g_emulation->getCurClock();
         }
+        m_mCycleTState = 5;
         RST(vect * 8);
         m_statusWord = 0xA2;
+        m_mCycleTState = 0;
         m_curClock += m_kDiv * 11;
         /*if (m_waits)
             m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xFF, 11);*/
@@ -1803,13 +1846,15 @@ void Cpu8080::intCall(uint16_t addr) {
     if (IFF != 0) {
         IFF = 0;
         m_core->inte(false);
-        if (RD_BYTE(PC) == 0x76) {
+        if (as_input(PC) == 0x76) {
             PC++;
             m_curClock = g_emulation->getCurClock();
         }
+        m_mCycleTState = 11;
         PUSH(PC);
         PC = addr;
         m_statusWord = 0xA2;
+        m_mCycleTState = 0;
         m_curClock += m_kDiv * 17;
         /*if (m_waits)
             m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xCD, 17);*/

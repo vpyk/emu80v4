@@ -117,6 +117,8 @@ class Cpu8080 : public Cpu8080Compatible
 
         uint8_t getStatusWord() {return m_statusWord;}
 
+        int getCurMCycleTState() override {return m_mCycleTState;}
+
         static EmuObject* create(const EmuValuesList&) {return new Cpu8080();}
 
 private:
@@ -126,12 +128,17 @@ private:
         void i8080_retrieve_flags();
         int i8080_execute(int opcode);
 
+        int rdByte(int addr);
+        void wrByte(int addr, int value);
         uint16_t rdWord(uint16_t addr);
         void wrWord(uint16_t addr, uint16_t value);
         void wrStackWord(uint16_t addr, uint16_t value);
 
         uint8_t m_statusWord;
         int m_iffPendingCnt = 0;
+
+        const uint8_t* m_m1Cycles;
+        int m_mCycleTState = 0;
 };
 
 
