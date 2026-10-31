@@ -126,6 +126,10 @@ private:
         void i8080_retrieve_flags();
         int i8080_execute(int opcode);
 
+        uint16_t rdWord(uint16_t addr);
+        void wrWord(uint16_t addr, uint16_t value);
+        void wrStackWord(uint16_t addr, uint16_t value);
+
         uint8_t m_statusWord;
         int m_iffPendingCnt = 0;
 };

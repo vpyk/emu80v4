@@ -32,10 +32,10 @@ using namespace std;
 // Cpu8080 types and macroses
 
 #define RD_BYTE(addr) (as_input(addr))
-#define RD_WORD(addr) ((RD_BYTE((addr+1) & 0xFFFF) << 8) | RD_BYTE(addr))
+#define RD_WORD(addr) rdWord(addr)
 
 #define WR_BYTE(addr, value) as_output(addr, value)
-#define WR_WORD(addr, value) WR_BYTE(addr, value & 0xff);WR_BYTE((addr + 1) & 0xFFFF, (value >> 8) & 0xff);
+#define WR_WORD(addr, value) wrWord(addr, value)
 
 #define FLAGS           cpu.f
 #define AF              cpu.af.w
@@ -82,7 +82,7 @@ using namespace std;
 #define CPL(flag)       (flag = !flag)
 
 #define POP(reg)        { m_statusWord = 0x86; (reg) = RD_WORD(SP); SP += 2; }
-#define PUSH(reg)       { m_statusWord = 0x84; SP -= 2; WR_WORD(SP, (reg)); }
+#define PUSH(reg)       { m_statusWord = 0x84; SP -= 2; wrStackWord(SP, (reg)); }
 #define RET()           { POP(PC); }
 #define STC()           { SET(C_FLAG); }
 #define CMC()           { CPL(C_FLAG); }
@@ -213,9 +213,9 @@ using namespace std;
 
 #define CALL \
 {                                               \
+    work16 = RD_WORD(PC);                       \
     PUSH(PC + 2);                               \
-    m_statusWord = 0x80;                        \
-    PC = RD_WORD(PC);                           \
+    PC = work16;                                \
 }
 
 #define RST(addr) \
@@ -228,6 +228,25 @@ using namespace std;
 
 
 // Cpu8080 Implementation
+
+
+inline uint16_t Cpu8080::rdWord(uint16_t addr) {
+    uint8_t lo = RD_BYTE(addr);
+    return (RD_BYTE((addr + 1) & 0xFFFF) << 8) | lo;
+}
+
+
+inline void Cpu8080::wrWord(uint16_t addr, uint16_t value) {
+    WR_BYTE(addr, value & 0xff);
+    WR_BYTE((addr + 1) & 0xFFFF, value >> 8);
+}
+
+
+// The stack is written downwards: the high byte goes first
+inline void Cpu8080::wrStackWord(uint16_t addr, uint16_t value) {
+    WR_BYTE((addr + 1) & 0xFFFF, value >> 8);
+    WR_BYTE(addr, value & 0xff);
+}
 
 
 void Cpu8080::reset() {
@@ -1514,7 +1533,7 @@ int Cpu8080::i8080_execute(int opcode) {
             m_statusWord = 0x86;
             work16 = RD_WORD(SP);
             m_statusWord = 0x84;
-            WR_WORD(SP, HL);
+            wrStackWord(SP, HL);
             HL = work16;
             break;
 
