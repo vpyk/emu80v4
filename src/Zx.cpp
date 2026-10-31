@@ -420,8 +420,11 @@ void ZxRenderer::initConnections()
 
 void ZxRenderer::advanceToBusAccess()
 {
-    // An I/O or memory write takes effect 3 T-states after the M-cycle begins
-    advanceTo(m_cpu->getCurMCycleClock() + 3 * m_ticksPerTState);
+    // An I/O or memory write takes effect 3 or 2 (48K) T-states after the M-cycle begins
+    if (m_model != ZM_48K)
+        advanceTo(m_cpu->getCurMCycleClock() + 3 * m_ticksPerTState);
+    else
+        advanceTo(m_cpu->getCurMCycleClock() + 2 * m_ticksPerTState);
 }
 
 
