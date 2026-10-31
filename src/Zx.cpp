@@ -968,7 +968,7 @@ bool ZxKbdLayout::processSpecialKeys(PalKeyCode keyCode, bool pressed)
         m_platform->reset();
         //static_cast<Cpu8080Compatible*>(m_platform->getCpu())->getIoAddrSpace()->writeByte(0xFFFD, );
         Cpu8080Compatible* cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
-        g_emulation->exec((int64_t)cpu->getKDiv() * 6000000);
+        g_emulation->exec((int64_t)cpu->getKDiv() * 6500000);
 
         Keyboard* kbd = m_platform->getKeyboard();
 
@@ -986,7 +986,7 @@ bool ZxKbdLayout::processSpecialKeys(PalKeyCode keyCode, bool pressed)
         g_emulation->exec((int64_t)cpu->getKDiv() * 100000, true);
         kbd->processKey(EK_CR, false);
 
-        g_emulation->exec((int64_t)cpu->getKDiv() * 6000000);
+        g_emulation->exec((int64_t)cpu->getKDiv() * 6500000);
 
         AddressableDevice* as = cpu->getAddrSpace();
         as->writeByte(0xfff6, 0);
@@ -1115,7 +1115,7 @@ bool ZxFileLoader::loadFile(const std::string& fileName, bool /*run*/)
     m_platform->reset();
     CpuZ80* cpu = dynamic_cast<CpuZ80*>(m_platform->getCpu());
 
-    g_emulation->exec(int64_t(cpu->getKDiv()) * 6000000, true);
+    g_emulation->exec(int64_t(cpu->getKDiv()) * 6500000, true);
 
     Keyboard* kbd = m_platform->getKeyboard();
 
