@@ -178,7 +178,7 @@ private:
 
     bool m_128kMode = true;
 
-    ZxRenderer* m_floatingBus = nullptr;
+    ZxRenderer* m_renderer = nullptr; // floating bus source, unattached ports read as FFh if not set
 
     uint8_t getUnattachedPortValue();
     void setKbdMatrixData(int data);

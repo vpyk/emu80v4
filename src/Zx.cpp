@@ -142,7 +142,7 @@ uint8_t ZxPorts::readByte(int addr)
 
 uint8_t ZxPorts::getUnattachedPortValue()
 {
-    return m_floatingBus ? m_floatingBus->getFloatingBusValue() : 0xFF;
+    return m_renderer ? m_renderer->getFloatingBusValue() : 0xFF;
 }
 
 
@@ -206,8 +206,8 @@ bool ZxPorts::setProperty(const string& propertyName, const EmuValuesList& value
     } else if (propertyName == "gsPorts") {
         m_gs = static_cast<GsPorts*>(g_emulation->findObject(values[0].asString()));
         return true;
-    } else if (propertyName == "floatingBus") {
-        m_floatingBus = static_cast<ZxRenderer*>(g_emulation->findObject(values[0].asString()));
+    } else if (propertyName == "renderer") {
+        m_renderer = static_cast<ZxRenderer*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "mode") {
         if (values[0].asString() == "128k" || values[0].asString() == "48k" || values[0].asString() == "pentagon") {
