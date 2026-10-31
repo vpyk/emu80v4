@@ -68,6 +68,9 @@ public:
 
         // ULA delay in T-states for a contended cycle starting at the given clock
         int getContentionDelay(uint64_t clock);
+        // Byte fetched by the ULA from the screen memory during the ongoing CPU M-cycle
+        // (floating bus), 0xFF outside of the screen fetch
+        uint8_t getFloatingBusValue();
         unsigned getTicksPerTState() {return m_ticksPerTState;}
 
         static EmuObject* create(const EmuValuesList&) {return new ZxRenderer();}
@@ -106,6 +109,9 @@ public:
 
         void advanceTo(uint64_t clocks);
         void advanceToBusAccess();
+
+        int getUlaStart();
+        int getFrameTState(uint64_t clock);
         void drawLine(int line, int fromTState, int toTState);
 
         void setModel(ZxModel model);
@@ -172,6 +178,9 @@ private:
 
     bool m_128kMode = true;
 
+    ZxRenderer* m_floatingBus = nullptr;
+
+    uint8_t getUnattachedPortValue();
     void setKbdMatrixData(int data);
     void setBdiActive(int active) {m_bdiActive = active;}
 };

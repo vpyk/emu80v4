@@ -69,7 +69,7 @@
    <item>
     <widget class="QCheckBox" name="contentionCheckBox">
      <property name="text">
-      <string>Contended memory (48K &amp;&amp; 128K)</string>
+      <string>ULA timings (contended memory, floating bus) in 48K &amp;&amp; 128K</string>
      </property>
     </widget>
    </item>

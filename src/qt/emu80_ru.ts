@@ -2146,8 +2146,9 @@
     </message>
     <message>
         <location filename="qtZxConfig.ui" line="72"/>
-        <source>Contended memory (48K &amp;&amp; 128K)</source>
-        <translation>Contended memory в 48K и 128K</translation>
+        <source>ULA timings (contended memory, floating bus) in 48K &amp;&amp; 128K</source>
+        <oldsource>Contended memory (48K &amp;&amp; 128K)</oldsource>
+        <translation>Тайминги ULA (contended memory, floating bus) в 48K и 128K</translation>
     </message>
 </context>
 </TS>

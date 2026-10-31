@@ -123,13 +123,8 @@ uint8_t ZxPorts::readByte(int addr)
         return (m_kbdMatrixData & 0x1F) + (g_emulation->getWavReader()->getCurValue() ? 0x40 : 0x00) + 0xa0;
     } else if (!(addr & 2)) {
         // port FD
-        if (!m_ay)
-            return 0xFF;
-        addr >>= 8;
-        if (addr == 0xFF)
+        if (m_ay && (addr >> 8) == 0xFF)
             return m_ay->readByte(0);
-        else
-            return 0xFF;
     } else if (m_gs && (addr & 0xf7) == 0xb3) {
         return m_gs->readByte((addr >> 3) & 1);
     } else {
@@ -141,7 +136,13 @@ uint8_t ZxPorts::readByte(int addr)
         }
     }
 
-    return 0xff;
+    return getUnattachedPortValue();
+}
+
+
+uint8_t ZxPorts::getUnattachedPortValue()
+{
+    return m_floatingBus ? m_floatingBus->getFloatingBusValue() : 0xFF;
 }
 
 
@@ -204,6 +205,9 @@ bool ZxPorts::setProperty(const string& propertyName, const EmuValuesList& value
         return true;
     } else if (propertyName == "gsPorts") {
         m_gs = static_cast<GsPorts*>(g_emulation->findObject(values[0].asString()));
+        return true;
+    } else if (propertyName == "floatingBus") {
+        m_floatingBus = static_cast<ZxRenderer*>(g_emulation->findObject(values[0].asString()));
         return true;
     } else if (propertyName == "mode") {
         if (values[0].asString() == "128k" || values[0].asString() == "48k" || values[0].asString() == "pentagon") {
@@ -421,30 +425,69 @@ void ZxRenderer::advanceToBusAccess()
 }
 
 
+// Frame T-state at which the ULA contention begins, -1 if there is no contention
+int ZxRenderer::getUlaStart()
+{
+    switch (m_model) {
+    case ZM_48K:
+        return m_visibleScanLine * m_lineTStates - 1; // 14335
+    case ZM_128K:
+        return m_visibleScanLine * m_lineTStates - 3; // 14361
+    default:
+        return -1;
+    }
+}
+
+
+int ZxRenderer::getFrameTState(uint64_t clock)
+{
+    // A frame boundary may be crossed during an instruction
+    return (int64_t(clock) - int64_t(m_curFrameClock)) / m_ticksPerTState % (m_lineTStates * m_scanLines);
+}
+
+
 int ZxRenderer::getContentionDelay(uint64_t clock)
 {
     static const int delays[8] = {6, 5, 4, 3, 2, 1, 0, 0};
 
-    int contentionStart;
-    switch (m_model) {
-    case ZM_48K:
-        contentionStart = m_visibleScanLine * m_lineTStates - 1; // 14335
-        break;
-    case ZM_128K:
-        contentionStart = m_visibleScanLine * m_lineTStates - 3; // 14361
-        break;
-    default:
+    int ulaStart = getUlaStart();
+    if (ulaStart < 0)
         return 0;
-    }
 
-    // A frame boundary may be crossed during an instruction
-    int frameTState = (int64_t(clock) - int64_t(m_curFrameClock)) / m_ticksPerTState % (m_lineTStates * m_scanLines);
-    int t = frameTState - contentionStart;
+    int t = getFrameTState(clock) - ulaStart;
     if (t < 0 || t >= 192 * m_lineTStates)
         return 0;
 
     int linePos = t % m_lineTStates;
     return linePos < 128 ? delays[linePos % 8] : 0;
+}
+
+
+uint8_t ZxRenderer::getFloatingBusValue()
+{
+    int ulaStart = getUlaStart();
+    if (ulaStart < 0)
+        return 0xFF;
+
+    // The CPU reads the data 3 T-states after the I/O cycle begins; the first screen
+    // byte is fetched 3 T-states after the contention begins
+    int t = getFrameTState(m_cpu->getCurMCycleClock() + 3 * m_ticksPerTState) - (ulaStart + 3);
+    if (t < 0 || t >= 192 * m_lineTStates)
+        return 0xFF;
+
+    // Each 8 T-states: bitmap, attribute, bitmap, attribute, then 4 idle T-states
+    int linePos = t % m_lineTStates;
+    if (linePos >= 128 || (linePos & 7) >= 4)
+        return 0xFF;
+
+    int row = t / m_lineTStates;
+    int col = (linePos >> 3) * 2 + ((linePos >> 1) & 1);
+    const uint8_t* screen = m_screenMemory[m_screenPage];
+
+    if (linePos & 1)
+        return screen[0x1800 + (row / 8 * 32) + col];
+    else
+        return screen[(((row & 0xC0) << 5) | ((row & 0x07) << 8) | ((row & 0x38) << 2)) + col];
 }
 
 
