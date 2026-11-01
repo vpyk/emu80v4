@@ -374,28 +374,28 @@ void VectorRenderer::advanceTo(uint64_t clock)
 
 void VectorRenderer::setBorderColor(uint8_t color)
 {
-    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
+    advanceTo(m_platform->getCpuClock() + m_ticksPerPixel * 16);
     m_borderColor = color;
 }
 
 
 void VectorRenderer::set512pxMode(bool mode512)
 {
-    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 34);
+    advanceTo(m_platform->getCpuClock() + m_ticksPerPixel * 2);
     m_mode512px = mode512;
 }
 
 
 void VectorRenderer::setLineOffset(uint8_t lineOffset)
 {
-    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 48);
+    advanceTo(m_platform->getCpuClock() + m_ticksPerPixel * 16);
     m_lineOffset = lineOffset;
 }
 
 
 void VectorRenderer::setPaletteColor(uint8_t color)
 {
-    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 27);
+    advanceTo(m_platform->getCpuClock() - m_ticksPerPixel * 5);
 
     m_colorPalette[m_lastColor] = ((color & 0x7) << 21) | ((color & 0x7) << 18) | ((color & 0x6) << 15) |
                                   ((color & 0x38) << 10) | ((color & 0x38) << 7) | ((color & 0x30) << 4) |
@@ -421,7 +421,7 @@ bool VectorRenderer::frameToScreen(int fx, int fy, int& x512, int& row)
 
 void VectorRenderer::vidMemWriteNotify()
 {
-    advanceTo(g_emulation->getCurClock() + m_ticksPerPixel * 40);
+    advanceTo(m_platform->getCpuClock() + m_ticksPerPixel * 8);
 }
 
 
