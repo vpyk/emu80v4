@@ -373,21 +373,19 @@ class VectorMouse : public MouseDevice
 };
 
 
-class VectorCpuWaits : public CpuWaits
+// The system bus has a 4 T-state cycle, the CPU's turn comes once per cycle: every bus
+// access (memory or I/O) waits for the next cycle boundary, internal T-states don't
+class VectorContention : public CpuContention
 {
 public:
-    int getCpuWaitStates(int, int, int normalClocks) override;
+    int getMemContention(uint16_t, uint64_t clock) override {return getDelay(clock);}
+    int getIoContention(uint16_t, uint64_t clock) override {return getDelay(clock);}
+    bool hasInternalContention() override {return false;}
 
-    static EmuObject* create(const EmuValuesList&) {return new VectorCpuWaits();}
-};
+    static EmuObject* create(const EmuValuesList&) {return new VectorContention();}
 
-
-class VectorZ80CpuWaits : public CpuWaits
-{
-public:
-    int getCpuWaitStates(int, int opcode, int normalClocks) override;
-
-    static EmuObject* create(const EmuValuesList&) {return new VectorZ80CpuWaits();}
+private:
+    int getDelay(uint64_t clock) {return int(-(clock / m_kDiv) & 3);}
 };
 
 

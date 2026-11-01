@@ -428,6 +428,9 @@ void CpuZ80::contend(uint16_t addr, int offset)
 
 void CpuZ80::contendExtra(uint16_t addr, int offset, int nCycles)
 {
+    if (!m_contention->hasInternalContention())
+        return;
+
     for (int i = 0; i < nCycles; i++)
         contend(addr, offset + i);
 }

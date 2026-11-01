@@ -130,6 +130,8 @@ private:
 
         int rdByte(int addr);
         void wrByte(int addr, int value);
+        int ioRdByte(int port);
+        void ioWrByte(int port, int value);
         uint16_t rdWord(uint16_t addr);
         void wrWord(uint16_t addr, uint16_t value);
         void wrStackWord(uint16_t addr, uint16_t value);

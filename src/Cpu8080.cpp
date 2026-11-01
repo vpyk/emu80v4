@@ -254,6 +254,8 @@ static const uint8_t i8080_m1_cycles[256] = {
 // Every bus cycle after M1 takes 3 T-states, except for the last one of xthl,
 // so the counter gives the start of the next one
 inline int Cpu8080::rdByte(int addr) {
+    if (m_contention)
+        m_curClock += m_kDiv * m_contention->getMemContention(addr, getCurMCycleClock());
     int value = as_input(addr);
     m_mCycleTState += 3;
     return value;
@@ -261,8 +263,24 @@ inline int Cpu8080::rdByte(int addr) {
 
 
 inline void Cpu8080::wrByte(int addr, int value) {
+    if (m_contention)
+        m_curClock += m_kDiv * m_contention->getMemContention(addr, getCurMCycleClock());
     as_output(addr, value);
     m_mCycleTState += 3;
+}
+
+
+inline int Cpu8080::ioRdByte(int port) {
+    if (m_contention)
+        m_curClock += m_kDiv * m_contention->getIoContention(port, getCurMCycleClock());
+    return io_input(port);
+}
+
+
+inline void Cpu8080::ioWrByte(int port, int value) {
+    if (m_contention)
+        m_curClock += m_kDiv * m_contention->getIoContention(port, getCurMCycleClock());
+    io_output(port, value);
 }
 
 
@@ -1336,6 +1354,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 PC = RD_WORD(PC);
             }
             else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1359,6 +1378,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1405,6 +1425,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (TST(Z_FLAG)) {
                 PC = RD_WORD(PC);
             } else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1415,6 +1436,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1463,13 +1485,14 @@ int Cpu8080::i8080_execute(int opcode) {
             if (!TST(C_FLAG)) {
                 PC = RD_WORD(PC);
             } else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
 
         case 0xD3:            /* out port8 */
             cpu_cycles = 10;
-            io_output(RD_BYTE(PC++), A);
+            ioWrByte(RD_BYTE(PC++), A);
             break;
 
         case 0xD4:            /* cnc addr */
@@ -1478,6 +1501,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1511,6 +1535,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (TST(C_FLAG)) {
                 PC = RD_WORD(PC);
             } else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1518,7 +1543,7 @@ int Cpu8080::i8080_execute(int opcode) {
         case 0xDB:            /* in port8 */
             cpu_cycles = 10;
             m_statusWord = 0x42;
-            A = io_input(RD_BYTE(PC++));
+            A = ioRdByte(RD_BYTE(PC++));
             break;
 
         case 0xDC:            /* cc addr */
@@ -1527,6 +1552,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1561,6 +1587,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 PC = RD_WORD(PC);
             }
             else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1580,6 +1607,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1618,6 +1646,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (TST(P_FLAG)) {
                 PC = RD_WORD(PC);
             } else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1635,6 +1664,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1669,6 +1699,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (!TST(S_FLAG)) {
                 PC = RD_WORD(PC);
             } else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1685,6 +1716,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1724,6 +1756,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (TST(S_FLAG)) {
                 PC = RD_WORD(PC);
             } else {
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
@@ -1740,6 +1773,7 @@ int Cpu8080::i8080_execute(int opcode) {
                 CALL;
             } else {
                 cpu_cycles = 11;
+                RD_WORD(PC);
                 PC += 2;
             }
             break;
