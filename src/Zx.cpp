@@ -424,7 +424,7 @@ void ZxRenderer::advanceToBusAccess()
     if (m_model != ZM_48K)
         advanceTo(m_cpu->getCurMCycleClock() + 3 * m_ticksPerTState);
     else
-        advanceTo(m_cpu->getCurMCycleClock() + 2 * m_ticksPerTState);
+        advanceTo(m_cpu->getCurMCycleClock() + 1 * m_ticksPerTState);
 }
 
 
