@@ -117,6 +117,12 @@ void Cpu::as_output(int addr, int value)
 }
 
 
+void Cpu::applyEndContention()
+{
+    m_curClock += m_kDiv * m_contention->getEndContention(m_curClock);
+}
+
+
 void Cpu::addDataBreakpoint(DataBreakpoint* dbp)
 {
     // One breakpoint per address — replace existing if any.

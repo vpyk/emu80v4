@@ -381,6 +381,9 @@ public:
     int getMemContention(uint16_t, uint64_t clock) override {return getDelay(clock);}
     int getIoContention(uint16_t, uint64_t clock) override {return getDelay(clock);}
     bool hasInternalContention() override {return false;}
+    // Keeps the emulation clock aligned at the start of an instruction: it's set
+    // before the opcode fetch, so the fetch delay wouldn't be visible to the devices
+    int getEndContention(uint64_t clock) override {return getDelay(clock);}
 
     static EmuObject* create(const EmuValuesList&) {return new VectorContention();}
 

@@ -90,6 +90,7 @@ class Cpu : public ActiveDevice
     protected:
         int as_input(int addr);
         void as_output(int addr, int value);
+        void endContention() {if (m_contention) applyEndContention();}
 
         AddressableDevice* m_addrSpace = nullptr;
         AddressableDevice* m_ioAddrSpace = nullptr;
@@ -113,6 +114,9 @@ class Cpu : public ActiveDevice
         CpuWaits* m_waits = nullptr;
         CpuCycleWaits* m_cycleWaits = nullptr;
         CpuContention* m_contention = nullptr;
+
+    private:
+        void applyEndContention();
 };
 
 

@@ -48,6 +48,8 @@ class CpuContention : public EmuObject
         virtual int getIoContention(uint16_t port, uint64_t clock) = 0;
         // Whether internal T-states of the CPU, without a bus access, are delayed too
         virtual bool hasInternalContention() {return true;}
+        // Delay at the end of an instruction ending at the given CPU clock
+        virtual int getEndContention(uint64_t /*clock*/) {return 0;}
 };
 
 #endif //CPUWAITS_H

@@ -125,6 +125,8 @@ void CpuZ80::operate()
     } else
         m_curClock += m_kDiv * simz80();
 
+    endContention();
+
     if (m_stepReq) {
         m_stepReq = false;
         g_emulation->debugRequest(this);
@@ -173,6 +175,7 @@ void CpuZ80::intCall(uint16_t /*addr*/)
 void CpuZ80::ret() {
     m_performRet = true;
     simz80();
+    endContention();
 }
 
 

@@ -1843,6 +1843,8 @@ void Cpu8080::operate() {
     } else
         m_curClock += m_kDiv * i8080_execute(RD_BYTE(PC++));
 
+    endContention();
+
     if (m_stepReq) {
         m_stepReq = false;
         g_emulation->debugRequest(this);
@@ -1854,6 +1856,7 @@ void Cpu8080::ret() {
     POP(PC);
     m_statusWord = 0xA2;
     m_mCycleTState = 0;
+    endContention();
 }
 
 
@@ -1870,6 +1873,7 @@ void Cpu8080::intRst(int vect) {
         m_statusWord = 0xA2;
         m_mCycleTState = 0;
         m_curClock += m_kDiv * 11;
+        endContention();
         /*if (m_waits)
             m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xFF, 11);*/
     }
@@ -1890,6 +1894,7 @@ void Cpu8080::intCall(uint16_t addr) {
         m_statusWord = 0xA2;
         m_mCycleTState = 0;
         m_curClock += m_kDiv * 17;
+        endContention();
         /*if (m_waits)
             m_curClock += m_kDiv * m_waits->getCpuWaitStates(0, 0xCD, 17);*/
     }
