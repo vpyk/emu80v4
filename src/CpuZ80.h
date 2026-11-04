@@ -110,6 +110,7 @@ class CpuZ80 : public Cpu8080Compatible
         Z80* m_z80 = nullptr;
         CpuZ80InsnClock* m_insnClock = nullptr;
         bool m_inInstruction = false;
+        uint8_t m_readValue = 0;
 
         bool m_m1Status = false;
         bool m_16bitPorts = false;

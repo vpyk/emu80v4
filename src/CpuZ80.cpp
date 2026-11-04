@@ -463,10 +463,12 @@ uint8_t CpuZ80::fetchOpcode(uint16_t address)
 uint8_t CpuZ80::read(uint16_t address)
 {
     m_m1Status = false;
-    zuint8 extraCycles = z80_insn_clock_extra_m(m_insnClock);
     if (m_contention)
         contend(address, 0);
     uint8_t value = as_input(address);
+    // Z80InsnClock peeks at the byte being read to predict cpir/cpdr timing
+    m_readValue = value;
+    zuint8 extraCycles = z80_insn_clock_extra_m(m_insnClock);
     if (m_contention)
         contendExtra(address, 3, extraCycles);
     z80_insn_clock_extra_add_m(m_insnClock, extraCycles);
@@ -486,10 +488,11 @@ uint8_t CpuZ80::nop(uint16_t address)
 }
 
 
-uint8_t CpuZ80::peek(uint16_t address)
+uint8_t CpuZ80::peek(uint16_t)
 {
-    // Used by Z80InsnClock to predict cpir/cpdr timing, so no side effects
-    return m_addrSpace->readByte(address);
+    // Called by Z80InsnClock for (HL) of cpir/cpdr while it is being read: return the byte
+    // already read, reading the device again could have side effects
+    return m_readValue;
 }
 
 
