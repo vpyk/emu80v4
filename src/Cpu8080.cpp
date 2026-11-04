@@ -957,7 +957,7 @@ int Cpu8080::i8080_execute(int opcode) {
             break;
 
         case 0x76:            /* hlt */
-            cpu_cycles = 4;
+            cpu_cycles = 7;
             PC--;
             if (m_debugOnHalt)
                 g_emulation->debugRequest(this);
