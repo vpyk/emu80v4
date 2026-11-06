@@ -22,7 +22,7 @@
 #include "Globals.h"
 #include "Cpu.h"
 #include "CpuHook.h"
-#include "Debugger.h"
+#include "Breakpoints.h"
 #include "CpuWaits.h"
 #include "Emulation.h"
 #include "PlatformCore.h"

@@ -19,7 +19,7 @@
 // Emulation core rouninues to be called from platform abstraction layer (PAL)
 
 
-#include "Debugger.h"
+#include "DebugWindow.h"
 #include "Platform.h"
 
 using namespace std;

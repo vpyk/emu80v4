@@ -16,7 +16,7 @@
 #include "../Emulation.h"
 #include "../EmuCalls.h"
 #include "../Platform.h"
-#include "../Debugger.h"
+#include "../ExternalDebugger.h"
 #include "../Cpu8080.h"
 #include "../CpuZ80.h"
 #include "../Cpu8080dasm.h"
@@ -28,6 +28,7 @@
 #include "../KbdLayout.h"
 #include "../KbdTapper.h"
 #include "../MouseDevice.h"
+#include "../Pal.h"
 
 #include "McpServer.h"
 #include "McpMarshal.h"

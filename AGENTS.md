@@ -66,7 +66,7 @@ The core (`src/*.cpp`) never touches a GUI/OS API directly; it calls `pal*` func
 
 ### Debugger and MCP server
 
-`src/Debugger.{h,cpp}` defines `IDebugger`. Normal builds use the GUI `DebugWindow`; builds with `MCP_SERVER` or `WASM_DBG` instead use `ExternalDebugger` (see `Platform::createDebugger()`), i.e. **the GUI debugger is not available in the MCP build**.
+`src/Debugger.h` defines `IDebugger`; breakpoint classes are in `src/Breakpoints.{h,cpp}`, the GUI debugger in `src/DebugWindow.{h,cpp}`, the external one in `src/ExternalDebugger.{h,cpp}`. Normal builds use the GUI `DebugWindow`; builds with `MCP_SERVER` or `WASM_DBG` instead use `ExternalDebugger` (see `Platform::createDebugger()`), i.e. **the GUI debugger is not available in the MCP build**.
 
 `src/mcp/` is an embedded MCP (Model Context Protocol) server, Qt builds only, compiled with `-DMCP_SERVER`. It listens on `127.0.0.1:19781` in a background HTTP thread (vendored `cpp-httplib` + `nlohmann/json` in `src/mcp/3rdparty/`). Tool handlers must not touch emulator state directly: they wrap work in `mcp::Run(fn)` (`McpMarshal.cpp`), which queues it and blocks until the main thread executes it in `Emulation::mainLoopCycle()` → `mcp::ProcessPendingCommands()`. All tools are in `McpServer.cpp`; the tool list is documented in `src/mcp/README.md` and `doc/MCP-server.md` — update both when adding/changing a tool. Register with Claude Code via `claude mcp add --transport http emu80 http://127.0.0.1:19781/mcp`.
 

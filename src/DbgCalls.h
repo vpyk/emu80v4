@@ -25,6 +25,7 @@
 class Platform;
 class PalWindow;
 class DebugWindow;
+class IDebugger;
 
 Platform* emuGetPlatform(PalWindow* wnd);
 IDebugger* emuGetDebugger(PalWindow* wnd);

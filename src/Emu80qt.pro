@@ -64,7 +64,9 @@ SOURCES += \
     Crt8275.cpp \
     Crt8275Renderer.cpp \
     CrtRenderer.cpp \
-    Debugger.cpp \
+    Breakpoints.cpp \
+    DebugWindow.cpp \
+    ExternalDebugger.cpp \
     Dma8257.cpp \
     EmuCalls.cpp \
     EmuConfig.cpp \
@@ -161,7 +163,10 @@ HEADERS  += \
     Crt8275Renderer.h \
     CrtRenderer.h \
     DbgCalls.h \
+    Breakpoints.h \
+    DebugWindow.h \
     Debugger.h \
+    ExternalDebugger.h \
     DiskImage.h \
     Dma8257.h \
     EmuCalls.h \

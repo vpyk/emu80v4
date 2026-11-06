@@ -33,7 +33,8 @@
 #include "FileLoader.h"
 #include "Keyboard.h"
 #include "RamDisk.h"
-#include "Debugger.h"
+#include "DebugWindow.h"
+#include "ExternalDebugger.h"
 #include "KbdTapper.h"
 #include "MouseDevice.h"
 

@@ -35,7 +35,7 @@
 #include "FileLoader.h"
 #include "EmuCalls.h"
 
-#include "Debugger.h"
+#include "DebugWindow.h"
 
 #ifdef MCP_SERVER
 #include "mcp/McpMarshal.h"

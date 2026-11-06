@@ -21,7 +21,7 @@
 #include "wasmDbgCalls.h"
 #include "wasmEmuCalls.h"
 
-#include "../Debugger.h"
+#include "../ExternalDebugger.h"
 #include "../EmuCalls.h"
 #include "../DbgCalls.h"
 

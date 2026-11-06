@@ -24,7 +24,7 @@
 
 #include "../Globals.h"
 #include "../Emulation.h"
-#include "../Debugger.h"
+#include "../DebugWindow.h"
 #include "../DbgCalls.h"
 
 
