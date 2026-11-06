@@ -881,16 +881,16 @@ void DebugWindow::displayCpuStatus()
     baseX = m_curLayout->regMemSmb.left + 12;
     first = m_compactMode ? 0 : 2;
     len = m_compactMode ? 29 : 27;
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_hl + first, m_states[1-m_stateNum].mem_hl, len);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_bc + first, m_states[1-m_stateNum].mem_bc, len);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_de + first, m_states[1-m_stateNum].mem_de, len);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_sp + first, m_states[1-m_stateNum].mem_sp, len);
-    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_hl + first, m_states[1-m_stateNum].mem_mem_hl, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_hl + first, m_states[1-m_stateNum].mem_hl + first, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_bc + first, m_states[1-m_stateNum].mem_bc + first, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_de + first, m_states[1-m_stateNum].mem_de + first, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_sp + first, m_states[1-m_stateNum].mem_sp + first, len);
+    drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_hl + first, m_states[1-m_stateNum].mem_mem_hl + first, len);
     if (!m_compactMode)
-        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_sp + first, m_states[1-m_stateNum].mem_mem_sp, len);
+        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_mem_sp + first, m_states[1-m_stateNum].mem_mem_sp + first, len);
     if (m_z80Mode) {
-        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_ix + first, m_states[1-m_stateNum].mem_ix, len);
-        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_iy + first, m_states[1-m_stateNum].mem_iy, len);
+        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_ix + first, m_states[1-m_stateNum].mem_ix + first, len);
+        drawSymSeq(baseX, baseY++, m_states[m_stateNum].mem_iy + first, m_states[1-m_stateNum].mem_iy + first, len);
     }
     baseY = m_curLayout->regMemHex.top + 1;
     baseX += m_compactMode ? 13 : 11;
