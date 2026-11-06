@@ -2312,22 +2312,26 @@ DataBreakpoint::~DataBreakpoint()
 
 bool DataBreakpoint::check(bool isWrite)
 {
+    // BT_ACSESS/BT_PORT_ACSESS fire on any access; BT_WRITE/BT_PORT_WRITE only on
+    // writes; BT_READ/BT_PORT_READ only on reads. Accesses of other kinds are
+    // ignored and do not affect the hit and skip counters.
+    bool matches = (m_type == BT_ACSESS || m_type == BT_PORT_ACSESS)
+                || ((m_type == BT_WRITE || m_type == BT_PORT_WRITE) && isWrite)
+                || ((m_type == BT_READ  || m_type == BT_PORT_READ)  && !isWrite);
+    if (!matches)
+        return false;
+
     ++m_hitCount;
     if (m_remaining > 0) {
         --m_remaining;
         return false;
     }
-    // BT_ACSESS/BT_PORT_ACSESS fire on any access; BT_WRITE/BT_PORT_WRITE only on
-    // writes; BT_READ/BT_PORT_READ only on reads.
-    bool shouldBreak = (m_type == BT_ACSESS || m_type == BT_PORT_ACSESS)
-                    || ((m_type == BT_WRITE || m_type == BT_PORT_WRITE) && isWrite)
-                    || ((m_type == BT_READ  || m_type == BT_PORT_READ)  && !isWrite);
-    if (shouldBreak) {
-        m_remaining = m_skipCount;
-        m_hitCount = 0;
-        g_emulation->debugRequest(m_cpu);
-    }
-    return shouldBreak;
+
+    // Actual stop — reset counters.
+    m_remaining = m_skipCount;
+    m_hitCount = 0;
+    g_emulation->debugRequest(m_cpu);
+    return true;
 }
 
 
