@@ -1335,9 +1335,12 @@ void DebugWindow::breakpoint()
 // проверяет перед выполнением, не установлена ли точка останова на текущий PC
 void DebugWindow::checkForCurBreakpoint()
 {
+    // Skip only the next hit; setSkipCount() here would make the breakpoint
+    // fire only every other time from then on.
     for (auto it = m_bpList.begin(); it != m_bpList.end(); it++)
         if ((*it).type == BT_EXEC && (*it).addr == m_states[m_stateNum].pc)
-            (*it).codeBp->setSkipCount(1);
+            if ((*it).codeBp->getRemaining() == 0)
+                (*it).codeBp->setRemaining(1);
 }
 
 // ######## INPUT mode methods ########
