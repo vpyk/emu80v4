@@ -2357,6 +2357,12 @@ ExternalDebugger::~ExternalDebugger()
     for (auto* dbp : m_dataBpList)
         delete dbp;
     m_dataBpList.clear();
+
+    for (auto* dbp : m_portBpList)
+        delete dbp;
+    m_portBpList.clear();
+
+    dbgCleanupTimer();
 }
 
 
