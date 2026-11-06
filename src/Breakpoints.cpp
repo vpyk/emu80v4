@@ -55,8 +55,12 @@ DataBreakpoint::DataBreakpoint(uint16_t addr, BreakpointType type)
 
 DataBreakpoint::~DataBreakpoint()
 {
-    if (m_cpu)
-        m_cpu->removeDataBreakpoint(this);
+    if (m_cpu) {
+        if (m_type == BT_PORT_WRITE || m_type == BT_PORT_READ || m_type == BT_PORT_ACSESS)
+            m_cpu->removePortBreakpoint(this);
+        else
+            m_cpu->removeDataBreakpoint(this);
+    }
     m_cpu = nullptr;
 }
 
