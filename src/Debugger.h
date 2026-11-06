@@ -36,6 +36,7 @@ class CodeBreakpoint : public CpuHook
         CodeBreakpoint(uint16_t addr) : CpuHook(addr) {}
         virtual ~CodeBreakpoint();
         bool hookProc() override;
+        bool isBreakpoint() override {return true;}
 
         void setSkipCount(int n)  { m_skipCount = n; m_remaining = n; }
         int  getSkipCount() const { return m_skipCount; }

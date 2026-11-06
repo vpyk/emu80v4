@@ -1823,13 +1823,8 @@ Cpu8080::Cpu8080() {
 
 void Cpu8080::operate() {
     if (!m_hooksDisabled) {
-        bool retFlag = false;
         list<CpuHook*>* hookList = m_hookArray[PC];
-        if (hookList) {
-            for (auto it = hookList->begin(); it != hookList->end(); it++)
-                retFlag = retFlag || (*it)->hookProc();
-        }
-        if (retFlag)
+        if (hookList && processHooks(hookList))
             return;
     }
 

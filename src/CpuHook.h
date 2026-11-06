@@ -41,6 +41,7 @@ class CpuHook : public EmuObject
 
         virtual void setCpu(Cpu* cpu) {m_cpu = cpu;}
         virtual bool hookProc() = 0; // returns false if continue
+        virtual bool isBreakpoint() {return false;} // debugger breakpoints are checked before other hooks
 
         void setEnabled(bool isEnabled);
         inline bool getEnabled() {return m_isEnabled;}

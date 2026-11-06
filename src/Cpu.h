@@ -137,6 +137,11 @@ class Cpu8080Compatible : public Cpu
         void hrq(int ticks) override;
 
         virtual uint16_t getPC() = 0;
+
+    protected:
+        bool processHooks(std::list<CpuHook*>* hookList);
+
+    public:
         virtual uint16_t getBC() = 0;
         virtual uint16_t getDE() = 0;
         virtual uint16_t getHL() = 0;

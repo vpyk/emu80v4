@@ -270,7 +270,30 @@ void Cpu8080Compatible::addHook(CpuHook* hook)
     uint16_t addr = hook->getHookAddr();
     if (!m_hookArray[addr])
         m_hookArray[addr] = new list<CpuHook*>;
-    m_hookArray[addr]->push_back(hook);
+    // Debugger breakpoints go first, so that they fire before a hook
+    // (e.g. a tape hook) emulates the routine at this address.
+    if (hook->isBreakpoint())
+        m_hookArray[addr]->push_front(hook);
+    else
+        m_hookArray[addr]->push_back(hook);
+}
+
+
+// Calls hooks for the current PC, returns true if the instruction must not be executed.
+// All breakpoints are evaluated (to keep their counters right); the remaining hooks are
+// called only while none of the previous hooks has handled the instruction.
+bool Cpu8080Compatible::processHooks(list<CpuHook*>* hookList)
+{
+    bool retFlag = false;
+    for (auto it = hookList->begin(); it != hookList->end(); it++) {
+        if ((*it)->isBreakpoint())
+            retFlag = (*it)->hookProc() || retFlag;
+        else if (!retFlag)
+            retFlag = (*it)->hookProc();
+        else
+            break;
+    }
+    return retFlag;
 }
 
 

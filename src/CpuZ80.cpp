@@ -107,13 +107,8 @@ unsigned CpuZ80::simz80()
 void CpuZ80::operate()
 {
     if (!m_hooksDisabled) {
-        bool retFlag = false;
         list<CpuHook*>* hookList = m_hookArray[getPC()/*m_z80->pc.uint16_value*/];
-        if (hookList) {
-            for (auto it = hookList->begin(); it != hookList->end(); it++)
-                retFlag = retFlag || (*it)->hookProc();
-        }
-        if (retFlag)
+        if (hookList && processHooks(hookList))
             return;
     }
 
