@@ -135,6 +135,8 @@
 		<Unit filename="CrtRenderer.h" />
 		<Unit filename="Breakpoints.cpp" />
 		<Unit filename="Breakpoints.h" />
+		<Unit filename="DebugSession.cpp" />
+		<Unit filename="DebugSession.h" />
 		<Unit filename="DebugWindow.cpp" />
 		<Unit filename="DebugWindow.h" />
 		<Unit filename="Debugger.h" />

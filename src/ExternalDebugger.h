@@ -24,13 +24,11 @@
 #include <list>
 #include <string>
 
-#include "EmuObjects.h"
 #include "Debugger.h"
 #include "Breakpoints.h"
 
-class Cpu;
 class Cpu8080Compatible;
-class CpuZ80;
+class AddressableDevice;
 
 
 struct DbgExecBreakpoint {
@@ -65,35 +63,29 @@ struct DbgCpuState {
 };
 
 
-class DebugElapsedTimer : public ElapsedTimer
-{
-public:
-    DebugElapsedTimer(Cpu* cpu) : m_cpu(cpu) {}
-    void onElapse() override;
-private:
-    Cpu* m_cpu;
-};
+class DebugSession;
 
 
+// Debugger interface for external front-ends (MCP server, wasm).
+// A thin wrapper over the platform's DebugSession.
 class ExternalDebugger : public IDebugger
 {
 public:
     ExternalDebugger(Platform* platform);
-    virtual ~ExternalDebugger();
+    virtual ~ExternalDebugger() {}
 
     virtual void initDbgWindow() override {}
     virtual void setCaption(std::string) override {}
     virtual void update() override {}
     virtual void draw() override {}
 
-    virtual void sendCmd(DebugCommand cmd) override {}
-    virtual void startDebug() override {dbgPause();}
+    virtual void sendCmd(DebugCommand) override {}
+    virtual void startDebug() override;
 
     enum class Register {
         af, bc, de, hl, sp, pc, iff
     };
 
-    void dbgPause();
     void dbgRun();
     void dbgRunFor(unsigned ms);
     void dbgStepIn();
@@ -117,34 +109,14 @@ public:
     void dbgWriteByte(uint16_t addr, uint8_t value);
     void dbgGetState(DbgCpuState& state);
     void dbgCleanupTimer();
-    bool isTimerRunning() { return m_runForTimer != nullptr; }
-    bool isTimerFired()   { return m_runForTimer && m_runForTimer->isPaused(); }
-
-    //static IDebugger* create(Platform* platform, bool oldSchool = true);
+    bool isTimerRunning();
+    bool isTimerFired();
 
 private:
-    std::list<BreakpointInfo> m_bpList;
-    std::list<DataBreakpoint*> m_dataBpList;
-    std::list<DataBreakpoint*> m_portBpList;
-    DebugElapsedTimer* m_runForTimer = nullptr;
-    CodeBreakpoint* m_tempBp = nullptr;
-    AddressableDevice* m_as = nullptr;
-    Cpu8080Compatible* m_cpu = nullptr;
-    CpuZ80* m_z80cpu = nullptr;
-    Platform* m_platform = nullptr;
-
-    bool m_z80Mode = false;
-    bool m_isRunning = true;
-
-    bool m_resetKeys;
-
-    inline uint8_t memByte(uint16_t addr) {return m_as->readByte(addr);}
-    int getInstructionLength(uint16_t addr);
-    bool getInstructionOverFlag(uint16_t addr);
-
-    void checkForCurBreakpoint();
-    void addBreakpoint(uint16_t addr);
-    void deleteBreakpoint(uint16_t addr);
+    DebugSession* m_session;
+    BreakpointManager* m_bps;
+    Cpu8080Compatible* m_cpu;
+    AddressableDevice* m_as;
 };
 
 #endif // WASM_DBG || MCP_SERVER

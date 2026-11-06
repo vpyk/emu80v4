@@ -35,6 +35,7 @@
 #include "RamDisk.h"
 #include "DebugWindow.h"
 #include "ExternalDebugger.h"
+#include "DebugSession.h"
 #include "KbdTapper.h"
 #include "MouseDevice.h"
 
@@ -202,11 +203,14 @@ Platform::~Platform()
 {
     Platform::shutdown();
 
+    // The debugger goes first: its breakpoints are to be detached from a live CPU
+    delete m_debugger;
+    m_debugger = nullptr;
+    delete m_debugSession;
+    m_debugSession = nullptr;
+
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
         delete *it;
-
-    if (m_debugger)
-        delete m_debugger;
 }
 
 
@@ -474,6 +478,17 @@ void Platform::createDebugger()
 #endif
 }
 
+
+
+DebugSession* Platform::getDebugSession()
+{
+    if (!m_debugSession) {
+        Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_cpu);
+        if (cpu)
+            m_debugSession = new DebugSession(this, cpu);
+    }
+    return m_debugSession;
+}
 
 
 void Platform::updateDebugger()

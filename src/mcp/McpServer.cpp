@@ -17,6 +17,7 @@
 #include "../EmuCalls.h"
 #include "../Platform.h"
 #include "../ExternalDebugger.h"
+#include "../DebugSession.h"
 #include "../Cpu8080.h"
 #include "../CpuZ80.h"
 #include "../Cpu8080dasm.h"

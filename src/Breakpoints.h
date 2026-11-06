@@ -20,34 +20,12 @@
 #define BREAKPOINTS_H
 
 #include <string>
+#include <vector>
 
 #include "CpuHook.h"
 
 class Cpu;
 
-
-class CodeBreakpoint : public CpuHook
-{
-    public:
-        CodeBreakpoint(uint16_t addr) : CpuHook(addr) {}
-        virtual ~CodeBreakpoint();
-        bool hookProc() override;
-        bool isBreakpoint() override {return true;}
-
-        void setSkipCount(int n)  { m_skipCount = n; m_remaining = n; }
-        int  getSkipCount() const { return m_skipCount; }
-        int  getRemaining() const { return m_remaining; }
-        void setRemaining(int n)  { m_remaining = n; }
-        int  getHitCount() const  { return m_hitCount; }
-        void setComment(const std::string& c) { m_comment = c; }
-        const std::string& getComment() const { return m_comment; }
-
-    private:
-        int m_skipCount = 0;    // fixed property
-        int m_remaining = 0;    // decremented each hit, reset from skipCount on stop
-        int m_hitCount = 0;     // hits since last stop
-        std::string m_comment;
-};
 
 enum BreakpointType {
     BT_EXEC,
@@ -59,6 +37,51 @@ enum BreakpointType {
     BT_PORT_ACSESS
 };
 
+
+// Breakpoint classes: code, memory or I/O ports
+enum BreakpointClass {
+    BC_EXEC,
+    BC_MEM,
+    BC_IO
+};
+
+BreakpointClass getBreakpointClass(BreakpointType type);
+
+
+// Hit counting common for all breakpoint kinds
+class BreakpointCounters
+{
+public:
+    void setSkipCount(int n)  { m_skipCount = n; m_remaining = n; }
+    int  getSkipCount() const { return m_skipCount; }
+    int  getRemaining() const { return m_remaining; }
+    void setRemaining(int n)  { m_remaining = n; }
+    int  getHitCount() const  { return m_hitCount; }
+    void setComment(const std::string& c) { m_comment = c; }
+    const std::string& getComment() const { return m_comment; }
+
+protected:
+    // Counts a hit, returns true if the breakpoint should stop now
+    bool countHit();
+
+private:
+    int m_skipCount = 0;    // fixed property
+    int m_remaining = 0;    // decremented each hit, reset from skipCount on stop
+    int m_hitCount = 0;     // hits since last stop
+    std::string m_comment;
+};
+
+
+class CodeBreakpoint : public CpuHook, public BreakpointCounters
+{
+    public:
+        CodeBreakpoint(uint16_t addr) : CpuHook(addr) {}
+        virtual ~CodeBreakpoint();
+        bool hookProc() override;
+        bool isBreakpoint() override {return true;}
+};
+
+
 struct BreakpointInfo {
     uint16_t addr;
     BreakpointType type;
@@ -66,32 +89,85 @@ struct BreakpointInfo {
 };
 
 
-class DataBreakpoint : public EmuObject
+class DataBreakpoint : public BreakpointCounters
 {
 public:
     DataBreakpoint(uint16_t addr, BreakpointType type);
     virtual ~DataBreakpoint();
 
     void setCpu(Cpu* cpu) { m_cpu = cpu; }
-    void setSkipCount(int n)  { m_skipCount = n; m_remaining = n; }
-    int  getSkipCount() const { return m_skipCount; }
-    int  getRemaining() const { return m_remaining; }
-    void setRemaining(int n)  { m_remaining = n; }
     uint16_t getAddr()  { return m_addr; }
     BreakpointType getType() { return m_type; }
-    int  getHitCount() const { return m_hitCount; }
-    void setComment(const std::string& c) { m_comment = c; }
-    const std::string& getComment() const { return m_comment; }
     bool check(bool isWrite);
 
 protected:
     Cpu*   m_cpu = nullptr;
     uint16_t m_addr;
     BreakpointType m_type;
-    int    m_skipCount = 0;   // fixed property
-    int    m_remaining = 0;   // decremented each hit, reset from skipCount on stop
-    int    m_hitCount = 0;    // hits since last stop
-    std::string m_comment;
+};
+
+
+// Breakpoint description for debugger front-ends
+struct BreakpointDesc {
+    int id;
+    BreakpointType type;
+    uint16_t addr;
+    bool enabled;
+    int skipCount;
+    int remaining;
+    int hitCount;
+    std::string comment;
+};
+
+
+// Owns all user breakpoints of a CPU, attaches them to the CPU and detaches when
+// they are disabled or removed. Breakpoints are identified by a stable id.
+class BreakpointManager
+{
+public:
+    BreakpointManager(Cpu* cpu);
+    ~BreakpointManager();
+
+    // Adds a breakpoint, returns its id. If a breakpoint of the same type
+    // at the same address exists, returns its id and changes nothing.
+    int add(BreakpointType type, uint16_t addr);
+    int find(BreakpointType type, uint16_t addr) const; // returns id or -1
+    bool remove(int id);
+    void clear();
+    void clear(BreakpointClass bpClass);
+
+    bool setEnabled(int id, bool enabled);
+    bool setSkipCount(int id, int skipCount);
+    bool setComment(int id, const std::string& comment);
+
+    bool get(int id, BreakpointDesc& desc) const;
+    void list(std::vector<BreakpointDesc>& descs) const; // in creation order
+
+    // Lets execution leave the current PC: the next hit of an exec breakpoint
+    // at this address is not counted as a stop.
+    void skipCurrentPc(uint16_t pc);
+
+private:
+    struct Entry {
+        int id;
+        BreakpointType type;
+        uint16_t addr;
+        bool enabled;
+        CodeBreakpoint* codeBp; // for BT_EXEC
+        DataBreakpoint* dataBp; // for other types
+        BreakpointCounters* counters() const;
+    };
+
+    Cpu* m_cpu;
+    std::vector<Entry> m_entries;
+    int m_nextId = 1;
+
+    Entry* findEntry(int id);
+    const Entry* findEntry(int id) const;
+    void attach(Entry& entry);
+    void detach(Entry& entry);
+    void destroy(Entry& entry);
+    void fillDesc(const Entry& entry, BreakpointDesc& desc) const;
 };
 
 

@@ -41,6 +41,7 @@ class DebugWindow;
 class MouseDevice;
 class KbdTapper;
 class IDebugger;
+class DebugSession;
 
 
 class Platform : public ParentObject
@@ -85,6 +86,7 @@ class Platform : public ParentObject
         uint64_t getCpuElapsedTicks();
 
         IDebugger* getDebugger() {return m_debugger;}
+        DebugSession* getDebugSession(); // created on first use, nullptr if the CPU is not supported
 
         void createDebugger();
         void showDebugger();
@@ -124,6 +126,7 @@ class Platform : public ParentObject
         int m_defConfigTabId = 0;
 
         IDebugger* m_debugger = nullptr;
+        DebugSession* m_debugSession = nullptr;
         uint64_t m_emuCpuTicksAtReset = 0;
 
         std::string m_helpFile = "";

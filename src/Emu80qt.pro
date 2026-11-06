@@ -65,6 +65,7 @@ SOURCES += \
     Crt8275Renderer.cpp \
     CrtRenderer.cpp \
     Breakpoints.cpp \
+    DebugSession.cpp \
     DebugWindow.cpp \
     ExternalDebugger.cpp \
     Dma8257.cpp \
@@ -164,6 +165,7 @@ HEADERS  += \
     CrtRenderer.h \
     DbgCalls.h \
     Breakpoints.h \
+    DebugSession.h \
     DebugWindow.h \
     Debugger.h \
     ExternalDebugger.h \

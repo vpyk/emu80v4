@@ -21,6 +21,39 @@
 #include "Emulation.h"
 #include "Cpu.h"
 
+using namespace std;
+
+
+BreakpointClass getBreakpointClass(BreakpointType type)
+{
+    switch (type) {
+        case BT_EXEC:
+            return BC_EXEC;
+        case BT_PORT_WRITE:
+        case BT_PORT_READ:
+        case BT_PORT_ACSESS:
+            return BC_IO;
+        default:
+            return BC_MEM;
+    }
+}
+
+
+//##### Breakpoint counters ####
+
+bool BreakpointCounters::countHit()
+{
+    ++m_hitCount;
+    if (m_remaining > 0) {
+        --m_remaining;
+        return false;
+    }
+    // Actual stop — reset counters.
+    m_remaining = m_skipCount;
+    m_hitCount = 0;
+    return true;
+}
+
 
 //##### Code Breakpoint class ####
 
@@ -33,14 +66,8 @@ CodeBreakpoint::~CodeBreakpoint()
 
 bool CodeBreakpoint::hookProc()
 {
-    ++m_hitCount;
-    if (m_remaining > 0) {
-        --m_remaining;
+    if (!countHit())
         return false;
-    }
-    // Actual stop — reset counters.
-    m_remaining = m_skipCount;
-    m_hitCount = 0;
     g_emulation->debugRequest(m_cpu);
     return true;
 }
@@ -56,7 +83,7 @@ DataBreakpoint::DataBreakpoint(uint16_t addr, BreakpointType type)
 DataBreakpoint::~DataBreakpoint()
 {
     if (m_cpu) {
-        if (m_type == BT_PORT_WRITE || m_type == BT_PORT_READ || m_type == BT_PORT_ACSESS)
+        if (getBreakpointClass(m_type) == BC_IO)
             m_cpu->removePortBreakpoint(this);
         else
             m_cpu->removeDataBreakpoint(this);
@@ -75,15 +102,238 @@ bool DataBreakpoint::check(bool isWrite)
     if (!matches)
         return false;
 
-    ++m_hitCount;
-    if (m_remaining > 0) {
-        --m_remaining;
+    if (!countHit())
         return false;
-    }
-
-    // Actual stop — reset counters.
-    m_remaining = m_skipCount;
-    m_hitCount = 0;
     g_emulation->debugRequest(m_cpu);
     return true;
+}
+
+
+
+//##### Breakpoint Manager class ####
+
+BreakpointCounters* BreakpointManager::Entry::counters() const
+{
+    if (codeBp)
+        return codeBp;
+    return dataBp;
+}
+
+
+BreakpointManager::BreakpointManager(Cpu* cpu) : m_cpu(cpu)
+{
+}
+
+
+BreakpointManager::~BreakpointManager()
+{
+    clear();
+}
+
+
+int BreakpointManager::add(BreakpointType type, uint16_t addr)
+{
+    int id = find(type, addr);
+    if (id >= 0)
+        return id;
+
+    Entry entry;
+    entry.id = m_nextId++;
+    entry.type = type;
+    entry.addr = addr;
+    entry.enabled = true;
+    entry.codeBp = nullptr;
+    entry.dataBp = nullptr;
+    if (type == BT_EXEC)
+        entry.codeBp = new CodeBreakpoint(addr);
+    else
+        entry.dataBp = new DataBreakpoint(addr, type);
+    attach(entry);
+    m_entries.push_back(entry);
+    return entry.id;
+}
+
+
+int BreakpointManager::find(BreakpointType type, uint16_t addr) const
+{
+    for (const Entry& entry : m_entries)
+        if (entry.type == type && entry.addr == addr)
+            return entry.id;
+    return -1;
+}
+
+
+bool BreakpointManager::remove(int id)
+{
+    for (auto it = m_entries.begin(); it != m_entries.end(); ++it)
+        if (it->id == id) {
+            destroy(*it);
+            m_entries.erase(it);
+            return true;
+        }
+    return false;
+}
+
+
+void BreakpointManager::clear()
+{
+    for (Entry& entry : m_entries)
+        destroy(entry);
+    m_entries.clear();
+}
+
+
+void BreakpointManager::clear(BreakpointClass bpClass)
+{
+    for (auto it = m_entries.begin(); it != m_entries.end(); ) {
+        if (getBreakpointClass(it->type) == bpClass) {
+            destroy(*it);
+            it = m_entries.erase(it);
+        } else
+            ++it;
+    }
+}
+
+
+bool BreakpointManager::setEnabled(int id, bool enabled)
+{
+    Entry* entry = findEntry(id);
+    if (!entry)
+        return false;
+    if (entry->enabled != enabled) {
+        if (enabled)
+            attach(*entry);
+        else
+            detach(*entry);
+        entry->enabled = enabled;
+    }
+    return true;
+}
+
+
+bool BreakpointManager::setSkipCount(int id, int skipCount)
+{
+    Entry* entry = findEntry(id);
+    if (!entry)
+        return false;
+    entry->counters()->setSkipCount(skipCount);
+    return true;
+}
+
+
+bool BreakpointManager::setComment(int id, const std::string& comment)
+{
+    Entry* entry = findEntry(id);
+    if (!entry)
+        return false;
+    entry->counters()->setComment(comment);
+    return true;
+}
+
+
+bool BreakpointManager::get(int id, BreakpointDesc& desc) const
+{
+    const Entry* entry = findEntry(id);
+    if (!entry)
+        return false;
+    fillDesc(*entry, desc);
+    return true;
+}
+
+
+void BreakpointManager::list(std::vector<BreakpointDesc>& descs) const
+{
+    descs.clear();
+    descs.reserve(m_entries.size());
+    for (const Entry& entry : m_entries) {
+        BreakpointDesc desc;
+        fillDesc(entry, desc);
+        descs.push_back(desc);
+    }
+}
+
+
+void BreakpointManager::skipCurrentPc(uint16_t pc)
+{
+    for (Entry& entry : m_entries)
+        if (entry.type == BT_EXEC && entry.addr == pc && entry.enabled)
+            if (entry.codeBp->getRemaining() == 0)
+                entry.codeBp->setRemaining(1);
+}
+
+
+BreakpointManager::Entry* BreakpointManager::findEntry(int id)
+{
+    for (Entry& entry : m_entries)
+        if (entry.id == id)
+            return &entry;
+    return nullptr;
+}
+
+
+const BreakpointManager::Entry* BreakpointManager::findEntry(int id) const
+{
+    for (const Entry& entry : m_entries)
+        if (entry.id == id)
+            return &entry;
+    return nullptr;
+}
+
+
+void BreakpointManager::attach(Entry& entry)
+{
+    if (!m_cpu)
+        return;
+
+    if (entry.codeBp)
+        m_cpu->addHook(entry.codeBp); // sets the hook's CPU
+    else {
+        entry.dataBp->setCpu(m_cpu);
+        if (getBreakpointClass(entry.type) == BC_IO)
+            m_cpu->addPortBreakpoint(entry.dataBp);
+        else
+            m_cpu->addDataBreakpoint(entry.dataBp);
+    }
+}
+
+
+void BreakpointManager::detach(Entry& entry)
+{
+    if (!m_cpu)
+        return;
+
+    if (entry.codeBp) {
+        m_cpu->removeHook(entry.codeBp);
+        entry.codeBp->setCpu(nullptr); // so that the destructor doesn't remove it once more
+    } else {
+        if (getBreakpointClass(entry.type) == BC_IO)
+            m_cpu->removePortBreakpoint(entry.dataBp);
+        else
+            m_cpu->removeDataBreakpoint(entry.dataBp);
+        entry.dataBp->setCpu(nullptr);
+    }
+}
+
+
+void BreakpointManager::destroy(Entry& entry)
+{
+    // Destructors detach enabled breakpoints from the CPU
+    delete entry.codeBp;
+    delete entry.dataBp;
+    entry.codeBp = nullptr;
+    entry.dataBp = nullptr;
+}
+
+
+void BreakpointManager::fillDesc(const Entry& entry, BreakpointDesc& desc) const
+{
+    const BreakpointCounters* counters = entry.counters();
+    desc.id = entry.id;
+    desc.type = entry.type;
+    desc.addr = entry.addr;
+    desc.enabled = entry.enabled;
+    desc.skipCount = counters->getSkipCount();
+    desc.remaining = counters->getRemaining();
+    desc.hitCount = counters->getHitCount();
+    desc.comment = counters->getComment();
 }
