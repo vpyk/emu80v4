@@ -681,10 +681,6 @@ void DebugWindow::fillCpuStatus()
         m_states[m_stateNum].mem_sp[i] = memByte(m_states[m_stateNum].sp - 13 + i);
         m_states[m_stateNum].mem_mem_hl[i] = memByte(m_states[m_stateNum].word_mem_hl - 13 + i);
         m_states[m_stateNum].mem_mem_sp[i] = memByte(m_states[m_stateNum].word_mem_sp - 13 + i);
-        if (m_z80cpu) {
-            m_states[m_stateNum].mem_ix[i] = memByte(m_states[m_stateNum].de - 13 + i);
-            m_states[m_stateNum].mem_iy[i] = memByte(m_states[m_stateNum].sp - 13 + i);
-        }
     }
 
     if (m_z80cpu) {
@@ -706,6 +702,10 @@ void DebugWindow::fillCpuStatus()
         m_states[m_stateNum].i = m_z80cpu->getI();
         m_states[m_stateNum].r = m_z80cpu->getR();
         m_states[m_stateNum].im = m_z80cpu->getIM();
+        for (uint16_t i = 0; i < 29; i++) {
+            m_states[m_stateNum].mem_ix[i] = memByte(m_states[m_stateNum].ix - 13 + i);
+            m_states[m_stateNum].mem_iy[i] = memByte(m_states[m_stateNum].iy - 13 + i);
+        }
     }
 }
 
