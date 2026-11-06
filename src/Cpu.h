@@ -101,10 +101,12 @@ class Cpu : public ActiveDevice
         int m_nHooks = 0;
         bool m_hooksDisabled = false;
 
-        std::map<uint16_t, DataBreakpoint*> m_dataBpMap;
+        // Several breakpoints (of different kinds) may share one address
+        std::multimap<uint16_t, DataBreakpoint*> m_dataBpMap;
         bool m_hasDataBreakpoints = false;
-        std::map<uint16_t, DataBreakpoint*> m_portBpMap;
+        std::multimap<uint16_t, DataBreakpoint*> m_portBpMap;
         bool m_hasPortBreakpoints = false;
+        static void removeBreakpointFromMap(std::multimap<uint16_t, DataBreakpoint*>& bpMap, DataBreakpoint* dbp);
 
         bool m_stepReq = false;
 

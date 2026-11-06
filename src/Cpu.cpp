@@ -125,20 +125,13 @@ void Cpu::applyEndContention()
 
 void Cpu::addDataBreakpoint(DataBreakpoint* dbp)
 {
-    // One breakpoint per address — replace existing if any.
-    uint16_t addr = dbp->getAddr();
-    auto it = m_dataBpMap.find(addr);
-    if (it != m_dataBpMap.end())
-        delete it->second;
-    m_dataBpMap[addr] = dbp;
+    m_dataBpMap.insert(std::make_pair(dbp->getAddr(), dbp));
     m_hasDataBreakpoints = true;
 }
 
 void Cpu::removeDataBreakpoint(DataBreakpoint* dbp)
 {
-    auto it = m_dataBpMap.find(dbp->getAddr());
-    if (it != m_dataBpMap.end() && it->second == dbp)
-        m_dataBpMap.erase(it);
+    removeBreakpointFromMap(m_dataBpMap, dbp);
     m_hasDataBreakpoints = !m_dataBpMap.empty();
 }
 
@@ -147,30 +140,25 @@ bool Cpu::checkDataBreakpoint(uint16_t addr, bool isWrite)
     if (!m_hasDataBreakpoints)
         return false;
 
-    auto it = m_dataBpMap.find(addr);
-    if (it == m_dataBpMap.end())
+    auto range = m_dataBpMap.equal_range(addr);
+    if (range.first == range.second)
         return false;
 
-    it->second->check(isWrite);
+    for (auto it = range.first; it != range.second; ++it)
+        it->second->check(isWrite);
 
     return g_emulation->isDebuggerActive();
 }
 
 void Cpu::addPortBreakpoint(DataBreakpoint* dbp)
 {
-    uint16_t port = dbp->getAddr();
-    auto it = m_portBpMap.find(port);
-    if (it != m_portBpMap.end())
-        delete it->second;
-    m_portBpMap[port] = dbp;
+    m_portBpMap.insert(std::make_pair(dbp->getAddr(), dbp));
     m_hasPortBreakpoints = true;
 }
 
 void Cpu::removePortBreakpoint(DataBreakpoint* dbp)
 {
-    auto it = m_portBpMap.find(dbp->getAddr());
-    if (it != m_portBpMap.end() && it->second == dbp)
-        m_portBpMap.erase(it);
+    removeBreakpointFromMap(m_portBpMap, dbp);
     m_hasPortBreakpoints = !m_portBpMap.empty();
 }
 
@@ -179,13 +167,24 @@ bool Cpu::checkPortBreakpoint(uint16_t port, bool isWrite)
     if (!m_hasPortBreakpoints)
         return false;
 
-    auto it = m_portBpMap.find(port);
-    if (it == m_portBpMap.end())
+    auto range = m_portBpMap.equal_range(port);
+    if (range.first == range.second)
         return false;
 
-    it->second->check(isWrite);
+    for (auto it = range.first; it != range.second; ++it)
+        it->second->check(isWrite);
 
     return g_emulation->isDebuggerActive();
+}
+
+void Cpu::removeBreakpointFromMap(std::multimap<uint16_t, DataBreakpoint*>& bpMap, DataBreakpoint* dbp)
+{
+    auto range = bpMap.equal_range(dbp->getAddr());
+    for (auto it = range.first; it != range.second; ++it)
+        if (it->second == dbp) {
+            bpMap.erase(it);
+            break;
+        }
 }
 
 

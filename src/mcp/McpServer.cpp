@@ -1641,9 +1641,9 @@ namespace
                 if (!exists)
                     extDbg->dbgSetPortBreakpoint(addr, bt);
                 if (skipCount >= 0)
-                    extDbg->dbgSetPortSkipCount(addr, skipCount);
+                    extDbg->dbgSetPortSkipCount(addr, bt, skipCount);
                 if (hasComment)
-                    extDbg->dbgSetPortComment(addr, comment);
+                    extDbg->dbgSetPortComment(addr, bt, comment);
             } else {
                 BreakpointType bt = (type == "write") ? BT_WRITE
                                  : (type == "read")  ? BT_READ
@@ -1656,9 +1656,9 @@ namespace
                 if (!exists)
                     extDbg->dbgSetDataBreakpoint(addr, bt);
                 if (skipCount >= 0)
-                    extDbg->dbgSetDataSkipCount(addr, skipCount);
+                    extDbg->dbgSetDataSkipCount(addr, bt, skipCount);
                 if (hasComment)
-                    extDbg->dbgSetDataComment(addr, comment);
+                    extDbg->dbgSetDataComment(addr, bt, comment);
             }
 
             result["added"] = !exists;

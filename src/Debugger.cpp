@@ -2621,10 +2621,10 @@ void ExternalDebugger::dbgGetState(DbgCpuState& state)
 
 void ExternalDebugger::dbgSetDataBreakpoint(uint16_t addr, BreakpointType type)
 {
-    // Remove any existing data breakpoint at this address from our list
-    // (addDataBreakpoint will replace it in the CPU map and delete the old one).
+    // Replace an existing breakpoint of the same kind at this address;
+    // breakpoints of other kinds stay.
     for (auto it = m_dataBpList.begin(); it != m_dataBpList.end(); ) {
-        if ((*it)->getAddr() == addr) {
+        if ((*it)->getAddr() == addr && (*it)->getType() == type) {
             delete *it;
             it = m_dataBpList.erase(it);
         } else {
@@ -2674,10 +2674,10 @@ void ExternalDebugger::dbgSetExecSkipCount(uint16_t addr, int skipCount)
             bp.codeBp->setSkipCount(skipCount);
 }
 
-void ExternalDebugger::dbgSetDataSkipCount(uint16_t addr, int skipCount)
+void ExternalDebugger::dbgSetDataSkipCount(uint16_t addr, BreakpointType type, int skipCount)
 {
     for (auto* dbp : m_dataBpList)
-        if (dbp->getAddr() == addr)
+        if (dbp->getAddr() == addr && dbp->getType() == type)
             dbp->setSkipCount(skipCount);
 }
 
@@ -2688,17 +2688,18 @@ void ExternalDebugger::dbgSetExecComment(uint16_t addr, const std::string& comme
             bp.codeBp->setComment(comment);
 }
 
-void ExternalDebugger::dbgSetDataComment(uint16_t addr, const std::string& comment)
+void ExternalDebugger::dbgSetDataComment(uint16_t addr, BreakpointType type, const std::string& comment)
 {
     for (auto* dbp : m_dataBpList)
-        if (dbp->getAddr() == addr)
+        if (dbp->getAddr() == addr && dbp->getType() == type)
             dbp->setComment(comment);
 }
 
 void ExternalDebugger::dbgSetPortBreakpoint(uint16_t addr, BreakpointType type)
 {
+    // Replace an existing breakpoint of the same kind at this port
     for (auto it = m_portBpList.begin(); it != m_portBpList.end(); ) {
-        if ((*it)->getAddr() == addr) {
+        if ((*it)->getAddr() == addr && (*it)->getType() == type) {
             delete *it;
             it = m_portBpList.erase(it);
         } else {
@@ -2732,17 +2733,17 @@ void ExternalDebugger::dbgClearPortBreakpoints()
     m_portBpList.clear();
 }
 
-void ExternalDebugger::dbgSetPortSkipCount(uint16_t addr, int skipCount)
+void ExternalDebugger::dbgSetPortSkipCount(uint16_t addr, BreakpointType type, int skipCount)
 {
     for (auto* dbp : m_portBpList)
-        if (dbp->getAddr() == addr)
+        if (dbp->getAddr() == addr && dbp->getType() == type)
             dbp->setSkipCount(skipCount);
 }
 
-void ExternalDebugger::dbgSetPortComment(uint16_t addr, const std::string& comment)
+void ExternalDebugger::dbgSetPortComment(uint16_t addr, BreakpointType type, const std::string& comment)
 {
     for (auto* dbp : m_portBpList)
-        if (dbp->getAddr() == addr)
+        if (dbp->getAddr() == addr && dbp->getType() == type)
             dbp->setComment(comment);
 }
 
