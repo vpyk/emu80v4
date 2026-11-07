@@ -88,6 +88,8 @@ void DebugSession::requestBreak(DebugClient client)
 
 void DebugSession::resume(DebugClient client)
 {
+    if (m_isRunning)
+        return;
     m_isRunning = true;
     m_runClient = client;
     m_breakRequested = false;
@@ -125,6 +127,8 @@ void DebugSession::cleanupTimer()
 
 void DebugSession::stepInto(DebugClient client)
 {
+    if (m_isRunning)
+        return;
     m_cpu->debugStepRequest();
     resume(client);
 }
@@ -132,6 +136,8 @@ void DebugSession::stepInto(DebugClient client)
 
 bool DebugSession::stepOver(DebugClient client)
 {
+    if (m_isRunning)
+        return false;
     unsigned pc = m_cpu->getPC();
     unsigned len = getInstructionLength(pc);
     bool over = getInstructionOverFlag(pc);
@@ -157,7 +163,7 @@ bool DebugSession::stepOver(DebugClient client)
 void DebugSession::runTo(uint16_t addr, DebugClient client)
 {
     // previous step over or run to is not completed yet
-    if (m_tempBp)
+    if (m_isRunning || m_tempBp)
         return;
     m_tempBp = new CodeBreakpoint(addr);
     m_cpu->addHook(m_tempBp);

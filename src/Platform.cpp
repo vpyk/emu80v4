@@ -34,7 +34,6 @@
 #include "Keyboard.h"
 #include "RamDisk.h"
 #include "DebugWindow.h"
-#include "ExternalDebugger.h"
 #include "DebugSession.h"
 #include "KbdTapper.h"
 #include "MouseDevice.h"
@@ -206,12 +205,11 @@ Platform::~Platform()
     // The debugger goes first: its breakpoints are to be detached from a live CPU
     delete m_debugger;
     m_debugger = nullptr;
-#ifdef MCP_SERVER
-    delete m_extDebugger;
-    m_extDebugger = nullptr;
-#endif
     delete m_debugSession;
     m_debugSession = nullptr;
+
+    // The emulation may be stopped in the debugger of this platform
+    g_emulation->debugCancel(m_cpu);
 
     for (auto it = m_objList.begin(); it != m_objList.end(); it++)
         delete *it;
@@ -485,6 +483,17 @@ void Platform::showDebugger()
 }
 
 
+#ifdef WASM_DBG
+// The debugger UI of the wasm build is the web debugger outside the emulator. It works
+// with the debug session itself (see wasmDbgCalls.cpp) and only has to be told of stops.
+class WebDebugger : public IDebugger
+{
+public:
+    void startDebug() override {palDebugRequest();}
+};
+#endif
+
+
 // Creates the debugger UI of the build
 void Platform::createDebugger()
 {
@@ -492,7 +501,7 @@ void Platform::createDebugger()
         return;
 
 #ifdef WASM_DBG
-    m_debugger = new ExternalDebugger(this, DC_UI);
+    m_debugger = new WebDebugger;
 #else
     DebugWindow* dbgWnd = new DebugWindow(this);
     dbgWnd->initDbgWindow();
@@ -500,16 +509,6 @@ void Platform::createDebugger()
     m_debugger = dbgWnd;
 #endif
 }
-
-
-#ifdef MCP_SERVER
-ExternalDebugger* Platform::getExternalDebugger()
-{
-    if (!m_extDebugger && getDebugSession())
-        m_extDebugger = new ExternalDebugger(this, DC_EXTERNAL);
-    return m_extDebugger;
-}
-#endif
 
 
 DebugSession* Platform::getDebugSession()

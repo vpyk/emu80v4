@@ -37,7 +37,7 @@
 using namespace std;
 
 
-DebugWindow::DebugWindow(Platform* platform) : IDebugger(platform)
+DebugWindow::DebugWindow(Platform* platform)
 {
     m_windowType = EWT_DEBUG;
 

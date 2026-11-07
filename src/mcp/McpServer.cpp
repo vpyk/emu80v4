@@ -16,7 +16,6 @@
 #include "../Emulation.h"
 #include "../EmuCalls.h"
 #include "../Platform.h"
-#include "../ExternalDebugger.h"
 #include "../DebugSession.h"
 #include "../Cpu8080.h"
 #include "../CpuZ80.h"
@@ -830,12 +829,12 @@ namespace
             Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
             if (!cpu) { err = "CPU is not available"; return; }
 
-            // Use ExternalDebugger to skip breakpoint at current PC.
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+            // The session lets execution leave a breakpoint at the current PC
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "debugger not available in MCP mode"; return; }
 
             const bool wasBreaked = g_emulation->isDebuggerActive();
-            extDbg->dbgRun();
+            session->run(DC_EXTERNAL);
 
             result["breaked"]  = g_emulation->isDebuggerActive();
             result["changed"]  = wasBreaked;
@@ -871,10 +870,10 @@ namespace
             Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
             if (!cpu) { err = "CPU is not available"; return; }
 
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "debugger not available in MCP mode"; return; }
 
-            extDbg->dbgRunFor(static_cast<unsigned>(ms));
+            session->runFor(static_cast<unsigned>(ms), DC_EXTERNAL);
             result["ms"] = ms;
         });
 
@@ -897,10 +896,10 @@ namespace
             Cpu8080Compatible* cpu = p ? dynamic_cast<Cpu8080Compatible*>(p->getCpu()) : nullptr;
             if (!cpu) { err = "CPU unavailable after run"; return; }
 
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            bool timerDidFire = extDbg && extDbg->isTimerFired();
-            if (extDbg)
-                extDbg->dbgCleanupTimer();
+            DebugSession* session = p->getDebugSession();
+            bool timerDidFire = session && session->isTimerFired();
+            if (session)
+                session->cleanupTimer();
 
             result["stoppedByTimer"] = timerDidFire;
             result["breaked"]        = g_emulation->isDebuggerActive();
@@ -947,9 +946,9 @@ namespace
 
             if (autorun && breakAfterLoad) {
                 Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
-                ExternalDebugger* extDbg = p->getExternalDebugger();
-                if (cpu && extDbg) {
-                    extDbg->dbgBreak();
+                DebugSession* session = p->getDebugSession();
+                if (cpu && session) {
+                    session->requestBreak(DC_EXTERNAL);
                     FillCpuStateJson(cpu, result);
                 }
                 result["breaked"] = g_emulation->isDebuggerActive();
@@ -1039,11 +1038,8 @@ namespace
             kbdTimer->start(static_cast<unsigned>(durationMs));
 
             result["wasBreaked"] = g_emulation->isDebuggerActive();
-            if (g_emulation->isDebuggerActive()) {
-                ExternalDebugger* extDbg = p->getExternalDebugger();
-                if (!extDbg) { err = "debugger not available in MCP mode"; return; }
-                extDbg->dbgRun();
-            }
+            if (g_emulation->isDebuggerActive())
+                session->run(DC_EXTERNAL);
         });
         if (!ok1) throw std::runtime_error("emulator main thread is not ready");
         if (!err.empty()) throw std::runtime_error(err);
@@ -1076,9 +1072,9 @@ namespace
             // Restore CPU state after timer intervention.
             if (timerFired) {
                 // was breaked: stay stopped, otherwise continue
-                ExternalDebugger* extDbg = p->getExternalDebugger();
-                if (!wasBreaked && extDbg)
-                    extDbg->dbgRun();
+                DebugSession* session = p->getDebugSession();
+                if (!wasBreaked && session)
+                    session->run(DC_EXTERNAL);
             }
 
             result["breaked"]             = g_emulation->isDebuggerActive();
@@ -1207,9 +1203,9 @@ namespace
 
             result["wasBreaked"] = g_emulation->isDebuggerActive();
             if (g_emulation->isDebuggerActive()) {
-                ExternalDebugger* extDbg = p->getExternalDebugger();
-                if (!extDbg) { err = "debugger not available in MCP mode"; return; }
-                extDbg->dbgRun();
+                DebugSession* session = p->getDebugSession();
+                if (!session) { err = "debugger not available in MCP mode"; return; }
+                session->run(DC_EXTERNAL);
             }
         });
         if (!ok1) throw std::runtime_error("emulator main thread is not ready");
@@ -1239,9 +1235,9 @@ namespace
 
             // If was breaked and typing completed (not BP), return to breaked.
             if (wasBreaked && !stoppedByBreakpoint) {
-                ExternalDebugger* extDbg = p->getExternalDebugger();
-                if (extDbg)
-                    extDbg->dbgBreak();
+                DebugSession* session = p->getDebugSession();
+                if (session)
+                    session->requestBreak(DC_EXTERNAL);
             }
 
             result["completed"]           = !stoppedByBreakpoint;
@@ -1270,9 +1266,9 @@ namespace
 
             const bool wasBreaked = g_emulation->isDebuggerActive();
             if (!wasBreaked) {
-                ExternalDebugger* extDbg = p->getExternalDebugger();
-                if (!extDbg) { err = "debugger not available in MCP mode"; return; }
-                extDbg->dbgBreak();
+                DebugSession* session = p->getDebugSession();
+                if (!session) { err = "debugger not available in MCP mode"; return; }
+                session->requestBreak(DC_EXTERNAL);
             }
 
             uint16_t pc = cpu->getPC();
@@ -1345,9 +1341,8 @@ namespace
                 return;
             }
 
-            // Get ExternalDebugger for proper breakpoint-aware stepping.
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "debugger not available in MCP mode"; return; }
 
             if (mode == "skip") {
                 uint16_t pc = cpu->getPC();
@@ -1366,9 +1361,9 @@ namespace
             }
 
             if (mode == "into") {
-                extDbg->dbgStepIn();
+                session->stepInto(DC_EXTERNAL);
             } else { // "over"
-                extDbg->dbgStepOver();
+                session->stepOver(DC_EXTERNAL);
             }
 
             async = true;
@@ -1488,6 +1483,41 @@ namespace
     }
 
     // ================================================================
+    // Breakpoint type names used by the bp_* tools
+    // ================================================================
+    const char* const BP_TYPES_EXPECTED = "exec|write|read|access|port_read|port_write|port_access";
+
+    bool ParseBpType(const std::string& name, BreakpointType& type)
+    {
+        static const struct { const char* name; BreakpointType type; } types[] = {
+            { "exec",        BT_EXEC },
+            { "write",       BT_WRITE },
+            { "read",        BT_READ },
+            { "access",      BT_ACSESS },
+            { "port_write",  BT_PORT_WRITE },
+            { "port_read",   BT_PORT_READ },
+            { "port_access", BT_PORT_ACSESS },
+        };
+        for (auto& t : types)
+            if (name == t.name) { type = t.type; return true; }
+        return false;
+    }
+
+    const char* BpTypeName(BreakpointType type)
+    {
+        switch (type) {
+        case BT_EXEC:        return "exec";
+        case BT_WRITE:       return "write";
+        case BT_READ:        return "read";
+        case BT_ACSESS:      return "access";
+        case BT_PORT_WRITE:  return "port_write";
+        case BT_PORT_READ:   return "port_read";
+        case BT_PORT_ACSESS: return "port_access";
+        }
+        return "unknown";
+    }
+
+    // ================================================================
     // Tool: bp_list
     // ================================================================
     json Tool_BpList(const json& /*args*/)
@@ -1500,53 +1530,29 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "debugger not available in MCP mode"; return; }
 
-            DbgCpuState state;
-            extDbg->dbgGetState(state);
+            std::vector<BreakpointDesc> bps;
+            session->getBreakpoints()->list(bps);
 
+            // exec, then memory, then port breakpoints
             json items = json::array();
             int idx = 0;
-            for (auto& bp : state.breakpoints) {
-                items.push_back({
-                    { "index",     idx++ },
-                    { "addr",      Hex(bp.addr) },
-                    { "type",      "exec" },
-                    { "hitCount",  bp.hitCount },
-                    { "skipCount", bp.skipCount },
-                    { "remaining", bp.remaining },
-                    { "comment",   bp.comment },
-                });
-            }
-            for (auto& dbp : state.dataBreakpoints) {
-                const char* typeStr = (dbp.type == BT_WRITE)  ? "write"
-                                    : (dbp.type == BT_READ)   ? "read"
-                                    : "access";
-                items.push_back({
-                    { "index",     idx++ },
-                    { "addr",      Hex(dbp.addr) },
-                    { "type",      typeStr },
-                    { "hitCount",  dbp.hitCount },
-                    { "skipCount", dbp.skipCount },
-                    { "remaining", dbp.remaining },
-                    { "comment",   dbp.comment },
-                });
-            }
-            for (auto& dbp : state.portBreakpoints) {
-                const char* typeStr = (dbp.type == BT_PORT_WRITE)  ? "port_write"
-                                    : (dbp.type == BT_PORT_READ)   ? "port_read"
-                                    : "port_access";
-                items.push_back({
-                    { "index",     idx++ },
-                    { "addr",      Hex(dbp.addr) },
-                    { "type",      typeStr },
-                    { "hitCount",  dbp.hitCount },
-                    { "skipCount", dbp.skipCount },
-                    { "remaining", dbp.remaining },
-                    { "comment",   dbp.comment },
-                });
-            }
+            for (BreakpointClass bc : { BC_EXEC, BC_MEM, BC_IO })
+                for (auto& bp : bps) {
+                    if (getBreakpointClass(bp.type) != bc)
+                        continue;
+                    items.push_back({
+                        { "index",     idx++ },
+                        { "addr",      Hex(bp.addr) },
+                        { "type",      BpTypeName(bp.type) },
+                        { "hitCount",  bp.hitCount },
+                        { "skipCount", bp.skipCount },
+                        { "remaining", bp.remaining },
+                        { "comment",   bp.comment },
+                    });
+                }
             result["count"]       = idx;
             result["breakpoints"] = items;
         });
@@ -1568,9 +1574,9 @@ namespace
         std::string type = "exec";
         if (args.contains("type") && args["type"].is_string())
             type = args["type"].get<std::string>();
-        if (type != "exec" && type != "write" && type != "read" && type != "access"
-            && type != "port_read" && type != "port_write" && type != "port_access")
-            throw std::runtime_error("invalid type (expected exec|write|read|access|port_read|port_write|port_access)");
+        BreakpointType bt;
+        if (!ParseBpType(type, bt))
+            throw std::runtime_error(std::string("invalid type (expected ") + BP_TYPES_EXPECTED + ")");
 
         int skipCount = -1; // -1 means "don't set"
         if (args.contains("skipCount") && args["skipCount"].is_number_integer())
@@ -1589,55 +1595,16 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "debugger not available in MCP mode"; return; }
+            BreakpointManager* bps = session->getBreakpoints();
 
-            bool exists = false;
-            if (type == "exec") {
-                DbgCpuState state;
-                extDbg->dbgGetState(state);
-                for (auto& bp : state.breakpoints)
-                    if (bp.addr == addr) { exists = true; break; }
-                if (!exists) {
-                    std::list<uint16_t> addrs;
-                    addrs.push_back(addr);
-                    extDbg->dbgSetBreakpoints(addrs);
-                }
-                if (skipCount >= 0)
-                    extDbg->dbgSetExecSkipCount(addr, skipCount);
-                if (hasComment)
-                    extDbg->dbgSetExecComment(addr, comment);
-            } else if (type == "port_read" || type == "port_write" || type == "port_access") {
-                BreakpointType bt = (type == "port_write") ? BT_PORT_WRITE
-                                 : (type == "port_read")  ? BT_PORT_READ
-                                 : BT_PORT_ACSESS;
-                DbgCpuState state;
-                extDbg->dbgGetState(state);
-                for (auto& dbp : state.portBreakpoints)
-                    if (dbp.addr == addr && dbp.type == static_cast<int>(bt))
-                        { exists = true; break; }
-                if (!exists)
-                    extDbg->dbgSetPortBreakpoint(addr, bt);
-                if (skipCount >= 0)
-                    extDbg->dbgSetPortSkipCount(addr, bt, skipCount);
-                if (hasComment)
-                    extDbg->dbgSetPortComment(addr, bt, comment);
-            } else {
-                BreakpointType bt = (type == "write") ? BT_WRITE
-                                 : (type == "read")  ? BT_READ
-                                 : BT_ACSESS;
-                DbgCpuState state;
-                extDbg->dbgGetState(state);
-                for (auto& dbp : state.dataBreakpoints)
-                    if (dbp.addr == addr && dbp.type == static_cast<int>(bt))
-                        { exists = true; break; }
-                if (!exists)
-                    extDbg->dbgSetDataBreakpoint(addr, bt);
-                if (skipCount >= 0)
-                    extDbg->dbgSetDataSkipCount(addr, bt, skipCount);
-                if (hasComment)
-                    extDbg->dbgSetDataComment(addr, bt, comment);
-            }
+            bool exists = bps->find(bt, addr) >= 0;
+            int id = bps->add(bt, addr, DC_EXTERNAL);
+            if (skipCount >= 0)
+                bps->setSkipCount(id, skipCount);
+            if (hasComment)
+                bps->setComment(id, comment);
 
             result["added"] = !exists;
             result["addr"]  = Hex(addr);
@@ -1665,12 +1632,12 @@ namespace
 
         // Optional type filter — if provided, only remove matching BPs.
         std::string type;
+        BreakpointType bt = BT_EXEC;
         bool hasType = args.contains("type") && args["type"].is_string();
         if (hasType) {
             type = args["type"].get<std::string>();
-            if (type != "exec" && type != "write" && type != "read" && type != "access"
-                && type != "port_read" && type != "port_write" && type != "port_access")
-                throw std::runtime_error("invalid type (expected exec|write|read|access|port_read|port_write|port_access)");
+            if (!ParseBpType(type, bt))
+                throw std::runtime_error(std::string("invalid type (expected ") + BP_TYPES_EXPECTED + ")");
         }
 
         json        result;
@@ -1681,55 +1648,21 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            if (!extDbg) {
+            DebugSession* session = p->getDebugSession();
+            if (!session) {
                 result["removed"] = 0;
                 result["count"]   = 0;
                 return;
             }
+            BreakpointManager* bps = session->getBreakpoints();
 
-            DbgCpuState state;
-            extDbg->dbgGetState(state);
+            std::vector<BreakpointDesc> descs;
+            bps->list(descs);
 
             int removed = 0;
-
-            // Remove exec breakpoints.
-            if (!hasType || type == "exec") {
-                std::list<uint16_t> toRemove;
-                for (auto& bp : state.breakpoints) {
-                    if (bp.addr == addr) { toRemove.push_back(bp.addr); ++removed; }
-                }
-                if (!toRemove.empty())
-                    extDbg->dbgDelBreakpoints(toRemove);
-            }
-
-            // Remove data breakpoints.
-            if (!hasType || type == "write" || type == "read" || type == "access") {
-                for (auto& dbp : state.dataBreakpoints) {
-                    if (dbp.addr != addr) continue;
-                    if (hasType) {
-                        BreakpointType bt = (type == "write") ? BT_WRITE
-                                          : (type == "read")  ? BT_READ : BT_ACSESS;
-                        if (dbp.type != static_cast<int>(bt)) continue;
-                    }
-                    extDbg->dbgDelDataBreakpoint(dbp.addr, static_cast<BreakpointType>(dbp.type));
+            for (auto& bp : descs)
+                if (bp.addr == addr && (!hasType || bp.type == bt) && bps->remove(bp.id))
                     ++removed;
-                }
-            }
-
-            // Remove port breakpoints.
-            if (!hasType || type == "port_read" || type == "port_write" || type == "port_access") {
-                for (auto& dbp : state.portBreakpoints) {
-                    if (dbp.addr != addr) continue;
-                    if (hasType) {
-                        BreakpointType bt = (type == "port_write") ? BT_PORT_WRITE
-                                          : (type == "port_read")  ? BT_PORT_READ : BT_PORT_ACSESS;
-                        if (dbp.type != static_cast<int>(bt)) continue;
-                    }
-                    extDbg->dbgDelPortBreakpoint(dbp.addr, static_cast<BreakpointType>(dbp.type));
-                    ++removed;
-                }
-            }
 
             result["removed"] = removed;
             result["addr"]    = Hex(addr);
@@ -1755,29 +1688,19 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            ExternalDebugger* extDbg = p->getExternalDebugger();
-            if (!extDbg) {
+            DebugSession* session = p->getDebugSession();
+            if (!session) {
                 result["removed"] = 0;
                 result["count"]   = 0;
                 return;
             }
+            BreakpointManager* bps = session->getBreakpoints();
 
-            DbgCpuState state;
-            extDbg->dbgGetState(state);
-            int execCount = static_cast<int>(state.breakpoints.size());
-            int dataCount = static_cast<int>(state.dataBreakpoints.size());
-            int portCount = static_cast<int>(state.portBreakpoints.size());
+            std::vector<BreakpointDesc> descs;
+            bps->list(descs);
+            bps->clear();
 
-            if (execCount > 0) {
-                std::list<uint16_t> addrs;
-                for (auto& bp : state.breakpoints) addrs.push_back(bp.addr);
-                extDbg->dbgDelBreakpoints(addrs);
-            }
-            if (dataCount > 0)
-                extDbg->dbgClearDataBreakpoints();
-            if (portCount > 0)
-                extDbg->dbgClearPortBreakpoints();
-            result["cleared"] = execCount + dataCount + portCount;
+            result["cleared"] = static_cast<int>(descs.size());
             result["count"]   = 0;
         });
 

@@ -42,7 +42,6 @@ class MouseDevice;
 class KbdTapper;
 class IDebugger;
 class DebugSession;
-class ExternalDebugger;
 
 
 class Platform : public ParentObject
@@ -87,9 +86,6 @@ class Platform : public ParentObject
         uint64_t getCpuElapsedTicks();
 
         IDebugger* getDebugger() {return m_debugger;} // debugger UI, nullptr if not created yet
-#ifdef MCP_SERVER
-        ExternalDebugger* getExternalDebugger(); // debugger interface for the MCP server, created on first use
-#endif
         DebugSession* getDebugSession(); // created on first use, nullptr if the CPU is not supported
 
         void createDebugger();
@@ -131,9 +127,6 @@ class Platform : public ParentObject
 
         IDebugger* m_debugger = nullptr;
         DebugSession* m_debugSession = nullptr;
-#ifdef MCP_SERVER
-        ExternalDebugger* m_extDebugger = nullptr;
-#endif
         uint64_t m_emuCpuTicksAtReset = 0;
 
         std::string m_helpFile = "";

@@ -72,6 +72,8 @@ class Emulation : public ParentObject
 
         inline void debugRequest(Cpu* cpu) {m_debugReqCpu = cpu; m_isPaused = false;}
         inline void debugRun() {m_debugReqCpu = nullptr;}
+        // drops a debug stop of the CPU (of a platform being deleted)
+        inline void debugCancel(Cpu* cpu) {if (m_debugReqCpu == cpu) m_debugReqCpu = nullptr;}
         inline bool isDebuggerActive() {return m_debugReqCpu;}
 
         void processKey(EmuWindow* wnd, PalKeyCode keyCode, bool isPressed, unsigned unicodeKey = 0);

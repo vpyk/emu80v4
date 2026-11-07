@@ -19,10 +19,6 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
-#include <string>
-
-class Platform;
-
 
 enum DebugCommand {
     DCMD_REPAINT,
@@ -44,19 +40,16 @@ enum DebugCommand {
 };
 
 
+// Debugger UI (front-end) of a platform. It works with the platform's DebugSession;
+// the platform notifies it of stops and calls it on the emulator's update and draw.
 class IDebugger
 {
 public:
-    IDebugger(Platform* /*platform*/) {} // todo: implement
     virtual ~IDebugger() {}
 
-    virtual void initDbgWindow() = 0;
-    virtual void setCaption(std::string caption) = 0;
-    virtual void sendCmd(DebugCommand /*cmd*/) {}
-
-    virtual void startDebug() = 0;      // stopped in the debugger: show the UI
+    virtual void startDebug() = 0;      // stopped in the debugger by the UI: show the UI
     virtual void refreshDebug() {}      // stopped by another client: refresh the UI if it is open
-    virtual void update() = 0;
+    virtual void update() {}            // platform state changed (e.g. a file loaded)
     virtual void draw() {}
 };
 

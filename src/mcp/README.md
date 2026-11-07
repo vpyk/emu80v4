@@ -23,7 +23,8 @@ wrappers over existing emulator objects:
 - `g_emulation` → `getCurrentPlatform()` — Platform access
 - `Platform` — CPU, memory, keyboard, disks, renderer, debugger
 - `Cpu8080Compatible` / `CpuZ80` — registers, stepping
-- `ExternalDebugger` — breakpoints, run control
+- `DebugSession` (`Platform::getDebugSession()`) — run control and breakpoints
+  (`BreakpointManager`); MCP acts as the client `DC_EXTERNAL`
 - `CrtRenderer` — screen capture, text screen
 
 ## Build

@@ -45,14 +45,3 @@ IDebugger* emuGetDebugger(PalWindow* wnd)
 
     return dbg;
 }
-
-
-void emuCreateDebugger(PalWindow* wnd)
-{
-    if (!wnd)
-        return;
-
-    Platform* platform = emuGetPlatform(wnd);
-    if (platform)
-        platform->createDebugger();
-}

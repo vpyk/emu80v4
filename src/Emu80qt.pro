@@ -67,7 +67,6 @@ SOURCES += \
     Breakpoints.cpp \
     DebugSession.cpp \
     DebugWindow.cpp \
-    ExternalDebugger.cpp \
     Dma8257.cpp \
     EmuCalls.cpp \
     EmuConfig.cpp \
@@ -168,7 +167,6 @@ HEADERS  += \
     DebugSession.h \
     DebugWindow.h \
     Debugger.h \
-    ExternalDebugger.h \
     DiskImage.h \
     Dma8257.h \
     EmuCalls.h \

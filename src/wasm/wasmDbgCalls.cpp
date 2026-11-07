@@ -1,6 +1,6 @@
 ﻿/*
  *  Emu80 v. 4.x
- *  © Viktor Pykhonin <pyk@mail.ru>, 2025
+ *  © Viktor Pykhonin <pyk@mail.ru>, 2025-2026
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,17 +17,37 @@
  */
 
 #include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <vector>
 
 #include "wasmDbgCalls.h"
 #include "wasmEmuCalls.h"
 
-#include "../ExternalDebugger.h"
+#include "../DebugSession.h"
+#include "../Platform.h"
+#include "../Cpu.h"
 #include "../EmuCalls.h"
 #include "../DbgCalls.h"
 
 using namespace std;
 
-static ExternalDebugger* debugger = nullptr;
+
+// The web debugger is the debugger UI of the wasm build (client DC_UI). It works
+// with the debug session of the current platform directly.
+static DebugSession* getSession()
+{
+    Platform* platform = emuGetPlatform((PalWindow*)wasmGetWindowId());
+    return platform ? platform->getDebugSession() : nullptr;
+}
+
+
+// Debug session stopped in the debugger, nullptr if running or not available
+static DebugSession* getStoppedSession()
+{
+    DebugSession* session = getSession();
+    return session && !session->isRunning() ? session : nullptr;
+}
 
 
 void wasmDbgPause()
@@ -39,83 +59,92 @@ void wasmDbgPause()
 
 void wasmDbgRun()
 {
-    if (!debugger)
-        return;
-
-    debugger->dbgRun();
+    if (DebugSession* session = getStoppedSession())
+        session->run(DC_UI);
 }
 
 
 void wasmDbgStepIn()
 {
-    if (!debugger)
-        return;
-
-    debugger->dbgStepIn();
+    if (DebugSession* session = getStoppedSession())
+        session->stepInto(DC_UI);
 }
 
 
 void wasmDbgStepOver()
 {
-    if (!debugger)
-        return;
-
-    debugger->dbgStepOver();
+    if (DebugSession* session = getStoppedSession())
+        session->stepOver(DC_UI);
 }
 
 void wasmDbgStepOut()
 {
-    if (!debugger)
-        return;
-
-    debugger->dbgStepOut();
+    // not implemented yet
 }
 
 
 void wasmDbgSetBreakpoints(int* bps, int size)
 {
-    if (!debugger) {
-        PalWindow* window = (PalWindow*)wasmGetWindowId();
-        emuCreateDebugger(window);
-        debugger = static_cast<ExternalDebugger*>(emuGetDebugger(window));
-    }
+    DebugSession* session = getSession();
+    if (!session)
+        return;
 
-    list<uint16_t> breakpoints;
     for (int i = 0; i < size; i++)
-       breakpoints.push_back(*bps++);
-
-    debugger->dbgSetBreakpoints(breakpoints);
+        session->getBreakpoints()->add(BT_EXEC, bps[i], DC_UI);
 }
 
 
 void wasmDbgDelBreakpoints(int* bps, int size)
 {
-    if (!debugger)
+    DebugSession* session = getSession();
+    if (!session)
         return;
 
-    list<uint16_t> breakpoints;
+    BreakpointManager* bpm = session->getBreakpoints();
     for (int i = 0; i < size; i++)
-       breakpoints.push_back(*bps++);
-
-    debugger->dbgDelBreakpoints(breakpoints);
+        bpm->remove(bpm->find(BT_EXEC, bps[i]));
 }
 
 void wasmDbgSetRegister(int regId, int value)
 {
-    if (!debugger)
+    DebugSession* session = getSession();
+    if (!session)
         return;
 
-    auto reg = static_cast<ExternalDebugger::Register>(regId);
-    debugger->dbgSetRegister(reg, value);
+    Cpu8080Compatible* cpu = session->getCpu();
+    switch (regId) { // af, bc, de, hl, sp, pc, iff
+    case 0:
+        cpu->setAF(value);
+        break;
+    case 1:
+        cpu->setBC(value);
+        break;
+    case 2:
+        cpu->setDE(value);
+        break;
+    case 3:
+        cpu->setHL(value);
+        break;
+    case 4:
+        cpu->setSP(value);
+        break;
+    case 5:
+        cpu->setPC(value);
+        break;
+    case 6:
+        cpu->setIFF(value & 1);
+        break;
+    }
 }
 
 
 void wasmDbgWriteByte(int addr, int value)
 {
-    if (!debugger)
+    DebugSession* session = getSession();
+    if (!session)
         return;
 
-    debugger->dbgWriteByte(addr, value);
+    session->getCpu()->getAddrSpace()->writeByte(addr, value);
 }
 
 
@@ -128,35 +157,41 @@ static void* state[3] = {regs, nullptr, nullptr};
 
 void* wasmDbgGetState()
 {
-    if (!debugger)
+    DebugSession* session = getSession();
+    if (!session)
         return nullptr;
 
-    DbgCpuState* dbgState = new DbgCpuState; // don't allocate on stack for its limited size while using wasm
-    debugger->dbgGetState(*dbgState);
+    wasmDbgFreeState();
 
-    regs[0] = dbgState->af;
-    regs[1] = dbgState->bc;
-    regs[2] = dbgState->de;
-    regs[3] = dbgState->hl;
-    regs[4] = dbgState->sp;
-    regs[5] = dbgState->pc;
-    regs[6] = dbgState->iff;
+    Cpu8080Compatible* cpu = session->getCpu();
+    regs[0] = cpu->getAF();
+    regs[1] = cpu->getBC();
+    regs[2] = cpu->getDE();
+    regs[3] = cpu->getHL();
+    regs[4] = cpu->getSP();
+    regs[5] = cpu->getPC();
+    regs[6] = cpu->getInte();
 
-    int nBps = dbgState->breakpoints.size();
+    // the web debugger shows exec breakpoints only
+    vector<BreakpointDesc> bps;
+    session->getBreakpoints()->list(bps);
+    vector<uint16_t> execBps;
+    for (auto& bp : bps)
+        if (bp.type == BT_EXEC)
+            execBps.push_back(bp.addr);
+
+    int nBps = execBps.size();
     breakpoints = static_cast<uint16_t*>(malloc((nBps + 1) * sizeof(uint16_t)));
     breakpoints[0] = nBps;
-
-    int i = 1;
-    for (auto& bp : dbgState->breakpoints)
-        breakpoints[i++] = bp.addr;
-
+    for (int i = 0; i < nBps; i++)
+        breakpoints[i + 1] = execBps[i];
     state[1] = breakpoints;
 
+    AddressableDevice* as = cpu->getAddrSpace();
     mem = static_cast<uint8_t*>(malloc(0x10000));
-    memcpy(mem, dbgState->mem, 0x10000);
+    for (int i = 0; i <= 0xffff; i++)
+        mem[i] = as->readByte(i);
     state[2] = mem;
-
-    delete dbgState;
 
     return state; // mem and breakpoints must be freed by calling wasmDbgFreeState()
 }
@@ -181,12 +216,8 @@ EM_JS(void, jsDebugRequest, (), {
 });
 
 
+// Called on stops of the web debugger (DC_UI), see Platform::createDebugger()
 void palDebugRequest()
 {
-    if (!debugger) {
-        PalWindow* window = (PalWindow*)wasmGetWindowId();
-        debugger = static_cast<ExternalDebugger*>(emuGetDebugger(window));
-    }
-
     jsDebugRequest();
 }

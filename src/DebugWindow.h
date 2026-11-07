@@ -70,9 +70,9 @@ public:
     DebugWindow(Platform* platform);
     ~DebugWindow();
 
-    void initDbgWindow() override {EmuWindow::init();}
-    void setCaption(std::string caption) override {EmuWindow::setCaption(caption);}
-    void sendCmd(DebugCommand cmd) override;
+    void initDbgWindow() {EmuWindow::init();}
+    void setCaption(std::string caption) {EmuWindow::setCaption(caption);}
+    void sendCmd(DebugCommand cmd);
 
     void startDebug() override;
     void refreshDebug() override;

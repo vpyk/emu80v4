@@ -40,7 +40,8 @@ private:
 
 
 // Debugger core of a platform: run control and breakpoints. It doesn't depend on
-// any UI; debugger front-ends (debug window, MCP server, wasm) use it.
+// any UI; debugger front-ends (debug window, MCP server, web debugger in wasm)
+// use it directly.
 // Must be used from the main (emulation) thread only.
 //
 // Run control methods take the client that issues the command. When the emulation
@@ -65,7 +66,8 @@ public:
     DebugClient getStopClient() {return m_stopClient;} // who the last stop belongs to
     unsigned getStopCount() {return m_stopCount;}      // number of stops so far
 
-    // Run control
+    // Run control. The commands that resume the emulation do nothing while it is
+    // running (runFor only starts its timer then).
     void requestBreak(DebugClient client);
     void run(DebugClient client);
     void runFor(unsigned ms, DebugClient client);

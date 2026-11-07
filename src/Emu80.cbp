@@ -140,8 +140,6 @@
 		<Unit filename="DebugWindow.cpp" />
 		<Unit filename="DebugWindow.h" />
 		<Unit filename="Debugger.h" />
-		<Unit filename="ExternalDebugger.cpp" />
-		<Unit filename="ExternalDebugger.h" />
 		<Unit filename="DiskImage.cpp" />
 		<Unit filename="DiskImage.h" />
 		<Unit filename="Dma8257.cpp" />

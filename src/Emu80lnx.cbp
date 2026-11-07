@@ -125,8 +125,6 @@
         <Unit filename="DebugWindow.cpp" />
         <Unit filename="DebugWindow.h" />
         <Unit filename="Debugger.h" />
-        <Unit filename="ExternalDebugger.cpp" />
-        <Unit filename="ExternalDebugger.h" />
         <Unit filename="Dma8257.cpp" />
         <Unit filename="Dma8257.h" />
         <Unit filename="EmuCalls.cpp" />

@@ -29,6 +29,5 @@ class IDebugger;
 
 Platform* emuGetPlatform(PalWindow* wnd);
 IDebugger* emuGetDebugger(PalWindow* wnd);
-void emuCreateDebugger(PalWindow* wnd);
 
 #endif // EMUCALLS_H
