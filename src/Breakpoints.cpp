@@ -48,9 +48,8 @@ bool BreakpointCounters::countHit()
         --m_remaining;
         return false;
     }
-    // Actual stop — reset counters.
+    // Actual stop: skip the next skipCount hits again
     m_remaining = m_skipCount;
-    m_hitCount = 0;
     if (m_manager)
         m_manager->onBreakpointStop(m_id);
     return true;
@@ -261,15 +260,6 @@ void BreakpointManager::list(std::vector<BreakpointDesc>& descs) const
         fillDesc(entry, desc);
         descs.push_back(desc);
     }
-}
-
-
-void BreakpointManager::skipCurrentPc(uint16_t pc)
-{
-    for (Entry& entry : m_entries)
-        if (entry.type == BT_EXEC && entry.addr == pc && entry.enabled)
-            if (entry.codeBp->getRemaining() == 0)
-                entry.codeBp->setRemaining(1);
 }
 
 

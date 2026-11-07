@@ -78,7 +78,7 @@ All numbers: JSON integer = decimal, JSON string = hex by default
 
 | Tool | Params | Description |
 |------|--------|-------------|
-| `bp_list` | — | List all BPs (exec, data, port) with hitCount/skipCount/remaining/comment |
+| `bp_list` | — | List all BPs (exec, data, port) with hitCount (total hits)/skipCount/remaining (hits to skip before the next stop)/comment |
 | `bp_set` | `addr`, `type` (`exec`/`write`/`read`/`access`/`port_read`/`port_write`/`port_access`), `skipCount`, `comment` | Add or configure breakpoint. `exec` = code; `write`/`read`/`access` = memory; `port_*` = I/O ports |
 | `bp_remove` | `addr`, `type` (optional filter) | Remove BPs at addr. With type: selective removal |
 | `bp_clear` | — | Remove ALL breakpoints |

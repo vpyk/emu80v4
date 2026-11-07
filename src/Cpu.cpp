@@ -284,10 +284,17 @@ void Cpu8080Compatible::addHook(CpuHook* hook)
 // called only while none of the previous hooks has handled the instruction.
 bool Cpu8080Compatible::processHooks(list<CpuHook*>* hookList)
 {
+    // the skip applies to the first hooked instruction only
+    // (hook lists are never empty)
+    bool skipBps = m_bpSkipAddr >= 0 && hookList->front()->getHookAddr() == m_bpSkipAddr;
+    m_bpSkipAddr = -1;
+
     bool retFlag = false;
     for (auto it = hookList->begin(); it != hookList->end(); it++) {
-        if ((*it)->isBreakpoint())
-            retFlag = (*it)->hookProc() || retFlag;
+        if ((*it)->isBreakpoint()) {
+            if (!skipBps)
+                retFlag = (*it)->hookProc() || retFlag;
+        }
         else if (!retFlag)
             retFlag = (*it)->hookProc();
         else

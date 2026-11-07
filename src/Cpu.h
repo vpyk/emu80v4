@@ -138,6 +138,10 @@ class Cpu8080Compatible : public Cpu
 
         virtual uint16_t getPC() = 0;
 
+        // Lets execution leave the address when the debugger resumes: breakpoints
+        // at it are not checked (and not counted) for the next instruction
+        void skipBreakpointsOnce(uint16_t addr) {m_bpSkipAddr = m_hookArray[addr] ? addr : -1;}
+
     protected:
         bool processHooks(std::list<CpuHook*>* hookList);
 
@@ -174,6 +178,7 @@ class Cpu8080Compatible : public Cpu
         void io_output(int port, int value);
 
         std::list<CpuHook*>* m_hookArray[65536];
+        int m_bpSkipAddr = -1; // see skipBreakpointsOnce()
 };
 
 #endif // CPU_H

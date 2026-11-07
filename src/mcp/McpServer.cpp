@@ -2094,7 +2094,9 @@ namespace
 
         tools.push_back({
             "bp_list",
-            "List all breakpoints with index, address (hex), and type.",
+            "List all breakpoints with index, address (hex), type, hitCount (total hits "
+            "since the breakpoint was set), skipCount, remaining (hits to skip before "
+            "the next stop) and comment.",
             json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_BpList
         });
@@ -2107,8 +2109,8 @@ namespace
             "'type' is \"exec\" (code execution, default), \"write\" / \"read\" "
             "/ \"access\" (memory), or \"port_write\" / \"port_read\" / "
             "\"port_access\" (I/O ports). "
-            "Optional 'skipCount' sets how many hits to skip before "
-            "actually stopping (default 0 = stop immediately). "
+            "Optional 'skipCount' makes the breakpoint stop on every "
+            "(skipCount+1)-th hit (default 0 = stop on every hit). "
             "Duplicates of the same type+addr are a no-op (but skipCount "
             "is still applied if provided).",
             json{
@@ -2116,7 +2118,7 @@ namespace
                 { "properties", {
                     { "addr",     { { "type", json::array({ "string", "integer" }) }, { "description", "breakpoint address (required)" } } },
                     { "type",     { { "type", "string" }, { "enum", json::array({ "exec", "write", "read", "access", "port_read", "port_write", "port_access" }) }, { "description", "breakpoint type (default exec)" } } },
-                    { "skipCount", { { "type", "integer" }, { "minimum", 0 }, { "description", "skip N hits before stopping (default 0)" } } },
+                    { "skipCount", { { "type", "integer" }, { "minimum", 0 }, { "description", "stop on every (N+1)-th hit (default 0)" } } },
                     { "comment",   { { "type", "string" }, { "description", "optional comment stored with the breakpoint" } } },
                 }},
                 { "required", json::array({ "addr" }) },

@@ -94,7 +94,8 @@ void DebugSession::resume(DebugClient client)
     m_runClient = client;
     m_breakRequested = false;
     m_breakpoints.resetStopBreakpoint();
-    m_breakpoints.skipCurrentPc(m_cpu->getPC());
+    // let execution leave the current address
+    m_cpu->skipBreakpointsOnce(m_cpu->getPC());
     g_emulation->debugRun();
 }
 
@@ -168,10 +169,8 @@ void DebugSession::runTo(uint16_t addr, DebugClient client)
     m_tempBp = new CodeBreakpoint(addr);
     m_cpu->addHook(m_tempBp);
 
-    // running to the current address means a full loop
-    if (addr == m_cpu->getPC())
-        m_tempBp->setSkipCount(1);
-
+    // running to the current address means a full loop, as the breakpoints
+    // at the current address are skipped on resume
     resume(client);
 }
 

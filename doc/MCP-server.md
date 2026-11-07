@@ -89,8 +89,8 @@ claude mcp add --transport http emu80 http://127.0.0.1:19781/mcp
 
 | Инструмент | Параметры | Назначение |
 |---|---|---|
-| `bp_list` | — | Список всех точек останова |
-| `bp_set` | `addr`, `type`, `skipCount`, `comment` | Установка точки останова. Типы: `exec` — код, `write`/`read`/`access` — память, `port_read`/`port_write`/`port_access` — порты |
+| `bp_list` | — | Список всех точек останова: тип, адрес, `hitCount` — общее число срабатываний, `skipCount`, `remaining` — сколько срабатываний осталось пропустить до следующей остановки, комментарий |
+| `bp_set` | `addr`, `type`, `skipCount`, `comment` | Установка точки останова. Типы: `exec` — код, `write`/`read`/`access` — память, `port_read`/`port_write`/`port_access` — порты. С `skipCount` = N точка останавливает на каждом (N+1)-м срабатывании |
 | `bp_remove` | `addr`, `type` (необязательно) | Удаление точек останова. С фильтром по типу — выборочное |
 | `bp_clear` | — | Удалить все точки останова |
 
@@ -139,7 +139,7 @@ claude mcp add --transport http emu80 http://127.0.0.1:19781/mcp
 {"method": "tools/call", "params": {"name": "cpu_state", "arguments": {}}}
 ```
 
-Установить точку останова на запись в память по адресу 0x8000 с пропуском 3 срабатываний:
+Установить точку останова на запись в память по адресу 0x8000, останавливающую на каждой 4-й записи:
 ```json
 {"method": "tools/call", "params": {"name": "bp_set", "arguments": {"addr": "8000", "type": "write", "skipCount": 3}}}
 ```

@@ -65,7 +65,6 @@ public:
     void setSkipCount(int n)  { m_skipCount = n; m_remaining = n; }
     int  getSkipCount() const { return m_skipCount; }
     int  getRemaining() const { return m_remaining; }
-    void setRemaining(int n)  { m_remaining = n; }
     int  getHitCount() const  { return m_hitCount; }
     void setComment(const std::string& c) { m_comment = c; }
     const std::string& getComment() const { return m_comment; }
@@ -80,9 +79,9 @@ protected:
 private:
     BreakpointManager* m_manager = nullptr;
     int m_id = 0;
-    int m_skipCount = 0;    // fixed property
-    int m_remaining = 0;    // decremented each hit, reset from skipCount on stop
-    int m_hitCount = 0;     // hits since last stop
+    int m_skipCount = 0;    // stop on every (skipCount + 1)-th hit
+    int m_remaining = 0;    // hits to skip before the next stop, reset from skipCount on stop
+    int m_hitCount = 0;     // total number of hits since the breakpoint was set
     std::string m_comment;
 };
 
@@ -159,10 +158,6 @@ public:
     bool get(int id, BreakpointDesc& desc) const;
     void list(std::vector<BreakpointDesc>& descs) const; // in creation order
     unsigned getChangeCount() const {return m_changeCount;} // incremented on every change of the list or settings
-
-    // Lets execution leave the current PC: the next hit of an exec breakpoint
-    // at this address is not counted as a stop.
-    void skipCurrentPc(uint16_t pc);
 
     // The first breakpoint that has stopped the emulation since the last call
     // (-1 if none); called on stop to find out the stop reason
