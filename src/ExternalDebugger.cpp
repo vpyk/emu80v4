@@ -30,8 +30,9 @@ using namespace std;
 
 //##### External Debugger class ####
 
-ExternalDebugger::ExternalDebugger(Platform* platform) : IDebugger(platform)
+ExternalDebugger::ExternalDebugger(Platform* platform, DebugClient client) : IDebugger(platform)
 {
+    m_client = client;
     m_session = platform->getDebugSession();
     m_bps = m_session->getBreakpoints();
     m_cpu = m_session->getCpu();
@@ -41,20 +42,25 @@ ExternalDebugger::ExternalDebugger(Platform* platform) : IDebugger(platform)
 
 void ExternalDebugger::startDebug()
 {
-    if (m_session->onStop())
-        palDebugRequest();
+    palDebugRequest();
+}
+
+
+void ExternalDebugger::dbgBreak()
+{
+    m_session->requestBreak(m_client);
 }
 
 
 void ExternalDebugger::dbgRun()
 {
-    m_session->run();
+    m_session->run(m_client);
 }
 
 
 void ExternalDebugger::dbgRunFor(unsigned ms)
 {
-    m_session->runFor(ms);
+    m_session->runFor(ms, m_client);
 }
 
 
@@ -78,20 +84,20 @@ bool ExternalDebugger::isTimerFired()
 
 void ExternalDebugger::dbgStepIn()
 {
-    m_session->stepInto();
+    m_session->stepInto(m_client);
 }
 
 
 void ExternalDebugger::dbgStepOver()
 {
-    m_session->stepOver();
+    m_session->stepOver(m_client);
 }
 
 
 void ExternalDebugger::dbgSetBreakpoints(const std::list<uint16_t> &breakpoints)
 {
     for (auto& addr: breakpoints)
-        m_bps->add(BT_EXEC, addr);
+        m_bps->add(BT_EXEC, addr, m_client);
 }
 
 
@@ -170,7 +176,7 @@ void ExternalDebugger::dbgGetState(DbgCpuState& state)
 
 void ExternalDebugger::dbgSetDataBreakpoint(uint16_t addr, BreakpointType type)
 {
-    m_bps->add(type, addr);
+    m_bps->add(type, addr, m_client);
 }
 
 
@@ -212,7 +218,7 @@ void ExternalDebugger::dbgSetDataComment(uint16_t addr, BreakpointType type, con
 
 void ExternalDebugger::dbgSetPortBreakpoint(uint16_t addr, BreakpointType type)
 {
-    m_bps->add(type, addr);
+    m_bps->add(type, addr, m_client);
 }
 
 

@@ -23,23 +23,30 @@
 #include "Breakpoints.h"
 
 class Platform;
-class Cpu;
 class Cpu8080Compatible;
+class DebugSession;
 
 
+// Stops the emulation in the debugger after the given time, on behalf of a client
 class DebugElapsedTimer : public ElapsedTimer
 {
 public:
-    DebugElapsedTimer(Cpu* cpu) : m_cpu(cpu) {}
+    DebugElapsedTimer(DebugSession* session, DebugClient client) : m_session(session), m_client(client) {}
     void onElapse() override;
 private:
-    Cpu* m_cpu;
+    DebugSession* m_session;
+    DebugClient m_client;
 };
 
 
 // Debugger core of a platform: run control and breakpoints. It doesn't depend on
 // any UI; debugger front-ends (debug window, MCP server, wasm) use it.
 // Must be used from the main (emulation) thread only.
+//
+// Run control methods take the client that issues the command. When the emulation
+// stops, the stop is attributed to a client: the owner of the breakpoint that has
+// fired, else the client that requested the break, else the client that resumed
+// the emulation last (step completion, step over, run for, HLT etc.).
 class DebugSession
 {
 public:
@@ -52,12 +59,21 @@ public:
 
     bool isRunning() {return m_isRunning;}
 
+    // Called when the emulation has stopped in the debugger; returns false if
+    // the session is already stopped (it is called repeatedly while stopped)
+    bool onStop();
+    DebugClient getStopClient() {return m_stopClient;} // who the last stop belongs to
+    unsigned getStopCount() {return m_stopCount;}      // number of stops so far
+
     // Run control
-    bool onStop(); // the emulation has stopped in the debugger; returns false if already stopped
-    void run();
-    void runFor(unsigned ms);
-    void stepInto();
-    void stepOver();
+    void requestBreak(DebugClient client);
+    void run(DebugClient client);
+    void runFor(unsigned ms, DebugClient client);
+    void stepInto(DebugClient client);
+    // Steps over a call; returns true if the emulation runs until the return
+    // address, false if it was an ordinary step (or nothing was done)
+    bool stepOver(DebugClient client);
+    void runTo(uint16_t addr, DebugClient client);
 
     // Run-for timer
     void cleanupTimer();
@@ -78,7 +94,13 @@ private:
     CodeBreakpoint* m_tempBp = nullptr;
     DebugElapsedTimer* m_runForTimer = nullptr;
 
-    void resume();
+    DebugClient m_runClient = DC_UI;   // who has resumed the emulation last
+    DebugClient m_breakClient = DC_UI; // who has requested a break
+    bool m_breakRequested = false;
+    DebugClient m_stopClient = DC_UI;
+    unsigned m_stopCount = 0;
+
+    void resume(DebugClient client);
 };
 
 

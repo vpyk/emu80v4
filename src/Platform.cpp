@@ -206,6 +206,10 @@ Platform::~Platform()
     // The debugger goes first: its breakpoints are to be detached from a live CPU
     delete m_debugger;
     m_debugger = nullptr;
+#ifdef MCP_SERVER
+    delete m_extDebugger;
+    m_extDebugger = nullptr;
+#endif
     delete m_debugSession;
     m_debugSession = nullptr;
 
@@ -316,11 +320,20 @@ void Platform::sysReq(SysReq sr)
                 m_loader->chooseAndLoadFile(true);
             }
             break;
-        case SR_DEBUG:
-            // show debugger
-            g_emulation->debugRequest(m_cpu);
-            //showDebugger();
+        case SR_DEBUG: {
+            DebugSession* session = getDebugSession();
+            if (!session)
+                g_emulation->debugRequest(m_cpu);
+            else if (session->isRunning())
+                session->requestBreak(DC_UI); // showDebugger() is called on stop
+            else {
+                // already stopped (e.g. by an external client): just open the debugger UI
+                createDebugger();
+                if (m_debugger)
+                    m_debugger->startDebug();
+            }
             break;
+        }
         case SR_LOADRAMDISK:
             if (m_ramDisk)
                 m_ramDisk->loadFromFile();
@@ -454,30 +467,49 @@ void Platform::draw()
 }
 
 
+// Called by the emulation repeatedly while it is stopped in the debugger
 void Platform::showDebugger()
 {
-    if (m_cpu->getType() == Cpu::CPU_8080 || m_cpu->getType() == Cpu::CPU_Z80) {
-        if (!m_debugger)
-            createDebugger();
-        m_debugger->startDebug();
-    }
+    DebugSession* session = getDebugSession();
+    if (!session || !session->onStop())
+        return;
+
+    // The debugger UI shows up only on its own stops; a stop of an external
+    // client (MCP) only refreshes the UI if it is open
+    if (session->getStopClient() == DC_UI) {
+        createDebugger();
+        if (m_debugger)
+            m_debugger->startDebug();
+    } else if (m_debugger)
+        m_debugger->refreshDebug();
 }
 
 
+// Creates the debugger UI of the build
 void Platform::createDebugger()
 {
-    if (m_debugger)
+    if (m_debugger || !getDebugSession())
         return;
 
-#if (!defined PAL_WASM || !defined WASM_DBG) && !defined MCP_SERVER
-    m_debugger = new DebugWindow(this);
-    m_debugger->initDbgWindow();
-    m_debugger->setCaption("Debug: " + m_window->getCaption());
+#ifdef WASM_DBG
+    m_debugger = new ExternalDebugger(this, DC_UI);
 #else
-    m_debugger = new ExternalDebugger(this);
+    DebugWindow* dbgWnd = new DebugWindow(this);
+    dbgWnd->initDbgWindow();
+    dbgWnd->setCaption("Debug: " + m_window->getCaption());
+    m_debugger = dbgWnd;
 #endif
 }
 
+
+#ifdef MCP_SERVER
+ExternalDebugger* Platform::getExternalDebugger()
+{
+    if (!m_extDebugger && getDebugSession())
+        m_extDebugger = new ExternalDebugger(this, DC_EXTERNAL);
+    return m_extDebugger;
+}
+#endif
 
 
 DebugSession* Platform::getDebugSession()

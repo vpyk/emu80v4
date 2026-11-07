@@ -54,7 +54,8 @@ public:
     virtual void setCaption(std::string caption) = 0;
     virtual void sendCmd(DebugCommand /*cmd*/) {}
 
-    virtual void startDebug() = 0;
+    virtual void startDebug() = 0;      // stopped in the debugger: show the UI
+    virtual void refreshDebug() {}      // stopped by another client: refresh the UI if it is open
     virtual void update() = 0;
     virtual void draw() {}
 };

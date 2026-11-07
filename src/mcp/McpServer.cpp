@@ -831,12 +831,7 @@ namespace
             if (!cpu) { err = "CPU is not available"; return; }
 
             // Use ExternalDebugger to skip breakpoint at current PC.
-            IDebugger* dbg = p->getDebugger();
-            if (!dbg) {
-                p->createDebugger();
-                dbg = p->getDebugger();
-            }
-            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             if (!extDbg) { err = "debugger not available in MCP mode"; return; }
 
             const bool wasBreaked = g_emulation->isDebuggerActive();
@@ -876,12 +871,7 @@ namespace
             Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
             if (!cpu) { err = "CPU is not available"; return; }
 
-            IDebugger* dbg = p->getDebugger();
-            if (!dbg) {
-                p->createDebugger();
-                dbg = p->getDebugger();
-            }
-            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             if (!extDbg) { err = "debugger not available in MCP mode"; return; }
 
             extDbg->dbgRunFor(static_cast<unsigned>(ms));
@@ -907,8 +897,7 @@ namespace
             Cpu8080Compatible* cpu = p ? dynamic_cast<Cpu8080Compatible*>(p->getCpu()) : nullptr;
             if (!cpu) { err = "CPU unavailable after run"; return; }
 
-            IDebugger* dbg = p->getDebugger();
-            ExternalDebugger* extDbg = dbg ? dynamic_cast<ExternalDebugger*>(dbg) : nullptr;
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             bool timerDidFire = extDbg && extDbg->isTimerFired();
             if (extDbg)
                 extDbg->dbgCleanupTimer();
@@ -958,8 +947,9 @@ namespace
 
             if (autorun && breakAfterLoad) {
                 Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
-                if (cpu) {
-                    g_emulation->debugRequest(dynamic_cast<Cpu*>(cpu));
+                ExternalDebugger* extDbg = p->getExternalDebugger();
+                if (cpu && extDbg) {
+                    extDbg->dbgBreak();
                     FillCpuStateJson(cpu, result);
                 }
                 result["breaked"] = g_emulation->isDebuggerActive();
@@ -1038,17 +1028,19 @@ namespace
             Keyboard* kb = p->getKeyboard();
             if (!kb) { err = "no keyboard found"; return; }
 
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "debugger not available in MCP mode"; return; }
+
             for (auto k : keys)
                 kb->processKey(k, true);
 
-            kbdTimer = new DebugElapsedTimer(cpu);
+            // the stop on the timer is MCP's own, the debug window doesn't show up
+            kbdTimer = new DebugElapsedTimer(session, DC_EXTERNAL);
             kbdTimer->start(static_cast<unsigned>(durationMs));
 
             result["wasBreaked"] = g_emulation->isDebuggerActive();
             if (g_emulation->isDebuggerActive()) {
-                IDebugger* dbg = p->getDebugger();
-                if (!dbg) { p->createDebugger(); dbg = p->getDebugger(); }
-                ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+                ExternalDebugger* extDbg = p->getExternalDebugger();
                 if (!extDbg) { err = "debugger not available in MCP mode"; return; }
                 extDbg->dbgRun();
             }
@@ -1083,10 +1075,10 @@ namespace
 
             // Restore CPU state after timer intervention.
             if (timerFired) {
-                if (wasBreaked)
-                    g_emulation->debugRequest(p->getCpu());
-                else
-                    g_emulation->debugRun();
+                // was breaked: stay stopped, otherwise continue
+                ExternalDebugger* extDbg = p->getExternalDebugger();
+                if (!wasBreaked && extDbg)
+                    extDbg->dbgRun();
             }
 
             result["breaked"]             = g_emulation->isDebuggerActive();
@@ -1215,9 +1207,7 @@ namespace
 
             result["wasBreaked"] = g_emulation->isDebuggerActive();
             if (g_emulation->isDebuggerActive()) {
-                IDebugger* dbg = p->getDebugger();
-                if (!dbg) { p->createDebugger(); dbg = p->getDebugger(); }
-                ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+                ExternalDebugger* extDbg = p->getExternalDebugger();
                 if (!extDbg) { err = "debugger not available in MCP mode"; return; }
                 extDbg->dbgRun();
             }
@@ -1249,9 +1239,9 @@ namespace
 
             // If was breaked and typing completed (not BP), return to breaked.
             if (wasBreaked && !stoppedByBreakpoint) {
-                Cpu* cpu = p->getCpu();
-                if (cpu)
-                    g_emulation->debugRequest(cpu);
+                ExternalDebugger* extDbg = p->getExternalDebugger();
+                if (extDbg)
+                    extDbg->dbgBreak();
             }
 
             result["completed"]           = !stoppedByBreakpoint;
@@ -1279,8 +1269,11 @@ namespace
             if (!cpu) { err = "CPU is not available"; return; }
 
             const bool wasBreaked = g_emulation->isDebuggerActive();
-            if (!wasBreaked)
-                g_emulation->debugRequest(dynamic_cast<Cpu*>(cpu));
+            if (!wasBreaked) {
+                ExternalDebugger* extDbg = p->getExternalDebugger();
+                if (!extDbg) { err = "debugger not available in MCP mode"; return; }
+                extDbg->dbgBreak();
+            }
 
             uint16_t pc = cpu->getPC();
             result["breaked"]  = g_emulation->isDebuggerActive();
@@ -1353,12 +1346,7 @@ namespace
             }
 
             // Get ExternalDebugger for proper breakpoint-aware stepping.
-            IDebugger* dbg = p->getDebugger();
-            if (!dbg) {
-                p->createDebugger();
-                dbg = p->getDebugger();
-            }
-            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             if (!extDbg) { err = "debugger not available in MCP mode"; return; }
 
             if (mode == "skip") {
@@ -1512,13 +1500,7 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            IDebugger* dbg = p->getDebugger();
-            if (!dbg) {
-                p->createDebugger();
-                dbg = p->getDebugger();
-            }
-
-            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             if (!extDbg) { err = "debugger not available in MCP mode"; return; }
 
             DbgCpuState state;
@@ -1607,13 +1589,7 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            IDebugger* dbg = p->getDebugger();
-            if (!dbg) {
-                p->createDebugger();
-                dbg = p->getDebugger();
-            }
-
-            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             if (!extDbg) { err = "debugger not available in MCP mode"; return; }
 
             bool exists = false;
@@ -1705,15 +1681,7 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            IDebugger* dbg = p->getDebugger();
-            // No debugger means no breakpoints — return zero results.
-            if (!dbg) {
-                result["removed"] = 0;
-                result["count"]   = 0;
-                return;
-            }
-
-            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             if (!extDbg) {
                 result["removed"] = 0;
                 result["count"]   = 0;
@@ -1787,15 +1755,7 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            IDebugger* dbg = p->getDebugger();
-            // No debugger means no breakpoints — return zero results.
-            if (!dbg) {
-                result["removed"] = 0;
-                result["count"]   = 0;
-                return;
-            }
-
-            ExternalDebugger* extDbg = dynamic_cast<ExternalDebugger*>(dbg);
+            ExternalDebugger* extDbg = p->getExternalDebugger();
             if (!extDbg) {
                 result["removed"] = 0;
                 result["count"]   = 0;

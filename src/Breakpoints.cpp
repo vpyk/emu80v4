@@ -51,6 +51,8 @@ bool BreakpointCounters::countHit()
     // Actual stop — reset counters.
     m_remaining = m_skipCount;
     m_hitCount = 0;
+    if (m_manager)
+        m_manager->onBreakpointStop(m_id);
     return true;
 }
 
@@ -131,7 +133,7 @@ BreakpointManager::~BreakpointManager()
 }
 
 
-int BreakpointManager::add(BreakpointType type, uint16_t addr)
+int BreakpointManager::add(BreakpointType type, uint16_t addr, DebugClient owner)
 {
     int id = find(type, addr);
     if (id >= 0)
@@ -141,6 +143,7 @@ int BreakpointManager::add(BreakpointType type, uint16_t addr)
     entry.id = m_nextId++;
     entry.type = type;
     entry.addr = addr;
+    entry.owner = owner;
     entry.enabled = true;
     entry.codeBp = nullptr;
     entry.dataBp = nullptr;
@@ -148,8 +151,10 @@ int BreakpointManager::add(BreakpointType type, uint16_t addr)
         entry.codeBp = new CodeBreakpoint(addr);
     else
         entry.dataBp = new DataBreakpoint(addr, type);
+    entry.counters()->setManager(this, entry.id);
     attach(entry);
     m_entries.push_back(entry);
+    ++m_changeCount;
     return entry.id;
 }
 
@@ -169,6 +174,7 @@ bool BreakpointManager::remove(int id)
         if (it->id == id) {
             destroy(*it);
             m_entries.erase(it);
+            ++m_changeCount;
             return true;
         }
     return false;
@@ -180,6 +186,7 @@ void BreakpointManager::clear()
     for (Entry& entry : m_entries)
         destroy(entry);
     m_entries.clear();
+    ++m_changeCount;
 }
 
 
@@ -192,6 +199,7 @@ void BreakpointManager::clear(BreakpointClass bpClass)
         } else
             ++it;
     }
+    ++m_changeCount;
 }
 
 
@@ -206,6 +214,7 @@ bool BreakpointManager::setEnabled(int id, bool enabled)
         else
             detach(*entry);
         entry->enabled = enabled;
+        ++m_changeCount;
     }
     return true;
 }
@@ -217,6 +226,7 @@ bool BreakpointManager::setSkipCount(int id, int skipCount)
     if (!entry)
         return false;
     entry->counters()->setSkipCount(skipCount);
+    ++m_changeCount;
     return true;
 }
 
@@ -227,6 +237,7 @@ bool BreakpointManager::setComment(int id, const std::string& comment)
     if (!entry)
         return false;
     entry->counters()->setComment(comment);
+    ++m_changeCount;
     return true;
 }
 
@@ -259,6 +270,14 @@ void BreakpointManager::skipCurrentPc(uint16_t pc)
         if (entry.type == BT_EXEC && entry.addr == pc && entry.enabled)
             if (entry.codeBp->getRemaining() == 0)
                 entry.codeBp->setRemaining(1);
+}
+
+
+int BreakpointManager::takeStopBreakpoint()
+{
+    int id = m_stopBpId;
+    m_stopBpId = -1;
+    return id;
 }
 
 
@@ -331,6 +350,7 @@ void BreakpointManager::fillDesc(const Entry& entry, BreakpointDesc& desc) const
     desc.id = entry.id;
     desc.type = entry.type;
     desc.addr = entry.addr;
+    desc.owner = entry.owner;
     desc.enabled = entry.enabled;
     desc.skipCount = counters->getSkipCount();
     desc.remaining = counters->getRemaining();

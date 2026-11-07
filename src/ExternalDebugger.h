@@ -67,11 +67,13 @@ class DebugSession;
 
 
 // Debugger interface for external front-ends (MCP server, wasm).
-// A thin wrapper over the platform's DebugSession.
+// A thin wrapper over the platform's DebugSession. In wasm it is the debugger UI
+// (client DC_UI) and gets startDebug() on stops; for MCP it is an external client
+// (DC_EXTERNAL) which polls the state and is never notified.
 class ExternalDebugger : public IDebugger
 {
 public:
-    ExternalDebugger(Platform* platform);
+    ExternalDebugger(Platform* platform, DebugClient client);
     virtual ~ExternalDebugger() {}
 
     virtual void initDbgWindow() override {}
@@ -86,6 +88,7 @@ public:
         af, bc, de, hl, sp, pc, iff
     };
 
+    void dbgBreak();
     void dbgRun();
     void dbgRunFor(unsigned ms);
     void dbgStepIn();
@@ -114,6 +117,7 @@ public:
 
 private:
     DebugSession* m_session;
+    DebugClient m_client;
     BreakpointManager* m_bps;
     Cpu8080Compatible* m_cpu;
     AddressableDevice* m_as;

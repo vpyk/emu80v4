@@ -19,12 +19,14 @@
 #ifndef DEBUGWINDOW_H
 #define DEBUGWINDOW_H
 
-#include <list>
+#include <vector>
 
 #include "PalKeys.h"
 #include "EmuWindow.h"
 #include "Debugger.h"
 #include "Breakpoints.h"
+
+class DebugSession;
 
 class Cpu;
 class Cpu8080Compatible;
@@ -73,6 +75,7 @@ public:
     void sendCmd(DebugCommand cmd) override;
 
     void startDebug() override;
+    void refreshDebug() override;
     void update() override;
     void draw() override;
 
@@ -161,6 +164,8 @@ private:
     Cpu8080Compatible* m_cpu;
     CpuZ80* m_z80cpu;
     AddressableDevice* m_as;
+    DebugSession* m_session;
+    BreakpointManager* m_bps;
 
     Cpu8080State m_states[2];
     int m_stateNum = 0;
@@ -272,10 +277,12 @@ private:
 
     void saveDump();
 
-    bool m_isRunning = true;
-    CodeBreakpoint* m_tempBp = nullptr;
-    std::list<BreakpointInfo> m_bpList;
-    void checkForCurBreakpoint();           // проверяет перед выполнением, не установлена ли точка останова на текущий PC
+    bool isRunning();                       // the emulation is running: commands are ignored
+    unsigned m_lastStopCount = 0;           // the session's stop count of the state shown
+    unsigned m_bpChangeCount = 0;           // the breakpoint list's change count of the list shown
+    void refreshState();                    // re-reads CPU state after a stop or a change
+    std::vector<BreakpointDesc> m_bpDescs;  // breakpoints shown (all types, from the session)
+    void updateBpList();
 
     // code section fields and methods
     const int m_codeDefPcLine = 7;          // номер строки листинга по умолчанию для отображения PC
@@ -342,6 +349,9 @@ private:
     void bpointsDraw();
     void bpointsKbdProc(PalKeyCode keyCode);// клавиатурный обработчик секции точек останова
     void bpointsClick(int x, int y, PalMouseKey key); // обработка щелчка мышью
+    void dumpGotoAddr(uint16_t addr);       // shows the given address in the dump
+    void bpointsClamp();                    // keeps the current line within the list
+    static char bpointTypeChar(BreakpointType type);
 
     // debugger options
     bool m_mnemo8080UpperCase;

@@ -28,6 +28,7 @@
 #include "Platform.h"
 #include "Pal.h"
 #include "PalFile.h"
+#include "DebugSession.h"
 
 #include "CpuZ80.h"
 #include "Cpu8080dasm.h"
@@ -130,6 +131,8 @@ DebugWindow::DebugWindow(Platform* platform) : IDebugger(platform)
     m_cpu = static_cast<Cpu8080Compatible*>(m_platform->getCpu());
     m_z80cpu = dynamic_cast<CpuZ80*>(m_cpu);
     m_as = m_cpu->getAddrSpace();
+    m_session = m_platform->getDebugSession();
+    m_bps = m_session->getBreakpoints();
 
     m_z80Mode = m_z80cpu != nullptr;
 
@@ -137,8 +140,6 @@ DebugWindow::DebugWindow(Platform* platform) : IDebugger(platform)
 
     int bytesToRead = (256 + 128) * 12;
     m_font = palReadFile("dbgfont.bin", bytesToRead);
-
-    m_isRunning = true;
 
     for (int i = 0; i < 100; i++)
         for (int j = 0; j < 50; j++) {
@@ -204,34 +205,46 @@ void DebugWindow::setLayout(bool isCompact)
 
 void DebugWindow::closeRequest()
 {
-    run();
+    if (isRunning())
+        hide(); // the emulation was resumed by another client
+    else
+        run();
 }
 
 
 void DebugWindow::startDebug()
 {
-    if (!m_isRunning)
-        return;
-
-    /*if (m_tempBp && m_tempBp->getHookAddr() != m_cpu->getPC()) {
-        resetCpuClock();
-        m_resetCpuClockFlag = false;
-    }*/
-
-    m_isRunning = false;
-
-    if (m_tempBp) {
-        delete m_tempBp;
-        m_tempBp = nullptr;
-    }
-
-    m_stateNum = 1 - m_stateNum;
-    fillCpuStatus();
-    codeGotoPc();
+    refreshState();
     invalidate();
     show();
     updateEmuScreen();
     draw();
+}
+
+
+void DebugWindow::refreshDebug()
+{
+    if (!isVisible())
+        return;
+
+    refreshState();
+    invalidate();
+    updateEmuScreen();
+    draw();
+}
+
+
+void DebugWindow::refreshState()
+{
+    // a new stop: the previous state is kept to highlight the changes
+    unsigned stopCount = m_session->getStopCount();
+    if (stopCount != m_lastStopCount) {
+        m_lastStopCount = stopCount;
+        m_stateNum = 1 - m_stateNum;
+    }
+
+    fillCpuStatus();
+    codeGotoPc();
 }
 
 
@@ -298,6 +311,7 @@ void DebugWindow::putString(string s)
 
 void DebugWindow::preparePixelBuffer()
 {
+    updateBpList();
     drawDbgFrame();
     displayCpuStatus();
     displayObjectDbgInfo();
@@ -358,6 +372,12 @@ void DebugWindow::draw()
     m_resetKeys = debOpt.resetKeys;
 
     m_codePage = m_platform->getCodePage();
+
+    unsigned bpChangeCount = m_bps->getChangeCount();
+    if (bpChangeCount != m_bpChangeCount) {
+        m_bpChangeCount = bpChangeCount;
+        invalidate();
+    }
 
     checkForInput();
 
@@ -941,7 +961,7 @@ void DebugWindow::drawHintBar()
             break;
         case AM_BPOINTS:
             //s = "C/D/R/B,Tab,Esc-Section F2-Edit Enter-Goto";
-            s = "C/D/R/F/B,Tab,Esc-Section Enter-Goto";
+            s = "C/D/R/F/B,Tab,Esc-Section Enter-Goto Space-On/Off Del-Delete";
             break;
         case AM_INPUT:
             s = "Enter-Enter Esc-Cancel";
@@ -968,7 +988,9 @@ void DebugWindow::drawHintBar()
 
 void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
 {
-    if (isPressed) {
+    // no commands while the emulation is running (resumed by another client)
+    if (isPressed && !isRunning()) {
+        updateBpList();
         m_needRepaint = true;
         if (m_mode == AM_INPUT)
             inputKbdProc(keyCode);
@@ -988,7 +1010,7 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
                     m_mode = AM_FLAGS;
                     break;
                 case PK_B:
-                    if (m_bpList.size() > 0)
+                    if (m_bpDescs.size() > 0)
                         m_mode = AM_BPOINTS;
                     break;
                 case PK_TAB:
@@ -1050,7 +1072,7 @@ void DebugWindow::processKey(PalKeyCode keyCode, bool isPressed)
 
 void DebugWindow::sendCmd(DebugCommand cmd)
 {
-    if (m_mode == AM_INPUT)
+    if (m_mode == AM_INPUT || (cmd != DCMD_REPAINT && isRunning()))
         return;
 
     switch(cmd) {
@@ -1121,8 +1143,9 @@ bool DebugWindow::checkRegion(const DbgRegion& rgn, int x, int y)
 
 void DebugWindow::mouseClick(int x, int y, PalMouseKey key)
 {
-    if (!translateCoords(x, y))
+    if (isRunning() || !translateCoords(x, y))
         return;
+    updateBpList();
 
     x /= m_chrW;
     y /= m_chrH;
@@ -1168,7 +1191,7 @@ void DebugWindow::mouseClick(int x, int y, PalMouseKey key)
     } else if (checkRegion(m_curLayout->flags, x, y)) {
         m_mode = AM_FLAGS;
         flagsClick(x - m_curLayout->flags.left, y - m_curLayout->flags.top, key);
-    } else if (checkRegion(m_curLayout->bpts, x, y) && (m_bpList.size() > 0)) {
+    } else if (checkRegion(m_curLayout->bpts, x, y) && (m_bpDescs.size() > 0)) {
         m_mode = AM_BPOINTS;
         bpointsClick(x - m_curLayout->bpts.left, y - m_curLayout->bpts.top, key);
     }
@@ -1202,15 +1225,8 @@ void DebugWindow::step()
     if (m_resetCpuClockFlag)
         resetCpuClock();
 
-    /*unsigned pc = m_states[m_stateNum].pc;
-    unsigned len = getInstructionLength(pc);
-    m_states[m_stateNum].pc += len;
-    codeGotoPc();*/
-    m_cpu->debugStepRequest();
-    m_isRunning = true;
-    checkForCurBreakpoint();
     m_resetCpuClockFlag = false;
-    g_emulation->debugRun();
+    m_session->stepInto(DC_UI);
 }
 
 
@@ -1219,12 +1235,10 @@ void DebugWindow::run()
     if (m_resetCpuClockFlag)
         resetCpuClock();
 
-    m_isRunning = true;
-    checkForCurBreakpoint();
     m_resetCpuClockFlag = true;
     if (m_resetKeys)
         m_platform->resetKeys();
-    g_emulation->debugRun();
+    m_session->run(DC_UI);
     hide();
     m_platform->getWindow()->bringToFront();
 }
@@ -1235,29 +1249,10 @@ void DebugWindow::over()
     if (m_resetCpuClockFlag)
         resetCpuClock();
 
-    unsigned pc = m_states[m_stateNum].pc;
-    unsigned len = getInstructionLength(pc);
-    bool over = getInstructionOverFlag(pc);
-
-    //uint8_t op = memByte(pc);
-    //over = (op & 0xcf) == 0xcd /* CALL */ || (op & 0xc7) == 0xc7 /* RST */ || (op & 0xc7) == 0xc4 /* Cx */;
-
-    if (over) {
-        // если пользователь нажал F8, пока не успела выполниться предудущая F8 или F4, ничего не делаем
-        if (m_tempBp)
-            return;
-        m_tempBp = new CodeBreakpoint(pc + len);
-        m_cpu->addHook(m_tempBp);
-
-        m_isRunning = true;
-        checkForCurBreakpoint();
-        m_resetCpuClockFlag = false;
-        if (m_resetKeys)
-            m_platform->resetKeys();
-        g_emulation->debugRun();
+    m_resetCpuClockFlag = false;
+    // a call is executed at full speed until it returns, the window is hidden meanwhile
+    if (m_session->stepOver(DC_UI))
         hide();
-    } else
-        step();
 }
 
 
@@ -1266,8 +1261,12 @@ void DebugWindow::skip()
     unsigned pc = m_states[m_stateNum].pc;
     unsigned len = getInstructionLength(pc);
     m_cpu->setPC(pc + len);
-    m_isRunning = true;
-    startDebug();
+
+    m_stateNum = 1 - m_stateNum;
+    fillCpuStatus();
+    codeGotoPc();
+    invalidate();
+    draw();
 }
 
 
@@ -1278,71 +1277,38 @@ void DebugWindow::here()
 
     unsigned pc = m_codeLayout[m_codeHighlightedLine];
 
-    // если пользователь нажал F4, пока не успела выполниться предудущая F4 или F8, ничего не делаем
-    if (m_tempBp)
-        return;
-    m_tempBp = new CodeBreakpoint(pc);
-    m_cpu->addHook(m_tempBp);
-
-    m_isRunning = true;
-    checkForCurBreakpoint();
-
-    if (pc == m_states[m_stateNum].pc) {
-        m_tempBp->setSkipCount(1);
-    }
-
     m_resetCpuClockFlag = true;
     if (m_resetKeys)
         m_platform->resetKeys();
-    g_emulation->debugRun();
+    m_session->runTo(pc, DC_UI);
     hide();
 }
 
 
+// sets or removes an exec breakpoint at the highlighted line
 void DebugWindow::breakpoint()
 {
-    unsigned pc = m_codeLayout[m_codeHighlightedLine];
+    uint16_t pc = m_codeLayout[m_codeHighlightedLine];
 
-    // ищем точку останова
-    bool found = false;
-    BreakpointInfo bpInfo;
-    list<BreakpointInfo>::iterator it;
-    for (it = m_bpList.begin(); it != m_bpList.end(); it++)
-        if ((*it).addr == pc) {
-            found = true;
-            bpInfo = *it;
-            break;
-        }
-
-    if (found) {
-        // нашли, удаляем
-        delete bpInfo.codeBp;
-        m_bpList.erase(it);
-    } else {
-        // не нашли
-        /*if (m_bpList.size() >= 6) // ограничение на количество точек останова
-            return;*/
-        // ставим
-        CodeBreakpoint* cbp = new CodeBreakpoint(pc);
-        m_cpu->addHook(cbp);
-        bpInfo.addr = pc;
-        bpInfo.type = BT_EXEC;
-        bpInfo.codeBp = cbp;
-        m_bpList.push_back(bpInfo);
-    }
+    int id = m_bps->find(BT_EXEC, pc);
+    if (id >= 0)
+        m_bps->remove(id);
+    else
+        m_bps->add(BT_EXEC, pc, DC_UI);
 }
 
 
-// проверяет перед выполнением, не установлена ли точка останова на текущий PC
-void DebugWindow::checkForCurBreakpoint()
+bool DebugWindow::isRunning()
 {
-    // Skip only the next hit; setSkipCount() here would make the breakpoint
-    // fire only every other time from then on.
-    for (auto it = m_bpList.begin(); it != m_bpList.end(); it++)
-        if ((*it).type == BT_EXEC && (*it).addr == m_states[m_stateNum].pc)
-            if ((*it).codeBp->getRemaining() == 0)
-                (*it).codeBp->setRemaining(1);
+    return m_session->isRunning();
 }
+
+
+void DebugWindow::updateBpList()
+{
+    m_bps->list(m_bpDescs);
+}
+
 
 // ######## INPUT mode methods ########
 
@@ -1596,10 +1562,12 @@ void DebugWindow::codeDraw()
     if (pcLine >= 0)
         putChars(m_curLayout->code.left + 2, m_curLayout->code.top + pcLine, 0x10, 1);
 
-    setColors(12, 1);
-    for (auto it = m_bpList.begin(); it != m_bpList.end(); it++) {
+    for (auto& bp : m_bpDescs) {
+        if (bp.type != BT_EXEC)
+            continue;
+        setColors(bp.enabled ? 12 : 8, 1);
         for(int i = 0; i < m_curLayout->code.height; i++)
-            if (m_codeLayout[i] == (*it).addr && (*it).type == BT_EXEC)
+            if (m_codeLayout[i] == bp.addr)
                 putChars(m_curLayout->code.left + 1, m_curLayout->code.top + i, 0x0f, 1);
     }
 
@@ -2184,24 +2152,28 @@ void DebugWindow::bpointsDraw()
 {
     //clearBlock(m_curLayout->bpts.left, m_curLayout->bpts.top, m_curLayout->bpts.left + m_curLayout->bpts.width - 1, m_curLayout->bpts.top + m_curLayout->bpts.height - 1, 1);
 
-    if (m_bpList.size() == 0) {
+    unsigned nBps = m_bpDescs.size();
+    unsigned height = m_curLayout->bpts.height;
+
+    if (nBps == 0) {
+        if (m_mode == AM_BPOINTS)
+            m_mode = AM_CODE; // the last breakpoint was removed by another client
+        m_curBpointLine = 0;
+        m_firstVisibleBpoint = 0;
         setColors(10, 1);
         putString(m_curLayout->bpts.left + (m_compactMode ? 1 : 3), m_curLayout->bpts.top + 1, "Emu80");
         putString(m_curLayout->bpts.left + (m_compactMode ? 2 : 4), m_curLayout->bpts.top + 2, "v.4");
-    } else {
-        if (m_firstVisibleBpoint > m_bpList.size() - m_curLayout->bpts.height)
-            m_firstVisibleBpoint = m_bpList.size() - m_curLayout->bpts.height;
-        if (m_curBpointLine >= m_bpList.size() - m_firstVisibleBpoint)
-            m_curBpointLine = m_bpList.size() - m_firstVisibleBpoint - 1;
-        auto it = m_bpList.begin();
-        advance(it, m_firstVisibleBpoint);
-        for (int i = 0; i < m_curLayout->bpts.height && unsigned(i) < m_bpList.size() + m_firstVisibleBpoint; i++) {
-            setColors(12, 1);
-            putString(m_curLayout->bpts.left + 2 , i + m_curLayout->bpts.top, int2Hex((*it).addr, 4));
-            setColors(7, 1);
-            putString(m_curLayout->bpts.left + 1, i + m_curLayout->bpts.top, "x");
-            it++;
-        }
+        return;
+    }
+
+    bpointsClamp();
+    for (unsigned i = 0; i < height && m_firstVisibleBpoint + i < nBps; i++) {
+        const BreakpointDesc& bp = m_bpDescs[m_firstVisibleBpoint + i];
+        // type letter: cyan for breakpoints of external clients (MCP)
+        setColors(bp.enabled ? (bp.owner == DC_UI ? 7 : 11) : 8, 1);
+        putString(m_curLayout->bpts.left + 1, i + m_curLayout->bpts.top, string(1, bpointTypeChar(bp.type)));
+        setColors(bp.enabled ? 12 : 8, 1);
+        putString(m_curLayout->bpts.left + 2, i + m_curLayout->bpts.top, int2Hex(bp.addr, 4));
     }
 
     if (m_mode == AM_BPOINTS)
@@ -2209,9 +2181,55 @@ void DebugWindow::bpointsDraw()
 }
 
 
+// keeps the current line and the scroll position within the list
+void DebugWindow::bpointsClamp()
+{
+    unsigned nBps = m_bpDescs.size();
+    unsigned height = m_curLayout->bpts.height;
+
+    if (nBps == 0) {
+        m_curBpointLine = 0;
+        m_firstVisibleBpoint = 0;
+        return;
+    }
+    if (m_firstVisibleBpoint + height > nBps)
+        m_firstVisibleBpoint = nBps > height ? nBps - height : 0;
+    if (m_curBpointLine >= height)
+        m_curBpointLine = height - 1;
+    if (m_firstVisibleBpoint + m_curBpointLine >= nBps)
+        m_curBpointLine = nBps - m_firstVisibleBpoint - 1;
+}
+
+
+// x - exec, r/w/a - memory read/write/access, i/o/p - port read (in)/write (out)/access
+char DebugWindow::bpointTypeChar(BreakpointType type)
+{
+    switch (type) {
+        case BT_EXEC:        return 'x';
+        case BT_READ:        return 'r';
+        case BT_WRITE:       return 'w';
+        case BT_ACSESS:      return 'a';
+        case BT_PORT_READ:   return 'i';
+        case BT_PORT_WRITE:  return 'o';
+        case BT_PORT_ACSESS: return 'p';
+    }
+    return '?';
+}
+
+
 // клавиатурный обработчик секции точек останова
 void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
 {
+    unsigned nBps = m_bpDescs.size();
+    unsigned height = m_curLayout->bpts.height;
+
+    if (nBps == 0) {
+        m_mode = AM_CODE;
+        return;
+    }
+    bpointsClamp();
+    const BreakpointDesc& bp = m_bpDescs[m_firstVisibleBpoint + m_curBpointLine];
+
     switch (keyCode) {
         case PK_UP:
             if (m_curBpointLine > 0)
@@ -2220,31 +2238,51 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
                 --m_firstVisibleBpoint;
             break;
         case PK_DOWN:
-            if (m_curBpointLine < m_bpList.size() - 1 && m_curBpointLine < unsigned(m_curLayout->bpts.height) - 1)
-                ++m_curBpointLine;
-            else if (m_curBpointLine == unsigned(m_curLayout->bpts.height) - 1 && m_curBpointLine < m_bpList.size() - 1)
-                ++m_firstVisibleBpoint;
+            if (m_firstVisibleBpoint + m_curBpointLine + 1 < nBps) {
+                if (m_curBpointLine + 1 < height)
+                    ++m_curBpointLine;
+                else
+                    ++m_firstVisibleBpoint;
+            }
             break;
         case PK_PGUP:
             m_curBpointLine = 0;
             m_firstVisibleBpoint = 0;
             break;
         case PK_PGDN:
-            if (m_bpList.size() < unsigned(m_curLayout->bpts.height))
-                m_curBpointLine = m_bpList.size() - 1;
+            if (nBps < height)
+                m_curBpointLine = nBps - 1;
             else {
-                m_curBpointLine = m_curLayout->bpts.height - 1;
-                m_firstVisibleBpoint = m_bpList.size() - m_curLayout->bpts.height;
+                m_curBpointLine = height - 1;
+                m_firstVisibleBpoint = nBps - height;
             }
             break;
         case PK_ENTER:
-        case PK_KP_ENTER: {
-            auto it = m_bpList.begin();
-            advance(it, m_curBpointLine + m_firstVisibleBpoint);
-            codeGotoAddr((*it).addr);
-            codeGotoAddr((*it).addr);
-            m_mode = AM_CODE;
-            break; }
+        case PK_KP_ENTER:
+            switch (getBreakpointClass(bp.type)) {
+                case BC_EXEC:
+                    codeGotoAddr(bp.addr);
+                    m_mode = AM_CODE;
+                    break;
+                case BC_MEM:
+                    dumpGotoAddr(bp.addr);
+                    m_mode = AM_DUMP;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case PK_SPACE:
+            m_bps->setEnabled(bp.id, !bp.enabled);
+            break;
+        case PK_DEL:
+            m_bps->remove(bp.id);
+            updateBpList();
+            if (m_bpDescs.empty())
+                m_mode = AM_CODE;
+            else
+                bpointsClamp();
+            break;
         default:
             m_needRepaint = false;
             break;
@@ -2255,7 +2293,7 @@ void DebugWindow::bpointsKbdProc(PalKeyCode keyCode)
 // обработчик событий мыши секции точек останова
 void DebugWindow::bpointsClick(int /*x*/, int y, PalMouseKey key)
 {
-    if (y >= int(m_bpList.size()))
+    if (y < 0 || m_firstVisibleBpoint + y >= m_bpDescs.size())
         return;
 
     switch (key) {
@@ -2263,6 +2301,7 @@ void DebugWindow::bpointsClick(int /*x*/, int y, PalMouseKey key)
         m_curBpointLine = y;
         break;
     case PM_LEFT_DBLCLICK:
+        m_curBpointLine = y;
         bpointsKbdProc(PK_ENTER);
         break;
     case PM_WHEEL_UP:
@@ -2271,5 +2310,15 @@ void DebugWindow::bpointsClick(int /*x*/, int y, PalMouseKey key)
     case PM_WHEEL_DOWN:
         bpointsKbdProc(PK_DOWN);
         break;
+    default:
+        break;
     }
+}
+
+
+void DebugWindow::dumpGotoAddr(uint16_t addr)
+{
+    // keeps the position of the current line in the dump, as address input does
+    m_dumpCurStartAddr = uint16_t((addr & 0xFFF0) - uint16_t((m_dumpCurAddr & 0xFFF0) - m_dumpCurStartAddr));
+    m_dumpCurAddr = addr;
 }

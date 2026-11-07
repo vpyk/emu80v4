@@ -25,6 +25,16 @@
 #include "CpuHook.h"
 
 class Cpu;
+class BreakpointManager;
+
+
+// Debugger clients: the debugger UI of the build (debug window, or the web debugger
+// in wasm) and external clients (MCP server). Used to tell who has set a breakpoint
+// or stopped the emulation, so that the UI shows up on its own stops only.
+enum DebugClient {
+    DC_UI,
+    DC_EXTERNAL
+};
 
 
 enum BreakpointType {
@@ -60,11 +70,16 @@ public:
     void setComment(const std::string& c) { m_comment = c; }
     const std::string& getComment() const { return m_comment; }
 
+    // Breakpoint manager to report stops to (not set for temporary breakpoints)
+    void setManager(BreakpointManager* manager, int id) { m_manager = manager; m_id = id; }
+
 protected:
     // Counts a hit, returns true if the breakpoint should stop now
     bool countHit();
 
 private:
+    BreakpointManager* m_manager = nullptr;
+    int m_id = 0;
     int m_skipCount = 0;    // fixed property
     int m_remaining = 0;    // decremented each hit, reset from skipCount on stop
     int m_hitCount = 0;     // hits since last stop
@@ -112,6 +127,7 @@ struct BreakpointDesc {
     int id;
     BreakpointType type;
     uint16_t addr;
+    DebugClient owner;
     bool enabled;
     int skipCount;
     int remaining;
@@ -130,7 +146,7 @@ public:
 
     // Adds a breakpoint, returns its id. If a breakpoint of the same type
     // at the same address exists, returns its id and changes nothing.
-    int add(BreakpointType type, uint16_t addr);
+    int add(BreakpointType type, uint16_t addr, DebugClient owner);
     int find(BreakpointType type, uint16_t addr) const; // returns id or -1
     bool remove(int id);
     void clear();
@@ -142,16 +158,25 @@ public:
 
     bool get(int id, BreakpointDesc& desc) const;
     void list(std::vector<BreakpointDesc>& descs) const; // in creation order
+    unsigned getChangeCount() const {return m_changeCount;} // incremented on every change of the list or settings
 
     // Lets execution leave the current PC: the next hit of an exec breakpoint
     // at this address is not counted as a stop.
     void skipCurrentPc(uint16_t pc);
+
+    // The first breakpoint that has stopped the emulation since the last call
+    // (-1 if none); called on stop to find out the stop reason
+    int takeStopBreakpoint();
+    void resetStopBreakpoint() {m_stopBpId = -1;}
+
+    void onBreakpointStop(int id) {if (m_stopBpId < 0) m_stopBpId = id;} // called by breakpoints
 
 private:
     struct Entry {
         int id;
         BreakpointType type;
         uint16_t addr;
+        DebugClient owner;
         bool enabled;
         CodeBreakpoint* codeBp; // for BT_EXEC
         DataBreakpoint* dataBp; // for other types
@@ -161,6 +186,8 @@ private:
     Cpu* m_cpu;
     std::vector<Entry> m_entries;
     int m_nextId = 1;
+    int m_stopBpId = -1;
+    unsigned m_changeCount = 0;
 
     Entry* findEntry(int id);
     const Entry* findEntry(int id) const;

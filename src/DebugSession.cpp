@@ -28,7 +28,7 @@
 
 void DebugElapsedTimer::onElapse()
 {
-    g_emulation->debugRequest(m_cpu);
+    m_session->requestBreak(m_client);
 }
 
 
@@ -53,37 +53,63 @@ bool DebugSession::onStop()
         return false;
 
     m_isRunning = false;
+    ++m_stopCount;
 
     if (m_tempBp) {
         delete m_tempBp;
         m_tempBp = nullptr;
     }
 
+    BreakpointDesc bp;
+    int bpId = m_breakpoints.takeStopBreakpoint();
+    if (bpId >= 0 && m_breakpoints.get(bpId, bp))
+        m_stopClient = bp.owner;
+    else if (m_breakRequested)
+        m_stopClient = m_breakClient;
+    else
+        m_stopClient = m_runClient;
+    m_breakRequested = false;
+
     return true;
 }
 
 
-void DebugSession::resume()
+void DebugSession::requestBreak(DebugClient client)
+{
+    if (!m_isRunning)
+        return;
+    if (!m_breakRequested) {
+        m_breakRequested = true;
+        m_breakClient = client;
+    }
+    g_emulation->debugRequest(m_cpu);
+}
+
+
+void DebugSession::resume(DebugClient client)
 {
     m_isRunning = true;
+    m_runClient = client;
+    m_breakRequested = false;
+    m_breakpoints.resetStopBreakpoint();
     m_breakpoints.skipCurrentPc(m_cpu->getPC());
     g_emulation->debugRun();
 }
 
 
-void DebugSession::run()
+void DebugSession::run(DebugClient client)
 {
-    resume();
+    resume(client);
 }
 
 
-void DebugSession::runFor(unsigned ms)
+void DebugSession::runFor(unsigned ms, DebugClient client)
 {
     if (m_runForTimer)
         cleanupTimer();
-    m_runForTimer = new DebugElapsedTimer(m_cpu);
+    m_runForTimer = new DebugElapsedTimer(this, client);
     m_runForTimer->start(ms);
-    run();
+    run(client);
 }
 
 
@@ -97,14 +123,14 @@ void DebugSession::cleanupTimer()
 }
 
 
-void DebugSession::stepInto()
+void DebugSession::stepInto(DebugClient client)
 {
     m_cpu->debugStepRequest();
-    resume();
+    resume(client);
 }
 
 
-void DebugSession::stepOver()
+bool DebugSession::stepOver(DebugClient client)
 {
     unsigned pc = m_cpu->getPC();
     unsigned len = getInstructionLength(pc);
@@ -113,15 +139,34 @@ void DebugSession::stepOver()
     if (over) {
         // previous step over is not completed yet
         if (m_tempBp)
-            return;
+            return false;
         m_tempBp = new CodeBreakpoint(pc + len);
         m_cpu->addHook(m_tempBp);
 
         if (m_resetKeys)
             m_platform->resetKeys();
-        resume();
-    } else
-        stepInto();
+        resume(client);
+        return true;
+    }
+
+    stepInto(client);
+    return false;
+}
+
+
+void DebugSession::runTo(uint16_t addr, DebugClient client)
+{
+    // previous step over or run to is not completed yet
+    if (m_tempBp)
+        return;
+    m_tempBp = new CodeBreakpoint(addr);
+    m_cpu->addHook(m_tempBp);
+
+    // running to the current address means a full loop
+    if (addr == m_cpu->getPC())
+        m_tempBp->setSkipCount(1);
+
+    resume(client);
 }
 
 
