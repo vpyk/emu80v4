@@ -892,10 +892,13 @@ void DebugWindow::drawHintBar()
 
     switch (m_mode) {
         case AM_CODE:
-            if (!m_swapF5F9)
-                s = "C/D/R/F/B,Tab,Esc-Section A-Addr F4-Here F5-B/p F7-Step F8-Over F9-Run";
-            else
-                s = "C/D/R/F/B,Tab,Esc-Section A-Addr F4-Here F5-Run F7-Step F8-Over F9-B/p";
+            // the compact layout has no room for F6-Out and U-Skip
+            s = "C/D/R/F/B,Tab,Esc-Section A-Addr F4-Here ";
+            s += m_swapF5F9 ? "F5-Run" : "F5-B/p";
+            if (!m_compactMode)
+                s += " F6-Out";
+            s += " F7-Step F8-Over ";
+            s += m_swapF5F9 ? "F9-B/p" : "F9-Run";
             if (!m_compactMode)
                 s += " U-Skip";
             if (!m_z80Mode) {
@@ -1052,6 +1055,9 @@ void DebugWindow::sendCmd(DebugCommand cmd)
     case DCMD_OVER:
         //over();
         processKey(PK_F8, true);
+        break;
+    case DCMD_OUT:
+        processKey(PK_F6, true);
         break;
     case DCMD_HERE:
         //here();
@@ -1210,6 +1216,18 @@ void DebugWindow::over()
     // a call is executed at full speed until it returns, the window is hidden meanwhile
     if (m_session->stepOver(DC_UI))
         hide();
+}
+
+
+void DebugWindow::out()
+{
+    if (m_resetCpuClockFlag)
+        resetCpuClock();
+
+    m_resetCpuClockFlag = false;
+    // runs at full speed until the subroutine returns, the window is hidden meanwhile
+    m_session->stepOut(DC_UI);
+    hide();
 }
 
 
@@ -1611,6 +1629,9 @@ void DebugWindow::codeKbdProc(PalKeyCode keyCode)
             break;
         case PK_F8:
             over();
+            break;
+        case PK_F6:
+            out();
             break;
         case PK_F9:
             m_swapF5F9 ? breakpoint() : run();

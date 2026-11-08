@@ -52,6 +52,14 @@ void MainWindow::onDbgOver()
 }
 
 
+void MainWindow::onDbgOut()
+{
+    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    if (dbg)
+        dbg->sendCmd(DCMD_OUT);
+}
+
+
 void MainWindow::onDbgHere()
 {
     DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
@@ -206,6 +214,14 @@ void MainWindow::createDebugActions()
     addAction(dbgOverAction);
     debugMenu->addAction(dbgOverAction);
     connect(dbgOverAction, SIGNAL(triggered()), this, SLOT(onDbgOver()));
+
+    // Out
+    QAction* dbgOutAction = new QAction(tr("Step out"), this);
+    QKeySequence dbgOutKey(Qt::Key_F6);
+    dbgOutAction->setShortcut(dbgOutKey);
+    addAction(dbgOutAction);
+    debugMenu->addAction(dbgOutAction);
+    connect(dbgOutAction, SIGNAL(triggered()), this, SLOT(onDbgOut()));
 
     // Skip
     QAction* dbgSkipAction = new QAction(tr("Skip"), this);

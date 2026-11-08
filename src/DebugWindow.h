@@ -270,6 +270,7 @@ private:
     // debugger operations
     void step();
     void over();
+    void out();
     void skip();
     void here();
     void run();

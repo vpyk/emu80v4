@@ -220,6 +220,7 @@ private slots:
     void onDbgRun();
     void onDbgStep();
     void onDbgOver();
+    void onDbgOut();
     void onDbgHere();
     void onDbgSkip();
     void onDbgBreakpoint();

@@ -196,6 +196,11 @@
     </message>
     <message>
         <location filename="qtDebug.cpp" line="211"/>
+        <source>Step out</source>
+        <translation>Выполнить до выхода из подпрограммы</translation>
+    </message>
+    <message>
+        <location filename="qtDebug.cpp" line="211"/>
         <source>Skip</source>
         <translation>Пропустить</translation>
     </message>

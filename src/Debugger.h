@@ -26,6 +26,7 @@ enum DebugCommand {
     DCMD_RUN,
     DCMD_STEP,
     DCMD_OVER,
+    DCMD_OUT,
     DCMD_BPOINT,
     DCMD_SKIP,
     DCMD_SAVEMEM,
