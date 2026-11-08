@@ -89,6 +89,7 @@ class Platform : public ParentObject
         DebugSession* getDebugSession(); // created on first use, nullptr if the CPU is not supported
 
         void createDebugger();
+        bool isDebuggerUiSupported();
         void showDebugger();
         void updateDebugger();
         void reqScreenUpdateForDebug();

@@ -145,8 +145,12 @@ public:
 
     // Adds a breakpoint, returns its id. If a breakpoint of the same type
     // at the same address exists, returns its id and changes nothing.
+    // Returns -1 if the type is not supported.
     int add(BreakpointType type, uint16_t addr, DebugClient owner);
     int find(BreakpointType type, uint16_t addr) const; // returns id or -1
+    // Port breakpoints are not added (add() returns -1) if the CPU has no I/O space
+    void setIoSupported(bool supported) {m_ioSupported = supported;}
+    bool isSupported(BreakpointType type) const {return m_ioSupported || getBreakpointClass(type) != BC_IO;}
     bool remove(int id);
     void clear();
     void clear(BreakpointClass bpClass);
@@ -179,6 +183,7 @@ private:
     };
 
     Cpu* m_cpu;
+    bool m_ioSupported = true;
     std::vector<Entry> m_entries;
     int m_nextId = 1;
     int m_stopBpId = -1;

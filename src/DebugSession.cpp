@@ -21,10 +21,6 @@
 #include "Emulation.h"
 #include "Platform.h"
 
-#include "CpuZ80.h"
-#include "Cpu8080dasm.h"
-#include "CpuZ80dasm.h"
-
 
 void DebugElapsedTimer::onElapse()
 {
@@ -32,18 +28,21 @@ void DebugElapsedTimer::onElapse()
 }
 
 
-DebugSession::DebugSession(Platform* platform, Cpu8080Compatible* cpu)
-    : m_platform(platform), m_cpu(cpu), m_z80Mode(dynamic_cast<CpuZ80*>(cpu) != nullptr),
-      m_breakpoints(cpu)
+DebugSession::DebugSession(Platform* platform, CpuDebugTarget* target)
+    : m_platform(platform), m_target(target), m_cpu(target->getCpu()),
+      m_breakpoints(target->getCpu())
 {
     m_resetKeys = g_emulation->getDebuggerOptions().resetKeys;
+    m_breakpoints.setIoSupported(target->supportsBreakpoint(BT_PORT_ACSESS));
 }
 
 
 DebugSession::~DebugSession()
 {
+    m_cpu->cancelDebugStep();
     cleanupTimer();
     delete m_tempBp;
+    delete m_target;
 }
 
 
@@ -54,6 +53,7 @@ bool DebugSession::onStop()
 
     m_isRunning = false;
     ++m_stopCount;
+    m_cpu->cancelDebugStep(); // a step (out) may be interrupted by a breakpoint
 
     if (m_tempBp) {
         delete m_tempBp;
@@ -95,7 +95,7 @@ void DebugSession::resume(DebugClient client)
     m_breakRequested = false;
     m_breakpoints.resetStopBreakpoint();
     // let execution leave the current address
-    m_cpu->skipBreakpointsOnce(m_cpu->getPC());
+    m_cpu->skipBreakpointsOnce(m_target->getPC());
     g_emulation->debugRun();
 }
 
@@ -139,15 +139,15 @@ bool DebugSession::stepOver(DebugClient client)
 {
     if (m_isRunning)
         return false;
-    unsigned pc = m_cpu->getPC();
-    unsigned len = getInstructionLength(pc);
-    bool over = getInstructionOverFlag(pc);
+    uint16_t pc = m_target->getPC();
+    DisasmInstr instr;
+    m_target->disassemble(pc, instr);
 
-    if (over) {
+    if (instr.flow == IFL_CALL) {
         // previous step over is not completed yet
         if (m_tempBp)
             return false;
-        m_tempBp = new CodeBreakpoint(pc + len);
+        m_tempBp = new CodeBreakpoint(uint16_t(pc + instr.length));
         m_cpu->addHook(m_tempBp);
 
         if (m_resetKeys)
@@ -158,6 +158,39 @@ bool DebugSession::stepOver(DebugClient client)
 
     stepInto(client);
     return false;
+}
+
+
+void DebugSession::stepOut(DebugClient client)
+{
+    if (m_isRunning)
+        return;
+    m_stepOutFilter.start(m_target);
+    m_cpu->debugStepRequest(&m_stepOutFilter);
+    if (m_resetKeys)
+        m_platform->resetKeys();
+    resume(client);
+}
+
+
+void DebugSession::StepOutFilter::start(CpuDebugTarget* target)
+{
+    m_target = target;
+    m_startSp = target->getSP();
+    m_lastPc = target->getPC();
+}
+
+
+bool DebugSession::StepOutFilter::isStepDone()
+{
+    // m_lastPc is the address of the instruction just executed
+    bool ret = m_target->isReturn(m_lastPc);
+    m_lastPc = m_target->getPC();
+    if (!ret)
+        return false;
+    // returned above the start frame (not from a nested call or an interrupt)
+    uint16_t diff = m_target->getSP() - m_startSp;
+    return diff != 0 && diff < 0x8000;
 }
 
 
@@ -172,45 +205,4 @@ void DebugSession::runTo(uint16_t addr, DebugClient client)
     // running to the current address means a full loop, as the breakpoints
     // at the current address are skipped on resume
     resume(client);
-}
-
-
-int DebugSession::getInstructionLength(uint16_t addr)
-{
-    AddressableDevice* as = m_cpu->getAddrSpace();
-    uint8_t buf[4];
-    buf[0] = as->readByte(addr);
-    buf[1] = as->readByte(uint16_t(addr + 1)); // Z80
-    buf[2] = as->readByte(uint16_t(addr + 2)); // Z80
-    buf[3] = as->readByte(uint16_t(addr + 3)); // Z80
-
-    if (!m_z80Mode)
-        return i8080GetInstructionLength(buf);
-
-    unsigned length;
-    STEP_FLAG flag;
-    cpu_disassemble_z80(addr, buf, length, flag);
-    return length;
-}
-
-
-bool DebugSession::getInstructionOverFlag(uint16_t addr)
-{
-    AddressableDevice* as = m_cpu->getAddrSpace();
-
-    if (!m_z80Mode) {
-        uint8_t op = as->readByte(addr);
-        return (op & 0xcf) == 0xcd /* CALL */ || (op & 0xc7) == 0xc7 /* RST */ || (op & 0xc7) == 0xc4 /* Cx */;
-    }
-
-    uint8_t buf[4];
-    buf[0] = as->readByte(addr);
-    buf[1] = as->readByte(uint16_t(addr + 1)); // Z80
-    buf[2] = as->readByte(uint16_t(addr + 2)); // Z80
-    buf[3] = as->readByte(uint16_t(addr + 3)); // Z80
-
-    unsigned length;
-    STEP_FLAG flag;
-    cpu_disassemble_z80(addr, buf, length, flag);
-    return (flag == SF_OVER);
 }

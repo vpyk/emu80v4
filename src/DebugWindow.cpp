@@ -31,8 +31,6 @@
 #include "DebugSession.h"
 
 #include "CpuZ80.h"
-#include "Cpu8080dasm.h"
-#include "CpuZ80dasm.h"
 
 using namespace std;
 
@@ -731,28 +729,18 @@ void DebugWindow::fillCpuStatus()
 }
 
 
+// 8080 code is shown in Z80 mnemonics on request (disassembler syntax 1)
 string DebugWindow::getInstructionMnemonic(uint16_t addr)
 {
-    string mnemo;
-
-    uint8_t buf[4];
-    buf[0] = memByte(addr);
-    buf[1] = memByte(addr + 1);
-    buf[2] = memByte(addr + 2);
-    buf[3] = memByte(addr + 3); // Z80
+    DisasmInstr instr;
+    m_session->getTarget()->disassemble(addr, instr, m_z80Mnemonics ? 1 : 0);
+    string mnemo = instr.text;
 
     if (!m_z80Mode && !m_z80Mnemonics) {
-        mnemo = i8080GetInstructionMnemonic(buf);
         if (!m_mnemo8080UpperCase)
             transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::tolower);
-        return mnemo;
-    } else {
-        unsigned length;
-        STEP_FLAG flag;
-        mnemo = cpu_disassemble_z80(addr, buf, length, flag);
-        if (m_mnemoZ80UpperCase)
-            transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::toupper);
-    }
+    } else if (m_mnemoZ80UpperCase)
+        transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::toupper);
 
     return mnemo;
 }
@@ -760,40 +748,9 @@ string DebugWindow::getInstructionMnemonic(uint16_t addr)
 
 int DebugWindow::getInstructionLength(uint16_t addr)
 {
-    uint8_t buf[4];
-    buf[0] = memByte(addr);
-    buf[1] = memByte(addr + 1); // Z80
-    buf[2] = memByte(addr + 2); // Z80
-    buf[3] = memByte(addr + 3); // Z80
-
-    if (!m_z80Mode && !m_z80Mnemonics) {
-        return i8080GetInstructionLength(buf);
-    }
-
-    unsigned length;
-    STEP_FLAG flag;
-    cpu_disassemble_z80(addr, buf, length, flag);
-    return length;
-}
-
-
-bool DebugWindow::getInstructionOverFlag(uint16_t addr)
-{
-    if (!m_z80Mode && !m_z80Mnemonics) {
-        uint8_t op = memByte(addr);
-        return (op & 0xcf) == 0xcd /* CALL */ || (op & 0xc7) == 0xc7 /* RST */ || (op & 0xc7) == 0xc4 /* Cx */;
-    }
-
-    uint8_t buf[4];
-    buf[0] = memByte(addr);
-    buf[1] = memByte(addr + 1); // Z80
-    buf[2] = memByte(addr + 2); // Z80
-    buf[3] = memByte(addr + 3); // Z80
-
-    unsigned length;
-    STEP_FLAG flag;
-    cpu_disassemble_z80(addr, buf, length, flag);
-    return (flag == SF_OVER);
+    DisasmInstr instr;
+    m_session->getTarget()->disassemble(addr, instr, m_z80Mnemonics ? 1 : 0);
+    return instr.length;
 }
 
 

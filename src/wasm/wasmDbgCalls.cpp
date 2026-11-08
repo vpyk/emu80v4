@@ -26,7 +26,6 @@
 
 #include "../DebugSession.h"
 #include "../Platform.h"
-#include "../Cpu.h"
 #include "../EmuCalls.h"
 #include "../DbgCalls.h"
 
@@ -40,6 +39,10 @@ static DebugSession* getSession()
     Platform* platform = emuGetPlatform((PalWindow*)wasmGetWindowId());
     return platform ? platform->getDebugSession() : nullptr;
 }
+
+
+// Register ids of the web debugger's register numbers
+static const char* const c_regIds[] = {"af", "bc", "de", "hl", "sp", "pc", "iff"};
 
 
 // Debug session stopped in the debugger, nullptr if running or not available
@@ -111,30 +114,12 @@ void wasmDbgSetRegister(int regId, int value)
     if (!session)
         return;
 
-    Cpu8080Compatible* cpu = session->getCpu();
-    switch (regId) { // af, bc, de, hl, sp, pc, iff
-    case 0:
-        cpu->setAF(value);
-        break;
-    case 1:
-        cpu->setBC(value);
-        break;
-    case 2:
-        cpu->setDE(value);
-        break;
-    case 3:
-        cpu->setHL(value);
-        break;
-    case 4:
-        cpu->setSP(value);
-        break;
-    case 5:
-        cpu->setPC(value);
-        break;
-    case 6:
-        cpu->setIFF(value & 1);
-        break;
-    }
+    if (regId < 0 || regId >= 7)
+        return;
+    CpuDebugTarget* target = session->getTarget();
+    int index = target->findReg(c_regIds[regId]);
+    if (index >= 0)
+        target->setReg(index, value);
 }
 
 
@@ -144,7 +129,7 @@ void wasmDbgWriteByte(int addr, int value)
     if (!session)
         return;
 
-    session->getCpu()->getAddrSpace()->writeByte(addr, value);
+    session->getTarget()->writeMem(addr, value);
 }
 
 
@@ -163,14 +148,11 @@ void* wasmDbgGetState()
 
     wasmDbgFreeState();
 
-    Cpu8080Compatible* cpu = session->getCpu();
-    regs[0] = cpu->getAF();
-    regs[1] = cpu->getBC();
-    regs[2] = cpu->getDE();
-    regs[3] = cpu->getHL();
-    regs[4] = cpu->getSP();
-    regs[5] = cpu->getPC();
-    regs[6] = cpu->getInte();
+    CpuDebugTarget* target = session->getTarget();
+    for (int i = 0; i < 7; i++) {
+        int index = target->findReg(c_regIds[i]);
+        regs[i] = index >= 0 ? target->getReg(index) : 0;
+    }
 
     // the web debugger shows exec breakpoints only
     vector<BreakpointDesc> bps;
@@ -187,10 +169,9 @@ void* wasmDbgGetState()
         breakpoints[i + 1] = execBps[i];
     state[1] = breakpoints;
 
-    AddressableDevice* as = cpu->getAddrSpace();
     mem = static_cast<uint8_t*>(malloc(0x10000));
     for (int i = 0; i <= 0xffff; i++)
-        mem[i] = as->readByte(i);
+        mem[i] = target->readMem(i);
     state[2] = mem;
 
     return state; // mem and breakpoints must be freed by calling wasmDbgFreeState()

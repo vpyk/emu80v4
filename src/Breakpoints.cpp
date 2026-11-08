@@ -134,6 +134,8 @@ BreakpointManager::~BreakpointManager()
 
 int BreakpointManager::add(BreakpointType type, uint16_t addr, DebugClient owner)
 {
+    if (!isSupported(type))
+        return -1;
     int id = find(type, addr);
     if (id >= 0)
         return id;

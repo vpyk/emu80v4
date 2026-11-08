@@ -20,10 +20,11 @@
 #define DEBUGSESSION_H
 
 #include "EmuObjects.h"
+#include "Cpu.h"
 #include "Breakpoints.h"
+#include "DebugTarget.h"
 
 class Platform;
-class Cpu8080Compatible;
 class DebugSession;
 
 
@@ -51,11 +52,13 @@ private:
 class DebugSession
 {
 public:
-    DebugSession(Platform* platform, Cpu8080Compatible* cpu);
+    // Takes ownership of the target
+    DebugSession(Platform* platform, CpuDebugTarget* target);
     ~DebugSession();
 
     Platform* getPlatform() {return m_platform;}
-    Cpu8080Compatible* getCpu() {return m_cpu;}
+    CpuDebugTarget* getTarget() {return m_target;}
+    Cpu* getCpu() {return m_cpu;}
     BreakpointManager* getBreakpoints() {return &m_breakpoints;}
 
     bool isRunning() {return m_isRunning;}
@@ -75,6 +78,9 @@ public:
     // Steps over a call; returns true if the emulation runs until the return
     // address, false if it was an ordinary step (or nothing was done)
     bool stepOver(DebugClient client);
+    // Runs until the current subroutine returns: stops after a return instruction
+    // that has taken the stack pointer above its value at the start
+    void stepOut(DebugClient client);
     void runTo(uint16_t addr, DebugClient client);
 
     // Run-for timer
@@ -82,14 +88,23 @@ public:
     bool isTimerRunning() {return m_runForTimer != nullptr;}
     bool isTimerFired()   {return m_runForTimer && m_runForTimer->isPaused();}
 
-    int getInstructionLength(uint16_t addr);
-    bool getInstructionOverFlag(uint16_t addr);
-
 private:
+    class StepOutFilter : public CpuStepFilter
+    {
+    public:
+        void start(CpuDebugTarget* target);
+        bool isStepDone() override;
+    private:
+        CpuDebugTarget* m_target = nullptr;
+        uint16_t m_startSp = 0;
+        uint16_t m_lastPc = 0;
+    };
+
     Platform* m_platform;
-    Cpu8080Compatible* m_cpu;
-    bool m_z80Mode;
+    CpuDebugTarget* m_target;
+    Cpu* m_cpu;
     BreakpointManager m_breakpoints;
+    StepOutFilter m_stepOutFilter;
 
     bool m_isRunning = true;
     bool m_resetKeys;

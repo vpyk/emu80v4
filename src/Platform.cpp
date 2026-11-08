@@ -320,9 +320,9 @@ void Platform::sysReq(SysReq sr)
             break;
         case SR_DEBUG: {
             DebugSession* session = getDebugSession();
-            if (!session)
-                g_emulation->debugRequest(m_cpu);
-            else if (session->isRunning())
+            if (!session || !isDebuggerUiSupported())
+                break; // nothing to show the stop in
+            if (session->isRunning())
                 session->requestBreak(DC_UI); // showDebugger() is called on stop
             else {
                 // already stopped (e.g. by an external client): just open the debugger UI
@@ -478,6 +478,8 @@ void Platform::showDebugger()
         createDebugger();
         if (m_debugger)
             m_debugger->startDebug();
+        else
+            session->run(DC_UI); // no UI for this CPU (e.g. a stop on HLT): don't hang
     } else if (m_debugger)
         m_debugger->refreshDebug();
 }
@@ -497,7 +499,7 @@ public:
 // Creates the debugger UI of the build
 void Platform::createDebugger()
 {
-    if (m_debugger || !getDebugSession())
+    if (m_debugger || !getDebugSession() || !isDebuggerUiSupported())
         return;
 
 #ifdef WASM_DBG
@@ -513,12 +515,19 @@ void Platform::createDebugger()
 
 DebugSession* Platform::getDebugSession()
 {
-    if (!m_debugSession) {
-        Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(m_cpu);
-        if (cpu)
-            m_debugSession = new DebugSession(this, cpu);
+    if (!m_debugSession && m_cpu) {
+        CpuDebugTarget* target = CpuDebugTarget::create(m_cpu);
+        if (target)
+            m_debugSession = new DebugSession(this, target);
     }
     return m_debugSession;
+}
+
+
+// The debugger UI of the build (debug window or web debugger) supports 8080 and Z80 only
+bool Platform::isDebuggerUiSupported()
+{
+    return dynamic_cast<Cpu8080Compatible*>(m_cpu) != nullptr;
 }
 
 

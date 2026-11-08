@@ -121,7 +121,9 @@
         <Unit filename="Breakpoints.cpp" />
         <Unit filename="Breakpoints.h" />
         <Unit filename="DebugSession.cpp" />
+        <Unit filename="DebugTarget.cpp" />
         <Unit filename="DebugSession.h" />
+        <Unit filename="DebugTarget.h" />
         <Unit filename="DebugWindow.cpp" />
         <Unit filename="DebugWindow.h" />
         <Unit filename="Debugger.h" />

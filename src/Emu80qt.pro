@@ -66,6 +66,7 @@ SOURCES += \
     CrtRenderer.cpp \
     Breakpoints.cpp \
     DebugSession.cpp \
+    DebugTarget.cpp \
     DebugWindow.cpp \
     Dma8257.cpp \
     EmuCalls.cpp \
@@ -165,6 +166,7 @@ HEADERS  += \
     DbgCalls.h \
     Breakpoints.h \
     DebugSession.h \
+    DebugTarget.h \
     DebugWindow.h \
     Debugger.h \
     DiskImage.h \

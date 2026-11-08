@@ -25,6 +25,7 @@
 #include "EmuWindow.h"
 #include "Debugger.h"
 #include "Breakpoints.h"
+#include "DebugTarget.h"
 
 class DebugSession;
 
@@ -234,12 +235,11 @@ private:
     void highlight(int x, int y, int color, int num, bool isVertical = false);
     void clearBlock(int x1, int y1, int x2, int y2, int bgColor);
 
-    inline uint8_t memByte(uint16_t addr) {return m_cpu->getAddrSpace()->readByte(addr);}
+    inline uint8_t memByte(uint16_t addr) {return debugReadByte(m_as, addr);}
     inline uint16_t memWord(uint16_t addr) {return memByte(addr) + ((uint16_t)memByte(addr + 1) << 8);}
     inline void writeByte(uint16_t addr, uint8_t value) {m_cpu->getAddrSpace()->writeByte(addr, value);}
     std::string getInstructionMnemonic(uint16_t addr);
     int getInstructionLength(uint16_t addr);
-    bool getInstructionOverFlag(uint16_t addr);
     void fillCpuStatus();
 
     void drawDbgFrame();
