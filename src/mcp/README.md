@@ -49,7 +49,7 @@ All numbers: JSON integer = decimal, JSON string = hex by default
 | Tool | Params | Description |
 |------|--------|-------------|
 | `cpu_state` | — | Registers (AF/BC/DE/HL/SP/PC), flags (S/Z/H/P/N/C), IFF, Z80 alt regs, instruction at PC, breaked/paused state, cpu_ticks since reset |
-| `regs_set` | `af`/`bc`/`de`/`hl`/`sp`/`pc`/`psw`/`iff` (+ Z80: `af2`/`bc2`/`de2`/`hl2`/`ix`/`iy`/`i`/`r`/`im`) | Set registers (requires breaked) |
+| `regs_set` | `af`/`bc`/`de`/`hl`/`sp`/`pc`/`psw`/`iff` (+ Z80: `af2`/`bc2`/`de2`/`hl2`/`ix`/`iy`/`i`/`r`/`im`), single flags (8080: `s`/`z`/`ac`/`p`/`c`, Z80: `s`/`z`/`h`/`p`/`n`/`c`) | Set registers (requires breaked), returns all registers |
 | `sys_info` | — | Server info, platform name, CPU type/frequency_hz, breaked/paused state, speed factor, available platforms |
 
 ### Execution control
@@ -59,7 +59,8 @@ All numbers: JSON integer = decimal, JSON string = hex by default
 | `emu_run` | — | Resume execution (skips BP at current PC) |
 | `emu_run_for` | `ms` (1–60000) | Run for N ms, stop on timer or breakpoint. Returns full cpu_state |
 | `debug_break` | — | Pause CPU (also exits paused state). Idempotent |
-| `debug_step` | `mode` (`into`/`over`/`skip`), `timeout_ms` | Single-step. `skip` advances PC without executing |
+| `debug_step` | `mode` (`into`/`over`/`out`/`skip`), `timeout_ms` | Single-step. `out` runs until the current subroutine returns, `skip` advances PC without executing |
+| `emu_run_to` | `addr`, `timeout_ms` | Run until addr (temporary breakpoint; current PC = full loop); other breakpoints may stop earlier |
 | `emu_reset` | — | Cold reset |
 | `emu_load` | `file`, `autorun` (default true), `break_after_load` (default false) | Load file into emulator. If break_after_load: stop + cpu_state |
 | `switch_platform` | `platform` | Switch to another platform (name from sys_info) |
@@ -68,8 +69,10 @@ All numbers: JSON integer = decimal, JSON string = hex by default
 
 | Tool | Params | Description |
 |------|--------|-------------|
-| `mem_read` | `addr`, `len` (default 64, max 4096) | Read memory range, hex dump + ASCII |
-| `mem_write` | `addr`, `data` (hex string) | Write bytes to memory (max 4096) |
+| `mem_read` | `addr`, `len` (default 64, max 4096), `device` | Read memory range, hex dump + ASCII. `device`: memory from mem_devices (default: CPU address space) |
+| `mem_write` | `addr`, `data` (hex string), `device` | Write bytes to memory (max 4096) |
+| `mem_devices` | — | Memories for mem_read/mem_write: `cpu`, Ram/Rom objects, devices with `debugName` in conf; with sizes |
+| `devices_info` | — | Debug info text of platform devices (DMA, CRT, PIC, FDC…) |
 | `port_read` | `port` (0–255) | Read single byte from I/O port |
 | `port_write` | `port` (0–255), `value` | Write single byte to I/O port |
 | `disasm` | `addr` (default PC), `count` (default 16, max 64) | Disassemble instructions |
@@ -78,9 +81,10 @@ All numbers: JSON integer = decimal, JSON string = hex by default
 
 | Tool | Params | Description |
 |------|--------|-------------|
-| `bp_list` | — | List all BPs (exec, data, port) with hitCount (total hits)/skipCount/remaining (hits to skip before the next stop)/comment |
+| `bp_list` | — | List all BPs (exec, data, port) with id/enabled/owner (ui/mcp)/hitCount (total hits)/skipCount/remaining (hits to skip before the next stop)/comment |
 | `bp_set` | `addr`, `type` (`exec`/`write`/`read`/`access`/`port_read`/`port_write`/`port_access`), `skipCount`, `comment` | Add or configure breakpoint. `exec` = code; `write`/`read`/`access` = memory; `port_*` = I/O ports |
-| `bp_remove` | `addr`, `type` (optional filter) | Remove BPs at addr. With type: selective removal |
+| `bp_remove` | `addr`, `type` (optional filter) or `id` | Remove BPs at addr. With type: selective removal; with id: one BP |
+| `bp_enable` | `id`, `enabled` (default true) | Enable/disable a BP; a disabled BP neither stops nor counts hits |
 | `bp_clear` | — | Remove ALL breakpoints |
 
 ### Screen

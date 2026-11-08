@@ -17,10 +17,8 @@
 #include "../EmuCalls.h"
 #include "../Platform.h"
 #include "../DebugSession.h"
-#include "../Cpu8080.h"
-#include "../CpuZ80.h"
-#include "../Cpu8080dasm.h"
-#include "../CpuZ80dasm.h"
+#include "../Cpu.h"
+#include "../DebugTarget.h"
 #include "../CrtRenderer.h"
 #include "../AddrSpace.h"
 #include "../EmuConfig.h"
@@ -63,6 +61,14 @@ namespace
         return std::string(buf);
     }
 
+    // At least 4 digits, more for addresses above 64K
+    std::string Hex32(uint32_t v)
+    {
+        char buf[12];
+        std::snprintf(buf, sizeof(buf), "%04X", static_cast<unsigned>(v));
+        return std::string(buf);
+    }
+
     std::string Oct(uint16_t v)
     {
         char buf[8];
@@ -88,11 +94,12 @@ namespace
     // JSON integer → always decimal (JSON spec).
     // JSON string → hex by default. Prefixes: 0x/0X = hex, 0o/0O = octal,
     // a lone leading zero (no x/o) = decimal.
-    uint16_t ParseNumArg(const json& v, const char* what)
+    // Parses a number argument (32 bits)
+    uint32_t ParseNumArg32(const json& v, const char* what)
     {
         try {
             if (v.is_number_integer())
-                return static_cast<uint16_t>(v.get<long long>() & 0xFFFF);
+                return static_cast<uint32_t>(v.get<long long>());
 
             if (v.is_string()) {
                 std::string s = v.get<std::string>();
@@ -114,12 +121,17 @@ namespace
                 size_t pos = 0;
                 const unsigned long val = std::stoul(s, &pos, base);
                 if (pos == s.size())
-                    return static_cast<uint16_t>(val & 0xFFFF);
+                    return static_cast<uint32_t>(val);
             }
         } catch (...) {
         }
 
         throw std::runtime_error(std::string("invalid ") + what + " value");
+    }
+
+    uint16_t ParseNumArg(const json& v, const char* what)
+    {
+        return static_cast<uint16_t>(ParseNumArg32(v, what) & 0xFFFF);
     }
 
     bool OptBool(const json& args, const char* key, bool def)
@@ -220,65 +232,81 @@ namespace
     };
 
     // ================================================================
+    // Helpers for the CPU debug target. Must be called on the main thread.
+    // ================================================================
+
+    // Debugger view of the platform CPU, nullptr if the CPU is not supported
+    CpuDebugTarget* GetTarget(Platform* p)
+    {
+        DebugSession* session = p ? p->getDebugSession() : nullptr;
+        return session ? session->getTarget() : nullptr;
+    }
+
+    std::string InstrText(CpuDebugTarget* cpu, uint16_t addr)
+    {
+        DisasmInstr instr;
+        cpu->disassemble(addr, instr);
+        return instr.text;
+    }
+
+    // Register value by id (0 if the CPU has no such register)
+    unsigned RegById(CpuDebugTarget* cpu, const char* id)
+    {
+        int index = cpu->findReg(id);
+        return index >= 0 ? cpu->getReg(index) : 0;
+    }
+
+    // All registers except single flags, {id: {hex, dec}}
+    json AllRegsJson(CpuDebugTarget* cpu)
+    {
+        json regs = json::object();
+        for (int i = 0; i < cpu->getRegCount(); i++) {
+            const DebugRegInfo& info = cpu->getRegInfo(i);
+            if (info.group != DRG_FLAG)
+                regs[info.id] = RegVal(static_cast<uint16_t>(cpu->getReg(i)));
+        }
+        return regs;
+    }
+
+    // ================================================================
     // Helper: fill json with CPU state (registers, flags, Z80 alt regs,
     // instruction at PC). Must be called on the main thread.
     // ================================================================
-    void FillCpuStateJson(Cpu8080Compatible* cpu, json& state)
+    void FillCpuStateJson(CpuDebugTarget* cpu, json& state)
     {
-        json regs;
-        regs["af"] = RegVal(cpu->getAF());
-        regs["bc"] = RegVal(cpu->getBC());
-        regs["de"] = RegVal(cpu->getDE());
-        regs["hl"] = RegVal(cpu->getHL());
-        regs["sp"] = RegVal(cpu->getSP());
-        regs["pc"] = RegVal(cpu->getPC());
+        std::string cpuType = cpu->getCpuName();
+        state["cpu_type"] = cpuType;
+
+        // main registers, PC and SP
+        json regs = json::object();
+        for (int i = 0; i < cpu->getRegCount(); i++) {
+            const DebugRegInfo& info = cpu->getRegInfo(i);
+            if (info.group == DRG_MAIN && !(cpuType == "z80" && (std::string(info.id) == "ix" || std::string(info.id) == "iy")))
+                regs[info.id] = RegVal(static_cast<uint16_t>(cpu->getReg(i)));
+        }
         state["registers"] = regs;
 
-        const uint16_t af = cpu->getAF();
-        const uint16_t f  = af & 0xFF;
-        state["psw"] = RegVal(f);
-        state["flags"] = {
-            { "S", !!(f & 0x80) }, { "Z", !!(f & 0x40) },
-            { "H", !!(f & 0x10) }, { "P", !!(f & 0x04) },
-            { "N", !!(f & 0x02) }, { "C", !!(f & 0x01) },
-        };
-        state["iff"] = cpu->getInte();
+        if (cpu->findReg("af") >= 0) {
+            const uint16_t f = RegById(cpu, "af") & 0xFF;
+            state["psw"] = RegVal(f);
+            state["flags"] = {
+                { "S", !!(f & 0x80) }, { "Z", !!(f & 0x40) },
+                { "H", !!(f & 0x10) }, { "P", !!(f & 0x04) },
+                { "N", !!(f & 0x02) }, { "C", !!(f & 0x01) },
+            };
+        }
+        state["iff"] = RegById(cpu, "iff") != 0;
 
-        CpuZ80* z80 = dynamic_cast<CpuZ80*>(cpu);
-        if (z80) {
-            state["cpu_type"] = "z80";
+        if (cpuType == "z80") {
             json alt;
-            alt["af2"] = RegVal(z80->getAF2());
-            alt["bc2"] = RegVal(z80->getBC2());
-            alt["de2"] = RegVal(z80->getDE2());
-            alt["hl2"] = RegVal(z80->getHL2());
-            alt["ix"]  = RegVal(z80->getIX());
-            alt["iy"]  = RegVal(z80->getIY());
-            alt["i"]   = RegVal(z80->getI());
-            alt["r"]   = RegVal(z80->getR());
-            alt["im"]  = z80->getIM();
+            for (const char* id : { "af2", "bc2", "de2", "hl2", "ix", "iy", "i", "r" })
+                alt[id] = RegVal(static_cast<uint16_t>(RegById(cpu, id)));
+            alt["im"] = RegById(cpu, "im");
             state["z80_regs"] = alt;
-        } else {
-            state["cpu_type"] = "8080";
         }
 
         // Current instruction at PC
-        uint16_t pc = cpu->getPC();
-        AddressableDevice* as = cpu->getAddrSpace();
-        if (as) {
-            uint8_t buf[4];
-            buf[0] = as->readByte(pc);
-            buf[1] = as->readByte(pc + 1);
-            buf[2] = as->readByte(pc + 2);
-            buf[3] = as->readByte(pc + 3);
-            Cpu::CpuType ct = cpu->getType();
-            if (ct == Cpu::CPU_8080)
-                state["instruction"] = i8080GetInstructionMnemonic(buf);
-            else {
-                unsigned length; STEP_FLAG flag;
-                state["instruction"] = cpu_disassemble_z80(pc, buf, length, flag);
-            }
-        }
+        state["instruction"] = InstrText(cpu, cpu->getPC());
     }
 
     // ================================================================
@@ -294,7 +322,7 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
 
             state["breaked"]   = g_emulation->isDebuggerActive();
@@ -311,11 +339,9 @@ namespace
     // ================================================================
     // Tool: regs_set
     // ================================================================
-    struct RegDef { const char* name; bool isZ80; };
-
     json Tool_RegsSet(const json& args)
     {
-        // Parse all keys upfront.
+        // Parse all keys upfront; the names are checked against the CPU on the main thread
         std::vector<std::string>  names;
         std::vector<uint16_t>     values;
         for (auto it = args.begin(); it != args.end(); ++it) {
@@ -323,17 +349,6 @@ namespace
             for (char& c : key)
                 if (c >= 'A' && c <= 'Z')
                     c = static_cast<char>(c - 'A' + 'a');
-
-            const char* valid[] = {
-                "af", "bc", "de", "hl", "sp", "pc", "psw", "iff",
-                "af2", "bc2", "de2", "hl2", "ix", "iy", "i", "r", "im"
-            };
-            bool found = false;
-            for (const char* vn : valid) {
-                if (key == vn) { found = true; break; }
-            }
-            if (!found)
-                throw std::runtime_error("unknown register '" + it.key() + "' (use af, bc, de, hl, sp, pc, psw, iff, af2, bc2, de2, hl2, ix, iy, ir, im)");
             names.push_back(key);
             values.push_back(ParseNumArg(it.value(), key.c_str()));
         }
@@ -349,7 +364,7 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
 
             if (!g_emulation->isDebuggerActive()) {
@@ -357,53 +372,31 @@ namespace
                 return;
             }
 
-            json regsOut;
-            for (size_t i = 0; i < names.size(); ++i) {
-                const std::string& n = names[i];
-                uint16_t v = values[i];
+            // check all names first, so that nothing is changed on an error
+            std::vector<int> indexes;
+            for (const std::string& n : names) {
+                int index = cpu->findReg(n == "psw" ? "af" : n);
+                if (index < 0) {
+                    std::string valid;
+                    for (int i = 0; i < cpu->getRegCount(); i++)
+                        valid += std::string(valid.empty() ? "" : ", ") + cpu->getRegInfo(i).id;
+                    if (cpu->findReg("af") >= 0)
+                        valid += ", psw";
+                    err = "unknown register '" + n + "' (" + cpu->getCpuName() + ": " + valid + ")";
+                    return;
+                }
+                indexes.push_back(index);
+            }
 
-                if (n == "af")      cpu->setAF(v);
-                else if (n == "bc") cpu->setBC(v);
-                else if (n == "de") cpu->setDE(v);
-                else if (n == "hl") cpu->setHL(v);
-                else if (n == "sp") cpu->setSP(v);
-                else if (n == "pc") cpu->setPC(v);
-                else if (n == "iff")cpu->setIFF(v != 0);
-                else if (n == "psw") {
-                    uint16_t af = cpu->getAF();
-                    cpu->setAF((af & 0xFF00) | (v & 0xFF));
-                }
-                else {
-                    CpuZ80* z80 = dynamic_cast<CpuZ80*>(cpu);
-                    if (!z80) { err = "Z80 register not available on 8080"; continue; }
-                    if (n == "af2")      z80->setAF2(v);
-                    else if (n == "bc2") z80->setBC2(v);
-                    else if (n == "de2") z80->setDE2(v);
-                    else if (n == "hl2") z80->setHL2(v);
-                    else if (n == "ix")  z80->setIX(v);
-                    else if (n == "iy")  z80->setIY(v);
-                    else if (n == "i")   z80->setI(static_cast<uint8_t>(v & 0xFF));
-                    else if (n == "r")   z80->setR(static_cast<uint8_t>(v & 0x7F));
-                    else if (n == "im")  z80->setIM(static_cast<uint8_t>(v & 0x3));
-                }
+            for (size_t i = 0; i < names.size(); ++i) {
+                uint16_t v = values[i];
+                if (names[i] == "psw") // low byte of AF
+                    v = (cpu->getReg(indexes[i]) & 0xFF00) | (v & 0xFF);
+                cpu->setReg(indexes[i], v);
             }
 
             // Read back
-            json r;
-            r["af"] = RegVal(cpu->getAF());
-            r["bc"] = RegVal(cpu->getBC());
-            r["de"] = RegVal(cpu->getDE());
-            r["hl"] = RegVal(cpu->getHL());
-            r["sp"] = RegVal(cpu->getSP());
-            r["pc"] = RegVal(cpu->getPC());
-            r["iff"] = cpu->getInte();
-            CpuZ80* z80 = dynamic_cast<CpuZ80*>(cpu);
-            if (z80) {
-                r["af2"] = RegVal(z80->getAF2());
-                r["ix"]  = RegVal(z80->getIX());
-                r["iy"]  = RegVal(z80->getIY());
-            }
-            result["registers"] = r;
+            result["registers"] = AllRegsJson(cpu);
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -430,9 +423,10 @@ namespace
             info["platform"] = p ? p->getBaseName() : "(none)";
 
             if (p) {
-                Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+                Cpu* cpu = p->getCpu();
+                CpuDebugTarget* target = GetTarget(p);
                 json& cpuInfo = info["cpu"];
-                cpuInfo["type"] = (cpu && dynamic_cast<CpuZ80*>(cpu)) ? "z80" : "8080";
+                cpuInfo["type"] = target ? target->getCpuName() : "unknown";
                 cpuInfo["frequency_hz"] = cpu ? g_emulation->getFrequency() / cpu->getKDiv() : 0;
                 cpuInfo["breaked"] = g_emulation->isDebuggerActive();
                 cpuInfo["paused"]  = g_emulation->getPausedState();
@@ -478,41 +472,25 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
-            AddressableDevice* as = cpu->getAddrSpace();
-            if (!as) { err = "no address space"; return; }
-
-            Cpu::CpuType ct = cpu->getType();
             uint16_t pc = hasAddr ? reqAddr : cpu->getPC();
             result["start"] = Hex(pc);
 
             json items = json::array();
             for (int n = 0; n < count; ++n) {
-                uint8_t buf[4];
-                buf[0] = as->readByte(pc);
-                buf[1] = as->readByte(pc + 1);
-                buf[2] = as->readByte(pc + 2);
-                buf[3] = as->readByte(pc + 3);
+                DisasmInstr instr;
+                cpu->disassemble(pc, instr);
+                unsigned len = instr.length;
 
                 json item;
                 item["addr"] = Hex(pc);
-
-                unsigned len = 1;
-                std::string text;
-                if (ct == Cpu::CPU_8080) {
-                    text = i8080GetInstructionMnemonic(buf);
-                    len  = i8080GetInstructionLength(buf);
-                } else {
-                    STEP_FLAG flag;
-                    text = cpu_disassemble_z80(pc, buf, len, flag);
-                }
-                item["text"]     = text;
+                item["text"]     = instr.text;
                 item["len_bytes"] = static_cast<int>(len);
 
                 json bytesArr = json::array();
                 for (unsigned i = 0; i < len && i < 4; ++i)
-                    bytesArr.push_back(Hex(buf[i]));
+                    bytesArr.push_back(Hex(cpu->readMem(static_cast<uint16_t>(pc + i))));
                 item["bytes"] = bytesArr;
 
                 items.push_back(item);
@@ -533,12 +511,33 @@ namespace
     constexpr int MEM_READ_DEFAULT_LEN = 64;
     constexpr int MEM_READ_MAX_LEN     = 4096;
 
+    // Optional 'device' argument of the memory tools: a memory name from mem_devices;
+    // the CPU address space if omitted
+    std::string DeviceArg(const json& args)
+    {
+        if (!args.contains("device") || args["device"].is_null())
+            return "cpu";
+        if (!args["device"].is_string())
+            throw std::runtime_error("device must be a string (see mem_devices)");
+        return args["device"].get<std::string>();
+    }
+
+    // Finds the memory on the main thread; sets err if not found
+    int FindMemory(DebugSession* session, const std::string& device, std::string& err)
+    {
+        int mem = session->findMemory(device);
+        if (mem < 0)
+            err = "unknown device '" + device + "' (see mem_devices)";
+        return mem;
+    }
+
     json Tool_MemRead(const json& args)
     {
         if (!args.contains("addr") || args["addr"].is_null())
             throw std::runtime_error("addr is required");
 
-        const uint16_t addr = ParseNumArg(args["addr"], "addr");
+        const uint32_t addr32 = ParseNumArg32(args["addr"], "addr");
+        const std::string device = DeviceArg(args);
         int len = MEM_READ_DEFAULT_LEN;
         if (args.contains("len") && !args["len"].is_null()) {
             const json& L = args["len"];
@@ -559,10 +558,17 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu* cpu = p->getCpu();
-            if (!cpu) { err = "CPU is not available"; return; }
-            AddressableDevice* as = cpu->getAddrSpace();
-            if (!as) { err = "no address space"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "CPU is not available"; return; }
+            int mem = FindMemory(session, device, err);
+            if (mem < 0) return;
+            const unsigned size = session->getMemories()[mem].size;
+
+            // the CPU address space wraps around, other memories end at their size
+            uint32_t addr = mem == 0 ? (addr32 & 0xFFFF) : addr32;
+            if (addr >= size) { err = "addr is out of the device (size " + Hex32(size) + ")"; return; }
+            if (mem != 0 && addr + len > size)
+                len = static_cast<int>(size - addr);
 
             static const char hexd[] = "0123456789abcdef";
             std::string hex, ascii;
@@ -570,15 +576,17 @@ namespace
             ascii.reserve(static_cast<size_t>(len));
 
             for (int i = 0; i < len; ++i) {
-                const uint8_t b = as->readByte(static_cast<uint16_t>(addr + i));
+                const uint8_t b = session->readMem(mem, (addr + i) % size);
                 hex.push_back(hexd[b >> 4]);
                 hex.push_back(hexd[b & 0x0F]);
                 ascii.push_back((b >= 0x20 && b < 0x7F) ? static_cast<char>(b) : '.');
             }
 
-            result["addr"]  = Hex(addr);
+            if (mem != 0)
+                result["device"] = device;
+            result["addr"]  = Hex32(addr);
             result["len"]   = len;
-            result["end"]   = Hex(static_cast<uint16_t>(addr + len));
+            result["end"]   = Hex32(mem == 0 ? ((addr + len) & 0xFFFF) : addr + len);
             result["hex"]   = hex;
             result["ascii"] = ascii;
         });
@@ -600,7 +608,8 @@ namespace
         if (!args.contains("data") || !args["data"].is_string())
             throw std::runtime_error("data (hex string) is required");
 
-        const uint16_t addr = ParseNumArg(args["addr"], "addr");
+        const uint32_t addr32 = ParseNumArg32(args["addr"], "addr");
+        const std::string device = DeviceArg(args);
         std::string hexStr = args["data"].get<std::string>();
 
         // Strip non-hex characters.
@@ -622,22 +631,33 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu* cpu = p->getCpu();
-            if (!cpu) { err = "CPU is not available"; return; }
-            AddressableDevice* as = cpu->getAddrSpace();
-            if (!as) { err = "no address space"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "CPU is not available"; return; }
+            int mem = FindMemory(session, device, err);
+            if (mem < 0) return;
+            const unsigned size = session->getMemories()[mem].size;
+
+            // the CPU address space wraps around, other memories end at their size
+            uint32_t addr = mem == 0 ? (addr32 & 0xFFFF) : addr32;
+            const unsigned n = static_cast<unsigned>(clean.size() / 2);
+            if (addr >= size || (mem != 0 && addr + n > size)) {
+                err = "data is out of the device (size " + Hex32(size) + ")";
+                return;
+            }
 
             int count = 0;
             for (size_t i = 0; i < clean.size(); i += 2) {
                 uint8_t byteVal = static_cast<uint8_t>(
                     std::stoul(clean.substr(i, 2), nullptr, 16));
-                as->writeByte(static_cast<uint16_t>(addr + count), byteVal);
+                session->writeMem(mem, (addr + count) % size, byteVal);
                 ++count;
             }
 
-            result["addr"]  = Hex(addr);
+            if (mem != 0)
+                result["device"] = device;
+            result["addr"]  = Hex32(addr);
             result["count"] = count;
-            result["end"]   = Hex(static_cast<uint16_t>(addr + count));
+            result["end"]   = Hex32(mem == 0 ? ((addr + count) & 0xFFFF) : addr + count);
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -826,7 +846,7 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
 
             // The session lets execution leave a breakpoint at the current PC
@@ -867,7 +887,7 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
 
             DebugSession* session = p->getDebugSession();
@@ -893,7 +913,7 @@ namespace
         const bool ok3 = mcp::Run([&]
         {
             Platform* p = GetPlatform();
-            Cpu8080Compatible* cpu = p ? dynamic_cast<Cpu8080Compatible*>(p->getCpu()) : nullptr;
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU unavailable after run"; return; }
 
             DebugSession* session = p->getDebugSession();
@@ -945,7 +965,7 @@ namespace
             result["autorun"] = autorun;
 
             if (autorun && breakAfterLoad) {
-                Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+                CpuDebugTarget* cpu = GetTarget(p);
                 DebugSession* session = p->getDebugSession();
                 if (cpu && session) {
                     session->requestBreak(DC_EXTERNAL);
@@ -1261,7 +1281,7 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
 
             const bool wasBreaked = g_emulation->isDebuggerActive();
@@ -1277,20 +1297,8 @@ namespace
             result["pc"]       = Hex(pc);
 
             // Disassemble instruction at PC
-            AddressableDevice* as = cpu->getAddrSpace();
-            if (as && g_emulation->isDebuggerActive()) {
-                uint8_t buf[4];
-                buf[0] = as->readByte(pc);
-                buf[1] = as->readByte(pc + 1);
-                buf[2] = as->readByte(pc + 2);
-                buf[3] = as->readByte(pc + 3);
-                if (cpu->getType() == Cpu::CPU_8080) {
-                    result["instruction"] = i8080GetInstructionMnemonic(buf);
-                } else {
-                    unsigned length; STEP_FLAG flag;
-                    result["instruction"] = cpu_disassemble_z80(pc, buf, length, flag);
-                }
-            }
+            if (g_emulation->isDebuggerActive())
+                result["instruction"] = InstrText(cpu, pc);
         });
 
         if (!ok) throw std::runtime_error("emulator main thread is not ready");
@@ -1308,8 +1316,8 @@ namespace
         std::string mode = "into";
         if (args.contains("mode") && args["mode"].is_string())
             mode = args["mode"].get<std::string>();
-        if (mode != "into" && mode != "over" && mode != "skip")
-            throw std::runtime_error("invalid mode (expected into|over|skip)");
+        if (mode != "into" && mode != "over" && mode != "out" && mode != "skip")
+            throw std::runtime_error("invalid mode (expected into|over|out|skip)");
 
         int timeoutMs = STEP_TIMEOUT_MS;
         if (args.contains("timeout_ms") && !args["timeout_ms"].is_null()) {
@@ -1333,7 +1341,7 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
 
             if (!g_emulation->isDebuggerActive()) {
@@ -1346,25 +1354,16 @@ namespace
 
             if (mode == "skip") {
                 uint16_t pc = cpu->getPC();
-                AddressableDevice* as = cpu->getAddrSpace();
-                if (!as) { err = "no address space"; return; }
-                uint8_t buf[4] = { as->readByte(pc), as->readByte(pc+1), as->readByte(pc+2), as->readByte(pc+3) };
-                unsigned len = 1;
-                if (cpu->getType() == Cpu::CPU_8080)
-                    len = i8080GetInstructionLength(buf);
-                else {
-                    STEP_FLAG flag;
-                    cpu_disassemble_z80(pc, buf, len, flag);
-                }
-                cpu->setPC(static_cast<uint16_t>(pc + len));
+                cpu->setPC(static_cast<uint16_t>(pc + cpu->getInstrLength(pc)));
                 return;
             }
 
-            if (mode == "into") {
+            if (mode == "into")
                 session->stepInto(DC_EXTERNAL);
-            } else { // "over"
+            else if (mode == "over")
                 session->stepOver(DC_EXTERNAL);
-            }
+            else // "out"
+                session->stepOut(DC_EXTERNAL);
 
             async = true;
         });
@@ -1389,7 +1388,7 @@ namespace
         const bool ok3 = mcp::Run([&]
         {
             Platform* p = GetPlatform();
-            Cpu8080Compatible* cpu = p ? dynamic_cast<Cpu8080Compatible*>(p->getCpu()) : nullptr;
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU unavailable after step"; return; }
 
             uint16_t pc = cpu->getPC();
@@ -1397,22 +1396,8 @@ namespace
             result["completed"] = completed;
             result["pc"]        = Hex(pc);
 
-            if (g_emulation->isDebuggerActive()) {
-                AddressableDevice* as = cpu->getAddrSpace();
-                if (as) {
-                    uint8_t buf[4];
-                    buf[0] = as->readByte(pc);
-                    buf[1] = as->readByte(pc + 1);
-                    buf[2] = as->readByte(pc + 2);
-                    buf[3] = as->readByte(pc + 3);
-                    if (cpu->getType() == Cpu::CPU_8080)
-                        result["instruction"] = i8080GetInstructionMnemonic(buf);
-                    else {
-                        unsigned length; STEP_FLAG flag;
-                        result["instruction"] = cpu_disassemble_z80(pc, buf, length, flag);
-                    }
-                }
-            }
+            if (g_emulation->isDebuggerActive())
+                result["instruction"] = InstrText(cpu, pc);
         });
 
         if (!ok3) throw std::runtime_error("emulator main thread is not ready");
@@ -1432,7 +1417,7 @@ namespace
         {
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
-            Cpu8080Compatible* cpu = dynamic_cast<Cpu8080Compatible*>(p->getCpu());
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU is not available"; return; }
 
             p->reset();
@@ -1545,6 +1530,9 @@ namespace
                         continue;
                     items.push_back({
                         { "index",     idx++ },
+                        { "id",        bp.id },
+                        { "enabled",   bp.enabled },
+                        { "owner",     bp.owner == DC_EXTERNAL ? "mcp" : "ui" },
                         { "addr",      Hex(bp.addr) },
                         { "type",      BpTypeName(bp.type) },
                         { "hitCount",  bp.hitCount },
@@ -1601,12 +1589,14 @@ namespace
 
             bool exists = bps->find(bt, addr) >= 0;
             int id = bps->add(bt, addr, DC_EXTERNAL);
+            if (id < 0) { err = "breakpoint type '" + type + "' is not supported by this CPU"; return; }
             if (skipCount >= 0)
                 bps->setSkipCount(id, skipCount);
             if (hasComment)
                 bps->setComment(id, comment);
 
             result["added"] = !exists;
+            result["id"]    = id;
             result["addr"]  = Hex(addr);
             result["type"]  = type;
             if (skipCount >= 0)
@@ -1625,10 +1615,12 @@ namespace
     // ================================================================
     json Tool_BpRemove(const json& args)
     {
-        if (!args.contains("addr") || args["addr"].is_null())
-            throw std::runtime_error("addr is required");
+        const bool hasId = args.contains("id") && args["id"].is_number_integer();
+        if (!hasId && (!args.contains("addr") || args["addr"].is_null()))
+            throw std::runtime_error("addr or id is required");
 
-        const uint16_t addr = ParseNumArg(args["addr"], "addr");
+        const int id = hasId ? args["id"].get<int>() : -1;
+        const uint16_t addr = hasId ? 0 : ParseNumArg(args["addr"], "addr");
 
         // Optional type filter — if provided, only remove matching BPs.
         std::string type;
@@ -1660,12 +1652,17 @@ namespace
             bps->list(descs);
 
             int removed = 0;
-            for (auto& bp : descs)
-                if (bp.addr == addr && (!hasType || bp.type == bt) && bps->remove(bp.id))
+            for (auto& bp : descs) {
+                bool match = hasId ? bp.id == id : bp.addr == addr && (!hasType || bp.type == bt);
+                if (match && bps->remove(bp.id))
                     ++removed;
+            }
 
             result["removed"] = removed;
-            result["addr"]    = Hex(addr);
+            if (hasId)
+                result["id"] = id;
+            else
+                result["addr"] = Hex(addr);
             if (hasType)
                 result["type"] = type;
         });
@@ -1793,6 +1790,154 @@ namespace
     }
 
     // ================================================================
+    // Tool: mem_devices
+    // ================================================================
+    json Tool_MemDevices(const json& /*args*/)
+    {
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "CPU is not available"; return; }
+
+            json items = json::array();
+            for (const DebugMemory& mem : session->getMemories())
+                items.push_back({ { "device", mem.name }, { "size", Hex32(mem.size) }, { "size_dec", mem.size } });
+            result["devices"] = items;
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
+    // Tool: devices_info
+    // ================================================================
+    json Tool_DevicesInfo(const json& /*args*/)
+    {
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+
+            json items = json::array();
+            for (EmuObject* obj : p->getObjects()) {
+                std::string info = obj->getDebugInfo();
+                if (!info.empty())
+                    items.push_back({ { "object", obj->getName() }, { "info", info } });
+            }
+            result["devices"] = items;
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
+    // Tool: emu_run_to
+    // ================================================================
+    json Tool_EmuRunTo(const json& args)
+    {
+        if (!args.contains("addr") || args["addr"].is_null())
+            throw std::runtime_error("addr is required");
+        const uint16_t addr = ParseNumArg(args["addr"], "addr");
+
+        int timeoutMs = STEP_TIMEOUT_MS;
+        if (args.contains("timeout_ms") && args["timeout_ms"].is_number_integer()) {
+            timeoutMs = args["timeout_ms"].get<int>();
+            if (timeoutMs < 1 || timeoutMs > 60000)
+                throw std::runtime_error("timeout_ms must be between 1 and 60000");
+        }
+
+        json        result;
+        std::string err;
+
+        // Phase 1: run to the address
+        const bool ok1 = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "CPU is not available"; return; }
+            if (!g_emulation->isDebuggerActive()) {
+                err = "CPU is not paused; call debug_break first";
+                return;
+            }
+            session->runTo(addr, DC_EXTERNAL);
+        });
+        if (!ok1) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+
+        // Phase 2: wait for a stop
+        auto start = std::chrono::steady_clock::now();
+        while (!g_emulation->isDebuggerActive()) {
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - start).count();
+            if (elapsed >= timeoutMs) break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+
+        // Phase 3: read result
+        const bool ok3 = mcp::Run([&]
+        {
+            CpuDebugTarget* cpu = GetTarget(GetPlatform());
+            if (!cpu) { err = "CPU unavailable after run"; return; }
+
+            const bool breaked = g_emulation->isDebuggerActive();
+            const uint16_t pc = cpu->getPC();
+            result["breaked"] = breaked;
+            result["reached"] = breaked && pc == addr;
+            result["pc"]      = Hex(pc);
+            if (breaked)
+                result["instruction"] = InstrText(cpu, pc);
+        });
+        if (!ok3) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
+    // Tool: bp_enable
+    // ================================================================
+    json Tool_BpEnable(const json& args)
+    {
+        if (!args.contains("id") || !args["id"].is_number_integer())
+            throw std::runtime_error("id (integer, see bp_list) is required");
+        const int id = args["id"].get<int>();
+        const bool enabled = OptBool(args, "enabled", true);
+
+        json        result;
+        std::string err;
+
+        const bool ok = mcp::Run([&]
+        {
+            Platform* p = GetPlatform();
+            if (!p) { err = "no platform created"; return; }
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "CPU is not available"; return; }
+            if (!session->getBreakpoints()->setEnabled(id, enabled)) {
+                err = "no breakpoint with id " + std::to_string(id);
+                return;
+            }
+            result["id"]      = id;
+            result["enabled"] = enabled;
+        });
+
+        if (!ok) throw std::runtime_error("emulator main thread is not ready");
+        if (!err.empty()) throw std::runtime_error(err);
+        return result;
+    }
+
+    // ================================================================
     // Tool registry builder
     // ================================================================
     std::vector<McpTool> BuildToolRegistry()
@@ -1821,7 +1966,8 @@ namespace
                 "regs_set",
                 "Set one or more CPU registers in one call. Provide any subset of "
                 "af/bc/de/hl/sp/pc/psw/iff (all CPUs) or af2/bc2/de2/hl2/ix/iy/i/r/im "
-                "(Z80 only). Number format: JSON integer = decimal, JSON string = hex "
+                "(Z80 only); single flags can be set by name too (8080: s/z/ac/p/c, "
+                "Z80: s/z/h/p/n/c). Returns all registers. Number format: JSON integer = decimal, JSON string = hex "
                 "by default (0x=hex, 0o=octal, leading 0=decimal). "
                 "Requires CPU to be paused.",
                 json{ { "type", "object" }, { "properties", props } },
@@ -1860,12 +2006,14 @@ namespace
             "Read a range of memory. 'addr' is required "
             "(JSON integer = decimal, JSON string = hex by default, "
             "0x=hex, 0o=octal, leading 0=decimal). "
-            "'len' is byte count (default 64, max 4096). Returns compact hex dump "
-            "and ASCII rendering (non-printable → '.').",
+            "'len' is byte count (default 64, max 4096). Optional 'device' selects a "
+            "memory from mem_devices (default: the CPU address space). Returns compact "
+            "hex dump and ASCII rendering (non-printable → '.').",
             json{
                 { "type", "object" },
                 { "properties", {
                     { "addr", { { "type", json::array({ "string", "integer" }) }, { "description", "start address (required)" } } },
+                    { "device", { { "type", "string" }, { "description", "memory name from mem_devices (default cpu)" } } },
                     { "len",  { { "type", "integer" }, { "minimum", 1 }, { "maximum", MEM_READ_MAX_LEN }, { "description", "byte count (default 64)" } } },
                 }},
                 { "required", json::array({ "addr" }) },
@@ -1879,16 +2027,36 @@ namespace
             "(JSON integer = decimal, JSON string = hex by default, "
             "0x=hex, 0o=octal, leading 0=decimal). "
             "'data' is required — a hex string of bytes to write (e.g. \"C3 00 01\" "
-            "or \"C30001\"). Non-hex characters are stripped. Max 4096 bytes.",
+            "or \"C30001\"). Non-hex characters are stripped. Max 4096 bytes. "
+            "Optional 'device' selects a memory from mem_devices (default: the CPU "
+            "address space).",
             json{
                 { "type", "object" },
                 { "properties", {
                     { "addr", { { "type", json::array({ "string", "integer" }) }, { "description", "start address (required)" } } },
+                    { "device", { { "type", "string" }, { "description", "memory name from mem_devices (default cpu)" } } },
                     { "data", { { "type", "string" }, { "description", "hex bytes to write (required)" } } },
                 }},
                 { "required", json::array({ "addr", "data" }) },
             },
             &Tool_MemWrite
+        });
+
+        tools.push_back({
+            "mem_devices",
+            "List memories that mem_read/mem_write can access with the 'device' "
+            "argument: 'cpu' (the CPU address space, the default) and the platform's "
+            "RAM/ROM objects and other devices marked for the debugger, with sizes.",
+            json{ { "type", "object" }, { "properties", json::object() } },
+            &Tool_MemDevices
+        });
+
+        tools.push_back({
+            "devices_info",
+            "Debug information of the platform devices that provide it (DMA, CRT, "
+            "PIC, FDC etc.), one text block per device object.",
+            json{ { "type", "object" }, { "properties", json::object() } },
+            &Tool_DevicesInfo
         });
 
         tools.push_back({
@@ -2056,17 +2224,35 @@ namespace
         tools.push_back({
             "debug_step",
             "Single-step the paused CPU. 'mode': 'into' (one instruction; default), "
-            "'over' (step over calls), or 'skip' (advance PC without executing). "
+            "'over' (step over calls), 'out' (run until the current subroutine "
+            "returns), or 'skip' (advance PC without executing). "
             "Optional 'timeout_ms' (1–60000, default 5000) limits wait for step "
             "completion. Requires CPU paused. Returns new PC and instruction.",
             json{
                 { "type", "object" },
                 { "properties", {
-                    { "mode",       { { "type", "string" }, { "enum", json::array({ "into", "over", "skip" }) }, { "description", "step mode (default into)" } } },
+                    { "mode",       { { "type", "string" }, { "enum", json::array({ "into", "over", "out", "skip" }) }, { "description", "step mode (default into)" } } },
                     { "timeout_ms", { { "type", "integer" }, { "minimum", 1 }, { "maximum", 60000 }, { "description", "timeout in ms (default 5000)" } } },
                 }}
             },
             &Tool_DebugStep
+        });
+
+        tools.push_back({
+            "emu_run_to",
+            "Run the paused CPU until it reaches 'addr' (a temporary breakpoint; "
+            "running to the current PC means a full loop). Other breakpoints may "
+            "stop it earlier ('reached' is false then). Optional 'timeout_ms' "
+            "(1–60000, default 5000) limits the wait; on timeout the CPU keeps running.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "addr",       { { "type", json::array({ "string", "integer" }) }, { "description", "address to run to (required)" } } },
+                    { "timeout_ms", { { "type", "integer" }, { "minimum", 1 }, { "maximum", 60000 }, { "description", "timeout in ms (default 5000)" } } },
+                }},
+                { "required", json::array({ "addr" }) },
+            },
+            &Tool_EmuRunTo
         });
 
         tools.push_back({
@@ -2094,7 +2280,7 @@ namespace
 
         tools.push_back({
             "bp_list",
-            "List all breakpoints with index, address (hex), type, hitCount (total hits "
+            "List all breakpoints with index, id, enabled, owner (ui/mcp), address (hex), type, hitCount (total hits "
             "since the breakpoint was set), skipCount, remaining (hits to skip before "
             "the next stop) and comment.",
             json{ { "type", "object" }, { "properties", json::object() } },
@@ -2128,7 +2314,7 @@ namespace
 
         tools.push_back({
             "bp_remove",
-            "Remove breakpoints at an address. 'addr' format: "
+            "Remove breakpoints at an address, or one breakpoint by 'id' (see bp_list). 'addr' format: "
             "JSON integer = decimal, JSON string = hex by default "
             "(0x=hex, 0o=octal, leading 0=decimal). "
             "Optional 'type' filters removal to only matching type "
@@ -2140,8 +2326,8 @@ namespace
                 { "properties", {
                     { "addr", { { "type", json::array({ "string", "integer" }) }, { "description", "breakpoint address (required)" } } },
                     { "type", { { "type", "string" }, { "enum", json::array({ "exec", "write", "read", "access", "port_read", "port_write", "port_access" }) }, { "description", "filter by type (optional)" } } },
+                    { "id",   { { "type", "integer" }, { "description", "breakpoint id instead of addr" } } },
                 }},
-                { "required", json::array({ "addr" }) },
             },
             &Tool_BpRemove
         });
@@ -2151,6 +2337,21 @@ namespace
             "Remove ALL breakpoints. Returns the number that were cleared.",
             json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_BpClear
+        });
+
+        tools.push_back({
+            "bp_enable",
+            "Enable or disable a breakpoint by 'id' (see bp_list). A disabled "
+            "breakpoint stays in the list but does not stop or count hits.",
+            json{
+                { "type", "object" },
+                { "properties", {
+                    { "id",      { { "type", "integer" }, { "description", "breakpoint id (required)" } } },
+                    { "enabled", { { "type", "boolean" }, { "description", "true to enable (default), false to disable" } } },
+                }},
+                { "required", json::array({ "id" }) },
+            },
+            &Tool_BpEnable
         });
 
         // state_save / state_load — not yet implemented for Emu80,

@@ -281,6 +281,12 @@ bool AddressableDevice::setProperty(const string& propertyName, const EmuValuesL
     } else if (propertyName == "poke" && values[0].isInt() && values[1].isInt()) {
         writeByte(values[0].asInt(), values[1].asInt());
         return true;
+    } else if (propertyName == "debugName") {
+        m_debugName = values[0].asString();
+        return true;
+    } else if (propertyName == "debugSize" && values[0].isInt()) {
+        m_debugSize = values[0].asInt();
+        return true;
     }
 
     return false;

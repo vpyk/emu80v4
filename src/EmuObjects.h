@@ -169,8 +169,14 @@ class AddressableDevice : public EmuObject
 
         void setAddrMask(int mask) {m_addrMask = mask;}
 
+        // Shown in debugger memory dumps if set (debugName/debugSize properties in conf)
+        const std::string& getDebugName() {return m_debugName;}
+        int getDebugSize() {return m_debugSize;}
+
     protected:
         int m_addrMask = 0;
+        std::string m_debugName;
+        int m_debugSize = 0;
 
         bool m_supportsTags = false;
         int m_tag = 0;

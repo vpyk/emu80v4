@@ -20,6 +20,7 @@
 #include "DebugSession.h"
 #include "Emulation.h"
 #include "Platform.h"
+#include "Memory.h"
 
 
 void DebugElapsedTimer::onElapse()
@@ -205,4 +206,65 @@ void DebugSession::runTo(uint16_t addr, DebugClient client)
     // running to the current address means a full loop, as the breakpoints
     // at the current address are skipped on resume
     resume(client);
+}
+
+
+const std::vector<DebugMemory>& DebugSession::getMemories()
+{
+    if (!m_memories.empty())
+        return m_memories;
+
+    AddressableDevice* cpuAs = m_cpu->getAddrSpace();
+    if (cpuAs)
+        m_memories.push_back({"cpu", cpuAs, 0x10000});
+
+    for (EmuObject* obj : m_platform->getObjects()) {
+        AddressableDevice* dev = dynamic_cast<AddressableDevice*>(obj);
+        if (!dev || dev == cpuAs)
+            continue;
+
+        int size = dev->getDebugSize();
+        if (!size) {
+            if (Ram* ram = dynamic_cast<Ram*>(dev))
+                size = ram->getSize();
+            else if (Rom* rom = dynamic_cast<Rom*>(dev))
+                size = rom->getSize();
+            else if (!dev->getDebugName().empty())
+                size = 0x10000;
+        }
+        if (size <= 0)
+            continue;
+
+        std::string name = dev->getDebugName().empty() ? dev->getName() : dev->getDebugName();
+        if (name.empty())
+            continue;
+        m_memories.push_back({name, dev, unsigned(size)});
+    }
+
+    return m_memories;
+}
+
+
+int DebugSession::findMemory(const std::string& name)
+{
+    const std::vector<DebugMemory>& memories = getMemories();
+    for (unsigned i = 0; i < memories.size(); i++)
+        if (memories[i].name == name)
+            return i;
+    return -1;
+}
+
+
+uint8_t DebugSession::readMem(int memory, unsigned addr)
+{
+    const DebugMemory& mem = getMemories()[memory];
+    return addr < mem.size ? debugReadByte(mem.device, addr) : 0xFF;
+}
+
+
+void DebugSession::writeMem(int memory, unsigned addr, uint8_t value)
+{
+    const DebugMemory& mem = getMemories()[memory];
+    if (addr < mem.size)
+        mem.device->writeByte(addr, value);
 }

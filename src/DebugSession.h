@@ -24,8 +24,18 @@
 #include "Breakpoints.h"
 #include "DebugTarget.h"
 
+#include <vector>
+
 class Platform;
 class DebugSession;
+
+
+// Memory shown in debugger dumps
+struct DebugMemory {
+    std::string name;
+    AddressableDevice* device;
+    unsigned size;
+};
 
 
 // Stops the emulation in the debugger after the given time, on behalf of a client
@@ -83,6 +93,13 @@ public:
     void stepOut(DebugClient client);
     void runTo(uint16_t addr, DebugClient client);
 
+    // Memories for dumps: the CPU address space ("cpu") first, then Ram/Rom objects
+    // and devices with debugName set in the platform configuration. Built on first use.
+    const std::vector<DebugMemory>& getMemories();
+    int findMemory(const std::string& name); // -1 if not found
+    uint8_t readMem(int memory, unsigned addr);
+    void writeMem(int memory, unsigned addr, uint8_t value);
+
     // Run-for timer
     void cleanupTimer();
     bool isTimerRunning() {return m_runForTimer != nullptr;}
@@ -101,6 +118,7 @@ private:
     };
 
     Platform* m_platform;
+    std::vector<DebugMemory> m_memories;
     CpuDebugTarget* m_target;
     Cpu* m_cpu;
     BreakpointManager m_breakpoints;

@@ -87,6 +87,7 @@ class Platform : public ParentObject
 
         IDebugger* getDebugger() {return m_debugger;} // debugger UI, nullptr if not created yet
         DebugSession* getDebugSession(); // created on first use, nullptr if the CPU is not supported
+        const std::list<EmuObject*>& getObjects() {return m_objList;}
 
         void createDebugger();
         bool isDebuggerUiSupported();
