@@ -33,6 +33,7 @@ Cpu::Cpu()
 {
     m_addrSpace = nullptr;
     m_ioAddrSpace = nullptr;
+    memset(m_hookArray, 0, sizeof(m_hookArray));
 }
 
 
@@ -74,18 +75,14 @@ void Cpu::attachCore(PlatformCore* core)
 }
 
 
-void Cpu::addHook(CpuHook* hook)
+// Called after an instruction while a debug step is requested
+void Cpu::onDebugStep()
 {
-    m_hookVector.push_back(hook);
-    m_nHooks++;
-    hook->setCpu(this);
-}
-
-
-void Cpu::removeHook(CpuHook* hook)
-{
-    m_hookVector.erase(remove(m_hookVector.begin(), m_hookVector.end(), hook), m_hookVector.end());
-    m_nHooks--; // добавить проверку на существование!
+    if (m_stepFilter && !m_stepFilter->isStepDone())
+        return;
+    m_stepReq = false;
+    m_stepFilter = nullptr;
+    g_emulation->debugRequest(this);
 }
 
 
@@ -258,15 +255,12 @@ std::string Cpu::getPropertyStringValue(const std::string& propertyName)
 }*/
 
 
-Cpu8080Compatible::Cpu8080Compatible()
+void Cpu::addHook(CpuHook* hook)
 {
-    memset(m_hookArray, 0, 65536 * sizeof(CpuHook*));
-}
+    m_hookVector.push_back(hook);
+    m_nHooks++;
+    hook->setCpu(this);
 
-
-void Cpu8080Compatible::addHook(CpuHook* hook)
-{
-    Cpu::addHook(hook);
     uint16_t addr = hook->getHookAddr();
     if (!m_hookArray[addr])
         m_hookArray[addr] = new list<CpuHook*>;
@@ -282,7 +276,7 @@ void Cpu8080Compatible::addHook(CpuHook* hook)
 // Calls hooks for the current PC, returns true if the instruction must not be executed.
 // All breakpoints are evaluated (to keep their counters right); the remaining hooks are
 // called only while none of the previous hooks has handled the instruction.
-bool Cpu8080Compatible::processHooks(list<CpuHook*>* hookList)
+bool Cpu::processHooks(list<CpuHook*>* hookList)
 {
     // the skip applies to the first hooked instruction only
     // (hook lists are never empty)
@@ -304,9 +298,11 @@ bool Cpu8080Compatible::processHooks(list<CpuHook*>* hookList)
 }
 
 
-void Cpu8080Compatible::removeHook(CpuHook* hook)
+void Cpu::removeHook(CpuHook* hook)
 {
-    Cpu::removeHook(hook);
+    m_hookVector.erase(remove(m_hookVector.begin(), m_hookVector.end(), hook), m_hookVector.end());
+    m_nHooks--; // добавить проверку на существование!
+
     uint16_t addr = hook->getHookAddr();
     list<CpuHook*>* hookList = m_hookArray[addr];
     if (hookList) {

@@ -34,6 +34,16 @@ class PlatformCore;
 class DataBreakpoint;
 
 
+// Decides when a requested debug step is over (e.g. step out); called after
+// every instruction while the step is in progress
+class CpuStepFilter
+{
+    public:
+        virtual ~CpuStepFilter() {}
+        virtual bool isStepDone() = 0;
+};
+
+
 class Cpu : public ActiveDevice
 {
     public:
@@ -65,7 +75,14 @@ class Cpu : public ActiveDevice
         void disableHooks() {m_hooksDisabled = true;}
         void enableHooks() {m_hooksDisabled = false;}
 
-        void debugStepRequest() {m_stepReq = true;}
+        // Stops in the debugger after the current instruction or, with a filter,
+        // after the instruction the filter accepts
+        void debugStepRequest(CpuStepFilter* filter = nullptr) {m_stepReq = true; m_stepFilter = filter;}
+        void cancelDebugStep() {m_stepReq = false; m_stepFilter = nullptr;}
+
+        // Lets execution leave the address when the debugger resumes: breakpoints
+        // at it are not checked (and not counted) for the next instruction
+        void skipBreakpointsOnce(uint16_t addr) {m_bpSkipAddr = m_hookArray[addr] ? addr : -1;}
 
         // Cycle, relative to the start of the current instruction, at which the ongoing
         // M-cycle begins (nominal, w/o waits); 0 if no instruction is being executed
@@ -98,8 +115,11 @@ class Cpu : public ActiveDevice
         unsigned m_startAddr = 0;
 
         std::vector<CpuHook*> m_hookVector;
+        std::list<CpuHook*>* m_hookArray[65536];
         int m_nHooks = 0;
         bool m_hooksDisabled = false;
+        int m_bpSkipAddr = -1; // see skipBreakpointsOnce()
+        bool processHooks(std::list<CpuHook*>* hookList);
 
         // Several breakpoints (of different kinds) may share one address
         std::multimap<uint16_t, DataBreakpoint*> m_dataBpMap;
@@ -109,6 +129,8 @@ class Cpu : public ActiveDevice
         static void removeBreakpointFromMap(std::multimap<uint16_t, DataBreakpoint*>& bpMap, DataBreakpoint* dbp);
 
         bool m_stepReq = false;
+        CpuStepFilter* m_stepFilter = nullptr;
+        void onDebugStep();
 
         bool m_debugOnHalt = false;
         bool m_debugOnIllegalCmd = false;
@@ -125,11 +147,6 @@ class Cpu : public ActiveDevice
 class Cpu8080Compatible : public Cpu
 {
     public:
-        Cpu8080Compatible();
-
-        void addHook(CpuHook* hook) override;
-        void removeHook(CpuHook* hook) override;
-
         virtual void intRst(int vect) = 0;
         virtual void intCall(uint16_t addr) = 0;
         virtual void ret() = 0;
@@ -137,13 +154,6 @@ class Cpu8080Compatible : public Cpu
         void hrq(int ticks) override;
 
         virtual uint16_t getPC() = 0;
-
-        // Lets execution leave the address when the debugger resumes: breakpoints
-        // at it are not checked (and not counted) for the next instruction
-        void skipBreakpointsOnce(uint16_t addr) {m_bpSkipAddr = m_hookArray[addr] ? addr : -1;}
-
-    protected:
-        bool processHooks(std::list<CpuHook*>* hookList);
 
     public:
         virtual uint16_t getBC() = 0;
@@ -177,8 +187,6 @@ class Cpu8080Compatible : public Cpu
         int io_input(int port);
         void io_output(int port, int value);
 
-        std::list<CpuHook*>* m_hookArray[65536];
-        int m_bpSkipAddr = -1; // see skipBreakpointsOnce()
 };
 
 #endif // CPU_H

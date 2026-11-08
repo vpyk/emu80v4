@@ -122,10 +122,8 @@ void CpuZ80::operate()
 
     endContention();
 
-    if (m_stepReq) {
-        m_stepReq = false;
-        g_emulation->debugRequest(this);
-    }
+    if (m_stepReq)
+        onDebugStep();
 }
 
 
