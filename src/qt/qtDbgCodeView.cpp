@@ -315,7 +315,15 @@ void DbgCodeView::gotoAddress()
     unsigned addr = text.trimmed().toUInt(&ok, 16);
     if (!ok || addr > 0xFFFF)
         return;
-    m_cursorAddr = uint16_t(addr);
+    showAddress(uint16_t(addr));
+}
+
+
+void DbgCodeView::showAddress(uint16_t addr)
+{
+    if (!canNavigate())
+        return;
+    m_cursorAddr = addr;
     showAddr(m_cursorAddr, false);
     viewport()->update();
 }

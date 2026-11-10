@@ -52,6 +52,7 @@ public slots:
     void setPcToCursor();
     void gotoPc();
     void gotoAddress();         // asks for the address
+    void showAddress(uint16_t addr); // moves the cursor to the address
 
 protected:
     void paintEvent(QPaintEvent* event) override;

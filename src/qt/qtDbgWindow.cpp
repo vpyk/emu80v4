@@ -28,6 +28,7 @@
 #include "qtDbgWindow.h"
 #include "qtDbgCodeView.h"
 #include "qtDbgRegsView.h"
+#include "qtDbgMemView.h"
 #include "qtMainWindow.h"
 
 #include "../Globals.h"
@@ -41,7 +42,7 @@ DbgWindow::DbgWindow(Platform* platform)
     : QMainWindow(nullptr), m_platform(platform), m_session(platform->getDebugSession())
 {
     setWindowTitle(tr("Debugger: %1").arg(QString::fromUtf8(platform->getWindow()->getCaption().c_str())));
-    resize(900, 640);
+    resize(1000, 760);
 
     m_codeView = new DbgCodeView(m_session, this);
     setCentralWidget(m_codeView);
@@ -133,6 +134,23 @@ void DbgWindow::createDocks()
     regsDock->setWidget(m_regsView);
     addDockWidget(Qt::RightDockWidgetArea, regsDock);
     m_viewMenu->addAction(regsDock->toggleViewAction());
+
+    m_memPanel = new DbgMemPanel(m_session, this);
+    connect(this, &DbgWindow::stateChanged, m_memPanel, &DbgMemPanel::onStateChanged);
+    connect(this, &DbgWindow::runStateChanged, m_memPanel, &DbgMemPanel::onRunStateChanged);
+    connect(m_memPanel, &DbgMemPanel::showInCode, this, [this](uint16_t addr) {
+        m_codeView->showAddress(addr);
+        m_codeView->setFocus();
+    });
+
+    QDockWidget* memDock = new QDockWidget(tr("Memory"), this);
+    memDock->setObjectName("memoryDock");
+    memDock->setWidget(m_memPanel);
+    addDockWidget(Qt::BottomDockWidgetArea, memDock);
+    m_viewMenu->addAction(memDock->toggleViewAction());
+
+    // the right docks take the whole height
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
 
 

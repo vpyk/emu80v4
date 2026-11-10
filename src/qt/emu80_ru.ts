@@ -124,7 +124,45 @@
     </message>
 </context>
 <context>
+    <name>DbgMemPanel</name>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Address (hex), Enter to go</source>
+        <translation>Адрес (hex), Enter — перейти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Address:</source>
+        <translation>Адрес:</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Breakpoint on read</source>
+        <translation>Точка останова по чтению</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Breakpoint on write</source>
+        <translation>Точка останова по записи</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Breakpoint on access</source>
+        <translation>Точка останова по обращению</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Show in code</source>
+        <translation>Показать в коде</translation>
+    </message>
+</context>
+<context>
     <name>DbgWindow</name>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Memory</source>
+        <translation>Память</translation>
+    </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>
         <source>View</source>
