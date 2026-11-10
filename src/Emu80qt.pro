@@ -296,12 +296,14 @@ isEmpty(NO_QT_DEBUGGER) {
     SOURCES += \
         qt/qtDebugger.cpp \
         qt/qtDbgWindow.cpp \
-        qt/qtDbgCodeView.cpp
+        qt/qtDbgCodeView.cpp \
+        qt/qtDbgStyle.cpp
     HEADERS += \
         qt/qtDbgCompat.h \
         qt/qtDebugger.h \
         qt/qtDbgWindow.h \
-        qt/qtDbgCodeView.h
+        qt/qtDbgCodeView.h \
+        qt/qtDbgStyle.h
 }
 
 # MCP Server support — enable with: qmake MCP_SERVER=1 src/Emu80qt.pro

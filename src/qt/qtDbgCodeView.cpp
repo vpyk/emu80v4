@@ -18,7 +18,6 @@
 
 #include <algorithm>
 
-#include <QFontDatabase>
 #include <QInputDialog>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -30,6 +29,7 @@
 
 #include "qtDbgCodeView.h"
 #include "qtDbgCompat.h"
+#include "qtDbgStyle.h"
 
 #include "../DebugSession.h"
 
@@ -44,13 +44,6 @@ const int c_gutterChars = 3;
 const int c_addrChars = 6;
 const int c_bytesChars = c_maxBytes * 3 + 1;
 
-QColor mixColors(const QColor& c1, const QColor& c2, double k)
-{
-    return QColor::fromRgbF(c1.redF() * (1 - k) + c2.redF() * k,
-                            c1.greenF() * (1 - k) + c2.greenF() * k,
-                            c1.blueF() * (1 - k) + c2.blueF() * k);
-}
-
 QString hex(unsigned value, int digits)
 {
     return QString("%1").arg(value, digits, 16, QChar('0')).toUpper();
@@ -62,7 +55,7 @@ QString hex(unsigned value, int digits)
 DbgCodeView::DbgCodeView(DebugSession* session, QWidget* parent)
     : QAbstractScrollArea(parent), m_session(session)
 {
-    setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    setFont(dbgFont());
     setFocusPolicy(Qt::StrongFocus);
     setContextMenuPolicy(Qt::ActionsContextMenu);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -74,10 +67,10 @@ DbgCodeView::DbgCodeView(DebugSession* session, QWidget* parent)
 
 void DbgCodeView::updateFontMetrics()
 {
-    QFontMetrics fm(font());
-    m_charWidth = dbgTextWidth(fm, "0");
-    m_lineHeight = fm.height();
-    m_ascent = fm.ascent();
+    DbgMetrics metrics(font());
+    m_charWidth = metrics.charWidth;
+    m_lineHeight = metrics.lineHeight;
+    m_ascent = metrics.ascent;
 }
 
 
@@ -331,17 +324,14 @@ void DbgCodeView::gotoAddress()
 void DbgCodeView::paintEvent(QPaintEvent*)
 {
     QPainter painter(viewport());
-    QPalette pal = palette();
 
-    // Outdated data (the emulation is running) is shown dimmed on the window color
-    QColor bgColor = pal.color(m_running ? QPalette::Window : QPalette::Base);
-    QColor textColor = m_running ? pal.color(QPalette::Disabled, QPalette::Text) : pal.color(QPalette::Text);
-    QColor dimColor = mixColors(textColor, bgColor, 0.4);
-    QColor highlight = pal.color(QPalette::Highlight);
-    QColor pcBgColor = mixColors(bgColor, highlight, m_running ? 0.15 : 0.35);
-    QColor cursorBgColor = mixColors(bgColor, highlight, 0.12);
+    // Outdated data (the emulation is running) is shown in the stale colors
+    DbgColors colors(palette());
+    bool stale = m_running;
+    QColor textColor = colors.fg(stale);
+    QColor dimColor = colors.dimFg(stale);
 
-    painter.fillRect(viewport()->rect(), bgColor);
+    painter.fillRect(viewport()->rect(), colors.bg(stale));
     if (!m_hasState)
         return;
 
@@ -361,11 +351,11 @@ void DbgCodeView::paintEvent(QPaintEvent*)
             break;
 
         if (line.addr == m_pc)
-            painter.fillRect(addrX, y, width - addrX, m_lineHeight, pcBgColor);
-        else if (line.addr == m_cursorAddr && hasFocus())
-            painter.fillRect(addrX, y, width - addrX, m_lineHeight, cursorBgColor);
+            painter.fillRect(addrX, y, width - addrX, m_lineHeight, colors.pcBg(stale));
+        else if (line.addr == m_cursorAddr && hasFocus() && !stale)
+            painter.fillRect(addrX, y, width - addrX, m_lineHeight, colors.cursorBackground);
         if (line.addr == m_cursorAddr) {
-            painter.setPen(QPen(mixColors(bgColor, highlight, hasFocus() ? 0.8 : 0.4), 1));
+            painter.setPen(QPen(hasFocus() && !stale ? colors.cursorFrame : colors.cursorFrameUnfocused, 1));
             painter.setBrush(Qt::NoBrush);
             painter.drawRect(QRectF(addrX + 0.5, y + 0.5, width - addrX - 1, m_lineHeight - 1));
         }
@@ -373,9 +363,9 @@ void DbgCodeView::paintEvent(QPaintEvent*)
         // breakpoint: filled circle if enabled, a ring if disabled; MCP breakpoints in another color
         auto bp = m_breakpoints.find(line.addr);
         if (bp != m_breakpoints.end()) {
-            QColor bpColor = bp->second.external ? QColor(230, 140, 0) : QColor(220, 50, 50);
-            if (m_running)
-                bpColor = mixColors(bpColor, bgColor, 0.4);
+            QColor bpColor = bp->second.external ? colors.externalBreakpoint : colors.breakpoint;
+            if (stale)
+                bpColor = dbgStaleColor(colors, bpColor);
             double d = m_lineHeight * 0.6;
             QRectF r(gutterX + cw * 0.3, y + (m_lineHeight - d) / 2, d, d);
             painter.setPen(QPen(bpColor, 1.5));
@@ -394,7 +384,7 @@ void DbgCodeView::paintEvent(QPaintEvent*)
             arrow.lineTo(x, yc + h / 2);
             arrow.closeSubpath();
             painter.setPen(Qt::NoPen);
-            painter.setBrush(m_running ? dimColor : highlight);
+            painter.setBrush(stale ? dimColor : colors.pcMarker);
             painter.drawPath(arrow);
         }
 
