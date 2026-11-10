@@ -111,7 +111,45 @@
     </message>
 </context>
 <context>
+    <name>DbgCodeView</name>
+    <message>
+        <location filename="qtDbgCodeView.cpp"/>
+        <source>Go to address</source>
+        <translation>Переход по адресу</translation>
+    </message>
+    <message>
+        <location filename="qtDbgCodeView.cpp"/>
+        <source>Address (hex):</source>
+        <translation>Адрес (hex):</translation>
+    </message>
+</context>
+<context>
     <name>DbgWindow</name>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Code</source>
+        <translation>Код</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Toggle breakpoint</source>
+        <translation>Точка останова</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Set PC to cursor</source>
+        <translation>Установить PC на курсор</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Go to PC</source>
+        <translation>Перейти к PC</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Go to address...</source>
+        <translation>Перейти по адресу...</translation>
+    </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>
         <source>Debugger: %1</source>

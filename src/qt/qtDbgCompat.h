@@ -23,6 +23,7 @@
 
 #include <QtGlobal>
 #include <QFontMetrics>
+#include <QMouseEvent>
 #include <QString>
 
 inline int dbgTextWidth(const QFontMetrics& fm, const QString& text)
@@ -31,6 +32,15 @@ inline int dbgTextWidth(const QFontMetrics& fm, const QString& text)
     return fm.horizontalAdvance(text);
 #else
     return fm.width(text);
+#endif
+}
+
+inline QPoint dbgMousePos(const QMouseEvent* event)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return event->position().toPoint();
+#else
+    return event->pos();
 #endif
 }
 

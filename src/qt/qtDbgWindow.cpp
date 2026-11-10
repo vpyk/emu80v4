@@ -25,6 +25,7 @@
 #include <QToolBar>
 
 #include "qtDbgWindow.h"
+#include "qtDbgCodeView.h"
 #include "qtMainWindow.h"
 
 #include "../Globals.h"
@@ -39,6 +40,13 @@ DbgWindow::DbgWindow(Platform* platform)
 {
     setWindowTitle(tr("Debugger: %1").arg(QString::fromUtf8(platform->getWindow()->getCaption().c_str())));
     resize(900, 640);
+
+    m_codeView = new DbgCodeView(m_session, this);
+    setCentralWidget(m_codeView);
+    m_codeView->setFocus(); // gets the keyboard when the window is activated
+    connect(this, &DbgWindow::stateChanged, m_codeView, &DbgCodeView::onStateChanged);
+    connect(this, &DbgWindow::breakpointsChanged, m_codeView, &DbgCodeView::onBreakpointsChanged);
+    connect(this, &DbgWindow::runStateChanged, m_codeView, &DbgCodeView::onRunStateChanged);
 
     createActions();
 
@@ -84,6 +92,27 @@ void DbgWindow::createActions()
     m_runToCursorAction = createAction(tr("Run to cursor"), tr("To cursor", "tool bar"), &DbgWindow::onRunToCursor, debugMenu, toolBar);
     m_skipAction = createAction(tr("Skip instruction"), tr("Skip", "tool bar"), &DbgWindow::onSkip, debugMenu, toolBar);
 
+    // Code view actions, also in its context menu
+    QMenu* codeMenu = menuBar()->addMenu(tr("Code"));
+    auto codeAction = [&](const QString& text, void (DbgCodeView::*slot)()) {
+        QAction* action = new QAction(text, this);
+        action->setShortcutContext(Qt::WindowShortcut);
+        connect(action, &QAction::triggered, m_codeView, slot);
+        codeMenu->addAction(action);
+        addAction(action);
+        return action;
+    };
+    m_breakpointAction = codeAction(tr("Toggle breakpoint"), &DbgCodeView::toggleBreakpoint);
+    m_setPcAction = codeAction(tr("Set PC to cursor"), &DbgCodeView::setPcToCursor);
+    codeMenu->addSeparator();
+    m_gotoPcAction = codeAction(tr("Go to PC") + "\tHome", &DbgCodeView::gotoPc); // Home is handled by the view
+    m_gotoAddrAction = codeAction(tr("Go to address..."), &DbgCodeView::gotoAddress);
+
+    QAction* separator = new QAction(this);
+    separator->setSeparator(true);
+    m_codeView->addActions({m_breakpointAction, m_runToCursorAction, m_setPcAction, separator,
+                            m_gotoPcAction, m_gotoAddrAction});
+
     updateShortcuts();
 }
 
@@ -100,6 +129,9 @@ void DbgWindow::updateShortcuts()
     m_stepOutAction->setShortcut(QKeySequence("F6"));
     m_runToCursorAction->setShortcut(QKeySequence("F4"));
     m_skipAction->setShortcut(QKeySequence("Shift+F8"));
+    m_breakpointAction->setShortcut(QKeySequence(m_swapF5F9 ? "F9" : "F5"));
+    m_setPcAction->setShortcut(QKeySequence("Ctrl+Shift+F10"));
+    m_gotoAddrAction->setShortcut(QKeySequence("Ctrl+G"));
 
     QAction* actions[] = {m_runAction, m_breakAction, m_stepIntoAction, m_stepOverAction,
                           m_stepOutAction, m_runToCursorAction, m_skipAction};
@@ -119,10 +151,11 @@ void DbgWindow::showStop()
 }
 
 
+// Memory may have changed (e.g. a file loaded) without a new stop, so the state is shown again
 void DbgWindow::refreshStop()
 {
     if (isVisible())
-        checkState(false);
+        checkState(true);
 }
 
 
@@ -163,10 +196,10 @@ void DbgWindow::checkState(bool forceRefresh)
 
 void DbgWindow::updateRunState()
 {
-    QAction* stoppedActions[] = {m_runAction, m_stepIntoAction, m_stepOverAction, m_stepOutAction, m_skipAction};
+    QAction* stoppedActions[] = {m_runAction, m_stepIntoAction, m_stepOverAction, m_stepOutAction,
+                                 m_runToCursorAction, m_skipAction, m_setPcAction, m_gotoPcAction, m_gotoAddrAction};
     for (QAction* action : stoppedActions)
         action->setEnabled(!m_running);
-    m_runToCursorAction->setEnabled(false); // needs the code view
     m_breakAction->setEnabled(m_running);
 
     if (m_running)
@@ -261,7 +294,9 @@ void DbgWindow::onStepOut()
 
 void DbgWindow::onRunToCursor()
 {
-    // the cursor address comes from the code view (next stage)
+    m_session->runTo(m_codeView->getCursorAddr(), DC_UI);
+    checkState(false);
+    activateEmuWindow();
 }
 
 

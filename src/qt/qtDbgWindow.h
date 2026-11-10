@@ -28,6 +28,7 @@ class QTimer;
 class QToolBar;
 class Platform;
 class DebugSession;
+class DbgCodeView;
 
 
 // The Qt debugger window. It stays open while the emulation runs; the views then
@@ -80,6 +81,11 @@ private:
     QAction* m_stepOutAction;
     QAction* m_runToCursorAction;
     QAction* m_skipAction;
+    QAction* m_breakpointAction;
+    QAction* m_setPcAction;
+    QAction* m_gotoPcAction;
+    QAction* m_gotoAddrAction;
+    DbgCodeView* m_codeView;
     QLabel* m_statusLabel;
     QTimer* m_pollTimer;
 
