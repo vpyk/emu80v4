@@ -299,7 +299,8 @@ isEmpty(NO_QT_DEBUGGER) {
         qt/qtDbgCodeView.cpp \
         qt/qtDbgStyle.cpp \
         qt/qtDbgRegsView.cpp \
-        qt/qtDbgMemView.cpp
+        qt/qtDbgMemView.cpp \
+        qt/qtDbgBreakpoints.cpp
     HEADERS += \
         qt/qtDbgCompat.h \
         qt/qtDebugger.h \
@@ -307,7 +308,8 @@ isEmpty(NO_QT_DEBUGGER) {
         qt/qtDbgCodeView.h \
         qt/qtDbgStyle.h \
         qt/qtDbgRegsView.h \
-        qt/qtDbgMemView.h
+        qt/qtDbgMemView.h \
+        qt/qtDbgBreakpoints.h
 }
 
 # MCP Server support — enable with: qmake MCP_SERVER=1 src/Emu80qt.pro

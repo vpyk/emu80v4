@@ -19,9 +19,12 @@
 #ifndef QTDBGWINDOW_H
 #define QTDBGWINDOW_H
 
+#include <vector>
+
 #include <QMainWindow>
 
 class QAction;
+class QDockWidget;
 class QLabel;
 class QMenu;
 class QTimer;
@@ -31,6 +34,7 @@ class DebugSession;
 class DbgCodeView;
 class DbgRegsView;
 class DbgMemPanel;
+class DbgBreakpointsPanel;
 
 
 // The Qt debugger window. It stays open while the emulation runs; the views then
@@ -90,6 +94,7 @@ private:
     DbgCodeView* m_codeView;
     DbgRegsView* m_regsView;
     DbgMemPanel* m_memPanel;
+    DbgBreakpointsPanel* m_bpPanel;
     QMenu* m_viewMenu;
     QLabel* m_statusLabel;
     QTimer* m_pollTimer;
@@ -100,6 +105,9 @@ private:
     unsigned m_modifyCount = 0;
     unsigned m_bpChangeCount = 0;
     bool m_swapF5F9 = false;
+
+    // floating docks hidden with the window, to be shown with it again
+    std::vector<QDockWidget*> m_hiddenFloatingDocks;
 
     QAction* createAction(const QString& text, const QString& shortText, void (DbgWindow::*slot)(),
                           QMenu* menu, QToolBar* toolBar);

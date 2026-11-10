@@ -493,6 +493,16 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
 }
 
 
+void DbgMemPanel::showAddress(uint16_t addr)
+{
+    if (m_session->isRunning())
+        return;
+    m_memoryCombo->setCurrentIndex(0); // cpu
+    m_view->gotoAddr(addr);
+    m_view->setFocus();
+}
+
+
 void DbgMemPanel::onMemoryChanged(int index)
 {
     m_view->setMemory(index);

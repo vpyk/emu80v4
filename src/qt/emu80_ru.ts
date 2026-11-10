@@ -111,6 +111,85 @@
     </message>
 </context>
 <context>
+    <name>DbgAddBreakpointDialog</name>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Add breakpoint</source>
+        <translation>Новая точка останова</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Type:</source>
+        <translation>Тип:</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Address (hex):</source>
+        <translation>Адрес (hex):</translation>
+    </message>
+</context>
+<context>
+    <name>DbgBreakpointsModel</name>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Stop on every (skip + 1)-th hit; %1 hit(s) to skip before the next stop</source>
+        <translation>Остановка на каждом (skip + 1)-м срабатывании; до следующей остановки пропустить: %1</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>#</source>
+        <translation>№</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Address</source>
+        <translation>Адрес</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Skip</source>
+        <translation>Пропуск</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Hits</source>
+        <translation>Срабатывания</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Comment</source>
+        <translation>Комментарий</translation>
+    </message>
+</context>
+<context>
+    <name>DbgBreakpointsPanel</name>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Add...</source>
+        <translation>Добавить...</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Remove all</source>
+        <translation>Удалить все</translation>
+    </message>
+</context>
+<context>
     <name>DbgCodeView</name>
     <message>
         <location filename="qtDbgCodeView.cpp"/>
@@ -158,6 +237,11 @@
 </context>
 <context>
     <name>DbgWindow</name>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Breakpoints</source>
+        <translation>Точки останова</translation>
+    </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>
         <source>Memory</source>
@@ -1578,6 +1662,44 @@
         <location filename="qtPlatformConfig.ui" line="81"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Execution</source>
+        <translation>Выполнение</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Memory read</source>
+        <translation>Чтение памяти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Memory write</source>
+        <translation>Запись в память</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Memory access</source>
+        <translation>Обращение к памяти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Port read</source>
+        <translation>Чтение порта</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Port write</source>
+        <translation>Запись в порт</translation>
+    </message>
+    <message>
+        <location filename="qtDbgBreakpoints.cpp"/>
+        <source>Port access</source>
+        <translation>Обращение к порту</translation>
     </message>
 </context>
 <context>

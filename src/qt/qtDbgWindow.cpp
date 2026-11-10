@@ -29,6 +29,7 @@
 #include "qtDbgCodeView.h"
 #include "qtDbgRegsView.h"
 #include "qtDbgMemView.h"
+#include "qtDbgBreakpoints.h"
 #include "qtMainWindow.h"
 
 #include "../Globals.h"
@@ -148,6 +149,27 @@ void DbgWindow::createDocks()
     memDock->setWidget(m_memPanel);
     addDockWidget(Qt::BottomDockWidgetArea, memDock);
     m_viewMenu->addAction(memDock->toggleViewAction());
+
+    m_bpPanel = new DbgBreakpointsPanel(m_session, this);
+    m_bpPanel->setAddressProvider([this]() {return m_codeView->getCursorAddr();});
+    connect(this, &DbgWindow::breakpointsChanged, m_bpPanel, &DbgBreakpointsPanel::onBreakpointsChanged);
+    connect(this, &DbgWindow::stateChanged, m_bpPanel, &DbgBreakpointsPanel::onStateChanged);
+    connect(m_bpPanel, &DbgBreakpointsPanel::showInCode, this, [this](uint16_t addr) {
+        m_codeView->showAddress(addr);
+        m_codeView->setFocus();
+    });
+    connect(m_bpPanel, &DbgBreakpointsPanel::showInMemory, this, [this, memDock](uint16_t addr) {
+        memDock->raise();
+        m_memPanel->showAddress(addr);
+    });
+
+    QDockWidget* bpDock = new QDockWidget(tr("Breakpoints"), this);
+    bpDock->setObjectName("breakpointsDock");
+    bpDock->setWidget(m_bpPanel);
+    addDockWidget(Qt::BottomDockWidgetArea, bpDock);
+    tabifyDockWidget(memDock, bpDock);
+    memDock->raise();
+    m_viewMenu->addAction(bpDock->toggleViewAction());
 
     // the right docks take the whole height
     setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -361,13 +383,23 @@ void DbgWindow::closeEvent(QCloseEvent* event)
 void DbgWindow::showEvent(QShowEvent* event)
 {
     QMainWindow::showEvent(event);
+    for (QDockWidget* dock : m_hiddenFloatingDocks)
+        dock->show();
+    m_hiddenFloatingDocks.clear();
     checkState(false);
     m_pollTimer->start();
 }
 
 
+// Floating docks are separate windows that stay on the screen when the main window
+// is hidden (closed or minimized), so they are hidden with it
 void DbgWindow::hideEvent(QHideEvent* event)
 {
     m_pollTimer->stop();
+    for (QDockWidget* dock : findChildren<QDockWidget*>())
+        if (dock->isFloating() && dock->isVisible()) {
+            dock->hide();
+            m_hiddenFloatingDocks.push_back(dock);
+        }
     QMainWindow::hideEvent(event);
 }

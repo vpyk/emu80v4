@@ -111,6 +111,7 @@ public:
     DbgMemPanel(DebugSession* session, QWidget* parent = nullptr);
 
     DbgMemView* getView() {return m_view;}
+    void showAddress(uint16_t addr); // in the CPU address space
 
 signals:
     void showInCode(uint16_t addr);
