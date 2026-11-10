@@ -73,6 +73,10 @@ void palSetRunFileName(const std::string& runFileName);
 void palShowConfigWindow(int curTabId = 0);
 void palUpdateConfig();
 void palDebugRequest();
+
+class IDebugger;
+class Platform;
+IDebugger* palCreateDebugger(Platform* platform); // the Qt debugger UI of the platform
 std::string palGetDefaultPlatform();
 void palGetPalDefines(std::list<std::string>& difineList);
 void palGetPlatformDefines(const std::string& platformName, std::map<std::string, std::string>& definesMap);

@@ -625,6 +625,15 @@ void palDebugRequest() {
 }
 
 
+#ifndef QT_DEBUGGER
+// built without the Qt debugger: the classic debug window only
+IDebugger* palCreateDebugger(Platform*)
+{
+    return nullptr;
+}
+#endif
+
+
 bool palChoosePlatform(std::vector<PlatformInfo>& pi, int& pos, bool& newWnd, bool setDef, PalWindow* wnd) {
     QWidget* parent = nullptr;
     if (wnd)

@@ -492,14 +492,32 @@ class WebDebugger : public IDebugger
 {
 public:
     void startDebug() override {palDebugRequest();}
+    bool isOpen() override {return false;}
 };
 #endif
 
 
-// Creates the debugger UI of the build
+// Creates the debugger UI of the build. In Qt it is the Qt debugger if chosen
+// in the options or if the classic debug window doesn't support the CPU.
 void Platform::createDebugger()
 {
-    if (m_debugger || !getDebugSession() || !isDebuggerUiSupported())
+    if (!getDebugSession() || !isDebuggerUiSupported())
+        return;
+
+#ifdef PAL_QT
+    bool useQt = g_emulation->getDebuggerOptions().qtDebugger || !dynamic_cast<Cpu8080Compatible*>(m_cpu);
+    if (m_debugger && m_qtDebugger != useQt && !m_debugger->isOpen()) {
+        // the option has changed: replace the closed UI
+        delete m_debugger;
+        m_debugger = nullptr;
+    }
+    if (!m_debugger && useQt) {
+        m_debugger = palCreateDebugger(this);
+        m_qtDebugger = true;
+    }
+#endif
+
+    if (m_debugger)
         return;
 
 #ifdef WASM_DBG
@@ -509,6 +527,7 @@ void Platform::createDebugger()
     dbgWnd->initDbgWindow();
     dbgWnd->setCaption("Debug: " + m_window->getCaption());
     m_debugger = dbgWnd;
+    m_qtDebugger = false;
 #endif
 }
 
@@ -524,10 +543,15 @@ DebugSession* Platform::getDebugSession()
 }
 
 
-// The debugger UI of the build (debug window or web debugger) supports 8080 and Z80 only
+// The Qt debugger supports any CPU with a debug target; the classic debug window
+// and the web debugger support 8080 and Z80 only
 bool Platform::isDebuggerUiSupported()
 {
+#ifdef PAL_QT
+    return getDebugSession() != nullptr;
+#else
     return dynamic_cast<Cpu8080Compatible*>(m_cpu) != nullptr;
+#endif
 }
 
 

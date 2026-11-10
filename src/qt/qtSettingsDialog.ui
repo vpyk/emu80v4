@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SettingsDialog</class>
  <widget class="QDialog" name="SettingsDialog">
@@ -992,6 +992,35 @@
        <string>Debugger</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="debuggerUiGroupBox">
+         <property name="title">
+          <string>Debugger window (all platforms)</string>
+         </property>
+         <layout class="QVBoxLayout" name="debuggerUiLayout">
+          <item>
+           <widget class="QRadioButton" name="classicDebuggerRadioButton">
+            <property name="text">
+             <string>Classic</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="qtDebuggerRadioButton">
+            <property name="toolTip">
+             <string>Always used for CPUs other than 8080 and Z80</string>
+            </property>
+            <property name="text">
+             <string>New (dockable panels)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QGroupBox" name="debugOnGroupBox">
          <property name="title">

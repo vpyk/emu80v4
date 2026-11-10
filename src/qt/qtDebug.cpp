@@ -30,7 +30,7 @@
 
 void MainWindow::onDbgRun()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_RUN);
 }
@@ -38,7 +38,7 @@ void MainWindow::onDbgRun()
 
 void MainWindow::onDbgStep()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_STEP);
 }
@@ -46,7 +46,7 @@ void MainWindow::onDbgStep()
 
 void MainWindow::onDbgOver()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_OVER);
 }
@@ -54,7 +54,7 @@ void MainWindow::onDbgOver()
 
 void MainWindow::onDbgOut()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_OUT);
 }
@@ -62,7 +62,7 @@ void MainWindow::onDbgOut()
 
 void MainWindow::onDbgHere()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_HERE);
 }
@@ -70,7 +70,7 @@ void MainWindow::onDbgHere()
 
 void MainWindow::onDbgSkip()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_SKIP);
 }
@@ -78,7 +78,7 @@ void MainWindow::onDbgSkip()
 
 void MainWindow::onDbgSaveMem()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_SAVEMEM);
 }
@@ -86,7 +86,7 @@ void MainWindow::onDbgSaveMem()
 
 void MainWindow::onDbgBreakpoint()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_BPOINT);
 }
@@ -94,7 +94,7 @@ void MainWindow::onDbgBreakpoint()
 
 void MainWindow::onDbgMnemo()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_MNEMO);
 }
@@ -102,14 +102,14 @@ void MainWindow::onDbgMnemo()
 
 void MainWindow::onDbgMini()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_MINI);
 }
 
 void MainWindow::onDbgCode()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_CODE);
 }
@@ -117,7 +117,7 @@ void MainWindow::onDbgCode()
 
 void MainWindow::onDbgData()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_DATA);
 }
@@ -125,7 +125,7 @@ void MainWindow::onDbgData()
 
 void MainWindow::onDbgRegs()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_REGS);
 }
@@ -133,7 +133,7 @@ void MainWindow::onDbgRegs()
 
 void MainWindow::onDbgFlags()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_FLAGS);
 }
@@ -141,7 +141,7 @@ void MainWindow::onDbgFlags()
 
 void MainWindow::onDbgAddr()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_ADDR);
 }
@@ -149,7 +149,7 @@ void MainWindow::onDbgAddr()
 
 void MainWindow::onDbgEdit()
 {
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_EDIT);
 }
@@ -158,7 +158,7 @@ void MainWindow::onDbgEdit()
 void MainWindow::onDbgSmoothing()
 {
     onSmoothing();
-    DebugWindow* dbg = static_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
+    DebugWindow* dbg = dynamic_cast<DebugWindow*>(emuGetDebugger(m_palWindow));
     if (dbg)
         dbg->sendCmd(DCMD_REPAINT);
 }

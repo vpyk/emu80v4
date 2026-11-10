@@ -205,6 +205,7 @@ void SettingsDialog::readRunningConfig()
     loadRunningConfigValue("emulation.debugForceZ80Mnemonics");
     loadRunningConfigValue("emulation.debugSwapF5F9");
     loadRunningConfigValue("emulation.debugResetKeys");
+    loadRunningConfigValue("emulation.debugger");
     loadRunningConfigValue("window.windowStyle");
     loadRunningConfigValue("window.frameScale");
     loadRunningConfigValue("window.shader");
@@ -369,6 +370,13 @@ void SettingsDialog::fillControlValues()
     ui->forceZ80checkBox->setChecked(m_options["emulation.debugForceZ80Mnemonics"] == "yes");
     ui->swapF5F9checkBox->setChecked(m_options["emulation.debugSwapF5F9"] == "yes");
     ui->resetKeysCheckBox->setChecked(m_options["emulation.debugResetKeys"] == "yes");
+    if (m_options["emulation.debugger"] == "qt")
+        ui->qtDebuggerRadioButton->setChecked(true);
+    else
+        ui->classicDebuggerRadioButton->setChecked(true);
+#ifndef QT_DEBUGGER
+    ui->debuggerUiGroupBox->setVisible(false);
+#endif
 
     // Debugger code page
     val = m_options["platform.codePage"];
@@ -863,6 +871,7 @@ void SettingsDialog::on_applyPushButton_clicked()
     m_options["emulation.debugForceZ80Mnemonics"] = ui->forceZ80checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugSwapF5F9"] = ui->swapF5F9checkBox->isChecked() ? "yes" : "no";
     m_options["emulation.debugResetKeys"] = ui->resetKeysCheckBox->isChecked() ? "yes" : "no";
+    m_options["emulation.debugger"] = ui->qtDebuggerRadioButton->isChecked() ? "qt" : "classic";
 
     val = "";
     if (ui->rkCodePageRadioButton->isChecked())

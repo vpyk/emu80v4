@@ -289,6 +289,19 @@ MOC_DIR = $${BUILDDIR}/moc
 RCC_DIR = $${BUILDDIR}/qrc
 UI_DIR = $${BUILDDIR}/ui
 
+# Qt debugger. It can be left out (e.g. in a legacy build) with: qmake NO_QT_DEBUGGER=1;
+# then only the classic debug window is available.
+isEmpty(NO_QT_DEBUGGER) {
+    DEFINES += QT_DEBUGGER
+    SOURCES += \
+        qt/qtDebugger.cpp \
+        qt/qtDbgWindow.cpp
+    HEADERS += \
+        qt/qtDbgCompat.h \
+        qt/qtDebugger.h \
+        qt/qtDbgWindow.h
+}
+
 # MCP Server support — enable with: qmake MCP_SERVER=1 src/Emu80qt.pro
 # or set environment variable: MCP_SERVER=1 qmake src/Emu80qt.pro
 isEmpty(MCP_SERVER):MCP_SERVER = $$(MCP_SERVER)

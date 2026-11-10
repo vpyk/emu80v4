@@ -792,6 +792,11 @@ bool Emulation::setProperty(const string& propertyName, const EmuValuesList& val
             m_debuggerOptions.swapF5F9 = values[0].asString() == "yes";
             return true;
         }
+    } else if (propertyName == "debugger") {
+        if (values[0].asString() == "classic" || values[0].asString() == "qt") {
+            m_debuggerOptions.qtDebugger = values[0].asString() == "qt";
+            return true;
+        }
     } else if (propertyName == "debugResetKeys") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
             m_debuggerOptions.resetKeys = values[0].asString() == "yes";
@@ -825,6 +830,8 @@ string Emulation::getPropertyStringValue(const string& propertyName)
         res = m_debuggerOptions.swapF5F9 ? "yes" : "no";
     else if (propertyName == "debugResetKeys")
         res = m_debuggerOptions.resetKeys ? "yes" : "no";
+    else if (propertyName == "debugger")
+        res = m_debuggerOptions.qtDebugger ? "qt" : "classic";
     /* else if (propertyName == "frameRate") {
         stringstream stringStream;
         stringStream << m_frameRate;

@@ -76,6 +76,7 @@ public:
     void sendCmd(DebugCommand cmd);
 
     void startDebug() override;
+    bool isOpen() override {return isVisible();}
     void refreshDebug() override;
     void update() override;
     void draw() override;

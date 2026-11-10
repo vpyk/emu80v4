@@ -52,6 +52,7 @@ public:
     virtual void refreshDebug() {}      // stopped by another client: refresh the UI if it is open
     virtual void update() {}            // platform state changed (e.g. a file loaded)
     virtual void draw() {}
+    virtual bool isOpen() = 0;          // the UI is shown
 };
 
 

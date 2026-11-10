@@ -111,6 +111,134 @@
     </message>
 </context>
 <context>
+    <name>DbgWindow</name>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Debugger: %1</source>
+        <translation>Отладчик: %1</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Debug</source>
+        <translation>Отладка</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Run</source>
+        <translation>Продолжить</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Break</source>
+        <translation>Остановить</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Step into</source>
+        <translation>Шаг с заходом</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Step over</source>
+        <translation>Шаг без захода</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Step out</source>
+        <translation>Выполнить до выхода из подпрограммы</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Run to cursor</source>
+        <translation>Выполнить до курсора</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Skip instruction</source>
+        <translation>Пропустить команду</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Into</source>
+        <comment>tool bar</comment>
+        <translation>Шаг</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Over</source>
+        <comment>tool bar</comment>
+        <translation>Шаг через</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Out</source>
+        <comment>tool bar</comment>
+        <translation>Выход</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>To cursor</source>
+        <comment>tool bar</comment>
+        <translation>До курсора</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Skip</source>
+        <comment>tool bar</comment>
+        <translation>Пропустить</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Running. The data shown is from the last stop</source>
+        <translation>Выполняется. Показаны данные последней остановки</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>break</source>
+        <translation>по запросу</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>breakpoint #%1</source>
+        <translation>точка останова №%1</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>step</source>
+        <translation>шаг</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>timer</source>
+        <translation>таймер</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>HLT</source>
+        <translation>команда HLT</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>illegal instruction</source>
+        <translation>недопустимая команда</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Stopped</source>
+        <translation>Остановлено</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Stopped: %1</source>
+        <translation>Остановлено: %1</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>(by MCP)</source>
+        <translation>(MCP)</translation>
+    </message>
+</context>
+<context>
     <name>HelpDialog</name>
     <message>
         <location filename="qtHelpDialog.ui" line="14"/>
@@ -1368,6 +1496,26 @@
 </context>
 <context>
     <name>SettingsDialog</name>
+    <message>
+        <location filename="qtSettingsDialog.ui"/>
+        <source>Debugger window (all platforms)</source>
+        <translation>Окно отладчика (все платформы)</translation>
+    </message>
+    <message>
+        <location filename="qtSettingsDialog.ui"/>
+        <source>Classic</source>
+        <translation>Классическое</translation>
+    </message>
+    <message>
+        <location filename="qtSettingsDialog.ui"/>
+        <source>Always used for CPUs other than 8080 and Z80</source>
+        <translation>Всегда используется для процессоров, отличных от 8080 и Z80</translation>
+    </message>
+    <message>
+        <location filename="qtSettingsDialog.ui"/>
+        <source>New (dockable panels)</source>
+        <translation>Новое (с панелями)</translation>
+    </message>
     <message>
         <location filename="qtSettingsDialog.ui" line="20"/>
         <source>Settings</source>

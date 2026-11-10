@@ -128,6 +128,7 @@ class Platform : public ParentObject
         int m_defConfigTabId = 0;
 
         IDebugger* m_debugger = nullptr;
+        bool m_qtDebugger = false; // m_debugger is the Qt debugger
         DebugSession* m_debugSession = nullptr;
         uint64_t m_emuCpuTicksAtReset = 0;
 

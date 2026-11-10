@@ -50,6 +50,7 @@ struct DebuggerOptions {
     bool forceZ80Mnemonics = false;
     bool swapF5F9 = true;
     bool resetKeys = true;
+    bool qtDebugger = false; // the new Qt debugger instead of the classic debug window (Qt only)
 };
 
 class Emulation : public ParentObject
