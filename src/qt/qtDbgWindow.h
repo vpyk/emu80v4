@@ -29,6 +29,7 @@ class QToolBar;
 class Platform;
 class DebugSession;
 class DbgCodeView;
+class DbgRegsView;
 
 
 // The Qt debugger window. It stays open while the emulation runs; the views then
@@ -86,6 +87,8 @@ private:
     QAction* m_gotoPcAction;
     QAction* m_gotoAddrAction;
     DbgCodeView* m_codeView;
+    DbgRegsView* m_regsView;
+    QMenu* m_viewMenu;
     QLabel* m_statusLabel;
     QTimer* m_pollTimer;
 
@@ -99,6 +102,7 @@ private:
     QAction* createAction(const QString& text, const QString& shortText, void (DbgWindow::*slot)(),
                           QMenu* menu, QToolBar* toolBar);
     void createActions();
+    void createDocks();
     void updateShortcuts();
     void checkState(bool forceRefresh);
     void updateRunState();

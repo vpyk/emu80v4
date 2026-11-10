@@ -127,6 +127,16 @@
     <name>DbgWindow</name>
     <message>
         <location filename="qtDbgWindow.cpp"/>
+        <source>View</source>
+        <translation>Вид</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Registers</source>
+        <translation>Регистры</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
         <source>Code</source>
         <translation>Код</translation>
     </message>

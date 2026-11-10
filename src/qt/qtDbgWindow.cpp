@@ -18,6 +18,7 @@
 
 #include <QAction>
 #include <QCloseEvent>
+#include <QDockWidget>
 #include <QLabel>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -26,6 +27,7 @@
 
 #include "qtDbgWindow.h"
 #include "qtDbgCodeView.h"
+#include "qtDbgRegsView.h"
 #include "qtMainWindow.h"
 
 #include "../Globals.h"
@@ -49,6 +51,7 @@ DbgWindow::DbgWindow(Platform* platform)
     connect(this, &DbgWindow::runStateChanged, m_codeView, &DbgCodeView::onRunStateChanged);
 
     createActions();
+    createDocks();
 
     m_statusLabel = new QLabel(this);
     statusBar()->addWidget(m_statusLabel, 1);
@@ -114,6 +117,22 @@ void DbgWindow::createActions()
                             m_gotoPcAction, m_gotoAddrAction});
 
     updateShortcuts();
+}
+
+
+void DbgWindow::createDocks()
+{
+    m_viewMenu = menuBar()->addMenu(tr("View"));
+
+    m_regsView = new DbgRegsView(m_session, this);
+    connect(this, &DbgWindow::stateChanged, m_regsView, &DbgRegsView::onStateChanged);
+    connect(this, &DbgWindow::runStateChanged, m_regsView, &DbgRegsView::onRunStateChanged);
+
+    QDockWidget* regsDock = new QDockWidget(tr("Registers"), this);
+    regsDock->setObjectName("registersDock");
+    regsDock->setWidget(m_regsView);
+    addDockWidget(Qt::RightDockWidgetArea, regsDock);
+    m_viewMenu->addAction(regsDock->toggleViewAction());
 }
 
 
