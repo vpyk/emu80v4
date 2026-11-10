@@ -281,6 +281,7 @@ private:
     bool isRunning();                       // the emulation is running: commands are ignored
     unsigned m_lastStopCount = 0;           // the session's stop count of the state shown
     unsigned m_bpChangeCount = 0;           // the breakpoint list's change count of the list shown
+    unsigned m_modifyCount = 0;             // the session's modify count of the state shown
     void refreshState();                    // re-reads CPU state after a stop or a change
     std::vector<BreakpointDesc> m_bpDescs;  // breakpoints shown (all types, from the session)
     void updateBpList();
@@ -355,8 +356,6 @@ private:
     static char bpointTypeChar(BreakpointType type);
 
     // debugger options
-    bool m_mnemo8080UpperCase;
-    bool m_mnemoZ80UpperCase;
     bool m_forceZ80Mnemonics;
     bool m_swapF5F9;
     bool m_resetKeys;

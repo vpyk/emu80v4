@@ -375,7 +375,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (m_debugOnIllegalCmd) {
                 PC--;
                 cpu_cycles = 0;
-                g_emulation->debugRequest(this);
+                debugStop(CSR_ILLEGAL);
                 break;
             }
         /* Falls through. */
@@ -960,7 +960,7 @@ int Cpu8080::i8080_execute(int opcode) {
             cpu_cycles = 7;
             PC--;
             if (m_debugOnHalt)
-                g_emulation->debugRequest(this);
+                debugStop(CSR_HALT);
             break;
 
         case 0x77:            /* mov m, a */
@@ -1363,7 +1363,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (m_debugOnIllegalCmd) {
                 PC--;
                 cpu_cycles = 0;
-                g_emulation->debugRequest(this);
+                debugStop(CSR_ILLEGAL);
                 break;
             }
             /* Falls through. */
@@ -1411,7 +1411,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (m_debugOnIllegalCmd) {
                 PC--;
                 cpu_cycles = 0;
-                g_emulation->debugRequest(this);
+                debugStop(CSR_ILLEGAL);
                 break;
             }
             /* Falls through. */
@@ -1447,7 +1447,7 @@ int Cpu8080::i8080_execute(int opcode) {
             if (m_debugOnIllegalCmd) {
                 PC--;
                 cpu_cycles = 0;
-                g_emulation->debugRequest(this);
+                debugStop(CSR_ILLEGAL);
                 break;
             }
             /* Falls through. */

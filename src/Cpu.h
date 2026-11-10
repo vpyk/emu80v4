@@ -44,6 +44,15 @@ class CpuStepFilter
 };
 
 
+// Why a CPU has stopped the emulation in the debugger by itself
+enum CpuStopReason {
+    CSR_NONE,
+    CSR_STEP,       // a requested debug step is done
+    CSR_HALT,       // HLT with debugOnHalt
+    CSR_ILLEGAL     // illegal instruction with debugOnIllegalCmd
+};
+
+
 class Cpu : public ActiveDevice
 {
     public:
@@ -79,6 +88,9 @@ class Cpu : public ActiveDevice
         // after the instruction the filter accepts
         void debugStepRequest(CpuStepFilter* filter = nullptr) {m_stepReq = true; m_stepFilter = filter;}
         void cancelDebugStep() {m_stepReq = false; m_stepFilter = nullptr;}
+
+        // The reason of the CPU's own stop request since the last call (CSR_NONE if none)
+        CpuStopReason takeDebugStopReason() {CpuStopReason r = m_stopReason; m_stopReason = CSR_NONE; return r;}
 
         // Lets execution leave the address when the debugger resumes: breakpoints
         // at it are not checked (and not counted) for the next instruction
@@ -131,6 +143,9 @@ class Cpu : public ActiveDevice
         bool m_stepReq = false;
         CpuStepFilter* m_stepFilter = nullptr;
         void onDebugStep();
+        // Stops the emulation in the debugger for the reason
+        void debugStop(CpuStopReason reason);
+        CpuStopReason m_stopReason = CSR_NONE;
 
         bool m_debugOnHalt = false;
         bool m_debugOnIllegalCmd = false;

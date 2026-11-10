@@ -82,6 +82,14 @@ void Cpu::onDebugStep()
         return;
     m_stepReq = false;
     m_stepFilter = nullptr;
+    debugStop(CSR_STEP);
+}
+
+
+void Cpu::debugStop(CpuStopReason reason)
+{
+    if (m_stopReason == CSR_NONE)
+        m_stopReason = reason;
     g_emulation->debugRequest(this);
 }
 

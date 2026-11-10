@@ -44,6 +44,12 @@ Third-party headers vendored under `3rdparty/`:
 All numbers: JSON integer = decimal, JSON string = hex by default
 (prefix `0x` = hex, `0o` = octal, leading `0` = decimal).
 
+When the CPU is stopped, `cpu_state`, `debug_step`, `emu_run_to`, `emu_run_for`,
+`kbd_send` and `kbd_text` return `stop_reason`: `break` (debug_break or Alt-D),
+`breakpoint` (with `breakpoint_id`), `step` (step into/over/out, run to), `timer`
+(emu_run_for), `halt` (HLT with "debug on HLT"), `illegal` (illegal instruction
+with "debug on illegal instruction").
+
 ### System state
 
 | Tool | Params | Description |

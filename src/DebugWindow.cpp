@@ -359,8 +359,6 @@ void DebugWindow::draw()
     m_cursorPhase = newCursorPhase;
 
     const DebuggerOptions& debOpt = g_emulation->getDebuggerOptions();
-    m_mnemo8080UpperCase = debOpt.mnemo8080UpperCase;
-    m_mnemoZ80UpperCase = debOpt.mnemoZ80UpperCase;
 
     bool forceZ80Mnemonics = debOpt.forceZ80Mnemonics;
     if (forceZ80Mnemonics != m_forceZ80Mnemonics)
@@ -375,6 +373,16 @@ void DebugWindow::draw()
     if (bpChangeCount != m_bpChangeCount) {
         m_bpChangeCount = bpChangeCount;
         invalidate();
+    }
+
+    // registers or memory changed by another client (MCP)
+    unsigned modifyCount = m_session->getModifyCount();
+    if (modifyCount != m_modifyCount) {
+        m_modifyCount = modifyCount;
+        if (!isRunning()) {
+            refreshState();
+            invalidate();
+        }
     }
 
     checkForInput();
@@ -733,16 +741,8 @@ void DebugWindow::fillCpuStatus()
 string DebugWindow::getInstructionMnemonic(uint16_t addr)
 {
     DisasmInstr instr;
-    m_session->getTarget()->disassemble(addr, instr, m_z80Mnemonics ? 1 : 0);
-    string mnemo = instr.text;
-
-    if (!m_z80Mode && !m_z80Mnemonics) {
-        if (!m_mnemo8080UpperCase)
-            transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::tolower);
-    } else if (m_mnemoZ80UpperCase)
-        transform(mnemo.begin(), mnemo.end(), mnemo.begin(), ::toupper);
-
-    return mnemo;
+    m_session->disassemble(addr, instr, m_z80Mnemonics ? 1 : 0);
+    return instr.text;
 }
 
 

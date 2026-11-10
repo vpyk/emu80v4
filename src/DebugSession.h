@@ -38,6 +38,27 @@ struct DebugMemory {
 };
 
 
+// Why the emulation has stopped in the debugger
+enum DebugStopReason {
+    DSR_NONE,       // not stopped yet, or the reason is unknown
+    DSR_BREAK,      // a client has requested a break
+    DSR_BREAKPOINT, // a user breakpoint has fired
+    DSR_STEP,       // step into, step over, step out or run to is done
+    DSR_TIMER,      // run for: the time has elapsed
+    DSR_HALT,       // HLT (debugOnHalt)
+    DSR_ILLEGAL     // illegal instruction (debugOnIllegalCmd)
+};
+
+const char* getStopReasonName(DebugStopReason reason); // "break", "breakpoint", "step"...
+
+
+struct DebugStopInfo {
+    DebugStopReason reason = DSR_NONE;
+    int bpId = -1;              // for DSR_BREAKPOINT
+    DebugClient client = DC_UI; // who the stop belongs to
+};
+
+
 // Stops the emulation in the debugger after the given time, on behalf of a client
 class DebugElapsedTimer : public ElapsedTimer
 {
@@ -76,7 +97,8 @@ public:
     // Called when the emulation has stopped in the debugger; returns false if
     // the session is already stopped (it is called repeatedly while stopped)
     bool onStop();
-    DebugClient getStopClient() {return m_stopClient;} // who the last stop belongs to
+    DebugClient getStopClient() {return m_stopInfo.client;} // who the last stop belongs to
+    const DebugStopInfo& getStopInfo() {return m_stopInfo;} // the last stop
     unsigned getStopCount() {return m_stopCount;}      // number of stops so far
 
     // Run control. The commands that resume the emulation do nothing while it is
@@ -92,6 +114,22 @@ public:
     // that has taken the stack pointer above its value at the start
     void stepOut(DebugClient client);
     void runTo(uint16_t addr, DebugClient client);
+
+    // Called by the run-for timer
+    void onTimerBreak(DebugClient client);
+
+    // Changes of the machine state by a debugger client (registers, memory, ports).
+    // Front-ends change the state through these methods or call notifyModified(),
+    // so that other front-ends can see the change by getModifyCount().
+    void setReg(int index, unsigned value);
+    void setPC(uint16_t value);
+    void notifyModified() {++m_modifyCount;}
+    unsigned getModifyCount() {return m_modifyCount;}
+
+    // Disassembles with the debugger options applied (letter case, Z80 mnemonics
+    // for 8080 code). syntax -1 means the one chosen by the options.
+    void disassemble(uint16_t addr, DisasmInstr& instr, int syntax = -1);
+    int getDefaultDisasmSyntax();
 
     // Memories for dumps: the CPU address space ("cpu") first, then Ram/Rom objects
     // and devices with debugName set in the platform configuration. Built on first use.
@@ -132,8 +170,10 @@ private:
     DebugClient m_runClient = DC_UI;   // who has resumed the emulation last
     DebugClient m_breakClient = DC_UI; // who has requested a break
     bool m_breakRequested = false;
-    DebugClient m_stopClient = DC_UI;
+    bool m_timerBreak = false;
+    DebugStopInfo m_stopInfo;
     unsigned m_stopCount = 0;
+    unsigned m_modifyCount = 0;
 
     void resume(DebugClient client);
 };

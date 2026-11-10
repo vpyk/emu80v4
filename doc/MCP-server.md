@@ -55,6 +55,8 @@ claude mcp add --transport http emu80 http://127.0.0.1:19781/mcp
 
 ## Инструменты
 
+Если процессор остановлен, `cpu_state`, `debug_step`, `emu_run_to`, `emu_run_for`, `kbd_send` и `kbd_text` возвращают причину остановки `stop_reason`: `break` (`debug_break` или Alt-D), `breakpoint` (и номер точки `breakpoint_id`), `step` (шаг, выход из подпрограммы, выполнение до адреса), `timer` (`emu_run_for`), `halt` (команда HLT при включённом останове по HLT), `illegal` (недопустимая команда при включённом останове по ней).
+
 ### Состояние системы
 
 | Инструмент | Назначение |

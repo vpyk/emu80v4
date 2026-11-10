@@ -119,7 +119,7 @@ void wasmDbgSetRegister(int regId, int value)
     CpuDebugTarget* target = session->getTarget();
     int index = target->findReg(c_regIds[regId]);
     if (index >= 0)
-        target->setReg(index, value);
+        session->setReg(index, value);
 }
 
 
@@ -129,7 +129,7 @@ void wasmDbgWriteByte(int addr, int value)
     if (!session)
         return;
 
-    session->getTarget()->writeMem(addr, value);
+    session->writeMem(0, addr & 0xFFFF, value); // memory 0 is the CPU address space
 }
 
 

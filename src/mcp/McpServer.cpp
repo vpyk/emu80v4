@@ -1,4 +1,4 @@
-// McpServer.cpp: embedded MCP server for Emu80.
+﻿// McpServer.cpp: embedded MCP server for Emu80.
 //
 // HTTP listener on 127.0.0.1, JSON-RPC 2.0 + MCP protocol "2024-11-05".
 // All emulator access happens on the main thread via mcp::Run().
@@ -242,6 +242,19 @@ namespace
         return session ? session->getTarget() : nullptr;
     }
 
+    // Why the emulation is stopped: stop_reason ("break", "breakpoint", "step",
+    // "timer", "halt", "illegal") and breakpoint_id for a breakpoint stop
+    void AddStopInfo(Platform* p, json& result)
+    {
+        DebugSession* session = p ? p->getDebugSession() : nullptr;
+        if (!session || session->isRunning() || !g_emulation->isDebuggerActive())
+            return;
+        const DebugStopInfo& info = session->getStopInfo();
+        result["stop_reason"] = getStopReasonName(info.reason);
+        if (info.reason == DSR_BREAKPOINT)
+            result["breakpoint_id"] = info.bpId;
+    }
+
     std::string InstrText(CpuDebugTarget* cpu, uint16_t addr)
     {
         DisasmInstr instr;
@@ -328,6 +341,7 @@ namespace
             state["breaked"]   = g_emulation->isDebuggerActive();
             state["paused"]    = g_emulation->getPausedState();
             state["cpu_ticks"] = p->getCpuElapsedTicks();
+            AddStopInfo(p, state);
             FillCpuStateJson(cpu, state);
         });
 
@@ -388,11 +402,12 @@ namespace
                 indexes.push_back(index);
             }
 
+            DebugSession* session = p->getDebugSession();
             for (size_t i = 0; i < names.size(); ++i) {
                 uint16_t v = values[i];
                 if (names[i] == "psw") // low byte of AF
                     v = (cpu->getReg(indexes[i]) & 0xFF00) | (v & 0xFF);
-                cpu->setReg(indexes[i], v);
+                session->setReg(indexes[i], v);
             }
 
             // Read back
@@ -723,6 +738,8 @@ namespace
             if (!io) { err = "no I/O address space"; return; }
 
             io->writeByte(port, static_cast<uint8_t>(value));
+            if (DebugSession* session = p->getDebugSession())
+                session->notifyModified();
             result["port"]  = Hex(static_cast<uint16_t>(port));
             result["value"] = Hex(value);
         });
@@ -923,6 +940,7 @@ namespace
 
             result["stoppedByTimer"] = timerDidFire;
             result["breaked"]        = g_emulation->isDebuggerActive();
+            AddStopInfo(p, result);
             FillCpuStateJson(cpu, result);
         });
 
@@ -1101,6 +1119,7 @@ namespace
             result["stoppedByBreakpoint"] = stoppedByBreakpoint;
             result["completed"]           = !stoppedByBreakpoint;
             result["duration_ms"]         = durationMs;
+            AddStopInfo(p, result);
         });
         if (!ok3) throw std::runtime_error("emulator main thread is not ready");
         if (!err.empty()) throw std::runtime_error(err);
@@ -1263,6 +1282,7 @@ namespace
             result["completed"]           = !stoppedByBreakpoint;
             result["stoppedByBreakpoint"] = stoppedByBreakpoint;
             result["breaked"]             = g_emulation->isDebuggerActive();
+            AddStopInfo(p, result);
         });
         if (!ok3) throw std::runtime_error("emulator main thread is not ready");
         if (!err.empty()) throw std::runtime_error(err);
@@ -1354,7 +1374,7 @@ namespace
 
             if (mode == "skip") {
                 uint16_t pc = cpu->getPC();
-                cpu->setPC(static_cast<uint16_t>(pc + cpu->getInstrLength(pc)));
+                session->setPC(static_cast<uint16_t>(pc + cpu->getInstrLength(pc)));
                 return;
             }
 
@@ -1395,6 +1415,7 @@ namespace
             result["breaked"]   = g_emulation->isDebuggerActive();
             result["completed"] = completed;
             result["pc"]        = Hex(pc);
+            AddStopInfo(p, result);
 
             if (g_emulation->isDebuggerActive())
                 result["instruction"] = InstrText(cpu, pc);
@@ -1889,7 +1910,8 @@ namespace
         // Phase 3: read result
         const bool ok3 = mcp::Run([&]
         {
-            CpuDebugTarget* cpu = GetTarget(GetPlatform());
+            Platform* p = GetPlatform();
+            CpuDebugTarget* cpu = GetTarget(p);
             if (!cpu) { err = "CPU unavailable after run"; return; }
 
             const bool breaked = g_emulation->isDebuggerActive();
@@ -1897,6 +1919,7 @@ namespace
             result["breaked"] = breaked;
             result["reached"] = breaked && pc == addr;
             result["pc"]      = Hex(pc);
+            AddStopInfo(p, result);
             if (breaked)
                 result["instruction"] = InstrText(cpu, pc);
         });
@@ -1950,7 +1973,8 @@ namespace
             "run/break/pause state, and the instruction at PC. Supports 8080 and Z80; "
             "Z80 alternate registers (AF2/BC2/DE2/HL2/IX/IY/IR/IM) are included when "
             "applicable. Hex values are the default format, with decimal equivalents "
-            "provided for each register.",
+            "provided for each register. When stopped, 'stop_reason' tells why "
+            "(break, breakpoint with 'breakpoint_id', step, timer, halt, illegal).",
             json{ { "type", "object" }, { "properties", json::object() } },
             &Tool_CpuState
         });
@@ -2227,7 +2251,8 @@ namespace
             "'over' (step over calls), 'out' (run until the current subroutine "
             "returns), or 'skip' (advance PC without executing). "
             "Optional 'timeout_ms' (1–60000, default 5000) limits wait for step "
-            "completion. Requires CPU paused. Returns new PC and instruction.",
+            "completion. Requires CPU paused. Returns new PC, instruction and "
+            "stop_reason ('step', or 'breakpoint' with 'breakpoint_id' if one fired first).",
             json{
                 { "type", "object" },
                 { "properties", {

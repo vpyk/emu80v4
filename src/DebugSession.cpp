@@ -22,10 +22,27 @@
 #include "Platform.h"
 #include "Memory.h"
 
+#include <algorithm>
+#include <cctype>
+
+
+const char* getStopReasonName(DebugStopReason reason)
+{
+    switch (reason) {
+    case DSR_BREAK:      return "break";
+    case DSR_BREAKPOINT: return "breakpoint";
+    case DSR_STEP:       return "step";
+    case DSR_TIMER:      return "timer";
+    case DSR_HALT:       return "halt";
+    case DSR_ILLEGAL:    return "illegal";
+    default:             return "unknown";
+    }
+}
+
 
 void DebugElapsedTimer::onElapse()
 {
-    m_session->requestBreak(m_client);
+    m_session->onTimerBreak(m_client);
 }
 
 
@@ -56,20 +73,42 @@ bool DebugSession::onStop()
     ++m_stopCount;
     m_cpu->cancelDebugStep(); // a step (out) may be interrupted by a breakpoint
 
+    bool tempBpHit = false;
     if (m_tempBp) {
+        tempBpHit = m_tempBp->getHitCount() > 0;
         delete m_tempBp;
         m_tempBp = nullptr;
     }
 
+    // Several reasons may coincide; the more specific one is reported
+    DebugStopInfo info;
+    CpuStopReason cpuReason = m_cpu->takeDebugStopReason();
     BreakpointDesc bp;
     int bpId = m_breakpoints.takeStopBreakpoint();
-    if (bpId >= 0 && m_breakpoints.get(bpId, bp))
-        m_stopClient = bp.owner;
+    if (bpId >= 0 && m_breakpoints.get(bpId, bp)) {
+        info.reason = DSR_BREAKPOINT;
+        info.bpId = bpId;
+    } else if (cpuReason == CSR_HALT)
+        info.reason = DSR_HALT;
+    else if (cpuReason == CSR_ILLEGAL)
+        info.reason = DSR_ILLEGAL;
+    else if (cpuReason == CSR_STEP || tempBpHit)
+        info.reason = DSR_STEP;
+    else if (m_timerBreak)
+        info.reason = DSR_TIMER;
     else if (m_breakRequested)
-        m_stopClient = m_breakClient;
+        info.reason = DSR_BREAK;
+
+    if (info.reason == DSR_BREAKPOINT)
+        info.client = bp.owner;
+    else if (m_breakRequested && (info.reason == DSR_BREAK || info.reason == DSR_TIMER))
+        info.client = m_breakClient;
     else
-        m_stopClient = m_runClient;
+        info.client = m_runClient;
+
+    m_stopInfo = info;
     m_breakRequested = false;
+    m_timerBreak = false;
 
     return true;
 }
@@ -87,6 +126,15 @@ void DebugSession::requestBreak(DebugClient client)
 }
 
 
+void DebugSession::onTimerBreak(DebugClient client)
+{
+    if (!m_isRunning)
+        return;
+    m_timerBreak = true;
+    requestBreak(client);
+}
+
+
 void DebugSession::resume(DebugClient client)
 {
     if (m_isRunning)
@@ -94,6 +142,8 @@ void DebugSession::resume(DebugClient client)
     m_isRunning = true;
     m_runClient = client;
     m_breakRequested = false;
+    m_timerBreak = false;
+    m_cpu->takeDebugStopReason(); // a stale request, e.g. HLT while stopped by a breakpoint
     m_breakpoints.resetStopBreakpoint();
     // let execution leave the current address
     m_cpu->skipBreakpointsOnce(m_target->getPC());
@@ -265,6 +315,47 @@ uint8_t DebugSession::readMem(int memory, unsigned addr)
 void DebugSession::writeMem(int memory, unsigned addr, uint8_t value)
 {
     const DebugMemory& mem = getMemories()[memory];
-    if (addr < mem.size)
+    if (addr < mem.size) {
         mem.device->writeByte(addr, value);
+        notifyModified();
+    }
+}
+
+
+void DebugSession::setReg(int index, unsigned value)
+{
+    m_target->setReg(index, value);
+    notifyModified();
+}
+
+
+void DebugSession::setPC(uint16_t value)
+{
+    m_target->setPC(value);
+    notifyModified();
+}
+
+
+int DebugSession::getDefaultDisasmSyntax()
+{
+    // 8080 code in Z80 mnemonics
+    if (g_emulation->getDebuggerOptions().forceZ80Mnemonics && m_target->getDisasmSyntaxCount() > 1)
+        return 1;
+    return 0;
+}
+
+
+void DebugSession::disassemble(uint16_t addr, DisasmInstr& instr, int syntax)
+{
+    if (syntax < 0)
+        syntax = getDefaultDisasmSyntax();
+    m_target->disassemble(addr, instr, syntax);
+
+    // The disassemblers produce 8080 code in upper case and Z80 code in lower case
+    const DebuggerOptions& opt = g_emulation->getDebuggerOptions();
+    std::string syntaxName = m_target->getDisasmSyntaxName(syntax);
+    if (syntaxName == "8080" && !opt.mnemo8080UpperCase)
+        std::transform(instr.text.begin(), instr.text.end(), instr.text.begin(), ::tolower);
+    else if (syntaxName == "z80" && opt.mnemoZ80UpperCase)
+        std::transform(instr.text.begin(), instr.text.end(), instr.text.begin(), ::toupper);
 }
