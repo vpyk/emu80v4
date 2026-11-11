@@ -151,7 +151,10 @@ QChar DbgMemView::byteChar(uint8_t value)
     CodePage cp = m_session->getPlatform()->getCodePage();
     if (value >= 0x20 && value < 0x60)
         return QChar(value);
-    if (cp == CP_RK) {
+    if (cp == CP_ASCII) {
+        if (value >= 0x60 && value < 0x7F)
+            return QChar(value);
+    } else if (cp == CP_RK) {
         if (value >= 0x60 && value < 0x7F)
             return QString::fromUtf8(c_rkCyrillic).at(value - 0x60);
     } else {

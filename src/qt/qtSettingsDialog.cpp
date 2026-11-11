@@ -382,6 +382,7 @@ void SettingsDialog::fillControlValues()
     val = m_options["platform.codePage"];
     ui->rkCodePageRadioButton->setChecked(val == "rk");
     ui->koi8CodePageRadioButton->setChecked(val == "koi8");
+    ui->asciiCodePageRadioButton->setChecked(val == "ascii");
 
     // Volume
     val = m_options["emulation.volume"];
@@ -878,6 +879,8 @@ void SettingsDialog::on_applyPushButton_clicked()
         val = "rk";
     else if (ui->koi8CodePageRadioButton->isChecked())
         val = "koi8";
+    else if (ui->asciiCodePageRadioButton->isChecked())
+        val = "ascii";
     m_options["platform.codePage"] = val;
 
     val = QString::number(ui->volumeSlider->value());

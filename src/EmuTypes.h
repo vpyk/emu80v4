@@ -151,7 +151,8 @@ enum TabIds
 
 enum CodePage {
     CP_RK,
-    CP_KOI8
+    CP_KOI8,
+    CP_ASCII // 7-bit ASCII without Cyrillic (ZX Spectrum etc.)
 };
 
 

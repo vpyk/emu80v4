@@ -781,7 +781,12 @@ void DebugWindow::drawSymSeq(int x, int y, uint8_t* seq, uint8_t* old_seq, int l
     for (int i = 0; i< len; i++) {
         setColors(seq[i] != old_seq[i] ? 14 : 15, 1);
         unsigned chr = seq[i];
-        chr = m_codePage == CP_RK ? chr < 128 ? chr + 256 : 0 : chr < 128 ? chr : m_koi8to866xlatTable[chr - 128];
+        if (m_codePage == CP_RK)
+            chr = chr < 128 ? chr + 256 : 0;
+        else if (m_codePage == CP_KOI8)
+            chr = chr < 128 ? chr : m_koi8to866xlatTable[chr - 128];
+        else // CP_ASCII
+            chr = chr < 128 ? chr : 0;
         putChars(chr, 1);
     }
 }

@@ -1152,6 +1152,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QRadioButton" name="asciiCodePageRadioButton">
+            <property name="text">
+             <string notr="true">ASCII</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

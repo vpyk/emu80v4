@@ -1476,6 +1476,17 @@ namespace
                 return;
             }
 
+            // An unknown name would leave the emulator without a platform, and it would exit
+            bool known = false;
+            if (EmuConfig* ec = g_emulation->getConfig())
+                for (const auto& pi : *ec->getPlatformInfos())
+                    if (pi.objName == target)
+                        known = true;
+            if (!known) {
+                err = "unknown platform '" + target + "', see 'platform' in sys_info's available_platforms";
+                return;
+            }
+
             emuSelectPlatform(target);
             Platform* newP = GetPlatform();
             std::string newName = newP ? newP->getBaseName() : "(none)";

@@ -586,6 +586,9 @@ bool Platform::setProperty(const string& propertyName, const EmuValuesList& valu
         } else if (values[0].asString() == "koi8") {
             m_codePage = CP_KOI8;
             return true;
+        } else if (values[0].asString() == "ascii") {
+            m_codePage = CP_ASCII;
+            return true;
         }
     } else if (propertyName == "muteTape") {
         if (values[0].asString() == "yes" || values[0].asString() == "no") {
@@ -616,7 +619,7 @@ string Platform::getPropertyStringValue(const string& propertyName)
     if (propertyName == "helpFile")
         return m_helpFile;
     else if (propertyName == "codePage")
-        return m_codePage == CP_RK ? "rk" : "koi8";
+        return m_codePage == CP_RK ? "rk" : m_codePage == CP_KOI8 ? "koi8" : "ascii";
     else if (propertyName == "muteTape")
         return m_muteTape ? "yes" : "no";
     else if (propertyName == "fastReset")
