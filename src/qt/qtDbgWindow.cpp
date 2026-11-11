@@ -74,10 +74,11 @@ DbgWindow::DbgWindow(Platform* platform)
 }
 
 
-QAction* DbgWindow::createAction(const QString& text, const QString& shortText, void (DbgWindow::*slot)(),
+QAction* DbgWindow::createAction(const QString& text, const QString& shortText, DbgIconKind icon,
+                                 void (DbgWindow::*slot)(),
                                  QMenu* menu, QToolBar* toolBar)
 {
-    QAction* action = new QAction(text, this);
+    QAction* action = new QAction(dbgIcon(icon), text, this);
     action->setIconText(shortText); // tool bar
     action->setShortcutContext(Qt::WindowShortcut);
     connect(action, &QAction::triggered, this, slot);
@@ -93,17 +94,18 @@ void DbgWindow::createActions()
 
     QToolBar* toolBar = addToolBar(tr("Debug"));
     toolBar->setObjectName("debugToolBar");
-    toolBar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    toolBar->setIconSize(QSize(16, 16));
 
-    m_runAction = createAction(tr("Run"), tr("Run"), &DbgWindow::onRun, debugMenu, toolBar);
-    m_breakAction = createAction(tr("Break"), tr("Break"), &DbgWindow::onBreak, debugMenu, toolBar);
+    m_runAction = createAction(tr("Run"), tr("Run"), DI_RUN, &DbgWindow::onRun, debugMenu, toolBar);
+    m_breakAction = createAction(tr("Break"), tr("Break"), DI_BREAK, &DbgWindow::onBreak, debugMenu, toolBar);
     debugMenu->addSeparator();
     toolBar->addSeparator();
-    m_stepIntoAction = createAction(tr("Step into"), tr("Into", "tool bar"), &DbgWindow::onStepInto, debugMenu, toolBar);
-    m_stepOverAction = createAction(tr("Step over"), tr("Over", "tool bar"), &DbgWindow::onStepOver, debugMenu, toolBar);
-    m_stepOutAction = createAction(tr("Step out"), tr("Out", "tool bar"), &DbgWindow::onStepOut, debugMenu, toolBar);
-    m_runToCursorAction = createAction(tr("Run to cursor"), tr("To cursor", "tool bar"), &DbgWindow::onRunToCursor, debugMenu, toolBar);
-    m_skipAction = createAction(tr("Skip instruction"), tr("Skip", "tool bar"), &DbgWindow::onSkip, debugMenu, toolBar);
+    m_stepIntoAction = createAction(tr("Step into"), tr("Into", "tool bar"), DI_STEP_INTO, &DbgWindow::onStepInto, debugMenu, toolBar);
+    m_stepOverAction = createAction(tr("Step over"), tr("Over", "tool bar"), DI_STEP_OVER, &DbgWindow::onStepOver, debugMenu, toolBar);
+    m_stepOutAction = createAction(tr("Step out"), tr("Out", "tool bar"), DI_STEP_OUT, &DbgWindow::onStepOut, debugMenu, toolBar);
+    m_runToCursorAction = createAction(tr("Run to cursor"), tr("To cursor", "tool bar"), DI_RUN_TO_CURSOR, &DbgWindow::onRunToCursor, debugMenu, toolBar);
+    m_skipAction = createAction(tr("Skip instruction"), tr("Skip", "tool bar"), DI_SKIP, &DbgWindow::onSkip, debugMenu, toolBar);
 
     // Code view actions, also in its context menu
     QMenu* codeMenu = menuBar()->addMenu(tr("Code"));

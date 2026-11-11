@@ -23,6 +23,8 @@
 
 #include <QMainWindow>
 
+#include "qtDbgIcons.h"
+
 class QAction;
 class QDockWidget;
 class QLabel;
@@ -109,7 +111,7 @@ private:
     // floating docks hidden with the window, to be shown with it again
     std::vector<QDockWidget*> m_hiddenFloatingDocks;
 
-    QAction* createAction(const QString& text, const QString& shortText, void (DbgWindow::*slot)(),
+    QAction* createAction(const QString& text, const QString& shortText, DbgIconKind icon, void (DbgWindow::*slot)(),
                           QMenu* menu, QToolBar* toolBar);
     void createActions();
     void createDocks();

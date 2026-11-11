@@ -298,6 +298,7 @@ isEmpty(NO_QT_DEBUGGER) {
         qt/qtDbgWindow.cpp \
         qt/qtDbgCodeView.cpp \
         qt/qtDbgStyle.cpp \
+        qt/qtDbgIcons.cpp \
         qt/qtDbgRegsView.cpp \
         qt/qtDbgMemView.cpp \
         qt/qtDbgBreakpoints.cpp
@@ -307,6 +308,7 @@ isEmpty(NO_QT_DEBUGGER) {
         qt/qtDbgWindow.h \
         qt/qtDbgCodeView.h \
         qt/qtDbgStyle.h \
+        qt/qtDbgIcons.h \
         qt/qtDbgRegsView.h \
         qt/qtDbgMemView.h \
         qt/qtDbgBreakpoints.h
