@@ -310,6 +310,7 @@ isEmpty(NO_QT_DEBUGGER) {
         qt/qtDbgRegsView.h \
         qt/qtDbgMemView.h \
         qt/qtDbgBreakpoints.h
+    RESOURCES += qt/dbgfont.qrc
 }
 
 # MCP Server support — enable with: qmake MCP_SERVER=1 src/Emu80qt.pro
@@ -329,4 +330,4 @@ isEmpty(MCP_SERVER):MCP_SERVER = $$(MCP_SERVER)
 
 INSTALLDIR = ~/emu80
 QMAKE_EXTRA_TARGETS += install
-install.commands = mkdir -p $$INSTALLDIR && mkdir -p $$INSTALLDIR/_settings && cp $$TARGET $$INSTALLDIR && cp -r dist/* $$INSTALLDIR && cp COPYING.txt $$INSTALLDIR && cp whatsnew.txt $$INSTALLDIR && cp -r doc/* $$INSTALLDIR
+install.commands = mkdir -p $$INSTALLDIR && mkdir -p $$INSTALLDIR/_settings && cp $$TARGET $$INSTALLDIR && cp -r dist/* $$INSTALLDIR && cp COPYING.txt $$INSTALLDIR && cp THIRD-PARTY-LICENSES.txt $$INSTALLDIR && cp whatsnew.txt $$INSTALLDIR && cp -r doc/* $$INSTALLDIR

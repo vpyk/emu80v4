@@ -39,6 +39,7 @@ install: $(TARGET)
 	cp $(TARGET) $(INSTALLDIR)
 	cp -r dist/* $(INSTALLDIR)
 	cp COPYING.txt $(INSTALLDIR)
+	cp THIRD-PARTY-LICENSES.txt $(INSTALLDIR)
 	cp whatsnew.txt $(INSTALLDIR)
 	cp -r doc/* $(INSTALLDIR)
 

@@ -24,9 +24,29 @@
 #include "qtDbgCompat.h"
 
 
+namespace {
+
+// The embedded Hack font, or the system fixed font if the font can't be loaded
+QFont createFont()
+{
+    int id = QFontDatabase::addApplicationFont(":/fonts/Hack-Regular.ttf");
+    QStringList families = id >= 0 ? QFontDatabase::applicationFontFamilies(id) : QStringList();
+    if (families.isEmpty())
+        return QFontDatabase::systemFont(QFontDatabase::FixedFont);
+
+    QFont font(families.first());
+    font.setStyleHint(QFont::TypeWriter);
+    font.setPointSize(10); // todo: make the size an option
+    return font;
+}
+
+} // namespace
+
+
 QFont dbgFont()
 {
-    return QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    static QFont font = createFont();
+    return font;
 }
 
 
