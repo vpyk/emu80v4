@@ -58,9 +58,15 @@ void DbgRegsView::createWidgets()
     DbgMetrics metrics(font);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    QGridLayout* grids[3] = {}; // DRG_MAIN, DRG_ALT, DRG_SPECIAL
-    int gridCounts[3] = {};
     QHBoxLayout* flagsLayout = nullptr;
+
+    // the cells of the groups DRG_MAIN, DRG_ALT, DRG_SPECIAL: a label and a field,
+    // or a check box (no label)
+    struct Cell {
+        QLabel* label;
+        QWidget* widget;
+    };
+    std::vector<Cell> groups[3];
 
     int n = target->getRegCount();
     m_regs.reserve(n);
@@ -89,40 +95,54 @@ void DbgRegsView::createWidgets()
         }
 
         if (info.group == DRG_FLAG) {
-            if (!flagsLayout) {
-                flagsLayout = new QHBoxLayout;
-                mainLayout->addLayout(flagsLayout);
-            }
+            if (!flagsLayout)
+                flagsLayout = new QHBoxLayout; // added after the grid
             flagsLayout->addWidget(widget);
             continue;
         }
 
-        int g = info.group == DRG_MAIN ? 0 : info.group == DRG_ALT ? 1 : 2;
-        if (!grids[g]) {
-            grids[g] = new QGridLayout;
-            grids[g]->setHorizontalSpacing(metrics.charWidth);
-            mainLayout->addLayout(grids[g]);
-        }
-        int row = gridCounts[g] / c_regsPerRow;
-        int col = gridCounts[g] % c_regsPerRow * 2;
-        ++gridCounts[g];
+        QLabel* label = nullptr;
         if (reg.edit) {
-            QLabel* label = new QLabel(QString::fromUtf8(info.name), this);
+            label = new QLabel(QString::fromUtf8(info.name), this);
             label->setFont(font);
             label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             label->setBuddy(reg.edit);
-            grids[g]->addWidget(label, row, col);
-            grids[g]->addWidget(reg.edit, row, col + 1);
-        } else
-            grids[g]->addWidget(widget, row, col, 1, 2);
+        }
+        int g = info.group == DRG_MAIN ? 0 : info.group == DRG_ALT ? 1 : 2;
+        groups[g].push_back(Cell{label, widget});
     }
 
-    // keep the fields together at the top left
-    for (QGridLayout* grid : grids)
-        if (grid)
-            grid->setColumnStretch(c_regsPerRow * 2, 1);
-    if (flagsLayout)
+    // One grid for all groups, so that the fields of all groups are aligned.
+    // Columns: label, field, a gap between the pairs, label, field, ..., stretch;
+    // the groups are separated by an empty row.
+    QGridLayout* grid = new QGridLayout;
+    grid->setHorizontalSpacing(metrics.charWidth / 2);
+    int row = 0;
+    for (const std::vector<Cell>& cells : groups) {
+        if (cells.empty())
+            continue;
+        if (row > 0)
+            grid->setRowMinimumHeight(row++, metrics.lineHeight / 2);
+        for (unsigned i = 0; i < cells.size(); i++) {
+            int r = row + i / c_regsPerRow;
+            int col = i % c_regsPerRow * 3;
+            if (cells[i].label) {
+                grid->addWidget(cells[i].label, r, col);
+                grid->addWidget(cells[i].widget, r, col + 1);
+            } else
+                grid->addWidget(cells[i].widget, r, col, 1, 2);
+        }
+        row += (cells.size() + c_regsPerRow - 1) / c_regsPerRow;
+    }
+    for (int i = 1; i < c_regsPerRow; i++)
+        grid->setColumnMinimumWidth(i * 3 - 1, metrics.charWidth * 2);
+    grid->setColumnStretch(c_regsPerRow * 3 - 1, 1); // keep the fields together at the left
+    mainLayout->addLayout(grid);
+
+    if (flagsLayout) {
         flagsLayout->addStretch(1);
+        mainLayout->addLayout(flagsLayout);
+    }
     mainLayout->addStretch(1);
 }
 

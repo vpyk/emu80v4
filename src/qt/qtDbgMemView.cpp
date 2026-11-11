@@ -97,12 +97,24 @@ void DbgMemView::setMemory(int memory)
 }
 
 
+int DbgMemView::width16() const
+{
+    return (m_addrDigits + 2 + 16 * 3 + 1 + 1 + 16 + 1) * m_charWidth;
+}
+
+
 // 16 bytes per line if they fit, else 8
 void DbgMemView::updateLayout()
 {
-    int width16 = (m_addrDigits + 2 + 16 * 3 + 1 + 1 + 16 + 1) * m_charWidth;
-    m_bytesPerLine = viewport()->width() >= width16 ? 16 : 8;
+    m_bytesPerLine = viewport()->width() >= width16() ? 16 : 8;
     syncScrollBar();
+}
+
+
+QSize DbgMemView::sizeHint() const
+{
+    int frame = frameWidth() * 2;
+    return QSize(width16() + verticalScrollBar()->sizeHint().width() + frame, m_lineHeight * 12 + frame);
 }
 
 

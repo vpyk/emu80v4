@@ -17,6 +17,8 @@
  */
 
 #include <QAction>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QCloseEvent>
 #include <QDockWidget>
 #include <QLabel>
@@ -30,6 +32,7 @@
 #include "qtDbgRegsView.h"
 #include "qtDbgMemView.h"
 #include "qtDbgBreakpoints.h"
+#include "qtDbgStyle.h"
 #include "qtMainWindow.h"
 
 #include "../Globals.h"
@@ -43,7 +46,12 @@ DbgWindow::DbgWindow(Platform* platform)
     : QMainWindow(nullptr), m_platform(platform), m_session(platform->getDebugSession())
 {
     setWindowTitle(tr("Debugger: %1").arg(QString::fromUtf8(platform->getWindow()->getCaption().c_str())));
-    resize(1000, 760);
+    // the memory view of 16 bytes per line with the breakpoints table beside the code
+    // and the registers, 30 lines of code and 12 lines of memory (the dock size hint)
+    DbgMetrics metrics(dbgFont());
+    QSize size(metrics.charWidth * 100, metrics.lineHeight * 42 + 120);
+    QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
+    resize(qMin(size.width(), screen.width() * 9 / 10), qMin(size.height(), screen.height() * 9 / 10));
 
     m_codeView = new DbgCodeView(m_session, this);
     setCentralWidget(m_codeView);
@@ -170,9 +178,6 @@ void DbgWindow::createDocks()
     tabifyDockWidget(memDock, bpDock);
     memDock->raise();
     m_viewMenu->addAction(bpDock->toggleViewAction());
-
-    // the right docks take the whole height
-    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
 
 

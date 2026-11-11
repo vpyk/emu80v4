@@ -49,6 +49,9 @@ public:
     unsigned getCursorAddr() {return m_cursorAddr;}
     void gotoAddr(unsigned addr);
 
+    // 16 bytes per line, 12 lines
+    QSize sizeHint() const override;
+
 public slots:
     void onStateChanged(bool newStop);
     void onRunStateChanged(bool running);
@@ -88,6 +91,7 @@ private:
 
     void updateFontMetrics();
     void updateLayout();
+    int width16() const;    // the width of a 16-byte line
     int visibleLines();
     unsigned lineCount();
     void readData();
