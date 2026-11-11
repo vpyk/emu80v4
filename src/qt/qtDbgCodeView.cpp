@@ -134,6 +134,11 @@ void DbgCodeView::buildLines()
     m_lines.clear();
     m_lines.reserve(n);
 
+    // The top address is found heuristically and may be wrong for data or code mixed
+    // with data. An instruction that overlaps PC or the cursor address is cut there
+    // and shown as bytes only, so that the instruction at that address gets its line.
+    const uint16_t anchors[] = {m_pc, m_cursorAddr};
+
     uint16_t addr = m_topAddr;
     for (int i = 0; i < n; i++) {
         DisasmInstr instr;
@@ -142,13 +147,20 @@ void DbgCodeView::buildLines()
         line.addr = addr;
         line.length = instr.length;
         line.text = QString::fromUtf8(instr.text.c_str());
-        for (int j = 0; j < instr.length && j < c_maxBytes; j++) {
+        for (uint16_t anchor : anchors) {
+            int dist = uint16_t(anchor - addr);
+            if (dist > 0 && dist < line.length) {
+                line.length = dist;
+                line.text.clear();
+            }
+        }
+        for (int j = 0; j < line.length && j < c_maxBytes; j++) {
             if (j)
                 line.bytes += ' ';
             line.bytes += hex(target->readMem(uint16_t(addr + j)), 2);
         }
         m_lines.push_back(line);
-        addr = uint16_t(addr + instr.length);
+        addr = uint16_t(addr + line.length);
     }
 }
 
