@@ -34,6 +34,7 @@
 
 #include "../DebugSession.h"
 #include "../Platform.h"
+#include "../CrtRenderer.h"
 
 
 namespace {
@@ -43,8 +44,6 @@ QString hex(unsigned value, int digits)
     return QString("%1").arg(value, digits, 16, QChar('0')).toUpper();
 }
 
-// Cyrillic letters of KOI-7 N2 (RK-86 code page) at 60h...7Eh
-const char* c_rkCyrillic = u8"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ";
 // Cyrillic letters of KOI-8 at C0h...FFh
 const char* c_koi8Cyrillic = u8"юабцдефгхийклмнопярстужвьызшэщчъЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧЪ";
 
@@ -149,14 +148,24 @@ int DbgMemView::charsX()
 QChar DbgMemView::byteChar(uint8_t value)
 {
     CodePage cp = m_session->getPlatform()->getCodePage();
+    if (cp == CP_RK) {
+        // the characters of the RK-86 font, including the graphics below 20h;
+        // codes without a character are shown as dots
+        if (value == 0x20)
+            return QChar(' ');
+        if (value < 0x80) {
+            wchar_t ch = TextCrtRenderer::c_rkSymbols[value];
+            if (ch != L' ')
+                return QChar(static_cast<ushort>(ch));
+        }
+        return QChar('.');
+    }
+
     if (value >= 0x20 && value < 0x60)
         return QChar(value);
     if (cp == CP_ASCII) {
         if (value >= 0x60 && value < 0x7F)
             return QChar(value);
-    } else if (cp == CP_RK) {
-        if (value >= 0x60 && value < 0x7F)
-            return QString::fromUtf8(c_rkCyrillic).at(value - 0x60);
     } else {
         if (value >= 0x60 && value < 0x7F)
             return QChar(value);
@@ -292,7 +301,6 @@ void DbgMemView::paintEvent(QPaintEvent*)
         painter.setPen(colors.dimFg(stale));
         painter.drawText(cw / 2, baseY, hex(lineAddr, m_addrDigits));
 
-        QString chars;
         for (int i = 0; i < m_bytesPerLine; i++) {
             unsigned addr = lineAddr + i;
             if (addr >= m_size)
@@ -325,11 +333,10 @@ void DbgMemView::paintEvent(QPaintEvent*)
 
             painter.setPen(changed && !stale ? colors.changedText : colors.fg(stale));
             painter.drawText(x, baseY, hex(value, 2));
-            chars += byteChar(value);
+            // each character in its own cell: some of them may come from a fallback font
+            // of a different width
+            painter.drawText(chX + i * cw, baseY, QString(byteChar(value)));
         }
-
-        painter.setPen(colors.fg(stale));
-        painter.drawText(chX, baseY, chars);
     }
 }
 

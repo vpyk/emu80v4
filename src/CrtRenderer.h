@@ -84,6 +84,11 @@ class CrtRenderer : public EmuObject
 class TextCrtRenderer : public CrtRenderer
 {
     public:
+        // Unicode characters closest to the RK-86 (and Mikro-80) font characters 00h...7Fh,
+        // also used in the debugger memory dump
+        static const wchar_t* const c_rkSymbols;
+        static const wchar_t* const c_mikroSymbols;
+
         virtual ~TextCrtRenderer();
 
         bool setProperty(const std::string& propertyName, const EmuValuesList& values) override;
@@ -106,18 +111,6 @@ class TextCrtRenderer : public CrtRenderer
 
         virtual void primaryRenderFrame() = 0;
         virtual void altRenderFrame() = 0;
-
-        const wchar_t* c_rkSymbols =
-            L" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢✿ "
-            L" !\"#¤%&'()*+,-./0123456789:;<=>?"
-            L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-            L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
-
-        const wchar_t* c_mikroSymbols =
-            L" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢· "
-            L" !\"#$%&'()*+,-./0123456789:;<=>?"
-            L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-            L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
 };
 
 #endif // CRTRENDERER_H

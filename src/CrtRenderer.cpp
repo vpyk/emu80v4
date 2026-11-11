@@ -189,6 +189,19 @@ bool CrtRenderer::setProperty(const string& propertyName, const EmuValuesList& v
 
 
 
+const wchar_t* const TextCrtRenderer::c_rkSymbols =
+        L" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢✿ "
+        L" !\"#¤%&'()*+,-./0123456789:;<=>?"
+        L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+        L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
+
+const wchar_t* const TextCrtRenderer::c_mikroSymbols =
+        L" ▘▝▀▗▚▐▜ ★ ↑  ↣↓▖▌▞▛▄▙▟█   ┃━↢· "
+        L" !\"#$%&'()*+,-./0123456789:;<=>?"
+        L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+        L"ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ▇";
+
+
 TextCrtRenderer::~TextCrtRenderer()
 {
     if (m_font)
