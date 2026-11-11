@@ -80,7 +80,9 @@ DbgColors::DbgColors(const QPalette& palette)
     background = palette.color(QPalette::Base);
     text = palette.color(QPalette::Text);
     dimText = dbgMixColors(text, background, 0.4);
-    staleBackground = palette.color(QPalette::Window);
+    // shifted to the text color: darker in a light theme, lighter in a dark one, where a darker
+    // background (the window color) hardly differs from the normal one
+    staleBackground = dbgMixColors(background, text, dark ? 0.1 : 0.06);
     staleText = palette.color(QPalette::Disabled, QPalette::Text);
     staleDimText = dbgMixColors(staleText, staleBackground, 0.4);
 
@@ -96,7 +98,7 @@ DbgColors::DbgColors(const QPalette& palette)
     } else {
         pcBackground = QColor(0x26, 0x4F, 0x78);
         pcMarker = QColor(0x4F, 0xA3, 0xFF);
-        cursorBackground = QColor(0x2A, 0x2D, 0x2E);
+        cursorBackground = QColor(0x33, 0x39, 0x40);
         cursorFrame = QColor(0x6A, 0x9B, 0xD8);
         cursorFrameUnfocused = QColor(0x4A, 0x5A, 0x6A);
         changedText = QColor(0xFF, 0x78, 0x64);
@@ -104,5 +106,5 @@ DbgColors::DbgColors(const QPalette& palette)
         externalBreakpoint = QColor(0xFF, 0xA0, 0x28);
     }
 
-    stalePcBackground = dbgMixColors(staleBackground, pcBackground, 0.4);
+    stalePcBackground = dbgMixColors(staleBackground, pcBackground, 0.5);
 }
