@@ -25,7 +25,9 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
+#include <QShortcut>
 #include <QSignalBlocker>
+#include <QToolTip>
 #include <QVBoxLayout>
 
 #include "qtDbgMemView.h"
@@ -180,6 +182,39 @@ QChar DbgMemView::byteChar(uint8_t value)
 }
 
 
+bool DbgMemView::charToByte(QChar ch, uint8_t& value)
+{
+    QChar variants[] = {ch, ch.toUpper()};
+    for (QChar c : variants)
+        for (int i = 0; i < 256; i++)
+            if (byteChar(uint8_t(i)) == c && (c != QChar('.') || i == '.')) {
+                value = uint8_t(i);
+                return true;
+            }
+    return false;
+}
+
+
+bool DbgMemView::find(const std::vector<uint8_t>& bytes, bool forward)
+{
+    if (!canNavigate() || bytes.empty() || bytes.size() > m_size)
+        return false;
+    for (unsigned n = 1; n <= m_size; n++) {
+        unsigned addr = forward ? (m_cursorAddr + n) % m_size : (m_cursorAddr + m_size - n) % m_size;
+        if (addr + bytes.size() > m_size)
+            continue;
+        unsigned i = 0;
+        while (i < bytes.size() && m_session->readMem(m_memory, addr + i) == bytes[i])
+            i++;
+        if (i == bytes.size()) {
+            gotoAddr(addr);
+            return true;
+        }
+    }
+    return false;
+}
+
+
 void DbgMemView::readData()
 {
     if (!canNavigate())
@@ -318,13 +353,11 @@ void DbgMemView::paintEvent(QPaintEvent*)
             if (addr == m_cursorAddr) {
                 QRect hexRect(x - cw / 2, y, cw * 3, m_lineHeight);
                 QRect chRect(chX + i * cw, y, cw, m_lineHeight);
-                if (focused) {
-                    painter.fillRect(hexRect, colors.cursorBackground);
-                    painter.fillRect(chRect, colors.cursorBackground);
-                }
+                if (focused) // the part being typed in
+                    painter.fillRect(m_charMode ? chRect : hexRect, colors.cursorBackground);
                 painter.setPen(stale ? colors.staleCursorFrame : colors.cursorFrame);
                 painter.setBrush(Qt::NoBrush);
-                if (m_nibble && focused)
+                if (m_nibble && focused && !m_charMode)
                     painter.drawRect(QRect(x + cw, y, cw - 1, m_lineHeight - 1)); // the low digit is typed
                 else
                     painter.drawRect(hexRect.adjusted(0, 0, -1, -1));
@@ -361,6 +394,18 @@ void DbgMemView::changeEvent(QEvent* event)
     }
     QAbstractScrollArea::changeEvent(event);
     viewport()->update();
+}
+
+
+// Tab switches the cursor between the hex and character parts
+bool DbgMemView::focusNextPrevChild(bool next)
+{
+    if (!canNavigate())
+        return QAbstractScrollArea::focusNextPrevChild(next);
+    m_charMode = !m_charMode;
+    m_nibble = 0;
+    viewport()->update();
+    return true;
 }
 
 
@@ -409,8 +454,23 @@ void DbgMemView::keyPressEvent(QKeyEvent* event)
         break;
     }
 
-    // hex digits change the byte at the cursor
     QString text = event->text();
+
+    // a printable character in the character part changes the byte at the cursor
+    if (m_charMode) {
+        uint8_t value;
+        if (text.size() == 1 && !ctrl && text[0].isPrint() && charToByte(text[0], value)) {
+            m_session->writeMem(m_memory, m_cursorAddr, value);
+            moveCursor(1);
+            readData();
+            viewport()->update();
+            return;
+        }
+        QAbstractScrollArea::keyPressEvent(event);
+        return;
+    }
+
+    // hex digits change the byte at the cursor
     if (text.size() == 1 && !ctrl) {
         bool ok;
         unsigned digit = text.toUInt(&ok, 16);
@@ -442,7 +502,8 @@ void DbgMemView::mousePressEvent(QMouseEvent* event)
     unsigned line = m_topLine + pos.y() / m_lineHeight;
     int index = -1;
     int chX = charsX();
-    if (pos.x() >= chX)
+    bool charPart = pos.x() >= chX;
+    if (charPart)
         index = (pos.x() - chX) / m_charWidth;
     else
         for (int i = 0; i < m_bytesPerLine; i++)
@@ -454,6 +515,7 @@ void DbgMemView::mousePressEvent(QMouseEvent* event)
     if (addr < m_size) {
         m_cursorAddr = addr;
         m_nibble = 0;
+        m_charMode = charPart;
         viewport()->update();
     }
 }
@@ -486,6 +548,13 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     m_addrEdit->setFixedWidth(DbgMetrics(dbgFont()).charWidth * 10 + 6);
     m_addrEdit->setToolTip(tr("Address (hex), Enter to go"));
 
+    m_searchEdit = new QLineEdit(this);
+    m_searchEdit->setFont(dbgFont());
+    m_searchEdit->setPlaceholderText(tr("Find"));
+    m_searchEdit->setToolTip(tr("Hex bytes (C3 00 F8) or text in quotes (\"TEXT\"); "
+                                "Enter, F3 - find next, Shift-F3 - find previous"));
+    m_searchEdit->setFixedWidth(DbgMetrics(dbgFont()).charWidth * 24 + 6);
+
     m_view = new DbgMemView(session, this);
     connect(m_view, &DbgMemView::focused, this, &DbgMemPanel::activated);
 
@@ -493,6 +562,8 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     topLayout->addWidget(m_memoryCombo);
     topLayout->addWidget(new QLabel(tr("Address:"), this));
     topLayout->addWidget(m_addrEdit);
+    topLayout->addSpacing(DbgMetrics(dbgFont()).charWidth * 2);
+    topLayout->addWidget(m_searchEdit);
     topLayout->addStretch(1);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -503,6 +574,24 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     connect(m_memoryCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &DbgMemPanel::onMemoryChanged);
     connect(m_addrEdit, &QLineEdit::returnPressed, this, &DbgMemPanel::onAddressEntered);
+    connect(m_searchEdit, &QLineEdit::returnPressed, this, [this]() {onFind(true);});
+    connect(m_searchEdit, &QLineEdit::textChanged, this, [this]() {
+        m_searchEdit->setPalette(QPalette()); // the error color is reset on editing
+    });
+
+    // search keys work in the whole panel
+    QShortcut* findShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
+    findShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(findShortcut, &QShortcut::activated, this, [this]() {
+        m_searchEdit->setFocus();
+        m_searchEdit->selectAll();
+    });
+    QShortcut* nextShortcut = new QShortcut(QKeySequence("F3"), this);
+    nextShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(nextShortcut, &QShortcut::activated, this, [this]() {onFind(true);});
+    QShortcut* prevShortcut = new QShortcut(QKeySequence("Shift+F3"), this);
+    prevShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(prevShortcut, &QShortcut::activated, this, [this]() {onFind(false);});
 
     // context menu of the dump
     m_readBpAction = new QAction(tr("Breakpoint on read"), this);
@@ -550,6 +639,56 @@ void DbgMemPanel::onAddressEntered()
 }
 
 
+bool DbgMemPanel::parsePattern(const QString& text, std::vector<uint8_t>& bytes)
+{
+    bytes.clear();
+    QString s = text.trimmed();
+    if (s.startsWith('"')) {
+        s = s.mid(1);
+        if (s.endsWith('"'))
+            s.chop(1);
+        for (QChar ch : s) {
+            uint8_t value;
+            if (!m_view->charToByte(ch, value))
+                return false;
+            bytes.push_back(value);
+        }
+    } else {
+        s.remove(' ');
+        if (s.size() % 2)
+            return false;
+        for (int i = 0; i < s.size(); i += 2) {
+            bool ok;
+            unsigned value = s.mid(i, 2).toUInt(&ok, 16);
+            if (!ok)
+                return false;
+            bytes.push_back(uint8_t(value));
+        }
+    }
+    return !bytes.empty();
+}
+
+
+void DbgMemPanel::onFind(bool forward)
+{
+    if (m_session->isRunning() || m_searchEdit->text().trimmed().isEmpty())
+        return;
+    std::vector<uint8_t> bytes;
+    QString message;
+    if (!parsePattern(m_searchEdit->text(), bytes))
+        message = tr("Invalid search pattern");
+    else if (!m_view->find(bytes, forward))
+        message = tr("Not found");
+    if (message.isEmpty())
+        return;
+    // the message near the field, the field in the error color
+    QPalette pal = m_searchEdit->palette();
+    pal.setColor(QPalette::Text, DbgColors(palette()).changedText);
+    m_searchEdit->setPalette(pal);
+    QToolTip::showText(m_searchEdit->mapToGlobal(QPoint(0, m_searchEdit->height())), message, m_searchEdit);
+}
+
+
 // Memory breakpoints are set in the CPU address space only
 void DbgMemPanel::onBreakpoint(int type)
 {
@@ -569,6 +708,7 @@ void DbgMemPanel::updateActions()
     m_accessBpAction->setEnabled(cpu);
     m_showInCodeAction->setEnabled(cpu && stopped);
     m_addrEdit->setEnabled(stopped);
+    m_searchEdit->setEnabled(stopped);
     m_memoryCombo->setEnabled(stopped);
 }
 

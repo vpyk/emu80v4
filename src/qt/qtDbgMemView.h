@@ -48,6 +48,15 @@ public:
     int getMemory() {return m_memory;}
     unsigned getCursorAddr() {return m_cursorAddr;}
     void gotoAddr(unsigned addr);
+    unsigned getSize() {return m_size;}
+
+    // The byte of a character in the code page of the dump; the upper case variant is
+    // tried for a character the code page lacks. False if there is none.
+    bool charToByte(QChar ch, uint8_t& value);
+
+    // Searches the bytes from the cursor (exclusive), wrapping around; moves the cursor
+    // to the found bytes. False if not found or the emulation is running.
+    bool find(const std::vector<uint8_t>& bytes, bool forward);
 
     // 16 bytes per line, 12 lines
     QSize sizeHint() const override;
@@ -67,6 +76,7 @@ protected:
     void scrollContentsBy(int dx, int dy) override;
     void changeEvent(QEvent* event) override;
     void focusInEvent(QFocusEvent* event) override;
+    bool focusNextPrevChild(bool next) override;
 
 private:
     DebugSession* m_session;
@@ -78,6 +88,7 @@ private:
     unsigned m_topLine = 0;
     unsigned m_cursorAddr = 0;
     int m_nibble = 0;           // the hex digit being typed at the cursor: 0 - high, 1 - low
+    bool m_charMode = false;    // the cursor is in the character part (Tab switches)
     bool m_running = true;
     bool m_hasState = false;
 
@@ -133,11 +144,13 @@ private slots:
     void onMemoryChanged(int index);
     void onAddressEntered();
     void onBreakpoint(int type);
+    void onFind(bool forward);
 
 private:
     DebugSession* m_session;
     QComboBox* m_memoryCombo;
     QLineEdit* m_addrEdit;
+    QLineEdit* m_searchEdit;
     DbgMemView* m_view;
     QAction* m_readBpAction;
     QAction* m_writeBpAction;
@@ -145,6 +158,8 @@ private:
     QAction* m_showInCodeAction;
 
     void updateActions();
+    // hex bytes ("C3 00 F8", "C300F8") or text in quotes ("TEXT" or "TEXT)
+    bool parsePattern(const QString& text, std::vector<uint8_t>& bytes);
 };
 
 

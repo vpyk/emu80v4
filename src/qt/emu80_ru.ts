@@ -206,6 +206,26 @@
     <name>DbgMemPanel</name>
     <message>
         <location filename="qtDbgMemView.cpp"/>
+        <source>Find</source>
+        <translation>Найти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Hex bytes (C3 00 F8) or text in quotes (&quot;TEXT&quot;); Enter, F3 - find next, Shift-F3 - find previous</source>
+        <translation>Байты в hex (C3 00 F8) или текст в кавычках (&quot;ТЕКСТ&quot;); Enter, F3 — найти далее, Shift-F3 — найти назад</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Invalid search pattern</source>
+        <translation>Неверный образец поиска</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Not found</source>
+        <translation>Не найдено</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
         <source>Address (hex), Enter to go</source>
         <translation>Адрес (hex), Enter — перейти</translation>
     </message>
