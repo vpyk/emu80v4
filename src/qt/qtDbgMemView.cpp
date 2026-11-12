@@ -322,7 +322,7 @@ void DbgMemView::paintEvent(QPaintEvent*)
                     painter.fillRect(hexRect, colors.cursorBackground);
                     painter.fillRect(chRect, colors.cursorBackground);
                 }
-                painter.setPen(focused ? colors.cursorFrame : colors.cursorFrameUnfocused);
+                painter.setPen(stale ? colors.staleCursorFrame : colors.cursorFrame);
                 painter.setBrush(Qt::NoBrush);
                 if (m_nibble && focused)
                     painter.drawRect(QRect(x + cw, y, cw - 1, m_lineHeight - 1)); // the low digit is typed
@@ -361,6 +361,13 @@ void DbgMemView::changeEvent(QEvent* event)
     }
     QAbstractScrollArea::changeEvent(event);
     viewport()->update();
+}
+
+
+void DbgMemView::focusInEvent(QFocusEvent* event)
+{
+    QAbstractScrollArea::focusInEvent(event);
+    emit focused();
 }
 
 
@@ -480,6 +487,7 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     m_addrEdit->setToolTip(tr("Address (hex), Enter to go"));
 
     m_view = new DbgMemView(session, this);
+    connect(m_view, &DbgMemView::focused, this, &DbgMemPanel::activated);
 
     QHBoxLayout* topLayout = new QHBoxLayout;
     topLayout->addWidget(m_memoryCombo);

@@ -249,7 +249,7 @@ void DbgStackView::paintEvent(QPaintEvent*)
         else if (item == m_cursorItem && focused)
             painter.fillRect(lineRect, colors.cursorBackground);
         if (item == m_cursorItem) {
-            painter.setPen(focused ? colors.cursorFrame : colors.cursorFrameUnfocused);
+            painter.setPen(stale ? colors.staleCursorFrame : colors.cursorFrame);
             painter.setBrush(Qt::NoBrush);
             painter.drawRect(lineRect.adjusted(0, 0, -1, -1));
         }

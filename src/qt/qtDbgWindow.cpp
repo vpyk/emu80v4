@@ -170,19 +170,30 @@ void DbgWindow::createDocks()
     addDockWidget(Qt::RightDockWidgetArea, stackDock); // under the registers
     m_viewMenu->addAction(stackDock->toggleViewAction());
 
-    m_memPanel = new DbgMemPanel(m_session, this);
-    connect(this, &DbgWindow::stateChanged, m_memPanel, &DbgMemPanel::onStateChanged);
-    connect(this, &DbgWindow::runStateChanged, m_memPanel, &DbgMemPanel::onRunStateChanged);
-    connect(m_memPanel, &DbgMemPanel::showInCode, this, [this](uint16_t addr) {
-        m_codeView->showAddress(addr);
-        m_codeView->setFocus();
-    });
+    // two dumps, the second one is hidden by default
+    for (int i = 0; i < 2; i++) {
+        DbgMemPanel* panel = new DbgMemPanel(m_session, this);
+        connect(this, &DbgWindow::stateChanged, panel, &DbgMemPanel::onStateChanged);
+        connect(this, &DbgWindow::runStateChanged, panel, &DbgMemPanel::onRunStateChanged);
+        connect(panel, &DbgMemPanel::showInCode, this, [this](uint16_t addr) {
+            m_codeView->showAddress(addr);
+            m_codeView->setFocus();
+        });
+        connect(panel, &DbgMemPanel::activated, this, [this, i]() {m_activeMem = i;});
 
-    QDockWidget* memDock = new QDockWidget(tr("Memory"), this);
-    memDock->setObjectName("memoryDock");
-    memDock->setWidget(m_memPanel);
-    addDockWidget(Qt::BottomDockWidgetArea, memDock);
-    m_viewMenu->addAction(memDock->toggleViewAction());
+        QDockWidget* dock = new QDockWidget(tr("Memory %1").arg(i + 1), this);
+        dock->setObjectName(i == 0 ? "memoryDock" : "memoryDock2");
+        dock->setWidget(panel);
+        addDockWidget(Qt::BottomDockWidgetArea, dock);
+        if (i > 0) {
+            tabifyDockWidget(m_memDocks[0], dock);
+            dock->hide();
+        }
+        m_viewMenu->addAction(dock->toggleViewAction());
+        m_memPanels[i] = panel;
+        m_memDocks[i] = dock;
+    }
+    QDockWidget* memDock = m_memDocks[0];
 
     m_bpPanel = new DbgBreakpointsPanel(m_session, this);
     m_bpPanel->setAddressProvider([this]() {return m_codeView->getCursorAddr();});
@@ -192,12 +203,8 @@ void DbgWindow::createDocks()
         m_codeView->showAddress(addr);
         m_codeView->setFocus();
     });
-    auto showInMemory = [this, memDock](uint16_t addr) {
-        memDock->raise();
-        m_memPanel->showAddress(addr);
-    };
-    connect(m_bpPanel, &DbgBreakpointsPanel::showInMemory, this, showInMemory);
-    connect(m_stackView, &DbgStackView::showInMemory, this, showInMemory);
+    connect(m_bpPanel, &DbgBreakpointsPanel::showInMemory, this, &DbgWindow::showInMemory);
+    connect(m_stackView, &DbgStackView::showInMemory, this, &DbgWindow::showInMemory);
 
     QDockWidget* bpDock = new QDockWidget(tr("Breakpoints"), this);
     bpDock->setObjectName("breakpointsDock");
@@ -218,6 +225,16 @@ void DbgWindow::createDocks()
     m_viewMenu->addAction(devicesDock->toggleViewAction());
 
     memDock->raise();
+}
+
+
+// In the last active dump if it's open, else in the first one
+void DbgWindow::showInMemory(uint16_t addr)
+{
+    int i = m_memDocks[m_activeMem]->toggleViewAction()->isChecked() ? m_activeMem : 0;
+    m_memDocks[i]->show();
+    m_memDocks[i]->raise();
+    m_memPanels[i]->showAddress(addr);
 }
 
 

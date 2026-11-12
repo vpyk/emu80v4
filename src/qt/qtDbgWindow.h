@@ -98,7 +98,10 @@ private:
     QAction* m_gotoAddrAction;
     DbgCodeView* m_codeView;
     DbgRegsView* m_regsView;
-    DbgMemPanel* m_memPanel;
+    // the dumps; "show in memory" uses the last active one
+    DbgMemPanel* m_memPanels[2];
+    QDockWidget* m_memDocks[2];
+    int m_activeMem = 0;
     DbgStackView* m_stackView;
     DbgBreakpointsPanel* m_bpPanel;
     QMenu* m_viewMenu;
@@ -131,6 +134,7 @@ private:
     void updateShortcuts();
     void checkState(bool forceRefresh);
     void updateRunState();
+    void showInMemory(uint16_t addr);
     uint64_t cpuTicks();
     void updateTicks(bool newStop);
     void activateEmuWindow();

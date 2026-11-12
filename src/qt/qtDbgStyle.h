@@ -60,8 +60,8 @@ struct DbgColors {
     QColor stalePcBackground;
     QColor pcMarker;            // PC arrow
     QColor cursorBackground;    // the cursor line in a focused panel
-    QColor cursorFrame;
-    QColor cursorFrameUnfocused;
+    QColor cursorFrame;         // the cursor frame, focused or not (no background then)
+    QColor staleCursorFrame;    // the cursor frame while running
     QColor changedText;         // values changed since the previous stop
     QColor breakpoint;          // breakpoint of the UI
     QColor externalBreakpoint;  // breakpoint of an external client (MCP)

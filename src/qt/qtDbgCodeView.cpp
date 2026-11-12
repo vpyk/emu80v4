@@ -375,7 +375,7 @@ void DbgCodeView::paintEvent(QPaintEvent*)
         else if (line.addr == m_cursorAddr && hasFocus() && !stale)
             painter.fillRect(addrX, y, width - addrX, m_lineHeight, colors.cursorBackground);
         if (line.addr == m_cursorAddr) {
-            painter.setPen(QPen(hasFocus() && !stale ? colors.cursorFrame : colors.cursorFrameUnfocused, 1));
+            painter.setPen(QPen(stale ? colors.staleCursorFrame : colors.cursorFrame, 1));
             painter.setBrush(Qt::NoBrush);
             painter.drawRect(QRectF(addrX + 0.5, y + 0.5, width - addrX - 1, m_lineHeight - 1));
         }

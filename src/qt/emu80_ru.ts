@@ -300,8 +300,8 @@
     </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>
-        <source>Memory</source>
-        <translation>Память</translation>
+        <source>Memory %1</source>
+        <translation>Память %1</translation>
     </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>

@@ -52,6 +52,9 @@ public:
     // 16 bytes per line, 12 lines
     QSize sizeHint() const override;
 
+signals:
+    void focused();
+
 public slots:
     void onStateChanged(bool newStop);
     void onRunStateChanged(bool running);
@@ -63,6 +66,7 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
     void scrollContentsBy(int dx, int dy) override;
     void changeEvent(QEvent* event) override;
+    void focusInEvent(QFocusEvent* event) override;
 
 private:
     DebugSession* m_session;
@@ -119,6 +123,7 @@ public:
 
 signals:
     void showInCode(uint16_t addr);
+    void activated(); // the dump got the focus
 
 public slots:
     void onStateChanged(bool newStop);
