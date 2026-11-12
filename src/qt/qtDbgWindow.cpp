@@ -19,6 +19,7 @@
 #include <QAction>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QSettings>
 #include <QCloseEvent>
 #include <QDockWidget>
 #include <QLabel>
@@ -44,6 +45,14 @@
 #include "../DebugSession.h"
 #include "../DebugTarget.h"
 #include "../Cpu.h"
+
+
+namespace {
+
+// Increased when the set of docks changes: an older saved layout is not restored then
+const int c_layoutVersion = 1;
+
+} // namespace
 
 
 DbgWindow::DbgWindow(Platform* platform)
@@ -74,11 +83,54 @@ DbgWindow::DbgWindow(Platform* platform)
     statusBar()->addPermanentWidget(m_ticksLabel);
     m_ticksBase = cpuTicks();
 
+    m_defaultState = saveState(c_layoutVersion);
+    m_defaultSize = QMainWindow::size();
+    restoreLayout();
+
     m_pollTimer = new QTimer(this);
     m_pollTimer->setInterval(100);
     connect(m_pollTimer, &QTimer::timeout, this, &DbgWindow::onPoll);
 
     checkState(true);
+}
+
+
+DbgWindow::~DbgWindow()
+{
+    if (isVisible())
+        saveLayout();
+}
+
+
+// The window geometry and docks, common for all platforms
+void DbgWindow::saveLayout()
+{
+    QSettings settings;
+    settings.beginGroup("debugger");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("state", saveState(c_layoutVersion));
+    settings.endGroup();
+}
+
+
+void DbgWindow::restoreLayout()
+{
+    QSettings settings;
+    settings.beginGroup("debugger");
+    QByteArray geometry = settings.value("geometry").toByteArray();
+    if (!geometry.isEmpty())
+        restoreGeometry(geometry);
+    QByteArray state = settings.value("state").toByteArray();
+    if (!state.isEmpty())
+        restoreState(state, c_layoutVersion);
+    settings.endGroup();
+}
+
+
+void DbgWindow::onResetLayout()
+{
+    restoreState(m_defaultState, c_layoutVersion);
+    resize(m_defaultSize);
 }
 
 
@@ -225,6 +277,9 @@ void DbgWindow::createDocks()
     m_viewMenu->addAction(devicesDock->toggleViewAction());
 
     memDock->raise();
+
+    m_viewMenu->addSeparator();
+    m_viewMenu->addAction(tr("Reset layout"), this, &DbgWindow::onResetLayout);
 }
 
 
@@ -491,6 +546,7 @@ void DbgWindow::showEvent(QShowEvent* event)
 void DbgWindow::hideEvent(QHideEvent* event)
 {
     m_pollTimer->stop();
+    saveLayout(); // with the floating docks still shown
     for (QDockWidget* dock : findChildren<QDockWidget*>())
         if (dock->isFloating() && dock->isVisible()) {
             dock->hide();

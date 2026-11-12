@@ -285,6 +285,11 @@
     <name>DbgWindow</name>
     <message>
         <location filename="qtDbgWindow.cpp"/>
+        <source>Reset layout</source>
+        <translation>Сбросить раскладку</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
         <source>Devices</source>
         <translation>Устройства</translation>
     </message>

@@ -53,6 +53,7 @@ class DbgWindow : public QMainWindow
 
 public:
     DbgWindow(Platform* platform);
+    ~DbgWindow();
 
     void showStop();    // a stop of the UI: show, refresh and activate the window
     void refreshStop(); // a stop of another client or a platform change: refresh if shown
@@ -80,6 +81,7 @@ private slots:
     void onSkip();
     void onPoll();
     void onResetTicks();
+    void onResetLayout();
 
 private:
     Platform* m_platform;
@@ -117,6 +119,10 @@ private:
     unsigned m_bpChangeCount = 0;
     bool m_swapF5F9 = false;
 
+    // the layout before restoring the saved one, for "Reset layout"
+    QByteArray m_defaultState;
+    QSize m_defaultSize;
+
     // CPU ticks: at the previous stop, at the counter reset, of the last run
     uint64_t m_prevStopTicks = 0;
     uint64_t m_ticksBase = 0;
@@ -135,6 +141,8 @@ private:
     void checkState(bool forceRefresh);
     void updateRunState();
     void showInMemory(uint16_t addr);
+    void saveLayout();
+    void restoreLayout();
     uint64_t cpuTicks();
     void updateTicks(bool newStop);
     void activateEmuWindow();
