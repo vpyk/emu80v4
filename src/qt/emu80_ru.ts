@@ -236,7 +236,50 @@
     </message>
 </context>
 <context>
+    <name>DbgStackView</name>
+    <message>
+        <location filename="qtDbgStackView.cpp"/>
+        <source>Show value in code</source>
+        <translation>Значение — в коде</translation>
+    </message>
+    <message>
+        <location filename="qtDbgStackView.cpp"/>
+        <source>Show value in memory</source>
+        <translation>Значение — в памяти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgStackView.cpp"/>
+        <source>Show stack item in memory</source>
+        <translation>Ячейка стека — в памяти</translation>
+    </message>
+</context>
+<context>
     <name>DbgWindow</name>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Stack</source>
+        <translation>Стек</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Reset tick counter</source>
+        <translation>Сбросить счетчик тактов</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Ticks: +%1, total: %2</source>
+        <translation>Такты: +%1, всего: %2</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Ticks: total %1</source>
+        <translation>Такты: всего %1</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>CPU ticks of the last run (since the previous stop) and since the counter reset</source>
+        <translation>Такты процессора за последний запуск (с предыдущей остановки) и с момента сброса счетчика</translation>
+    </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>
         <source>Breakpoints</source>

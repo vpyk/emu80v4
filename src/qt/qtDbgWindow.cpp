@@ -32,6 +32,7 @@
 #include "qtDbgRegsView.h"
 #include "qtDbgMemView.h"
 #include "qtDbgBreakpoints.h"
+#include "qtDbgStackView.h"
 #include "qtDbgStyle.h"
 #include "qtMainWindow.h"
 
@@ -40,6 +41,8 @@
 #include "../EmuWindow.h"
 #include "../Platform.h"
 #include "../DebugSession.h"
+#include "../DebugTarget.h"
+#include "../Cpu.h"
 
 
 DbgWindow::DbgWindow(Platform* platform)
@@ -65,6 +68,10 @@ DbgWindow::DbgWindow(Platform* platform)
 
     m_statusLabel = new QLabel(this);
     statusBar()->addWidget(m_statusLabel, 1);
+    m_ticksLabel = new QLabel(this);
+    m_ticksLabel->setToolTip(tr("CPU ticks of the last run (since the previous stop) and since the counter reset"));
+    statusBar()->addPermanentWidget(m_ticksLabel);
+    m_ticksBase = cpuTicks();
 
     m_pollTimer = new QTimer(this);
     m_pollTimer->setInterval(100);
@@ -106,6 +113,8 @@ void DbgWindow::createActions()
     m_stepOutAction = createAction(tr("Step out"), tr("Out", "tool bar"), DI_STEP_OUT, &DbgWindow::onStepOut, debugMenu, toolBar);
     m_runToCursorAction = createAction(tr("Run to cursor"), tr("To cursor", "tool bar"), DI_RUN_TO_CURSOR, &DbgWindow::onRunToCursor, debugMenu, toolBar);
     m_skipAction = createAction(tr("Skip instruction"), tr("Skip", "tool bar"), DI_SKIP, &DbgWindow::onSkip, debugMenu, toolBar);
+    debugMenu->addSeparator();
+    m_resetTicksAction = debugMenu->addAction(tr("Reset tick counter"), this, &DbgWindow::onResetTicks);
 
     // Code view actions, also in its context menu
     QMenu* codeMenu = menuBar()->addMenu(tr("Code"));
@@ -146,6 +155,20 @@ void DbgWindow::createDocks()
     addDockWidget(Qt::RightDockWidgetArea, regsDock);
     m_viewMenu->addAction(regsDock->toggleViewAction());
 
+    m_stackView = new DbgStackView(m_session, this);
+    connect(this, &DbgWindow::stateChanged, m_stackView, &DbgStackView::onStateChanged);
+    connect(this, &DbgWindow::runStateChanged, m_stackView, &DbgStackView::onRunStateChanged);
+    connect(m_stackView, &DbgStackView::showInCode, this, [this](uint16_t addr) {
+        m_codeView->showAddress(addr);
+        m_codeView->setFocus();
+    });
+
+    QDockWidget* stackDock = new QDockWidget(tr("Stack"), this);
+    stackDock->setObjectName("stackDock");
+    stackDock->setWidget(m_stackView);
+    addDockWidget(Qt::RightDockWidgetArea, stackDock); // under the registers
+    m_viewMenu->addAction(stackDock->toggleViewAction());
+
     m_memPanel = new DbgMemPanel(m_session, this);
     connect(this, &DbgWindow::stateChanged, m_memPanel, &DbgMemPanel::onStateChanged);
     connect(this, &DbgWindow::runStateChanged, m_memPanel, &DbgMemPanel::onRunStateChanged);
@@ -168,10 +191,12 @@ void DbgWindow::createDocks()
         m_codeView->showAddress(addr);
         m_codeView->setFocus();
     });
-    connect(m_bpPanel, &DbgBreakpointsPanel::showInMemory, this, [this, memDock](uint16_t addr) {
+    auto showInMemory = [this, memDock](uint16_t addr) {
         memDock->raise();
         m_memPanel->showAddress(addr);
-    });
+    };
+    connect(m_bpPanel, &DbgBreakpointsPanel::showInMemory, this, showInMemory);
+    connect(m_stackView, &DbgStackView::showInMemory, this, showInMemory);
 
     QDockWidget* bpDock = new QDockWidget(tr("Breakpoints"), this);
     bpDock->setObjectName("breakpointsDock");
@@ -245,8 +270,10 @@ void DbgWindow::checkState(bool forceRefresh)
         m_stopCount = stopCount;
         m_modifyCount = modifyCount;
         updateRunState();
-        if (!running)
+        if (!running) {
+            updateTicks(newStop);
             emit stateChanged(newStop);
+        }
     } else if (modifyCount != m_modifyCount) {
         m_modifyCount = modifyCount;
         if (!running)
@@ -274,6 +301,37 @@ void DbgWindow::updateRunState()
         m_statusLabel->setText(stopText());
 
     emit runStateChanged(m_running);
+}
+
+
+uint64_t DbgWindow::cpuTicks()
+{
+    Cpu* cpu = m_session->getTarget()->getCpu();
+    return cpu->getClock() / cpu->getKDiv();
+}
+
+
+// Ticks of the last run are known from the second stop seen by the window
+void DbgWindow::updateTicks(bool newStop)
+{
+    uint64_t ticks = cpuTicks();
+    if (newStop && m_ticksStarted) {
+        m_lastRunTicks = ticks - m_prevStopTicks;
+        m_hasLastRunTicks = true;
+    }
+    m_prevStopTicks = ticks;
+    m_ticksStarted = true;
+    if (m_hasLastRunTicks)
+        m_ticksLabel->setText(tr("Ticks: +%1, total: %2").arg(m_lastRunTicks).arg(ticks - m_ticksBase));
+    else
+        m_ticksLabel->setText(tr("Ticks: total %1").arg(ticks - m_ticksBase));
+}
+
+
+void DbgWindow::onResetTicks()
+{
+    m_ticksBase = cpuTicks();
+    updateTicks(false);
 }
 
 

@@ -301,7 +301,8 @@ isEmpty(NO_QT_DEBUGGER) {
         qt/qtDbgIcons.cpp \
         qt/qtDbgRegsView.cpp \
         qt/qtDbgMemView.cpp \
-        qt/qtDbgBreakpoints.cpp
+        qt/qtDbgBreakpoints.cpp \
+        qt/qtDbgStackView.cpp
     HEADERS += \
         qt/qtDbgCompat.h \
         qt/qtDebugger.h \
@@ -311,7 +312,8 @@ isEmpty(NO_QT_DEBUGGER) {
         qt/qtDbgIcons.h \
         qt/qtDbgRegsView.h \
         qt/qtDbgMemView.h \
-        qt/qtDbgBreakpoints.h
+        qt/qtDbgBreakpoints.h \
+        qt/qtDbgStackView.h
     RESOURCES += qt/dbgfont.qrc
 }
 

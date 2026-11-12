@@ -19,6 +19,7 @@
 #ifndef QTDBGWINDOW_H
 #define QTDBGWINDOW_H
 
+#include <cstdint>
 #include <vector>
 
 #include <QMainWindow>
@@ -36,6 +37,7 @@ class DebugSession;
 class DbgCodeView;
 class DbgRegsView;
 class DbgMemPanel;
+class DbgStackView;
 class DbgBreakpointsPanel;
 
 
@@ -77,6 +79,7 @@ private slots:
     void onRunToCursor();
     void onSkip();
     void onPoll();
+    void onResetTicks();
 
 private:
     Platform* m_platform;
@@ -96,9 +99,12 @@ private:
     DbgCodeView* m_codeView;
     DbgRegsView* m_regsView;
     DbgMemPanel* m_memPanel;
+    DbgStackView* m_stackView;
     DbgBreakpointsPanel* m_bpPanel;
     QMenu* m_viewMenu;
     QLabel* m_statusLabel;
+    QLabel* m_ticksLabel;
+    QAction* m_resetTicksAction;
     QTimer* m_pollTimer;
 
     // the state shown
@@ -107,6 +113,13 @@ private:
     unsigned m_modifyCount = 0;
     unsigned m_bpChangeCount = 0;
     bool m_swapF5F9 = false;
+
+    // CPU ticks: at the previous stop, at the counter reset, of the last run
+    uint64_t m_prevStopTicks = 0;
+    uint64_t m_ticksBase = 0;
+    uint64_t m_lastRunTicks = 0;
+    bool m_hasLastRunTicks = false;
+    bool m_ticksStarted = false;
 
     // floating docks hidden with the window, to be shown with it again
     std::vector<QDockWidget*> m_hiddenFloatingDocks;
@@ -118,6 +131,8 @@ private:
     void updateShortcuts();
     void checkState(bool forceRefresh);
     void updateRunState();
+    uint64_t cpuTicks();
+    void updateTicks(bool newStop);
     void activateEmuWindow();
     QString stopText();
 };

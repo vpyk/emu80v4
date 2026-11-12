@@ -95,6 +95,11 @@ public:
     virtual void setPC(uint16_t value) = 0;
     virtual uint16_t getSP() = 0;
 
+    // Stack view: the address of the top stack item and the item size in bytes
+    // (a CPU with an empty descending stack, like 6502, has its top item above SP)
+    virtual uint16_t getStackTop() {return getSP();}
+    virtual int getStackItemSize() {return 2;}
+
     // CPU address space
     uint8_t readMem(uint16_t addr);
     void writeMem(uint16_t addr, uint8_t value);
