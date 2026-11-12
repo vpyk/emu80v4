@@ -88,6 +88,7 @@ private:
     void updateFontMetrics();
     int visibleLines() const;
     int maxItem() const;
+    int lastFirstItem() const;
     uint16_t itemAddr(int item) const;
     unsigned readItem(int item);
     unsigned cursorValue();

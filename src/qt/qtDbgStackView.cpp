@@ -103,6 +103,13 @@ int DbgStackView::maxItem() const
 }
 
 
+// The top item can be in the first line also if the stack is shorter than the view
+int DbgStackView::lastFirstItem() const
+{
+    return std::max(0, maxItem() - visibleLines() + 1);
+}
+
+
 uint16_t DbgStackView::itemAddr(int item) const
 {
     return uint16_t(m_top + item * m_itemSize);
@@ -144,7 +151,7 @@ void DbgStackView::syncScrollBar()
 {
     QScrollBar* bar = verticalScrollBar();
     QSignalBlocker blocker(bar);
-    bar->setRange(-c_itemsAbove, std::max(-c_itemsAbove, maxItem() - visibleLines() + 1));
+    bar->setRange(-c_itemsAbove, lastFirstItem());
     bar->setPageStep(visibleLines());
     bar->setValue(m_firstItem);
 }
@@ -152,8 +159,7 @@ void DbgStackView::syncScrollBar()
 
 void DbgStackView::setFirstItem(int item)
 {
-    int last = std::max(-c_itemsAbove, maxItem() - visibleLines() + 1);
-    m_firstItem = std::min(std::max(item, -c_itemsAbove), last);
+    m_firstItem = std::min(std::max(item, -c_itemsAbove), lastFirstItem());
     readData();
     syncScrollBar();
     viewport()->update();
