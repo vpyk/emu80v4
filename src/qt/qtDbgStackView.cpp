@@ -284,6 +284,22 @@ void DbgStackView::resizeEvent(QResizeEvent* event)
 }
 
 
+// The cursor background shows the focused view: the viewport is repainted on focus
+// changes (the scroll area itself updates only its frame)
+void DbgStackView::focusInEvent(QFocusEvent* event)
+{
+    QAbstractScrollArea::focusInEvent(event);
+    viewport()->update();
+}
+
+
+void DbgStackView::focusOutEvent(QFocusEvent* event)
+{
+    QAbstractScrollArea::focusOutEvent(event);
+    viewport()->update();
+}
+
+
 void DbgStackView::changeEvent(QEvent* event)
 {
     if (event->type() == QEvent::FontChange) {

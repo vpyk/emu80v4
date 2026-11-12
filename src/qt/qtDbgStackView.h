@@ -59,6 +59,8 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;
     void scrollContentsBy(int dx, int dy) override;
     void changeEvent(QEvent* event) override;
+    void focusInEvent(QFocusEvent* event) override;
+    void focusOutEvent(QFocusEvent* event) override;
 
 private:
     DebugSession* m_session;

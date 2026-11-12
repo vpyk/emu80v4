@@ -409,10 +409,20 @@ bool DbgMemView::focusNextPrevChild(bool next)
 }
 
 
+// The cursor background shows the focused view: the viewport is repainted on focus
+// changes (the scroll area itself updates only its frame)
 void DbgMemView::focusInEvent(QFocusEvent* event)
 {
     QAbstractScrollArea::focusInEvent(event);
+    viewport()->update();
     emit focused();
+}
+
+
+void DbgMemView::focusOutEvent(QFocusEvent* event)
+{
+    QAbstractScrollArea::focusOutEvent(event);
+    viewport()->update();
 }
 
 

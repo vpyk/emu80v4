@@ -62,6 +62,8 @@ protected:
     void wheelEvent(QWheelEvent* event) override;
     void scrollContentsBy(int dx, int dy) override;
     void changeEvent(QEvent* event) override;
+    void focusInEvent(QFocusEvent* event) override;
+    void focusOutEvent(QFocusEvent* event) override;
     void showEvent(QShowEvent* event) override;
 
 private:

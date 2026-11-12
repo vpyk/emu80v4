@@ -443,6 +443,22 @@ void DbgCodeView::showEvent(QShowEvent* event)
 }
 
 
+// The cursor background shows the focused view: the viewport is repainted on focus
+// changes (the scroll area itself updates only its frame)
+void DbgCodeView::focusInEvent(QFocusEvent* event)
+{
+    QAbstractScrollArea::focusInEvent(event);
+    viewport()->update();
+}
+
+
+void DbgCodeView::focusOutEvent(QFocusEvent* event)
+{
+    QAbstractScrollArea::focusOutEvent(event);
+    viewport()->update();
+}
+
+
 void DbgCodeView::changeEvent(QEvent* event)
 {
     if (event->type() == QEvent::FontChange) {
