@@ -1860,12 +1860,11 @@ namespace
             Platform* p = GetPlatform();
             if (!p) { err = "no platform created"; return; }
 
+            DebugSession* session = p->getDebugSession();
+            if (!session) { err = "CPU is not available"; return; }
             json items = json::array();
-            for (EmuObject* obj : p->getObjects()) {
-                std::string info = obj->getDebugInfo();
-                if (!info.empty())
-                    items.push_back({ { "object", obj->getName() }, { "info", info } });
-            }
+            for (const DebugDeviceInfo& dev : session->getDevicesInfo())
+                items.push_back({ { "object", dev.name }, { "info", dev.info } });
             result["devices"] = items;
         });
 

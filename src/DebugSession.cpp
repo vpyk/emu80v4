@@ -295,6 +295,18 @@ const std::vector<DebugMemory>& DebugSession::getMemories()
 }
 
 
+std::vector<DebugDeviceInfo> DebugSession::getDevicesInfo()
+{
+    std::vector<DebugDeviceInfo> res;
+    for (EmuObject* obj : m_platform->getObjects()) {
+        std::string info = obj->getDebugInfo();
+        if (!info.empty())
+            res.push_back({obj->getName(), info});
+    }
+    return res;
+}
+
+
 int DebugSession::findMemory(const std::string& name)
 {
     const std::vector<DebugMemory>& memories = getMemories();

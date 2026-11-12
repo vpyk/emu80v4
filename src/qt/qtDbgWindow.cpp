@@ -33,6 +33,7 @@
 #include "qtDbgMemView.h"
 #include "qtDbgBreakpoints.h"
 #include "qtDbgStackView.h"
+#include "qtDbgDevicesView.h"
 #include "qtDbgStyle.h"
 #include "qtMainWindow.h"
 
@@ -203,8 +204,20 @@ void DbgWindow::createDocks()
     bpDock->setWidget(m_bpPanel);
     addDockWidget(Qt::BottomDockWidgetArea, bpDock);
     tabifyDockWidget(memDock, bpDock);
-    memDock->raise();
     m_viewMenu->addAction(bpDock->toggleViewAction());
+
+    DbgDevicesView* devicesView = new DbgDevicesView(m_session, this);
+    connect(this, &DbgWindow::stateChanged, devicesView, &DbgDevicesView::onStateChanged);
+    connect(this, &DbgWindow::runStateChanged, devicesView, &DbgDevicesView::onRunStateChanged);
+
+    QDockWidget* devicesDock = new QDockWidget(tr("Devices"), this);
+    devicesDock->setObjectName("devicesDock");
+    devicesDock->setWidget(devicesView);
+    addDockWidget(Qt::BottomDockWidgetArea, devicesDock);
+    tabifyDockWidget(bpDock, devicesDock);
+    m_viewMenu->addAction(devicesDock->toggleViewAction());
+
+    memDock->raise();
 }
 
 

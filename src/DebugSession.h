@@ -38,6 +38,13 @@ struct DebugMemory {
 };
 
 
+// Debug information of a platform object (its getDebugInfo())
+struct DebugDeviceInfo {
+    std::string name;
+    std::string info;
+};
+
+
 // Why the emulation has stopped in the debugger
 enum DebugStopReason {
     DSR_NONE,       // not stopped yet, or the reason is unknown
@@ -137,6 +144,9 @@ public:
     int findMemory(const std::string& name); // -1 if not found
     uint8_t readMem(int memory, unsigned addr);
     void writeMem(int memory, unsigned addr, uint8_t value);
+
+    // Debug information of the platform objects that have it, in the object order
+    std::vector<DebugDeviceInfo> getDevicesInfo();
 
     // Run-for timer
     void cleanupTimer();

@@ -236,6 +236,14 @@
     </message>
 </context>
 <context>
+    <name>DbgDevicesView</name>
+    <message>
+        <location filename="qtDbgDevicesView.cpp"/>
+        <source>No device information</source>
+        <translation>Нет информации об устройствах</translation>
+    </message>
+</context>
+<context>
     <name>DbgStackView</name>
     <message>
         <location filename="qtDbgStackView.cpp"/>
@@ -255,6 +263,11 @@
 </context>
 <context>
     <name>DbgWindow</name>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Devices</source>
+        <translation>Устройства</translation>
+    </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>
         <source>Stack</source>
