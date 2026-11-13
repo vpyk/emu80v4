@@ -457,7 +457,8 @@ bool RkSdController::cmdFind()
 
 bool RkSdController::cmdOpen()
 {
-    if (m_inBufferPos < 4 || m_inBuffer[m_inBufferPos - 1] != 0)
+    // cmd, mode, then a zero-terminated name; the name may be empty (O_SWAP is sent with "")
+    if (m_inBufferPos < 3 || m_inBuffer[m_inBufferPos - 1] != 0)
         return false;
 
     uint8_t mode = m_inBuffer[1];
