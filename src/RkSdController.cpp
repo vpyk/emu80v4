@@ -326,7 +326,8 @@ bool RkSdController::cmdVer()
 
 bool RkSdController::cmdExec()
 {
-    if (m_inBufferPos < 3 || m_inBuffer[m_inBufferPos - 1] != 0)
+    // cmd, then a zero-terminated name; an empty name is accepted and fails with ERR_NO_PATH
+    if (m_inBufferPos < 2 || m_inBuffer[m_inBufferPos - 1] != 0)
         return false;
 
     int pos = 0;
@@ -505,8 +506,9 @@ bool RkSdController::cmdOpen()
             createErrorAnswer(ERR_DISK_ERR);
             return false;
         }
-        string fileName = palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 2));
-        bool res = PalFile::del(fileName);
+        // an empty name would resolve to the SD root directory itself
+        bool res = m_inBuffer[2] != 0 &&
+                   PalFile::del(palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer + 2)));
         createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH); }
         break;
     case O_SWAP: {
@@ -696,14 +698,19 @@ bool RkSdController::cmdMove()
     if (m_subStage == 0) {
         m_multiStageCmdPending = true;
 
-        if (m_inBufferPos < 3 || m_inBuffer[m_inBufferPos - 1] != 0)
+        // cmd, then a zero-terminated source name (may be empty)
+        if (m_inBufferPos < 2 || m_inBuffer[m_inBufferPos - 1] != 0)
             return false;
         m_srcDir = (char*)(m_inBuffer + 1);
         createErrorAnswer(ERR_OK_WRITE);
     } else {
-        if (m_inBufferPos < 2 || m_inBuffer[m_inBufferPos - 1] != 0)
+        // a zero-terminated destination name (may be empty); m_inBufferPos is 0
+        // when the spec model calls cmd() on the CS_PREPARE strobe
+        if (m_inBufferPos < 1 || m_inBuffer[m_inBufferPos - 1] != 0)
             return false;
-        bool res = PalFile::moveRename(palMakeCaseInsensitivePath(m_sdDir, m_srcDir), palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer)));
+        // an empty name would resolve to the SD root directory itself
+        bool res = !m_srcDir.empty() && m_inBuffer[0] != 0 &&
+                   PalFile::moveRename(palMakeCaseInsensitivePath(m_sdDir, m_srcDir), palMakeCaseInsensitivePath(m_sdDir, (char*)(m_inBuffer)));
         m_multiStageCmdPending = false;
         createErrorAnswer(res ? ERR_OK_CMD : ERR_NO_PATH);
     }
