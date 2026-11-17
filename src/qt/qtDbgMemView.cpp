@@ -152,9 +152,22 @@ int DbgMemView::charsX()
 }
 
 
+void DbgMemView::setCodePage(int codePage)
+{
+    m_codePage = codePage;
+    viewport()->update();
+}
+
+
+int DbgMemView::getCodePage()
+{
+    return m_codePage >= 0 ? m_codePage : m_session->getPlatform()->getCodePage();
+}
+
+
 QChar DbgMemView::byteChar(uint8_t value)
 {
-    CodePage cp = m_session->getPlatform()->getCodePage();
+    int cp = getCodePage();
     if (cp == CP_RK) {
         // the characters of the RK-86 font, including the graphics below 20h;
         // codes without a character are shown as dots
@@ -621,9 +634,25 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     m_searchEdit->setPlaceholderText(tr("Find"));
     m_searchEdit->setToolTip(tr("Hex bytes (C3 00 F8) or text in quotes (\"TEXT\"); "
                                 "Enter, F3 - find next, Shift-F3 - find previous"));
-    m_searchEdit->setFixedWidth(DbgMetrics(dbgFont()).charWidth * 24 + 6);
+    // shrinks in a narrow panel
+    m_searchEdit->setMinimumWidth(DbgMetrics(dbgFont()).charWidth * 8 + 6);
+    m_searchEdit->setMaximumWidth(DbgMetrics(dbgFont()).charWidth * 24 + 6);
 
     m_view = new DbgMemView(session, this);
+
+    // in the order of CodePage; not saved, the default is the emulator settings
+    m_codePageCombo = new QComboBox(this);
+    m_codePageCombo->addItems({tr("RK-86"), tr("KOI-8"), "ASCII"});
+    m_codePageCombo->setToolTip(tr("Code page of the characters"));
+    // a margin: some styles clip the text of a combo box of the size hint width
+    m_codePageCombo->setMinimumWidth(m_codePageCombo->sizeHint().width() +
+                                     m_codePageCombo->fontMetrics().averageCharWidth() * 2);
+    updateCodePage();
+    // Tab: the fields in the order shown, then the dump (created before the combo box)
+    setTabOrder(m_searchEdit, m_codePageCombo);
+    setTabOrder(m_codePageCombo, m_view);
+    connect(m_codePageCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+            this, &DbgMemPanel::onCodePageChanged);
     connect(m_view, &DbgMemView::focused, this, &DbgMemPanel::activated);
     connect(m_view, &DbgMemView::gotoAddressRequested, this, &DbgMemPanel::onGotoAddress);
 
@@ -636,7 +665,9 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     topLayout->addWidget(new QLabel(tr("Address:"), this));
     topLayout->addWidget(m_addrEdit);
     topLayout->addSpacing(DbgMetrics(dbgFont()).charWidth * 2);
-    topLayout->addWidget(m_searchEdit);
+    topLayout->addWidget(m_searchEdit, 1);
+    topLayout->addSpacing(DbgMetrics(dbgFont()).charWidth * 2);
+    topLayout->addWidget(m_codePageCombo);
     topLayout->addStretch(1);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -819,6 +850,24 @@ void DbgMemPanel::onStateChanged(bool newStop)
 {
     m_view->onStateChanged(newStop);
     updateActions();
+    updateCodePage();
+}
+
+
+void DbgMemPanel::onCodePageChanged(int index)
+{
+    m_codePageChosen = true;
+    m_view->setCodePage(index);
+}
+
+
+// Until a code page is chosen in the panel, the combo box follows the settings
+void DbgMemPanel::updateCodePage()
+{
+    if (!m_codePageChosen) {
+        QSignalBlocker blocker(m_codePageCombo);
+        m_codePageCombo->setCurrentIndex(m_view->getCodePage());
+    }
 }
 
 

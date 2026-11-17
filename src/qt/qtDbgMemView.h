@@ -53,6 +53,10 @@ public:
     int getMemory() {return m_memory;}
     unsigned getCursorAddr() {return m_cursorAddr;}
     int getAddrDigits() {return m_addrDigits;}
+    // The code page of the characters: one of CodePage, or -1 for the platform's
+    // (the emulator settings), which is the default
+    void setCodePage(int codePage);
+    int getCodePage();
     void gotoAddr(unsigned addr);
     unsigned getSize() {return m_size;}
 
@@ -91,6 +95,7 @@ protected:
 private:
     DebugSession* m_session;
     int m_memory = 0;
+    int m_codePage = -1;        // CodePage, -1: the platform's
     unsigned m_size = 0x10000;
     int m_addrDigits = 4;
     int m_bytesPerLine = 16;
@@ -156,10 +161,13 @@ private slots:
     void onBreakpoint(int type);
     void onFind(bool forward);
     void onGotoAddress();
+    void onCodePageChanged(int index);
 
 private:
     DebugSession* m_session;
     QComboBox* m_memoryCombo;
+    QComboBox* m_codePageCombo;
+    bool m_codePageChosen = false; // in the panel, else the platform's code page is shown
     QLineEdit* m_addrEdit;
     QLineEdit* m_searchEdit;
     DbgMemView* m_view;
@@ -169,6 +177,7 @@ private:
     QAction* m_showInCodeAction;
 
     void updateActions();
+    void updateCodePage();
     bool eventFilter(QObject* obj, QEvent* event) override;
     // hex bytes ("C3 00 F8", "C300F8") or text in quotes ("TEXT" or "TEXT)
     bool parsePattern(const QString& text, std::vector<uint8_t>& bytes);

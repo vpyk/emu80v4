@@ -324,6 +324,21 @@
     <name>DbgMemPanel</name>
     <message>
         <location filename="qtDbgMemView.cpp"/>
+        <source>RK-86</source>
+        <translation>РК86</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>KOI-8</source>
+        <translation>КОИ-8</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
+        <source>Code page of the characters</source>
+        <translation>Таблица символов</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemView.cpp"/>
         <source>Find</source>
         <translation>Найти</translation>
     </message>
