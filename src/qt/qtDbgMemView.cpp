@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include <QAction>
 #include <QComboBox>
 #include <QContextMenuEvent>
@@ -583,9 +585,23 @@ void DbgMemView::scrollContentsBy(int, int)
 DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     : QWidget(parent), m_session(session)
 {
+    // Object names of the same platform ("rk86.ram"): the part after the last dot,
+    // unless two of them get the same name; the full name is in the tool tip
+    const std::vector<DebugMemory>& memories = m_session->getMemories();
+    std::vector<QString> names;
+    for (const DebugMemory& mem : memories) {
+        QString name = QString::fromUtf8(mem.name.c_str());
+        if (mem.device && mem.name == mem.device->getName())
+            name = name.mid(name.lastIndexOf('.') + 1);
+        names.push_back(name);
+    }
     m_memoryCombo = new QComboBox(this);
-    for (const DebugMemory& mem : m_session->getMemories())
-        m_memoryCombo->addItem(QString("%1 (%2)").arg(QString::fromUtf8(mem.name.c_str())).arg(hex(mem.size, 1)));
+    for (unsigned i = 0; i < memories.size(); i++) {
+        QString fullName = QString::fromUtf8(memories[i].name.c_str());
+        QString name = std::count(names.begin(), names.end(), names[i]) > 1 ? fullName : names[i];
+        m_memoryCombo->addItem(QString("%1 (%2)").arg(name).arg(hex(memories[i].size, 1)));
+        m_memoryCombo->setItemData(int(i), fullName, Qt::ToolTipRole);
+    }
 
     m_addrEdit = new QLineEdit(this);
     m_addrEdit->setFont(dbgFont());
