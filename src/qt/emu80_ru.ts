@@ -203,6 +203,124 @@
     </message>
 </context>
 <context>
+    <name>DbgMemFileDialog</name>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>%1 bytes to %2-%3</source>
+        <translation>%1 байт в %2-%3</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>%1 bytes</source>
+        <translation>%1 байт</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>%1 of %2 bytes read back differ from the file: the memory may be read-only</source>
+        <translation>После записи %1 из %2 байт отличаются от файла: возможно, память доступна только для чтения</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Address (hex):</source>
+        <translation>Адрес (hex):</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Addresses (hex):</source>
+        <translation>Адреса (hex):</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Binary files (*.bin);;All files (*)</source>
+        <translation>Двоичные файлы (*.bin);;Все файлы (*)</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Can&apos;t read the file %1</source>
+        <translation>Не удалось прочитать файл %1</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Can&apos;t write the file %1</source>
+        <translation>Не удалось записать файл %1</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Choose a file</source>
+        <translation>Выбрать файл</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>File:</source>
+        <translation>Файл:</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Load memory</source>
+        <translation>Загрузка памяти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Load</source>
+        <translation>Загрузить</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Memory:</source>
+        <translation>Память:</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Save memory</source>
+        <translation>Сохранение памяти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>The address must be from %1 to %2</source>
+        <translation>Адрес должен быть от %1 до %2</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>The end address is less than the start one</source>
+        <translation>Конечный адрес меньше начального</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>The file %1 exists. Overwrite it?</source>
+        <translation>Файл %1 существует. Перезаписать?</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>The file (%1 bytes) doesn&apos;t fit in memory from this address</source>
+        <translation>Файл (%1 байт) не помещается в память с этого адреса</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>The file is empty</source>
+        <translation>Файл пуст</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>The file is not found</source>
+        <translation>Файл не найден</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>Whole memory</source>
+        <translation>Вся память</translation>
+    </message>
+    <message>
+        <location filename="qtDbgMemFile.cpp"/>
+        <source>to</source>
+        <translation>до</translation>
+    </message>
+</context>
+<context>
     <name>DbgMemPanel</name>
     <message>
         <location filename="qtDbgMemView.cpp"/>
@@ -283,6 +401,16 @@
 </context>
 <context>
     <name>DbgWindow</name>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Save memory...</source>
+        <translation>Сохранить память...</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Load memory...</source>
+        <translation>Загрузить память...</translation>
+    </message>
     <message>
         <location filename="qtDbgWindow.cpp"/>
         <source>Go to panel</source>

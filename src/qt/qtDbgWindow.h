@@ -24,6 +24,8 @@
 
 #include <QMainWindow>
 
+#include "qtDbgMemFile.h"
+
 #include "qtDbgIcons.h"
 
 class QAction;
@@ -82,6 +84,8 @@ private slots:
     void onPoll();
     void onResetTicks();
     void onResetLayout();
+    void onSaveMemory();
+    void onLoadMemory();
 
 private:
     Platform* m_platform;
@@ -99,6 +103,10 @@ private:
     QAction* m_gotoPcAction;
     QAction* m_gotoAddrAction;
     QAction* m_showInMemoryAction;
+    QAction* m_saveMemAction;
+    QAction* m_loadMemAction;
+    DbgMemFileParams m_saveMemParams;
+    DbgMemFileParams m_loadMemParams;
     DbgCodeView* m_codeView;
     DbgRegsView* m_regsView;
     // the dumps; "show in memory" uses the last active one
@@ -150,6 +158,7 @@ private:
     void checkState(bool forceRefresh);
     void updateRunState();
     void showInMemory(uint16_t addr);
+    void memoryFileDialog(DbgMemFileDialog::Mode mode);
     void createPanelActions(QMenu* menu);
     int currentPanel();
     bool isPanelOpen(int index);

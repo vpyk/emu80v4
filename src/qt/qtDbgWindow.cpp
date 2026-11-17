@@ -171,6 +171,14 @@ void DbgWindow::createActions()
     m_skipAction = createAction(tr("Skip instruction"), tr("Skip", "tool bar"), DI_SKIP, &DbgWindow::onSkip, debugMenu, toolBar);
     debugMenu->addSeparator();
     m_resetTicksAction = debugMenu->addAction(tr("Reset tick counter"), this, &DbgWindow::onResetTicks);
+    debugMenu->addSeparator();
+    // F12 as in the classic debug window; also in the context menu of the dumps
+    m_saveMemAction = debugMenu->addAction(tr("Save memory..."), this, &DbgWindow::onSaveMemory);
+    m_loadMemAction = debugMenu->addAction(tr("Load memory..."), this, &DbgWindow::onLoadMemory);
+    m_saveMemAction->setShortcut(QKeySequence("F12"));
+    m_loadMemAction->setShortcut(QKeySequence("Shift+F12"));
+    m_saveMemAction->setShortcutContext(Qt::WindowShortcut);
+    m_loadMemAction->setShortcutContext(Qt::WindowShortcut);
 
     // Code view actions, also in its context menu
     QMenu* codeMenu = menuBar()->addMenu(tr("Code"));
@@ -255,6 +263,10 @@ void DbgWindow::createDocks()
         m_viewMenu->addAction(dock->toggleViewAction());
         m_memPanels[i] = panel;
         m_memDocks[i] = dock;
+
+        QAction* separator = new QAction(this);
+        separator->setSeparator(true);
+        panel->getView()->addActions({separator, m_saveMemAction, m_loadMemAction});
     }
     QDockWidget* memDock = m_memDocks[0];
 
@@ -393,6 +405,30 @@ void DbgWindow::activateMemoryPanel()
 }
 
 
+// The dialog starts with the memory and the cursor of the last active dump
+void DbgWindow::memoryFileDialog(DbgMemFileDialog::Mode mode)
+{
+    if (m_session->isRunning())
+        return;
+    DbgMemView* view = m_memPanels[m_activeMem]->getView();
+    DbgMemFileDialog dialog(m_session, mode, mode == DbgMemFileDialog::MODE_SAVE ? m_saveMemParams : m_loadMemParams,
+                            view->getMemory(), view->getCursorAddr(), this);
+    dialog.exec();
+}
+
+
+void DbgWindow::onSaveMemory()
+{
+    memoryFileDialog(DbgMemFileDialog::MODE_SAVE);
+}
+
+
+void DbgWindow::onLoadMemory()
+{
+    memoryFileDialog(DbgMemFileDialog::MODE_LOAD);
+}
+
+
 // In the last active dump if it's open, else in the first one
 void DbgWindow::showInMemory(uint16_t addr)
 {
@@ -486,7 +522,7 @@ void DbgWindow::updateRunState()
 {
     QAction* stoppedActions[] = {m_runAction, m_stepIntoAction, m_stepOverAction, m_stepOutAction,
                                  m_runToCursorAction, m_skipAction, m_setPcAction, m_gotoPcAction, m_gotoAddrAction,
-                                 m_showInMemoryAction};
+                                 m_showInMemoryAction, m_saveMemAction, m_loadMemAction};
     for (QAction* action : stoppedActions)
         action->setEnabled(!m_running);
     m_breakAction->setEnabled(m_running);

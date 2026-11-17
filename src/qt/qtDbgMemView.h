@@ -22,12 +22,17 @@
 #include <vector>
 
 #include <QAbstractScrollArea>
+#include <QStringList>
 #include <QWidget>
 
 class QAction;
 class QComboBox;
 class QLineEdit;
 class DebugSession;
+
+
+// Items of a memory selector: short names and sizes of the debugger memories
+QStringList dbgMemoryNames(DebugSession* session);
 
 
 // Hex dump of one of the debugger memories (DebugSession::getMemories()): address,
