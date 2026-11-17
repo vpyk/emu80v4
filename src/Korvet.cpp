@@ -18,6 +18,7 @@
 
 #include <cstring>
 #include <sstream>
+#include <iomanip>
 
 #include "Pal.h"
 
@@ -102,7 +103,17 @@ bool KorvetAddrSpace::setProperty(const string& propertyName, const EmuValuesLis
 
 void KorvetAddrSpaceSelector::writeByte(int, uint8_t value)
 {
-    m_korvetAddrSpace->setMemCfg(value & 0x7C);
+    m_sysReg = value & 0x7C;
+    m_korvetAddrSpace->setMemCfg(m_sysReg);
+}
+
+
+string KorvetAddrSpaceSelector::getDebugInfo()
+{
+    stringstream ss;
+    ss << "SysReg:" << "\n";
+    ss << setw(2) << setfill('0') << uppercase << hex << int(m_sysReg) << ' ' << c_memMapNames[m_sysReg >> 2] << "\n";
+    return ss.str();
 }
 
 

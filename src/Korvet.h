@@ -66,10 +66,20 @@ class KorvetAddrSpaceSelector : public AddressableDevice
         void writeByte(int, uint8_t value) override;
         uint8_t readByte(int)  override {return 0xff;}
 
+        std::string getDebugInfo() override;
+
         static EmuObject* create(const EmuValuesList&) {return new KorvetAddrSpaceSelector();}
 
     private:
+        const char* c_memMapNames[32] = {
+            "TRS80", "", "", "", "", "NDOS", "ROMB1", "ODOSA",
+            "ROMB2", "", "", "", "", "",     "",      "DOSG1",
+            "BASIC", "", "", "", "", "",     "",      "DOSA"
+            "BASG",  "", "", "", "", "",     "",      ""
+        };
+
         KorvetAddrSpace* m_korvetAddrSpace = nullptr;
+        uint8_t m_sysReg = 0;
 };
 
 
