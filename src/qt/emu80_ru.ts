@@ -285,6 +285,31 @@
     <name>DbgWindow</name>
     <message>
         <location filename="qtDbgWindow.cpp"/>
+        <source>Go to panel</source>
+        <translation>Перейти к панели</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Memory</source>
+        <translation>Память</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Next panel</source>
+        <translation>Следующая панель</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Previous panel</source>
+        <translation>Предыдущая панель</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
+        <source>Show in memory</source>
+        <translation>Показать в памяти</translation>
+    </message>
+    <message>
+        <location filename="qtDbgWindow.cpp"/>
         <source>Reset layout</source>
         <translation>Сбросить раскладку</translation>
     </message>

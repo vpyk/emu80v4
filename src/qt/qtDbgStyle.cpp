@@ -16,8 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAbstractScrollArea>
+#include <QContextMenuEvent>
 #include <QFontDatabase>
 #include <QFontMetrics>
+#include <QMenu>
 #include <QPalette>
 
 #include "qtDbgStyle.h"
@@ -107,4 +110,19 @@ DbgColors::DbgColors(const QPalette& palette)
     }
 
     stalePcBackground = dbgMixColors(staleBackground, pcBackground, 0.5);
+}
+
+
+void dbgShowContextMenu(QAbstractScrollArea* view, QContextMenuEvent* event, const QRect& cursorRect)
+{
+    if (view->actions().isEmpty())
+        return;
+    QPoint pos = event->globalPos();
+    if (event->reason() == QContextMenuEvent::Keyboard) {
+        QWidget* viewport = view->viewport();
+        QRect rect = cursorRect.intersected(viewport->rect());
+        pos = viewport->mapToGlobal(rect.isEmpty() ? viewport->rect().center() : rect.bottomLeft() + QPoint(0, 1));
+    }
+    QMenu::exec(view->actions(), pos, nullptr, view);
+    event->accept();
 }

@@ -311,6 +311,8 @@ DbgBreakpointsPanel::DbgBreakpointsPanel(DebugSession* session, QWidget* parent)
     layout->addLayout(buttonLayout);
     layout->addWidget(m_table, 1);
 
+    setFocusProxy(m_table);
+
     refresh();
     m_table->resizeColumnsToContents();
 }

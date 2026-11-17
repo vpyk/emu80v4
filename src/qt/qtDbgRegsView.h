@@ -46,6 +46,7 @@ public slots:
 
 protected:
     void changeEvent(QEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
     struct Reg {
@@ -69,6 +70,7 @@ private:
     void updateEnabled();
     void commitEdit(Reg& reg);
     void commitCheck(Reg& reg, bool checked);
+    Reg* findEdit(QObject* obj);
 };
 
 

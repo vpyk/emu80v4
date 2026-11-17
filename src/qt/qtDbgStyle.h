@@ -24,7 +24,10 @@
 #include <QColor>
 #include <QFont>
 
+class QAbstractScrollArea;
+class QContextMenuEvent;
 class QPalette;
+class QRect;
 
 
 // The font of the debugger panels (monospace)
@@ -81,6 +84,10 @@ QColor dbgMixColors(const QColor& c1, const QColor& c2, double k);
 
 // Colors with the outdated look applied (a breakpoint marker while running etc.)
 QColor dbgStaleColor(const DbgColors& colors, const QColor& color);
+
+// Shows the context menu of a view from its actions: at the mouse pointer, or under
+// the cursor (cursorRect, in viewport coordinates) when opened from the keyboard
+void dbgShowContextMenu(QAbstractScrollArea* view, QContextMenuEvent* event, const QRect& cursorRect);
 
 
 #endif // QTDBGSTYLE_H

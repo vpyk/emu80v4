@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include <QAction>
+#include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPainter>
@@ -51,7 +52,6 @@ DbgStackView::DbgStackView(DebugSession* session, QWidget* parent)
 {
     setFont(dbgFont());
     setFocusPolicy(Qt::StrongFocus);
-    setContextMenuPolicy(Qt::ActionsContextMenu);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     updateFontMetrics();
@@ -68,6 +68,11 @@ DbgStackView::DbgStackView(DebugSession* session, QWidget* parent)
     connect(m_showItemInMemoryAction, &QAction::triggered, this, [this]() {
         emit showInMemory(itemAddr(m_cursorItem));
     });
+    // Ctrl-K, Ctrl-M: as "show in code" and "show in memory" in the other views
+    m_showInCodeAction->setShortcut(QKeySequence("Ctrl+K"));
+    m_showInMemoryAction->setShortcut(QKeySequence("Ctrl+M"));
+    m_showInCodeAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    m_showInMemoryAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     addActions({m_showInCodeAction, m_showInMemoryAction, m_showItemInMemoryAction});
     updateActions();
 }
@@ -350,6 +355,17 @@ void DbgStackView::keyPressEvent(QKeyEvent* event)
         break;
     }
     QAbstractScrollArea::keyPressEvent(event);
+}
+
+
+// From the keyboard (the menu key, Shift-F10) the menu is shown under the cursor line
+void DbgStackView::contextMenuEvent(QContextMenuEvent* event)
+{
+    QRect cursorRect;
+    int line = m_cursorItem - m_firstItem;
+    if (canNavigate() && line >= 0 && line <= visibleLines())
+        cursorRect = QRect(m_charWidth * 4, line * m_lineHeight, m_charWidth * 4, m_lineHeight);
+    dbgShowContextMenu(this, event, cursorRect);
 }
 
 

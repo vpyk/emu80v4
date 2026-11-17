@@ -98,6 +98,7 @@ private:
     QAction* m_setPcAction;
     QAction* m_gotoPcAction;
     QAction* m_gotoAddrAction;
+    QAction* m_showInMemoryAction;
     DbgCodeView* m_codeView;
     DbgRegsView* m_regsView;
     // the dumps; "show in memory" uses the last active one
@@ -107,6 +108,14 @@ private:
     DbgStackView* m_stackView;
     DbgBreakpointsPanel* m_bpPanel;
     QMenu* m_viewMenu;
+
+    // panels in the order of Ctrl-Tab: the code view and the docks (dock is null for
+    // the code view); focus gets the keyboard when the panel is activated
+    struct Panel {
+        QDockWidget* dock;
+        QWidget* focus;
+    };
+    std::vector<Panel> m_panels;
     QLabel* m_statusLabel;
     QLabel* m_ticksLabel;
     QAction* m_resetTicksAction;
@@ -141,6 +150,12 @@ private:
     void checkState(bool forceRefresh);
     void updateRunState();
     void showInMemory(uint16_t addr);
+    void createPanelActions(QMenu* menu);
+    int currentPanel();
+    bool isPanelOpen(int index);
+    void activatePanel(int index);
+    void activateNextPanel(bool forward);
+    void activateMemoryPanel();
     void saveLayout();
     void restoreLayout();
     uint64_t cpuTicks();

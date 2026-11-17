@@ -65,6 +65,7 @@ protected:
     void focusInEvent(QFocusEvent* event) override;
     void focusOutEvent(QFocusEvent* event) override;
     void showEvent(QShowEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     struct Line {

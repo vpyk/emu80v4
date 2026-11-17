@@ -61,6 +61,7 @@ protected:
     void changeEvent(QEvent* event) override;
     void focusInEvent(QFocusEvent* event) override;
     void focusOutEvent(QFocusEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     DebugSession* m_session;

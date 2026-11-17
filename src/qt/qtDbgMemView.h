@@ -47,6 +47,7 @@ public:
     void setMemory(int memory);
     int getMemory() {return m_memory;}
     unsigned getCursorAddr() {return m_cursorAddr;}
+    int getAddrDigits() {return m_addrDigits;}
     void gotoAddr(unsigned addr);
     unsigned getSize() {return m_size;}
 
@@ -63,6 +64,7 @@ public:
 
 signals:
     void focused();
+    void gotoAddressRequested(); // Ctrl-G in the dump
 
 public slots:
     void onStateChanged(bool newStop);
@@ -78,6 +80,8 @@ protected:
     void focusInEvent(QFocusEvent* event) override;
     void focusOutEvent(QFocusEvent* event) override;
     bool focusNextPrevChild(bool next) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
+    bool event(QEvent* event) override;
 
 private:
     DebugSession* m_session;
@@ -146,6 +150,7 @@ private slots:
     void onAddressEntered();
     void onBreakpoint(int type);
     void onFind(bool forward);
+    void onGotoAddress();
 
 private:
     DebugSession* m_session;
@@ -159,6 +164,7 @@ private:
     QAction* m_showInCodeAction;
 
     void updateActions();
+    bool eventFilter(QObject* obj, QEvent* event) override;
     // hex bytes ("C3 00 F8", "C300F8") or text in quotes ("TEXT" or "TEXT)
     bool parsePattern(const QString& text, std::vector<uint8_t>& bytes);
 };

@@ -18,6 +18,7 @@
 
 #include <algorithm>
 
+#include <QContextMenuEvent>
 #include <QInputDialog>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -57,7 +58,6 @@ DbgCodeView::DbgCodeView(DebugSession* session, QWidget* parent)
 {
     setFont(dbgFont());
     setFocusPolicy(Qt::StrongFocus);
-    setContextMenuPolicy(Qt::ActionsContextMenu);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     verticalScrollBar()->setRange(0, 0xFFFF);
@@ -491,6 +491,20 @@ void DbgCodeView::keyPressEvent(QKeyEvent* event)
     default:
         QAbstractScrollArea::keyPressEvent(event);
     }
+}
+
+
+// From the keyboard (the menu key, Shift-F10) the menu is shown under the cursor line
+void DbgCodeView::contextMenuEvent(QContextMenuEvent* event)
+{
+    QRect cursorRect;
+    for (int i = 0; i < int(m_lines.size()); i++)
+        if (m_lines[i].addr == m_cursorAddr) {
+            int x = (c_gutterChars + c_addrChars) * m_charWidth;
+            cursorRect = QRect(x, i * m_lineHeight, m_charWidth * 4, m_lineHeight);
+            break;
+        }
+    dbgShowContextMenu(this, event, cursorRect);
 }
 
 

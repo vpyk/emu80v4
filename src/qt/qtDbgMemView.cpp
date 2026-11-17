@@ -18,6 +18,7 @@
 
 #include <QAction>
 #include <QComboBox>
+#include <QContextMenuEvent>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
@@ -49,6 +50,11 @@ QString hex(unsigned value, int digits)
 // Cyrillic letters of KOI-8 at C0h...FFh
 const char* c_koi8Cyrillic = u8"юабцдефгхийклмнопярстужвьызшэщчъЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧЪ";
 
+bool isGotoKey(const QKeyEvent* event)
+{
+    return event->key() == Qt::Key_G && event->modifiers() == Qt::ControlModifier;
+}
+
 } // namespace
 
 
@@ -59,7 +65,6 @@ DbgMemView::DbgMemView(DebugSession* session, QWidget* parent)
 {
     setFont(dbgFont());
     setFocusPolicy(Qt::StrongFocus);
-    setContextMenuPolicy(Qt::ActionsContextMenu);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     updateFontMetrics();
@@ -435,6 +440,10 @@ void DbgMemView::keyPressEvent(QKeyEvent* event)
 
     long page = long(visibleLines() - 1) * m_bytesPerLine;
     bool ctrl = event->modifiers() & Qt::ControlModifier;
+    if (isGotoKey(event)) {
+        emit gotoAddressRequested();
+        return;
+    }
     switch (event->key()) {
     case Qt::Key_Left:
         moveCursor(-1);
@@ -504,6 +513,32 @@ void DbgMemView::keyPressEvent(QKeyEvent* event)
 }
 
 
+// Ctrl-G in the dump goes to the panel's address field instead of the code view's
+// "go to address" (a window shortcut): the key is taken before shortcuts
+bool DbgMemView::event(QEvent* event)
+{
+    if (event->type() == QEvent::ShortcutOverride && canNavigate() && isGotoKey(static_cast<QKeyEvent*>(event))) {
+        event->accept();
+        return true;
+    }
+    return QAbstractScrollArea::event(event);
+}
+
+
+// From the keyboard (the menu key, Shift-F10) the menu is shown under the cursor
+void DbgMemView::contextMenuEvent(QContextMenuEvent* event)
+{
+    QRect cursorRect;
+    unsigned line = m_cursorAddr / m_bytesPerLine;
+    if (canNavigate() && line >= m_topLine && line <= m_topLine + visibleLines()) {
+        int i = m_cursorAddr % m_bytesPerLine;
+        int x = m_charMode ? charsX() + i * m_charWidth : byteX(i) - m_charWidth / 2;
+        cursorRect = QRect(x, (line - m_topLine) * m_lineHeight, m_charWidth * 3, m_lineHeight);
+    }
+    dbgShowContextMenu(this, event, cursorRect);
+}
+
+
 void DbgMemView::mousePressEvent(QMouseEvent* event)
 {
     if (!canNavigate())
@@ -567,6 +602,11 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
 
     m_view = new DbgMemView(session, this);
     connect(m_view, &DbgMemView::focused, this, &DbgMemPanel::activated);
+    connect(m_view, &DbgMemView::gotoAddressRequested, this, &DbgMemPanel::onGotoAddress);
+
+    // Esc in the fields returns to the dump
+    m_addrEdit->installEventFilter(this);
+    m_searchEdit->installEventFilter(this);
 
     QHBoxLayout* topLayout = new QHBoxLayout;
     topLayout->addWidget(m_memoryCombo);
@@ -614,6 +654,8 @@ DbgMemPanel::DbgMemPanel(DebugSession* session, QWidget* parent)
     connect(m_showInCodeAction, &QAction::triggered, this, [this]() {
         emit showInCode(uint16_t(m_view->getCursorAddr()));
     });
+    m_showInCodeAction->setShortcut(QKeySequence("Ctrl+K"));
+    m_showInCodeAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     QAction* separator = new QAction(this);
     separator->setSeparator(true);
     m_view->addActions({m_readBpAction, m_writeBpAction, m_accessBpAction, separator, m_showInCodeAction});
@@ -636,6 +678,33 @@ void DbgMemPanel::onMemoryChanged(int index)
 {
     m_view->setMemory(index);
     updateActions();
+}
+
+
+// Ctrl-G in the dump: the address field with the cursor address
+void DbgMemPanel::onGotoAddress()
+{
+    if (!m_addrEdit->isEnabled())
+        return;
+    m_addrEdit->setText(hex(m_view->getCursorAddr(), m_view->getAddrDigits()));
+    m_addrEdit->setFocus();
+    m_addrEdit->selectAll();
+}
+
+
+bool DbgMemPanel::eventFilter(QObject* obj, QEvent* event)
+{
+    if ((obj == m_addrEdit || obj == m_searchEdit) &&
+            (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress) &&
+            static_cast<QKeyEvent*>(event)->key() == Qt::Key_Escape &&
+            static_cast<QKeyEvent*>(event)->modifiers() == Qt::NoModifier) {
+        // the window's Esc (go to the code view) is overridden
+        if (event->type() == QEvent::KeyPress)
+            m_view->setFocus();
+        event->accept();
+        return true;
+    }
+    return QWidget::eventFilter(obj, event);
 }
 
 

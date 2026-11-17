@@ -20,6 +20,7 @@
 #include <QEvent>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
 #include <QVBoxLayout>
@@ -86,6 +87,9 @@ void DbgRegsView::createWidgets()
             reg.edit->setFixedWidth(metrics.charWidth * (reg.digits + 2) + 6);
             QLineEdit* edit = reg.edit;
             connect(edit, &QLineEdit::editingFinished, this, [this, i]() {commitEdit(m_regs[i]);});
+            edit->installEventFilter(this);
+            if (!focusProxy())
+                setFocusProxy(edit); // the panel is activated from the keyboard with the first field
             widget = edit;
         } else {
             reg.check = new QCheckBox(QString::fromUtf8(info.name), this);
@@ -220,6 +224,37 @@ void DbgRegsView::updateEnabled()
         else
             reg.check->setEnabled(enabled);
     }
+}
+
+
+DbgRegsView::Reg* DbgRegsView::findEdit(QObject* obj)
+{
+    for (Reg& reg : m_regs)
+        if (reg.edit && reg.edit == obj)
+            return &reg;
+    return nullptr;
+}
+
+
+// Esc in a field being edited restores the value; in an unchanged field it goes on
+// to the window (to the code view)
+bool DbgRegsView::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        Reg* reg = findEdit(obj);
+        if (reg && keyEvent->key() == Qt::Key_Escape && keyEvent->modifiers() == Qt::NoModifier &&
+                reg->edit->isModified()) {
+            if (event->type() == QEvent::KeyPress) {
+                reg->edit->setText(hex(reg->value, reg->digits));
+                reg->edit->setModified(false);
+                reg->edit->selectAll();
+            }
+            event->accept();
+            return true;
+        }
+    }
+    return QWidget::eventFilter(obj, event);
 }
 
 

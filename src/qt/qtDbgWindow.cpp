@@ -16,7 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <functional>
+
 #include <QAction>
+#include <QApplication>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QSettings>
@@ -184,11 +187,17 @@ void DbgWindow::createActions()
     codeMenu->addSeparator();
     m_gotoPcAction = codeAction(tr("Go to PC") + "\tHome", &DbgCodeView::gotoPc); // Home is handled by the view
     m_gotoAddrAction = codeAction(tr("Go to address..."), &DbgCodeView::gotoAddress);
+    // only in the code view: Ctrl-M is "show value in memory" in the stack view too
+    m_showInMemoryAction = new QAction(tr("Show in memory"), this);
+    m_showInMemoryAction->setShortcut(QKeySequence("Ctrl+M"));
+    m_showInMemoryAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    connect(m_showInMemoryAction, &QAction::triggered, this, [this]() {showInMemory(m_codeView->getCursorAddr());});
+    codeMenu->addAction(m_showInMemoryAction);
 
     QAction* separator = new QAction(this);
     separator->setSeparator(true);
     m_codeView->addActions({m_breakpointAction, m_runToCursorAction, m_setPcAction, separator,
-                            m_gotoPcAction, m_gotoAddrAction});
+                            m_gotoPcAction, m_gotoAddrAction, m_showInMemoryAction});
 
     updateShortcuts();
 }
@@ -197,6 +206,8 @@ void DbgWindow::createActions()
 void DbgWindow::createDocks()
 {
     m_viewMenu = menuBar()->addMenu(tr("View"));
+    QMenu* gotoMenu = m_viewMenu->addMenu(tr("Go to panel"));
+    m_viewMenu->addSeparator();
 
     m_regsView = new DbgRegsView(m_session, this);
     connect(this, &DbgWindow::stateChanged, m_regsView, &DbgRegsView::onStateChanged);
@@ -280,6 +291,105 @@ void DbgWindow::createDocks()
 
     m_viewMenu->addSeparator();
     m_viewMenu->addAction(tr("Reset layout"), this, &DbgWindow::onResetLayout);
+
+    m_panels = {{nullptr, m_codeView}, {regsDock, m_regsView}, {stackDock, m_stackView},
+                {m_memDocks[0], m_memPanels[0]->getView()}, {m_memDocks[1], m_memPanels[1]->getView()},
+                {bpDock, m_bpPanel}, {devicesDock, devicesView}};
+    createPanelActions(gotoMenu);
+}
+
+
+// Keyboard access to the panels, as the letter keys of the classic debug window
+// (Alt-D is "Break", so memory is Alt-M)
+void DbgWindow::createPanelActions(QMenu* menu)
+{
+    auto panelAction = [&](const QString& text, const char* key, std::function<void()> slot) {
+        QAction* action = new QAction(text, this);
+        action->setShortcut(QKeySequence(key));
+        action->setShortcutContext(Qt::WindowShortcut);
+        connect(action, &QAction::triggered, this, slot);
+        menu->addAction(action);
+        addAction(action);
+        return action;
+    };
+    QAction* codeAction = panelAction(tr("Code"), "Alt+C", [this]() {activatePanel(0);});
+    codeAction->setShortcuts({QKeySequence("Alt+C"), QKeySequence(Qt::Key_Escape)});
+    panelAction(tr("Registers"), "Alt+R", [this]() {activatePanel(1);});
+    panelAction(tr("Stack"), "Alt+S", [this]() {activatePanel(2);});
+    panelAction(tr("Memory"), "Alt+M", [this]() {activateMemoryPanel();});
+    panelAction(tr("Breakpoints"), "Alt+B", [this]() {activatePanel(5);});
+    panelAction(tr("Devices"), "Alt+V", [this]() {activatePanel(6);});
+    menu->addSeparator();
+    panelAction(tr("Next panel"), "Ctrl+Tab", [this]() {activateNextPanel(true);});
+    panelAction(tr("Previous panel"), "Ctrl+Shift+Tab", [this]() {activateNextPanel(false);});
+}
+
+
+// The panel with the keyboard focus, -1 if none
+int DbgWindow::currentPanel()
+{
+    QWidget* focus = QApplication::focusWidget();
+    if (!focus)
+        return -1;
+    for (int i = 0; i < int(m_panels.size()); i++) {
+        const Panel& panel = m_panels[i];
+        if (panel.dock ? panel.dock->isAncestorOf(focus) : focus == m_codeView)
+            return i;
+    }
+    return -1;
+}
+
+
+// Not closed (it may be under another tab)
+bool DbgWindow::isPanelOpen(int index)
+{
+    QDockWidget* dock = m_panels[index].dock;
+    return !dock || dock->toggleViewAction()->isChecked();
+}
+
+
+// Opens the panel if it's closed, brings its tab to front and gives it the keyboard
+void DbgWindow::activatePanel(int index)
+{
+    if (index == currentPanel())
+        return;
+    const Panel& panel = m_panels[index];
+    if (panel.dock) {
+        panel.dock->show();
+        panel.dock->raise();
+    }
+    panel.focus->window()->activateWindow(); // a floating dock is a window of its own
+    panel.focus->setFocus(Qt::ShortcutFocusReason);
+}
+
+
+// The open panels in turn
+void DbgWindow::activateNextPanel(bool forward)
+{
+    int n = int(m_panels.size());
+    int index = currentPanel();
+    if (index < 0)
+        index = 0;
+    for (int i = 1; i < n; i++) {
+        int next = (index + (forward ? i : n - i)) % n;
+        if (isPanelOpen(next)) {
+            activatePanel(next);
+            return;
+        }
+    }
+}
+
+
+// The last active dump; pressed again in a dump, the other one if it's open
+void DbgWindow::activateMemoryPanel()
+{
+    const int first = 3; // the dumps in m_panels
+    int index = currentPanel();
+    bool inMemory = index == first || index == first + 1;
+    int target = inMemory ? (index == first ? first + 1 : first) : first + m_activeMem;
+    if (!isPanelOpen(target))
+        target = inMemory ? index : first; // the first dump is opened if closed
+    activatePanel(target);
 }
 
 
@@ -375,7 +485,8 @@ void DbgWindow::checkState(bool forceRefresh)
 void DbgWindow::updateRunState()
 {
     QAction* stoppedActions[] = {m_runAction, m_stepIntoAction, m_stepOverAction, m_stepOutAction,
-                                 m_runToCursorAction, m_skipAction, m_setPcAction, m_gotoPcAction, m_gotoAddrAction};
+                                 m_runToCursorAction, m_skipAction, m_setPcAction, m_gotoPcAction, m_gotoAddrAction,
+                                 m_showInMemoryAction};
     for (QAction* action : stoppedActions)
         action->setEnabled(!m_running);
     m_breakAction->setEnabled(m_running);
